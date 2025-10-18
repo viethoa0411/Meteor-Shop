@@ -111,4 +111,11 @@ class UserController extends Controller
         $users = User::onlyTrashed()->paginate(15);
         return view('admin.users.trash', compact('users'));
     }
+    /**  Khôi phục người dùng đã xóa mềm */
+    public function restore($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->restore();
+        return redirect()->route('admin.users.trash')->with('success', 'Khôi phục người dùng thành công.');
+    }
 }
