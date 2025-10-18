@@ -118,4 +118,11 @@ class UserController extends Controller
         $user->restore();
         return redirect()->route('admin.users.trash')->with('success', 'Khôi phục người dùng thành công.');
     }
+    /** Xóa vĩnh viễn khỏi CSDL */
+    public function forceDelete($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->forceDelete();
+        return redirect()->route('admin.users.trash')->with('success', 'Đã xóa vĩnh viễn người dùng.');
+    }
 }
