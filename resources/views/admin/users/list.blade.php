@@ -1,5 +1,8 @@
-
 @extends('admin.layouts.app')
+
+@section('title','Danh sách người dùng')
+
+@section('content')
 
 <style>
 :root{
@@ -43,7 +46,7 @@ body {
 .pagination .page-link { border-radius: 6px; margin: 0 4px; color: var(--accent); border: 1px solid rgba(13,110,253,0.12); }
 .pagination .page-item.active .page-link { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 6px 18px rgba(13,110,253,0.08); }
 
-/* Responsive: make table blocks on small screens and use data-label attributes */
+/* Responsive table for mobile */
 @media (max-width: 768px) {
     .table thead { display: none; }
     .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
@@ -67,64 +70,69 @@ body {
 </style>
 
 @if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
+    <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 @if (session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
+    <div class="alert alert-danger">{{ session('error') }}</div>
 @endif
 
-@section('title','Danh sách người dùng')
-@section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Danh sách người dùng</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Danh sách người dùng</h1>
+    <div>
+        <a href="{{ route('admin.users.trash') }}" class="btn btn-secondary me-2">
+            <i class="bi bi-trash3"></i> Thùng rác
+        </a>
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Thêm người dùng
         </a>
     </div>
-    @if($users->isEmpty())
-        <p class="text-center">Chưa có người dùng nào.</p>
-    @else
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Tên</th>
-                        <th>Email</th>
-                        <th>Vai trò</th>
-                        <th>Ngày tạo</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($users as $user)
-                        <tr>
-                            <td>{{ $user->id }}</td>
-                            <td>{{ $user->name }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>{{ $user->role ?? '-' }}</td>
-                            <td>{{ $user->created_at->format('Y-m-d') }}</td>
-                            <td>
-                                {{-- <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-info">Xem</a> --}}
-                                {{-- <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-primary">Sửa</a> --}}
-                                {{-- <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Xác nhận xóa?')"> --}}
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger">Xóa</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+</div>
 
-        <div class="d-flex justify-content-center">
-            {{ $users->links() }}
-        </div>
-    @endif
+@if($users->isEmpty())
+    <p class="text-center">Chưa có người dùng nào.</p>
+@else
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Ngày tạo</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($users as $user)
+                    <tr>
+                        <td data-label="#"> {{ $user->id }} </td>
+                        <td data-label="Tên"> {{ $user->name }} </td>
+                        <td data-label="Email"> {{ $user->email }} </td>
+                        <td data-label="Vai trò"> {{ ucfirst($user->role) }} </td>
+                        <td data-label="Ngày tạo"> {{ $user->created_at->format('Y-m-d') }} </td>
+                        <td data-label="Hành động">
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-info">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </a>
+                            <form action="{{ route('admin.users.destroy', $user->id) }}"
+                                  method="POST" style="display:inline"
+                                  onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này không?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        {{ $users->links() }}
+    </div>
+@endif
 @endsection

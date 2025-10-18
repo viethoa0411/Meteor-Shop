@@ -56,4 +56,5 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.list')->with('success', 'Đã thêm người dùng thành công.');
     }
+
 }
