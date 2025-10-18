@@ -56,5 +56,46 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.list')->with('success', 'Đã thêm người dùng thành công.');
     }
+    /**  Hiển thị form sửa người dùng */
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.users.edit', compact('user'));
+    }
 
+    /**  Cập nhật người dùng */
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        // Validate dữ liệu khi sửa
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|string|min:8|confirmed',
+            'role' => 'required|in:admin,staff,user',
+            'address' => 'nullable|string|max:500',
+            'status' => 'required|in:active,inactive,banned',
+        ]);
+
+        // Cập nhật dữ liệu
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role,
+            'address' => $request->address,
+            'status' => $request->status,
+            'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
+        ]);
+
+        return redirect()->route('admin.users.list')->with('success', 'Cập nhật người dùng thành công.');
+    }
 }
