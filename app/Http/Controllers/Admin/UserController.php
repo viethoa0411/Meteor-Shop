@@ -98,4 +98,12 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.list')->with('success', 'Cập nhật người dùng thành công.');
     }
+    /**  Xóa mềm người dùng */
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete(); // Xóa mềm
+        return redirect()->route('admin.users.list')->with('success', 'Người dùng đã bị đưa vào thùng rác.');
+    }
+    
 }
