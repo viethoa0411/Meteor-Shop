@@ -105,5 +105,10 @@ class UserController extends Controller
         $user->delete(); // Xóa mềm
         return redirect()->route('admin.users.list')->with('success', 'Người dùng đã bị đưa vào thùng rác.');
     }
-    
+    /**  Hiển thị danh sách người dùng bị xóa mềm */
+    public function trash()
+    {
+        $users = User::onlyTrashed()->paginate(15);
+        return view('admin.users.trash', compact('users'));
+    }
 }
