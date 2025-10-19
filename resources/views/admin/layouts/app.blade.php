@@ -78,12 +78,14 @@
                 <a class="navbar-brand" href="#">AdminPanel</a>
                 <div class="ms-auto">
                     <div class="dropdown">
-                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button"
+                            data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i> Admin
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="#" onclick="return confirm('Đăng xuất khỏi hệ thống!!');">
+                                <a class="dropdown-item" href="#"
+                                    onclick="return confirm('Đăng xuất khỏi hệ thống!!');">
                                     Đăng xuất
                                 </a>
                             </li>
@@ -105,7 +107,7 @@
             <a href="#"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
             <a href="{{ route('admin.users.list') }}"><i class="bi bi-people-fill me-2"></i> Người dùng</a>
 
-           
+
 
             <a href="#"><i class="bi bi-gear-fill me-2"></i> Cài đặt</a>
         </aside>
@@ -118,7 +120,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <span>&copy; 2025 AdminPanel. All rights reserved.</span>
+        <span>© 2025 Xuất bản bởi <strong>Meteor-Shop</strong> — Cảm ơn bạn đã đồng hành cùng chúng tôi!</span>
     </footer>
 
     <!-- Bootstrap JS -->

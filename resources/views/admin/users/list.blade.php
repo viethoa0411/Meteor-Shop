@@ -183,13 +183,14 @@
         <p class="text-center">Chưa có người dùng nào.</p>
     @else
         <div class="table-responsive">
-            <table class="table table-striped table-bordered">
+            <table class="table table-striped table-bordered align-middle text-center">
                 <thead>
                     <tr>
                         <th>STT</th>
                         <th>Tên</th>
                         <th>Email</th>
                         <th>Vai trò</th>
+                        <th>Trạng thái</th>
                         <th>Ngày tạo</th>
                         <th>Hành động</th>
                     </tr>
@@ -197,27 +198,46 @@
                 <tbody>
                     @foreach ($users as $user)
                         <tr>
-                            <td data-label="#"> {{ $user->id }} </td>
-                            <td data-label="Tên"> {{ $user->name }} </td>
-                            <td data-label="Email"> {{ $user->email }} </td>
-                            <td data-label="Vai trò"> {{ ucfirst($user->role) }} </td>
-                            <td data-label="Ngày tạo"> {{ $user->created_at->format('Y-m-d') }} </td>
+                            <td data-label="STT">{{ $user->id }}</td>
+                            <td data-label="Tên">{{ $user->name }}</td>
+                            <td data-label="Email">{{ $user->email }}</td>
+                            <td data-label="Vai trò">{{ ucfirst($user->role) }}</td>
+
+                            {{-- Hiển thị trạng thái với màu sắc --}}
+                            <td data-label="Trạng thái">
+                                @if ($user->status === 'active')
+                                    <span class="badge bg-success">Hoạt động</span>
+                                @elseif ($user->status === 'inactive')
+                                    <span class="badge bg-warning text-dark">Không hoạt động</span>
+                                @elseif ($user->status === 'banned')
+                                    <span class="badge bg-danger">Bị cấm</span>
+                                @else
+                                    <span class="badge bg-secondary">Không xác định</span>
+                                @endif
+                            </td>
+
+                            <td data-label="Ngày tạo">{{ $user->created_at->format('Y-m-d') }}</td>
+
+                            {{-- Các nút hành động --}}
                             <td data-label="Hành động">
-                                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-info">
-                                    <i class="bi bi-pencil-square"></i> Sửa
-                                </a>
-                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
-                                    style="display:inline"
-                                    onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này không?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
-                                    </button>
+                                <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    </a>
+
+                                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
+                                        onsubmit="return confirm('Bạn có chắc muốn ẩn người dùng này không?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
+                                        </button>
+                                    </form>
+
                                     <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-secondary">
                                         <i class="bi bi-eye"></i> Xem Chi Tiết
                                     </a>
-                                </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
