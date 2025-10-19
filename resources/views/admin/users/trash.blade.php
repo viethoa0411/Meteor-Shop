@@ -35,14 +35,9 @@
                                 <form action="{{ route('admin.users.restore', $user->id) }}" method="POST"
                                     style="display:inline">
                                     @csrf
-                                    <button class="btn btn-success btn-sm">Khôi phục</button>
-                                </form>
-                                <form action="{{ route('admin.users.forceDelete', $user->id) }}" method="POST"
-                                    style="display:inline"
-                                    onsubmit="return confirm('Xác nhận xóa vĩnh viễn người dùng này?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-danger btn-sm">Xóa vĩnh viễn</button>
+                                    <button class="btn btn-success btn-sm">
+                                        <i class="bi bi-arrow-clockwise"></i> Khôi phục
+                                    </button>
                                 </form>
                             </td>
                         </tr>
