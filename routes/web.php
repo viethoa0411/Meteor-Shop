@@ -13,12 +13,15 @@ Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index']
 Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.users.create');
 Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.users.store');
 
-// ✅ Thêm mới:
+//  Thêm mới:
 Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
 Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
 Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
-// ✅ Xóa mềm & khôi phục
+//  Ẩn & khôi phục
 Route::get('/users/trash', [App\Http\Controllers\Admin\UserController::class, 'trash'])->name('admin.users.trash');
 Route::post('/users/{id}/restore', [App\Http\Controllers\Admin\UserController::class, 'restore'])->name('admin.users.restore');
 Route::delete('/users/{id}/force-delete', [App\Http\Controllers\Admin\UserController::class, 'forceDelete'])->name('admin.users.forceDelete');
+
+// Xem chi tiết
+Route::get('/users/{id}', [UserController::class, 'show'])->name('admin.users.show');

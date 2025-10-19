@@ -139,17 +139,45 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Danh sách người dùng</h1>
-        <div>
-            <a href="{{ route('admin.users.trash') }}" class="btn btn-secondary me-2">
-                <i class="bi bi-person-fill-slash"></i> Tài khoản bị ẩn
-            </a>
-            <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Thêm người dùng
-            </a>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                {{-- Tiêu đề --}}
+                <h3 class="fw-bold text-primary mb-0">
+                    <i class="bi bi-people-fill me-2"></i>Danh sách người dùng
+                </h3>
+
+                {{-- Ô tìm kiếm --}}
+                <form action="{{ route('admin.users.list') }}" method="GET"
+                    class="d-flex align-items-center flex-grow-1 mx-md-4" style="max-width: 500px;">
+                    <div class="input-group w-100">
+                        <input type="text" name="keyword" class="form-control"
+                            placeholder="VD: nguyenvana, email hoặc số điện thoại..." value="{{ request('keyword') }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                        @if (request('keyword'))
+                            <a href="{{ route('admin.users.list') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        @endif
+                    </div>
+                </form>
+
+                {{-- Nút chức năng --}}
+                <div class="d-flex flex-shrink-0 gap-2">
+                    <a href="{{ route('admin.users.trash') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-person-fill-slash"></i> Tài khoản bị ẩn
+                    </a>
+                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Thêm người dùng
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+
 
     @if ($users->isEmpty())
         <p class="text-center">Chưa có người dùng nào.</p>
@@ -158,7 +186,7 @@
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>STT</th>
                         <th>Tên</th>
                         <th>Email</th>
                         <th>Vai trò</th>
@@ -186,6 +214,9 @@
                                     <button type="submit" class="btn btn-sm btn-danger">
                                         <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
                                     </button>
+                                    <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-secondary">
+                                        <i class="bi bi-eye"></i> Xem Chi Tiết
+                                    </a>
                                 </form>
                             </td>
                         </tr>

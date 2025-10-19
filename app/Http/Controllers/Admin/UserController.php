@@ -14,12 +14,28 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Dùng paginate để view gọi $users->links() hoạt động
-        $users = User::orderBy('id', 'asc')->paginate(15);
+        $query = User::query();
+
+        // Nếu có từ khóa tìm kiếm
+        if ($request->has('keyword') && $request->keyword != '') {
+            $keyword = $request->keyword;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('email', 'like', "%{$keyword}%")
+                    ->orWhere('phone', 'like', "%{$keyword}%");
+            });
+        }
+
+        $users = $query->orderBy('id', 'asc')->paginate(15);
+
+        // Giữ lại từ khóa khi phân trang
+        $users->appends($request->only('keyword'));
+
         return view('admin.users.list', compact('users'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -56,12 +72,24 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.list')->with('success', 'Đã thêm người dùng thành công.');
     }
+
+
+    /** Hiển thị chi tiết người dùng */
+    public function show($id)
+    {
+        $user = User::withTrashed()->findOrFail($id); // lấy cả user đã ẩn
+        return view('admin.users.show', compact('user'));
+    }
+
+
     /**  Hiển thị form sửa người dùng */
     public function edit($id)
     {
         $user = User::findOrFail($id);
         return view('admin.users.edit', compact('user'));
     }
+
+
 
     /**  Cập nhật người dùng */
     public function update(Request $request, $id)
@@ -85,6 +113,8 @@ class UserController extends Controller
             'status' => 'required|in:active,inactive,banned',
         ]);
 
+
+
         // Cập nhật dữ liệu
         $user->update([
             'name' => $request->name,
@@ -98,6 +128,8 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.list')->with('success', 'Cập nhật người dùng thành công.');
     }
+
+
     /**  Xóa mềm người dùng */
     public function destroy($id)
     {
@@ -105,12 +137,17 @@ class UserController extends Controller
         $user->delete(); // Xóa mềm
         return redirect()->route('admin.users.list')->with('success', 'Người dùng đã bị đưa vào thùng rác.');
     }
+
+
     /**  Hiển thị danh sách người dùng bị xóa mềm */
     public function trash()
     {
         $users = User::onlyTrashed()->paginate(15);
         return view('admin.users.trash', compact('users'));
     }
+
+
+
     /**  Khôi phục người dùng đã xóa mềm */
     public function restore($id)
     {
@@ -118,5 +155,4 @@ class UserController extends Controller
         $user->restore();
         return redirect()->route('admin.users.trash')->with('success', 'Khôi phục người dùng thành công.');
     }
-    
 }
