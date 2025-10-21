@@ -100,7 +100,7 @@
         <aside class="sidebar">
             <h5 class="text-center py-3 border-bottom border-secondary">Quản trị</h5>
             <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
-            <a href="#"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
+            <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="#"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
             <a href="#"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
 
