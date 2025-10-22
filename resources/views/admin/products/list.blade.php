@@ -32,9 +32,9 @@
         @endif
         
         {{-- Ô tìm kiếm  --}}
-        <form action="" method="GET" class="mb-4">
+        <form method="GET" class="mb-4">
             <div class="flex gap-2">
-                <input type="text" name="name" value="{{ request('search') }}" placeholder="Tìm theo tên..."
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm theo tên..."
                 class="border rounded px-3 py-2 w-full">
                 <button class="border rounded px-4 py-2">Tìm</button>
             </div>

@@ -31,8 +31,8 @@ class ProductController extends Controller
 
         if ($search = trim((string) $req->get('search'))) {
             $q->where(function ($x) use ($search) {
-                $x  ->where('name', 'like', "%($search)")
-                    ->orWhere('slug', 'like', "%($search)");
+                $x->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%");
             });
         }
         
