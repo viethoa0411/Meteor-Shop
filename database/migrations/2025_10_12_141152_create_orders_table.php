@@ -19,12 +19,15 @@ return new class extends Migration
             $table->decimal('total_price', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
             $table->decimal('final_total', 10, 2);
+            $table->decimal('shipping_fee', 10, 2)->default(0);
             $table->enum('payment_method', ['cash', 'bank', 'momo', 'paypal'])->default('cash');
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
-            $table->enum('order_status', ['pending', 'processing', 'completed', 'cancelled'])->default('pending');
+            $table->enum('order_status', ['pending', 'processing', 'completed', 'cancelled', 'refunded'])->default('pending');
             $table->text('shipping_address');
             $table->string('shipping_phone')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             // Khóa ngoại
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
