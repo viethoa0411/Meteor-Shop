@@ -17,8 +17,9 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
-            $table->integer('stock')->default(0);
-            $table->string('image')->nullable(); // ảnh đại diện sản phẩm
+            $table->integer('stock')->default(0); 
+            $table->string('image')->nullable(); 
+            $table->json('gallery')->nullable();
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('brand_id')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
