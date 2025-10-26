@@ -80,14 +80,25 @@
                     <div class="dropdown">
                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button"
                             data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> Admin
+                            <i class="bi bi-person-circle"></i>
+                            {{ Auth::user()->name ?? 'Admin' }}
+                            <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="#"
-                                    onclick="return confirm('Đăng xuất khỏi hệ thống!!');">
-                                    Đăng xuất
+                                <a class="dropdown-item" href="#">
+                                    <i class="bi bi-person"></i> Hồ sơ
                                 </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item"
+                                            onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
+                                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>
