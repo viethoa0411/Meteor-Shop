@@ -76,5 +76,34 @@ class AdminController extends Controller
        
         return redirect()->route('admin.account.admin.list')->with('success', 'Đã thêm người dùng thành công.');
     }
+    // Chức năng sửa tài khoản admin
+    public function edit($id)
+    {
+        // Bước 1: Tìm admin theo ID (chỉ lấy admin chưa bị ẩn)
+        $user = User::findOrFail($id);
+
+        // Bước 2: Trả về view form chỉnh sửa với dữ liệu admin
+        return view('admin.account.admin.edit', compact('user'));
+    }
+    
+    //  * CẬP NHẬT THÔNG TIN ADMIN
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role,
+            'address' => $request->address,
+            'status' => $request->status,
+            'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
+        ]);
+
+        return redirect()->route('admin.account.admin.list')->with('success', 'Cập nhật người dùng thành công.');
+    }
 
 }

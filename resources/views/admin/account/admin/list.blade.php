@@ -154,7 +154,7 @@
      <div class="card shadow-sm">
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-
+                
               
 
                 {{-- Nút chức năng --}}
@@ -207,7 +207,12 @@
                             </td>
 
                             <td data-label="Ngày tạo">{{ $user->created_at->format('Y-m-d') }}</td>
-
+                                {{-- Các nút hành động --}}
+                            <td data-label="Hành động">
+                                <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                                    <a href="{{ route('admin.account.admin.edit', $user->id) }}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    </a>
                                 </div>
                             </td>
                         </tr>
