@@ -72,6 +72,8 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
+        // dd($request->all()); //test
+
         $data = $request->validated();
 
         // Tự tạo slug nếu bỏ trống
@@ -95,14 +97,14 @@ class ProductController extends Controller
                 ->filter(fn($c)  => !empty($c['code']))->values();
 
             $sizes = collect($request->input('sizes', []))
-                ->filter(fn($s)  =>Arr::has($s, ['length', 'color_name', 'height']))->values();
+                ->filter(fn($s)  =>Arr::has($s, ['length', 'width', 'height']))->values();
 
             // mặc định giá/stock cho biến thể
             $basePrice = $data['variant_price'] ?? ($data['price'] ?? null);
             $baseStock = $data['variant_stock'] ?? ($data['stock'] ?? 0);
 
             // sinh tổ hợp
-            $variant = [];
+            $variants = [];
 
             if ($colors->isEmpty() && $sizes->isEmpty()) {
                  // không tạo biến thể
@@ -110,10 +112,11 @@ class ProductController extends Controller
                 foreach ($sizes as $sz) {
                     $variants[] = [
                         'length'    => $sz['length'],
-                        'width'     => $sz['length'],
-                        'height'    => $sz['length'],
+                        'width'     => $sz['width'],
+                        'height'    => $sz['height'],
                         'price'     => $basePrice,
                         'stock'     => $baseStock,
+                        'sku' => strtoupper(Str::random(8)),
                     ];
                 }
             } elseif ($sizes->isEmpty()) {
@@ -123,6 +126,7 @@ class ProductController extends Controller
                         'color_code'     => $c['code'],
                         'price'          => $basePrice,
                         'stock'          => $baseStock,
+                        'sku' => strtoupper(Str::random(8)),
                     ];
                 }
             } else {
@@ -132,10 +136,12 @@ class ProductController extends Controller
                             'color_name'     => $c['name'] ?? null,
                             'color_code'     => $c['code'],
                             'length'         => $sz['length'],
-                            'width'          => $sz['length'],
-                            'height'         => $sz['length'],
+                            'width'          => $sz['width'],
+                            'height'         => $sz['height'],
                             'price'          => $basePrice,
                             'stock'          => $baseStock,
+                            'sku' => strtoupper(Str::random(8)),
+
                         ];
                     }
                 }

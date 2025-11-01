@@ -71,6 +71,27 @@
                                 </div>
                             </div>
 
+                            {{-- Biến thể --}}
+                            <h5>Biến thể đã lưu</h5>
+                                <div class="row">
+                                    @foreach ($product->variants as $v)
+                                        <div class="col-md-4 mb-3">
+                                            <div class="border p-3 rounded">
+                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                    <span style="width: 18px; height:18px; border:1px solid #000; background:{{ $v->color_code }}; display:inline-block"></span>
+                                                    <strong>{{ $v->color_name ?? 'Màu' }}</strong>
+                                                    <small class="text-muted">{{ $v->color_code }}</small>
+                                                </div>
+                                                <div>Kích thước: {{ $v->length }} × {{ $v->width }} × {{ $v->height }} cm </div>
+                                                @if (!is_null($v->price))
+                                                    <div>Giá: {{ number_format($v->price,0,',','.') }}₫</div>                                                    
+                                                @endif
+                                                <div>Tồn kho: {{ $v->stock }}</div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
                             <div class="row g-3 mt-1">
                                 {{-- Danh mục --}}
                                 <div class="col-md-6">
