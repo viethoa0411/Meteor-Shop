@@ -31,25 +31,7 @@ class UpdateProductRequest extends FormRequest
             'category_id' => ['required','exists:categories,id'],
             'brand_id'    => ['nullable','exists:brands,id'],
             'status'      => ['required','in:active,inactive'],
-        'length' => 'nullable|numeric|min:0', // (Nếu vẫn giữ cột kích thước tổng quát ở products)
-            'width'  => 'nullable|numeric|min:0',
-            'height' => 'nullable|numeric|min:0',
-            'color_code' => 'nullable|string|max:20',
-
-            // Màu (mảng)
-            'colors'                 => 'nullable|array',
-            'colors.*.name'          => 'nullable|string|max:50',
-            'colors.*.code'          => 'required_with:colors|string|max:20', // "#HEX"
-            
-            // Kích thước (mảng)
-            'sizes'                  => 'nullable|array',
-            'sizes.*.length'         => 'required_with:sizes|numeric|min:0',
-            'sizes.*.width'          => 'required_with:sizes|numeric|min:0',
-            'sizes.*.height'         => 'required_with:sizes|numeric|min:0',
-
-            // (tuỳ chọn) giá/stock mặc định cho biến thể mới
-            'variant_price'          => 'nullable|numeric|min:0',
-            'variant_stock'          => 'nullable|integer|min:0',
+       
         ];
     }
 }
