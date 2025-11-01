@@ -76,6 +76,16 @@ class AdminController extends Controller
        
         return redirect()->route('admin.account.admin.list')->with('success', 'Đã thêm người dùng thành công.');
     }
+    // Hiển thị chi tiết tài khoản
+    public function show($id)
+    {
+        // Bước 1: Tìm admin theo ID, bao gồm cả admin đã bị ẩn (soft deleted)
+        // withTrashed() cho phép lấy cả bản ghi đã bị xóa mềm
+        $user = User::withTrashed()->findOrFail($id);
+
+        // Bước 2: Trả về view hiển thị chi tiết với dữ liệu admin
+        return view('admin.account.admin.show', compact('user'));
+    }
     // Chức năng sửa tài khoản admin
     public function edit($id)
     {
@@ -117,5 +127,7 @@ class AdminController extends Controller
         // Bước 4: Redirect về danh sách admin với thông báo thành công
         return redirect()->route('admin.account.admin.list')->with('success', 'Cập nhật người dùng thành công.');
     }
+    
+
 
 }

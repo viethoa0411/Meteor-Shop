@@ -213,6 +213,11 @@
                                     <a href="{{ route('admin.account.admin.edit', $user->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-pencil-square"></i> Sửa
                                     </a>
+
+
+                                    <a href="{{ route('admin.account.admin.show', $user->id) }}" class="btn btn-sm btn-secondary">
+                                        <i class="bi bi-eye"></i> Xem Chi Tiết
+                                    </a>
                                 </div>
                             </td>
                         </tr>

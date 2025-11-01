@@ -25,6 +25,9 @@ Route::post('/admins', [AdminController::class, 'store'])->name('admin.account.a
 // Hiển thị form chỉnh sửa thông tin admin
 Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('admin.account.admin.edit');
 
+// Hiển thị chi tiết thông tin 1 admin
+Route::get('/admins/{id}', [AdminController::class, 'show'])->name('admin.account.admin.show');
 
 // Xử lý submit form cập nhật thông tin admin
 Route::put('/admins/{id}', [AdminController::class, 'update'])->name('admin.account.admin.update');
+
