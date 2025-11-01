@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Models\Category;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ProductPublicController;
 
 Route::redirect('/', '/admin')->name('home');
 
@@ -43,3 +45,12 @@ Route::prefix('admin/categories')->name('admin.categories.')->group(function () 
     Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
     Route::get('/admin/categories', [CategoryController::class, 'list'])->name('admin.categories.list');
 });
+
+/**
+ * ================== CLIENT (khách truy cập) ==================
+ */
+Route::get('/',             [HomeController::class, 'index'])->name('client.home');
+Route::get('/home',         [HomeController::class, 'index']);
+Route::get('/detail/{slug}',[ProductPublicController::class, 'show'])
+    ->name('client.product.detail');
+Route::get('/search',       [HomeController::class, 'search'])->name('client.product.search');
