@@ -26,15 +26,19 @@ class AdminController extends Controller
         }
 
         // Bước 3: Xử lý tìm kiếm (nếu có)
-        if ($request->has('keyword') && $request->keyword != '') {
-            $keyword = $request->keyword;
-            // Tìm kiếm theo tên HOẶC email HOẶC số điện thoại
-            $query->where(function ($q) use ($keyword) {
-                $q->where('name', 'like', "%{$keyword}%")
-                    ->orWhere('email', 'like', "%{$keyword}%")
-                    ->orWhere('phone', 'like', "%{$keyword}%");
-            });
-        }
+          if ($request->has('keyword') && $request->keyword != '') {
+              $keywords = explode(' ', $request->keyword); // Tách từ khóa theo khoảng trắng
+
+              $query->where(function ($q) use ($keywords) {
+                  foreach ($keywords as $keyword) {
+                      $q->where(function ($sub) use ($keyword) {
+                          $sub->where('name', 'like', "%{$keyword}%")
+                              ->orWhere('email', 'like', "%{$keyword}%")
+                              ->orWhere('phone', 'like', "%{$keyword}%");
+                      });
+                  }
+              });
+          }
 
      
         $users = $query->orderBy('id', 'asc')->paginate(7);

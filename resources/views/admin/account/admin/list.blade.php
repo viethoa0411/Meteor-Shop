@@ -154,6 +154,27 @@
      <div class="card shadow-sm">
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+
+            {{-- Ô tìm kiếm --}}
+                <form action="{{ route('admin.account.admin.list') }}" method="GET"
+                    class="d-flex align-items-center flex-grow-1 mx-md-4" style="max-width: 500px;">
+                    {{-- Giữ lại tham số status khi tìm kiếm --}}
+                    <input type="hidden" name="status" value="{{ request('status', 'active') }}">
+
+                    <div class="input-group w-100">
+                        <input type="text" name="keyword" class="form-control"
+                            placeholder="VD: nguyenvana, email hoặc số điện thoại..." value="{{ request('keyword') }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                        @if (request('keyword'))
+                            <a href="{{ route('admin.account.admin.list', ['status' => request('status', 'active')]) }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        @endif
+                    </div>
+                </form>
                 
               
 
