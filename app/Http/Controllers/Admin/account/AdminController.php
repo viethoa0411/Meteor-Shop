@@ -52,8 +52,16 @@ class AdminController extends Controller
     
     public function store(Request $request)
     {
-        
-
+        // Bước 1: Validate dữ liệu từ form
+        $request->validate([
+            'name' => 'required|string|max:255',              // Tên bắt buộc, tối đa 255 ký tự
+            'email' => 'required|string|email|max:255|unique:users', // Email bắt buộc, phải unique
+            'phone' => 'nullable|string|max:20',              // Số điện thoại không bắt buộc
+            'password' => 'required|string|min:8|confirmed',  // Mật khẩu tối thiểu 8 ký tự, phải nhập lại khớp
+            'role' => 'required|in:admin,staff,user',         // Role phải là 1 trong 3 giá trị
+            'address' => 'nullable|string|max:500',           // Địa chỉ không bắt buộc
+            'status' => 'required|in:active,inactive,banned', // Trạng thái bắt buộc
+        ]);
         
         User::create([
             'name' => $request->name,
