@@ -89,34 +89,32 @@ class AdminController extends Controller
     //  * CẬP NHẬT THÔNG TIN ADMIN
     public function update(Request $request, $id)
     {
+        // Bước 1: Tìm admin theo ID
         $user = User::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255',              // Tên bắt buộc
+        // Bước 2: Validate dữ liệu từ form
+          $request->validate([
+            'name' => 'required|string|max:255',
             'email' => [
                 'required',
                 'string',
                 'email',
                 'max:255',
-                Rule::unique('users')->ignore($user->id),     // Email phải unique, trừ chính admin này
+                Rule::unique('users')->ignore($user->id),
             ],
-            'phone' => 'nullable|string|max:20',              // Số điện thoại không bắt buộc
-            'password' => 'nullable|string|min:8|confirmed',  // Password không bắt buộc (để trống = không đổi)
-            'role' => 'required|in:admin,staff,user',         // Role bắt buộc
-            'address' => 'nullable|string|max:500',           // Địa chỉ không bắt buộc
-            'status' => 'required|in:active,inactive,banned', // Trạng thái bắt buộc
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users')->ignore($user->id), // Không được trùng username của user khác
+            ],
+            'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|string|min:8|confirmed',
+            'role' => 'required|in:admin,staff,user',
+            'address' => 'nullable|string|max:500',
+            'status' => 'required|in:active,inactive,banned',
         ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'role' => $request->role,
-            'address' => $request->address,
-            'status' => $request->status,
-            'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
-        ]);
-
+        // Bước 4: Redirect về danh sách admin với thông báo thành công
         return redirect()->route('admin.account.admin.list')->with('success', 'Cập nhật người dùng thành công.');
     }
 
