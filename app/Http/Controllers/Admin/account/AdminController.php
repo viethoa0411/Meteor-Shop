@@ -127,7 +127,18 @@ class AdminController extends Controller
         // Bước 4: Redirect về danh sách admin với thông báo thành công
         return redirect()->route('admin.account.admin.list')->with('success', 'Cập nhật người dùng thành công.');
     }
-    
+    // Chức năng ẩn tài khoản
+    public function destroy($id)
+    {
+        // Bước 1: Tìm admin theo ID
+        $user = User::findOrFail($id);
+
+        // Bước 2: Thực hiện soft delete (ẩn tài khoản)
+        $user->delete();
+
+        // Bước 3: Redirect về danh sách với thông báo
+        return redirect()->route('admin.account.admin.list')->with('success', 'Tài khoản admin đã được ẩn.');
+    }
 
 
 }

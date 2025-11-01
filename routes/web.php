@@ -31,3 +31,5 @@ Route::get('/admins/{id}', [AdminController::class, 'show'])->name('admin.accoun
 // Xử lý submit form cập nhật thông tin admin
 Route::put('/admins/{id}', [AdminController::class, 'update'])->name('admin.account.admin.update');
 
+// ẩn tài khoản admin 
+Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('admin.account.admin.destroy');

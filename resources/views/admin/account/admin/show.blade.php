@@ -68,7 +68,23 @@
                     <i class="bi bi-pencil-square"></i> Sửa
                 </a>
 
-      
+                @if (!$user->deleted_at)
+                    <form action="{{ route('admin.account.admin.destroy', $user->id) }}" method="POST" class="d-inline"
+                        onsubmit="return confirm('Bạn có chắc muốn ẩn tài khoản này không?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('admin.account.admin.restore', $user->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-person-check"></i> Khôi phục
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
