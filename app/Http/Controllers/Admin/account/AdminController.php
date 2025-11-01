@@ -139,6 +139,17 @@ class AdminController extends Controller
         // Bước 3: Redirect về danh sách với thông báo
         return redirect()->route('admin.account.admin.list')->with('success', 'Tài khoản admin đã được ẩn.');
     }
+    // Hiển thị trang tài khoản bị ẩn
+     public function trash()
+    {
+        // Bước 1: Lấy danh sách admin đã bị ẩn, phân trang 15 bản ghi/trang
+        $users = User::onlyTrashed()->where('role', 'admin')->paginate(15);
+
+        // Bước 2: Trả về view trash
+        return view('admin.account.admin.trash', compact('users'));
+    }
+
+    
 
 
 }

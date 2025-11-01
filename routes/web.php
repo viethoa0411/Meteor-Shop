@@ -21,6 +21,8 @@ Route::get('/admins/create', [AdminController::class, 'create'])->name('admin.ac
 // Xử lý submit form tạo admin mới (lưu vào database)
 Route::post('/admins', [AdminController::class, 'store'])->name('admin.account.admin.store');
 
+// Trang hiển thị tài khoản bị ẩn
+Route::get('/admins/trash', [AdminController::class, 'trash'])->name('admin.account.admin.trash');
 
 // Hiển thị form chỉnh sửa thông tin admin
 Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('admin.account.admin.edit');
@@ -33,3 +35,4 @@ Route::put('/admins/{id}', [AdminController::class, 'update'])->name('admin.acco
 
 // ẩn tài khoản admin 
 Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('admin.account.admin.destroy');
+
