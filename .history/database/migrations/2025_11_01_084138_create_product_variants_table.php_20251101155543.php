@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('color_code')->nulltable();   // mã màu
             $table->decimal('length', 8, 2)->nulltable();   // chiều dài
             $table->decimal('width', 8, 2)->nulltable();   // chiều rộgn
-            $table->decimal('height', 8, 2)->nulltable();   // chiều cao
+            $table->decimal('heigh', 8, 2)->nulltable();   // chiều cao
 
             //Dữ liệu riêng cho biến thể
             $table->decimal('price', 10, 2)->nulltable();   // giá

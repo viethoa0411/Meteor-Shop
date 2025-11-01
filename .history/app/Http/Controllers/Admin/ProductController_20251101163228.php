@@ -11,9 +11,6 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
-
 
 class ProductController extends Controller
 {
@@ -92,64 +89,11 @@ class ProductController extends Controller
 
             // Lấy dữ liệu biến thể từ form
             $colors = collect($request->input('colors', []))
-                ->filter(fn($c)  => !empty($c['code']))->values();
-
-            $sizes = collect($request->input('sizes', []))
-                ->filter(fn($s)  =>Arr::has($s, ['length', 'color_name', 'height']))->values();
-
-            // mặc định giá/stock cho biến thể
-            $basePrice = $data['variant_price'] ?? ($data['price'] ?? null);
-            $baseStock = $data['variant_stock'] ?? ($data['stock'] ?? 0);
-
-            // sinh tổ hợp
-            $variant = [];
-
-            if ($colors->isEmpty() && $sizes->isEmpty()) {
-                 // không tạo biến thể
-            } elseif ($colors->isEmpty()) {
-                foreach ($sizes as $sz) {
-                    $variants[] = [
-                        'length'    => $sz['length'],
-                        'width'     => $sz['length'],
-                        'height'    => $sz['length'],
-                        'price'     => $basePrice,
-                        'stock'     => $baseStock,
-                    ];
-                }
-            } elseif ($sizes->isEmpty()) {
-                foreach ($colors as $c) {
-                    $variants[] =[
-                        'color_name'     => $c['name'] ?? null,
-                        'color_code'     => $c['code'],
-                        'price'          => $basePrice,
-                        'stock'          => $baseStock,
-                    ];
-                }
-            } else {
-                foreach ($colors as $c) {
-                    foreach ($sizes as $sz) {
-                        $variants[] = [
-                            'color_name'     => $c['name'] ?? null,
-                            'color_code'     => $c['code'],
-                            'length'         => $sz['length'],
-                            'width'          => $sz['length'],
-                            'height'         => $sz['length'],
-                            'price'          => $basePrice,
-                            'stock'          => $baseStock,
-                        ];
-                    }
-                }
-            }
-
-            // lưu
-            if (!empty($variants)) {
-                $product->variants()->createMany($variants);
-            }
+                ->filter(fn($c)) => !empty
         });
 
-        return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Đã tạo sản phẩm và các biến thể thành công!');
+        return redirect()->route('admin.products.list')
+            ->with('success', 'Đã tạo sản phẩm ' .$product->name);
     }
 
     /**

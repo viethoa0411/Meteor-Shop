@@ -11,9 +11,6 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
-
 
 class ProductController extends Controller
 {
@@ -128,28 +125,13 @@ class ProductController extends Controller
             } else {
                 foreach ($colors as $c) {
                     foreach ($sizes as $sz) {
-                        $variants[] = [
-                            'color_name'     => $c['name'] ?? null,
-                            'color_code'     => $c['code'],
-                            'length'         => $sz['length'],
-                            'width'          => $sz['length'],
-                            'height'         => $sz['length'],
-                            'price'          => $basePrice,
-                            'stock'          => $baseStock,
-                        ];
-                    }
-                }
-            }
+                        $variants[] = []
 
-            // lưu
-            if (!empty($variants)) {
-                $product->variants()->createMany($variants);
             }
         });
 
-        return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Đã tạo sản phẩm và các biến thể thành công!');
+        return redirect()->route('admin.products.list')
+            ->with('success', 'Đã tạo sản phẩm ' .$product->name);
     }
 
     /**

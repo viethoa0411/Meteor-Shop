@@ -11,9 +11,6 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
-
 
 class ProductController extends Controller
 {
@@ -148,8 +145,8 @@ class ProductController extends Controller
         });
 
         return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Đã tạo sản phẩm và các biến thể thành công!');
+            ->route('admin.products.edit')
+            ->with('success', 'Đã tạo sản phẩm ' .$product->name);
     }
 
     /**

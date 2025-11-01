@@ -11,9 +11,6 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Arr;
-
 
 class ProductController extends Controller
 {
@@ -143,13 +140,12 @@ class ProductController extends Controller
 
             // lưu
             if (!empty($variants)) {
-                $product->variants()->createMany($variants);
+                $product->var
             }
         });
 
-        return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Đã tạo sản phẩm và các biến thể thành công!');
+        return redirect()->route('admin.products.list')
+            ->with('success', 'Đã tạo sản phẩm ' .$product->name);
     }
 
     /**
