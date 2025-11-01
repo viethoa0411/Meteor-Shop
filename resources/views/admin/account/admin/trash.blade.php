@@ -32,7 +32,13 @@
                             <td>{{ $user->role }}</td>
                             <td>{{ $user->deleted_at->format('Y-m-d H:i') }}</td>
                             <td>
-                                <button>Khôi phục</button>
+                                <form action="{{ route('admin.account.admin.restore', $user->id) }}" method="POST"
+                                    style="display:inline">
+                                    @csrf
+                                    <button class="btn btn-success btn-sm">
+                                        <i class="bi bi-arrow-clockwise"></i> Khôi phục
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

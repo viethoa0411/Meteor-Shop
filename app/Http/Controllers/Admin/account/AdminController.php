@@ -149,7 +149,18 @@ class AdminController extends Controller
         return view('admin.account.admin.trash', compact('users'));
     }
 
-    
+    // Khôi phục tài khoản bị ẩn
+    public function restore($id)
+    {
+        // Bước 1: Tìm admin đã bị ẩn theo ID
+        $user = User::withTrashed()->findOrFail($id);
+
+        // Bước 2: Khôi phục tài khoản
+        $user->restore();
+
+        // Bước 3: Redirect về trang trash với thông báo
+        return redirect()->route('admin.account.admin.trash')->with('success', 'Khôi phục tài khoản admin thành công.');
+    }
 
 
 }

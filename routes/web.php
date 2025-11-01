@@ -36,3 +36,6 @@ Route::put('/admins/{id}', [AdminController::class, 'update'])->name('admin.acco
 // ẩn tài khoản admin 
 Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('admin.account.admin.destroy');
 
+
+// Khôi phục admin từ trash
+Route::post('/admins/{id}/restore', [AdminController::class, 'restore'])->name('admin.account.admin.restore');
