@@ -37,13 +37,9 @@ class StoreProductRequest extends FormRequest
 
             // Kích thước 
             'sizes'         =>'nullable|array',
-            'sizes.*.length'=>'required_with:sizes|numeric|min:0',
-            'sizes.*.width' =>'required_with:sizes|numeric|min:0',
-            'sizes.*.height'=>'required_with:sizes|numeric|min:0',
+            'sizes.*.length'=>'required_with:sizes|numberic|min:0',
+            'sizes.*.width' =>'required_with:sizes|numberic|min:0',
 
-            // giá mạc định cho biến thẻ mới
-            'variant_price' =>'nullable|numeric|min:0',
-            'variant_stock' =>'nullable|integer|min:0',
 
         ];
     }

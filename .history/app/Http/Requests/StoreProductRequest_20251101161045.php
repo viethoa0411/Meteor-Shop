@@ -25,26 +25,7 @@ class StoreProductRequest extends FormRequest
             'brand_id'      =>['nullable', 'exists:brand,id'],
             'status'        =>['required', 'in:active,inactive'],
 
-            'length'        =>'nullable|numeric|min:0', 
-            'width'         =>'nullable|numeric|min:0', 
-            'height'        =>'nullable|numeric|min:0', 
-            'color_code'    =>'nullable|string|max:20',
-
-            //Màu (mảng)
-            'colors'        =>'nullable|array',
-            'colors.*.name' =>'nullable|string|max:50',
-            'colors.*.code' =>'required_with:colors|string|max:20',
-
-            // Kích thước 
-            'sizes'         =>'nullable|array',
-            'sizes.*.length'=>'required_with:sizes|numeric|min:0',
-            'sizes.*.width' =>'required_with:sizes|numeric|min:0',
-            'sizes.*.height'=>'required_with:sizes|numeric|min:0',
-
-            // giá mạc định cho biến thẻ mới
-            'variant_price' =>'nullable|numeric|min:0',
-            'variant_stock' =>'nullable|integer|min:0',
-
+            'length'        =>'nullable|numeric|min:9'
         ];
     }
 }
