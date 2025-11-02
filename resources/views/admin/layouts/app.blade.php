@@ -103,7 +103,13 @@
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
             <a href="{{ route('admin.orders.index')}}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
-            <a href="{{ route('admin.users.list') }}"><i class="bi bi-people-fill me-2"></i> Người dùng</a>
+            <div class="dropdown-menu-item">
+                <a><i class="bi bi-people-fill me-2"></i> Người dùng <i class="bi bi-chevron-right float-end"></i></a>
+                <div class="submenu">
+                    <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin</a>
+                    <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý User</a>
+                </div>
+            </div>
 
 
 
