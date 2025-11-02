@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ProductPublicController;
 use App\Models\Category;
 
 // ============ AUTHENTICATION ROUTES ============
@@ -14,9 +16,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ============ CLIENT ROUTES ============
-Route::get('/', function () {
-    return view('client.home');
-});
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
+Route::get('/home', [HomeController::class, 'index']);
+Route::get('/detail/{slug}', [ProductPublicController::class, 'show'])->name('client.product.detail');
+Route::get('/search', [HomeController::class, 'search'])->name('client.product.search');
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
@@ -63,5 +66,4 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
-
 });
