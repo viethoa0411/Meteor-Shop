@@ -22,6 +22,9 @@ Route::post('/register', [RegisterController::class, 'register']);
 // Quên mật khẩu (OTP Email) - 3 bước
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
+Route::get('/verify-otp', [ForgotPasswordController::class, 'showVerifyOtpForm'])->name('password.verify-otp');
+Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp.post');
+
 
 // Trang chủ client
 Route::get('/', function () {

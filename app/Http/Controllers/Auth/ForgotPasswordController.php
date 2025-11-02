@@ -87,4 +87,37 @@ class ForgotPasswordController extends Controller
             return back()->with('error', 'Không thể gửi email. Vui lòng thử lại sau hoặc liên hệ hỗ trợ.');
         }
     }
+     public function showVerifyOtpForm()
+    {
+        // Kiểm tra xem có email trong session không
+        if (!session('reset_email')) {
+            return redirect()->route('password.request')->with('error', 'Vui lòng nhập email trước.');
+        }
+        
+        return view('auth.verify-otp');
+    }
+
+    public function verifyOtp(Request $request)
+    {
+      
+
+        // Kiểm tra OTP
+        $cachedOtp = Cache::get('otp_' . $request->email);
+        if (!$cachedOtp || $cachedOtp != $request->otp) {
+            return back()->with('error', 'Mã OTP không chính xác hoặc đã hết hạn.')->withInput();
+        }
+
+        // Kiểm tra user có tồn tại và đang active
+        $user = \App\Models\User::where('email', $request->email)->first();
+        if (!$user || $user->status !== 'active') {
+            return back()->with('error', 'Tài khoản không tồn tại hoặc đã bị khóa.')->withInput();
+        }
+
+        // Lưu email vào session để sử dụng ở bước reset password
+        session(['reset_email' => $request->email, 'otp_verified' => true]);
+        
+        return redirect()->route('password.reset')->with('success', 'Xác nhận OTP thành công! Vui lòng nhập mật khẩu mới.');
+    }
+
+    
   };
