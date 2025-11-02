@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\Account\UserController;
 
 Route::get('/', function () {
     return view('client.home');
@@ -43,7 +44,10 @@ Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('admin.
 // Khôi phục admin từ trash
 Route::post('/admins/{id}/restore', [AdminController::class, 'restore'])->name('admin.account.admin.restore');
 
+// Quản lý tài khoản user
 
+// Hiển thị danh sách tất cả user (có phân trang + tìm kiếm)
+Route::get('/users', [UserController::class, 'index'])->name('admin.account.users.list');
 
 // ====== CATEGORIES ======
 

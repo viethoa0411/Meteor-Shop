@@ -107,7 +107,7 @@
                 <a><i class="bi bi-people-fill me-2"></i> Người dùng <i class="bi bi-chevron-right float-end"></i></a>
                 <div class="submenu">
                     <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin</a>
-                    <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý User</a>
+                    <a href="{{ route('admin.account.users.list') }}"><i class="bi bi-people-fill me-2"></i> Quản lý User</a>
                 </div>
             </div>
 
