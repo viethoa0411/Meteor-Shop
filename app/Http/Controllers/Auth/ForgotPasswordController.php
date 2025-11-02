@@ -145,7 +145,14 @@ class ForgotPasswordController extends Controller
         if (!session('otp_verified') || !session('reset_email')) {
             return redirect()->route('password.request')->with('error', 'Vui lòng xác nhận OTP trước.');
         }
-
+        
+        $request->validate([
+            'password' => 'required|confirmed|min:6',
+        ], [
+            'password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
+            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+        ]);
         
 
         $email = session('reset_email');
