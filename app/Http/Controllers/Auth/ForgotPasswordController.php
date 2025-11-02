@@ -99,7 +99,17 @@ class ForgotPasswordController extends Controller
 
     public function verifyOtp(Request $request)
     {
-      
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|numeric|digits:6',
+        ], [
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.exists' => 'Email không tồn tại trong hệ thống.',
+            'otp.required' => 'Vui lòng nhập mã OTP.',
+            'otp.numeric' => 'Mã OTP phải là số.',
+            'otp.digits' => 'Mã OTP phải có đúng 6 chữ số.',
+        ]);
 
         // Kiểm tra OTP
         $cachedOtp = Cache::get('otp_' . $request->email);
