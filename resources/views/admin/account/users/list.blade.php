@@ -154,7 +154,13 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                
+                {{-- Nút chức năng --}}
+                <div class="d-flex flex-shrink-0 gap-2">
+                    
+                    <a href="{{ route('admin.account.users.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Thêm người dùng
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -198,7 +204,19 @@
                             </td>
 
                             <td data-label="Ngày tạo">{{ $user->created_at->format('Y-m-d') }}</td>
+                                {{-- Các nút hành động --}}
+                            <td data-label="Hành động">
+                                <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                                    
 
+                                    <form action="{{ route('admin.account.users.destroy', $user->id) }}" method="POST"
+                                        onsubmit="return confirm('Bạn có chắc muốn ẩn người dùng này không?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
+                                        </button>
+                                    </form>
                             
                                 </div>
                             </td>

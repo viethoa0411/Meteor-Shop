@@ -52,3 +52,6 @@ Route::get('/users', [UserController::class, 'index'])->name('admin.account.user
 
 // Xử lý submit form tạo user mới
 Route::post('/users', [UserController::class, 'store'])->name('admin.account.users.store');
+
+// ẩn tài khoản user
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.account.users.destroy');
