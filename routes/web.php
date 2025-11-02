@@ -9,10 +9,9 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 
 
-// Đăng nhập / Đăng xuất (không cần middleware)
+// Đăng nhập / Đăng xuất 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Trang chủ client
 Route::get('/', function () {
@@ -83,8 +82,8 @@ Route::middleware(['auth'])->group(function () {
     // Hiển thị chi tiết thông tin 1 user
     Route::get('/users/{id}', [UserController::class, 'show'])->name('admin.account.users.show');
 
-});
 
+});
 
 
 // Admin routes - yêu cầu đăng nhập

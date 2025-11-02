@@ -15,36 +15,18 @@
         }
 
         body {
-            background-image: url('{{ asset("images/nen_Login.jpg") }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 1;
         }
 
         .login-container {
             width: 100%;
             max-width: 450px;
             padding: 20px;
-            position: relative;
-            z-index: 2;
         }
 
         .login-card {
@@ -73,21 +55,8 @@
             text-align: center;
         }
 
-        .logo-container {
-            margin-bottom: 20px;
-        }
-
-        .logo-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
         .login-header h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             margin-bottom: 10px;
         }
@@ -111,7 +80,7 @@
             color: #333;
             margin-bottom: 8px;
             display: block;
-font-size: 14px;
+            font-size: 14px;
         }
 
         .form-control {
@@ -145,8 +114,7 @@ font-size: 14px;
         .input-group .form-control:focus {
             border-color: #667eea;
         }
-
-        .input-group .form-control:focus + .input-group-text {
+.input-group .form-control:focus + .input-group-text {
             border-color: #667eea;
         }
 
@@ -237,7 +205,7 @@ font-size: 14px;
         }
 
         .form-check-input:checked {
-background-color: #667eea;
+            background-color: #667eea;
             border-color: #667eea;
         }
 
@@ -269,7 +237,7 @@ background-color: #667eea;
 
         .role-info {
             background-color: #e7f3ff;
-            border-left: 4px solid #667eea;
+border-left: 4px solid #667eea;
             padding: 12px 15px;
             border-radius: 4px;
             margin-bottom: 20px;
@@ -307,10 +275,7 @@ background-color: #667eea;
         <div class="login-card">
             <!-- Header -->
             <div class="login-header">
-                <div class="logo-container">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="Meteor Shop Logo" class="logo-image">
-                </div>
-                <h1>Đăng nhập</h1>
+                <h1><i class="bi bi-shield-lock"></i> Meteor Shop</h1>
             </div>
 
             <!-- Body -->
@@ -339,7 +304,7 @@ background-color: #667eea;
 
                 <!-- Form đăng nhập -->
                 <form action="{{ route('login') }}" method="POST" novalidate>
-@csrf
+                    @csrf
 
                     <!-- Email -->
                     <div class="form-group">
@@ -357,7 +322,7 @@ background-color: #667eea;
                     <!-- Password -->
                     <div class="form-group">
                         <label for="password" class="form-label">
-                            <i class="bi bi-lock"></i> Mật khẩu
+                        <i class="bi bi-lock"></i> Mật khẩu
                         </label>
                         <div class="input-group">
                             <input type="password" class="form-control @error('password') is-invalid @enderror" 
@@ -382,7 +347,6 @@ background-color: #667eea;
                         </div>
                         <a href="#" class="forgot-password">Bạn chưa có tài khoản?</a>
                         <a href="#" class="forgot-password">Quên mật khẩu?</a>
-
                     </div>
 
                     <!-- Submit Button -->
@@ -404,7 +368,7 @@ background-color: #667eea;
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-// Toggle password visibility
+        // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
