@@ -77,8 +77,7 @@
                 <a class="navbar-brand" href="#">AdminPanel</a>
                 <div class="ms-auto">
                     <div class="dropdown">
-                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button"
-                            data-bs-toggle="dropdown">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i>
                             {{ Auth::user()->name ?? 'Admin' }}
                             <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
@@ -94,7 +93,7 @@
                                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                                     @csrf
                                     <button type="submit" class="dropdown-item"
-                                            onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
+                                        onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
                                         <i class="bi bi-box-arrow-right"></i> Đăng xuất
                                     </button>
                                 </form>
@@ -111,11 +110,37 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <h5 class="text-center py-3 border-bottom border-secondary">Quản trị</h5>
+
             <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
             <a href="{{ route('admin.orders.index') }}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
-            <a href="{{ route('admin.users.list') }}"><i class="bi bi-people-fill me-2"></i> Người dùng</a>
+
+            <!-- Menu con Người dùng -->
+            <ul class="nav nav-pills flex-column mb-sm-auto mb-0">
+                <li>
+                    <a class="nav-link text-white" data-bs-toggle="collapse" href="#userSubmenu" role="button"
+                        aria-expanded="false" aria-controls="userSubmenu">
+                        <i class="bi bi-people-fill me-2"></i> Người dùng
+                        <i class="fas fa-angle-down float-end"></i>
+                    </a>
+                    <div class="collapse ps-3" id="userSubmenu">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.users.list') }}" class="nav-link text-white">
+                                    <i class="fas fa-user-cog me-2"></i> Tài khoản quản trị
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-white">
+                                    <i class="fas fa-user me-2"></i> Tài khoản khách hàng
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+
             <a href="#"><i class="bi bi-gear-fill me-2"></i> Cài đặt</a>
         </aside>
 
@@ -132,6 +157,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 </body>
 
 </html>

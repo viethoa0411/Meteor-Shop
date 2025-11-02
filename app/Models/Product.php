@@ -26,19 +26,27 @@ class Product extends Model
     protected static function boot()
     {
         parent::boot();
+
         static::creating(function ($product) {
             $product->slug = Str::slug($product->name);
         });
     }
 
-    // Quan hệ
+    // Quan hệ với danh mục
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
+    // Quan hệ với thương hiệu
     public function brand()
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    // Quan hệ với biến thể sản phẩm
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
     }
 }

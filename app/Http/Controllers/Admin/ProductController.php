@@ -11,13 +11,17 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class ProductController extends Controller
 {
     /**
-     * Danh sách sản phẩm
+     * Danh sách sản phẩm (có tìm kiếm và lọc)
+     * View: resources/views/admin/products/list.blade.php
+     * Route name: admin.products.list
      */
-    public function list(Request $req)
+    public function index(Request $req)
     {
         $q = Product::query()
             ->select(['id', 'name', 'slug', 'price', 'stock', 'image', 'category_id', 'brand_id', 'status', 'created_at'])
@@ -56,6 +60,8 @@ class ProductController extends Controller
 
     /**
      * Form tạo sản phẩm mới
+     * View: resources/views/admin/products/create.blade.php
+     * Route name: admin.products.create
      */
     public function create()
     {
@@ -65,98 +71,139 @@ class ProductController extends Controller
         return view('admin.products.create', compact('categories', 'brands'));
     }
 
-
-    public function store(Request $request)
+    /**
+     * Lưu sản phẩm mới
+     * Route name: admin.products.store
+     */
+    public function store(StoreProductRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'nullable|exists:brands,id',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'status' => 'required|in:active,inactive',
-        ]);
+        $data = $request->validated();
 
-        // Xử lý upload ảnh
-        $imagePath = null;
+        // Tự tạo slug nếu bỏ trống
+        $data['slug'] = $data['slug'] ?: Str::slug($data['name'] . '-' . Str::random(4));
+
+        // Upload ảnh
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
+            $data['image'] = $request->file('image')->store('products', 'public');
         }
 
-        Product::create([
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'image' => $imagePath,
-            'category_id' => $request->category_id,
-            'brand_id' => $request->brand_id,
-            'status' => $request->status,
-        ]);
+        $product = null;
 
-        return redirect()->route('admin.products.list')
-            ->with('success', 'Thêm sản phẩm thành công!');
+        DB::transaction(function () use (&$product, $data, $request) {
+            $product = Product::create($data);
+
+            // Xử lý biến thể (nếu có)
+            $colors = collect($request->input('colors', []))
+                ->filter(fn($c) => !empty($c['code']))->values();
+
+            $sizes = collect($request->input('sizes', []))
+                ->filter(fn($s) => Arr::has($s, ['length', 'width', 'height']))->values();
+
+            $basePrice = $data['variant_price'] ?? ($data['price'] ?? null);
+            $baseStock = $data['variant_stock'] ?? ($data['stock'] ?? 0);
+
+            $variants = [];
+
+            if ($colors->isEmpty() && $sizes->isEmpty()) {
+                // không tạo biến thể
+            } elseif ($colors->isEmpty()) {
+                foreach ($sizes as $sz) {
+                    $variants[] = [
+                        'length' => $sz['length'],
+                        'width'  => $sz['width'],
+                        'height' => $sz['height'],
+                        'price'  => $basePrice,
+                        'stock'  => $baseStock,
+                        'sku'    => strtoupper(Str::random(8)),
+                    ];
+                }
+            } elseif ($sizes->isEmpty()) {
+                foreach ($colors as $c) {
+                    $variants[] = [
+                        'color_name' => $c['name'] ?? null,
+                        'color_code' => $c['code'],
+                        'price'      => $basePrice,
+                        'stock'      => $baseStock,
+                        'sku'        => strtoupper(Str::random(8)),
+                    ];
+                }
+            } else {
+                foreach ($colors as $c) {
+                    foreach ($sizes as $sz) {
+                        $variants[] = [
+                            'color_name' => $c['name'] ?? null,
+                            'color_code' => $c['code'],
+                            'length'     => $sz['length'],
+                            'width'      => $sz['width'],
+                            'height'     => $sz['height'],
+                            'price'      => $basePrice,
+                            'stock'      => $baseStock,
+                            'sku'        => strtoupper(Str::random(8)),
+                        ];
+                    }
+                }
+            }
+
+            if (!empty($variants)) {
+                $product->variants()->createMany($variants);
+            }
+        });
+
+        return redirect()
+            ->route('admin.products.edit', $product)
+            ->with('success', 'Đã tạo sản phẩm và các biến thể thành công!');
     }
 
-
-
     /**
-     * Xem chi tiết
+     * Xem chi tiết sản phẩm
+     * View: resources/views/admin/products/show.blade.php
      */
-    public function show(Product $id)
+    public function show(Product $product)
     {
-        $id->load(['category:id,name', 'brand:id,name']);
-        return view('admin.products.show', compact('products'));
+        $product->load(['category:id,name', 'brand:id,name']);
+        return view('admin.products.show', compact('product'));
     }
 
     /**
      * Form sửa sản phẩm
+     * View: resources/views/admin/products/edit.blade.php
      */
-    public function edit($id)
+    public function edit(Product $product)
     {
-        $product = Product::findOrFail($id);
-        $categories = Category::all();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $categories = Category::orderBy('name')->get(['id', 'name']);
+        $brands     = Brand::orderBy('name')->get(['id', 'name']);
+
+        return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Cập nhật sản phẩm
+     * Route name: admin.products.update
+     */
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        $product = Product::findOrFail($id);
+        $data = $request->validated();
+        $data['slug'] = $data['slug'] ?: ($product->slug ?: Str::slug($data['name'] . '-' . $product->id));
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
-            'status' => 'required|in:active,inactive',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $imagePath = $product->image;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
         }
 
-        $product->update([
-            'name' => $request->name,
-            'price' => $request->price,
-            'category_id' => $request->category_id,
-            'description' => $request->description,
-            'image' => $imagePath,
-            'status' => $request->status,
-        ]);
+        $product->update($data);
 
-        return redirect()->route('admin.products.list')->with('success', 'Cập nhật sản phẩm thành công!');
+        return redirect()->route('admin.products.list')
+            ->with('success', 'Cập nhật sản phẩm thành công!');
     }
 
-    // Xóa sản phẩm
-    public function destroy($id)
+    /**
+     * Xoá sản phẩm
+     */
+    public function destroy(Product $product)
     {
-        $product = Product::findOrFail($id);
         $product->delete();
-        return redirect()->route('admin.products.list')->with('success', 'Đã xoá sản phẩm!');
+        return back()->with('error', 'Sản phẩm đã được chuyển vào thùng rác.');
     }
-
 }
