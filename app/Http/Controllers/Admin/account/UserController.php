@@ -120,7 +120,21 @@ class UserController extends Controller
         // Bước 1: Tìm user theo ID
         $user = User::findOrFail($id);
 
-        
+        $request->validate([
+            'name' => 'required|string|max:255',              // Tên bắt buộc
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),     // Email phải unique, trừ chính user này
+            ],
+            'phone' => 'nullable|string|max:20',              // Số điện thoại không bắt buộc
+            'password' => 'nullable|string|min:8|confirmed',  // Password không bắt buộc (để trống = không đổi)
+            'role' => 'required|in:admin,staff,user',         // Role bắt buộc
+            'address' => 'nullable|string|max:500',           // Địa chỉ không bắt buộc
+            'status' => 'required|in:active,inactive,banned', // Trạng thái bắt buộc
+        ]);
 
         // Bước 3: Cập nhật thông tin user
         $user->update([
