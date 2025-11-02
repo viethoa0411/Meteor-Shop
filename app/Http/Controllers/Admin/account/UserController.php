@@ -93,4 +93,16 @@ class UserController extends Controller
         // Bước 2: Trả về view trash
         return view('admin.account.users.trash', compact('users'));
     }
+    // Khôi phục tài khoản bị ẩn
+     public function restore($id)
+    {
+        // Bước 1: Tìm user đã bị ẩn theo ID
+        $user = User::withTrashed()->findOrFail($id);
+
+        // Bước 2: Khôi phục tài khoản
+        $user->restore();
+
+        // Bước 3: Redirect về trang trash với thông báo
+        return redirect()->route('admin.account.users.trash')->with('success', 'Khôi phục tài khoản user thành công.');
+    }
 }

@@ -57,3 +57,5 @@ Route::post('/users', [UserController::class, 'store'])->name('admin.account.use
     Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.account.users.destroy');
 // Hiển thị danh sách tài khoản bị ẩn
 Route::get('/users/trash', [UserController::class, 'trash'])->name('admin.account.users.trash');
+// Khôi phục user từ trash
+Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('admin.account.users.restore');
