@@ -19,10 +19,27 @@ class ForgotPasswordController extends Controller
     public function sendOtp(Request $request)
     {
 
-
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.exists' => 'Email không tồn tại trong hệ thống.',
+        ]);
 
         $user = \App\Models\User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            return back()->with('error', 'Tài khoản đã bị ẩn vui lòng liên hệ admin để được khắc phục.');
+        }
 
+        if ($user->status === 'inactive') {
+            return back()->with('error', 'Tài khoản bị dừng hoạt động, không thể gửi mã.');
+        }
+
+        if ($user->status === 'hidden') {
+            return back()->with('error', 'Tài khoản bị ẩn, không thể gửi mã.');
+        }
 
          // Kiểm tra spam - chỉ cho phép gửi OTP mỗi 1 phút
         $lastSent = Cache::get('otp_sent_' . $request->email);
