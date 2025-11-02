@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Account\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Account\UserController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
@@ -17,6 +18,10 @@ Route::post('/login', [AuthController::class, 'login']);
 // Đăng ký tài khoản
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+
+// Quên mật khẩu (OTP Email) - 3 bước
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
 
 // Trang chủ client
 Route::get('/', function () {
