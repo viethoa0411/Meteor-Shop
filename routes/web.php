@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\OrderController;
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
+
 // Trang chủ client
 Route::get('/', function () {
     return view('client.home');

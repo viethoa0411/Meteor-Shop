@@ -23,7 +23,15 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ], [
+            'email.required' => 'Email là bắt buộc',
+            'email.email' => 'Email không hợp lệ',
+            'password.required' => 'Mật khẩu là bắt buộc',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự',
+        ]);
 
         $credentials = $request->only('email', 'password');
 
@@ -60,5 +68,6 @@ class AuthController extends Controller
     /**
      * Xử lý đăng xuất
      */
+    
     
 }
