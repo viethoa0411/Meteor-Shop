@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Account\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Account\UserController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
@@ -12,6 +13,10 @@ use App\Http\Controllers\Admin\OrderController;
 // Đăng nhập / Đăng xuất 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+
+// Đăng ký tài khoản
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
 
 // Trang chủ client
 Route::get('/', function () {

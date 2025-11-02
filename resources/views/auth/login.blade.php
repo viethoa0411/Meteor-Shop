@@ -345,7 +345,7 @@ border-left: 4px solid #667eea;
                                 Ghi nhớ tôi
                             </label>
                         </div>
-                        <a href="#" class="forgot-password">Bạn chưa có tài khoản?</a>
+                        <a href="{{ route('register') }}" class="forgot-password">Bạn chưa có tài khoản?</a>
                         <a href="#" class="forgot-password">Quên mật khẩu?</a>
                     </div>
 
