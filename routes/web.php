@@ -64,3 +64,5 @@ Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.acc
 
 // Xử lý submit form cập nhật thông tin user
 Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.account.users.update');
+// Hiển thị chi tiết thông tin 1 user
+Route::get('/users/{id}', [UserController::class, 'show'])->name('admin.account.users.show');

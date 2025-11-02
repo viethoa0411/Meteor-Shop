@@ -221,7 +221,9 @@
                                             <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
                                         </button>
                                     </form>
-                            
+                                    <a href="{{ route('admin.account.users.show', $user->id) }}" class="btn btn-sm btn-secondary">
+                                        <i class="bi bi-eye"></i> Xem Chi Tiết
+                                    </a>
                                 </div>
                             </td>
                         </tr>

@@ -151,4 +151,14 @@ class UserController extends Controller
         // Bước 4: Redirect về danh sách user với thông báo thành công
         return redirect()->route('admin.account.users.list')->with('success', 'Cập nhật người dùng thành công.');
     }
+    // Xem chi tiết tài khoản
+    public function show($id)
+    {
+        // Bước 1: Tìm user theo ID, bao gồm cả user đã bị ẩn (soft deleted)
+        // withTrashed() cho phép lấy cả bản ghi đã bị xóa mềm
+        $user = User::withTrashed()->findOrFail($id);
+
+        // Bước 2: Trả về view hiển thị chi tiết với dữ liệu user
+        return view('admin.account.users.show', compact('user'));
+    }
 }
