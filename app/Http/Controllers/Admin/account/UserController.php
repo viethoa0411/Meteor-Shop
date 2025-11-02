@@ -45,31 +45,5 @@ class UserController extends Controller
         return view('admin.account.users.list', compact('users'));
     }
     //  * XỬ LÝ LƯU USER MỚI VÀO DATABASE
-    public function store(Request $request)
-    {
-        // Bước 1: Validate dữ liệu từ form
-        $request->validate([
-            'name' => 'required|string|max:255',              // Tên bắt buộc, tối đa 255 ký tự
-            'email' => 'required|string|email|max:255|unique:users', // Email bắt buộc, phải unique
-            'phone' => 'nullable|string|max:20',              // Số điện thoại không bắt buộc
-            'password' => 'required|string|min:8|confirmed',  // Mật khẩu tối thiểu 8 ký tự, phải nhập lại khớp
-            'role' => 'required|in:admin,staff,user',         // Role phải là 1 trong 3 giá trị
-            'address' => 'nullable|string|max:500',           // Địa chỉ không bắt buộc
-            'status' => 'required|in:active,inactive,banned', // Trạng thái bắt buộc
-        ]);
-
-        // Bước 2: Tạo bản ghi mới trong bảng users
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password), // Mã hóa password trước khi lưu
-            'role' => $request->role,
-            'address' => $request->address,
-            'status' => $request->status,
-        ]);
-
-        // Bước 3: Redirect về danh sách user với thông báo thành công
-        return redirect()->route('admin.account.users.list')->with('success', 'Đã thêm người dùng thành công.');
-    }
+ 
 }
