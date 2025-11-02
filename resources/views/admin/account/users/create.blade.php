@@ -21,7 +21,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.users.store') }}" method="POST">
+                    <form action="{{ route('admin.account.users.store') }}" method="POST">
                         @csrf
                         
                         <div class="row">
@@ -55,7 +55,7 @@
                                     <input type="text" class="form-control @error('phone') is-invalid @enderror" 
                                            id="phone" name="phone" value="{{ old('phone') }}">
                                     @error('phone')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+<div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
@@ -65,8 +65,8 @@
                                     <label for="role" class="form-label">Vai trò <span class="text-danger">*</span></label>
                                     <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                                         <option value="">Chọn vai trò</option>
-                                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                        <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
+                                        <!-- <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option> -->
+                                        <!-- <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option> -->
                                         <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
                                     </select>
                                     @error('role')
@@ -101,7 +101,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
+<select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
                                         <option value="">Chọn trạng thái</option>
                                         <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Hoạt động</option>
                                         <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Không hoạt động</option>
@@ -124,7 +124,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">
+                            <a href="{{ route('admin.account.users.list') }}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Quay lại
                             </a>
                             <button type="submit" class="btn btn-primary">

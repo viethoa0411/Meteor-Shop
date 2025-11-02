@@ -1,15 +1,15 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Thùng rác người dùng')
+@section('title', 'Kho tài khoản Admin bị ẩn')
 
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Thùng rác người dùng</h1>
-        <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">⬅ Quay lại danh sách</a>
+        <h1>Kho tài khoản Admin bị ẩn</h1>
+        <a href="{{ route('admin.account.admin.list') }}" class="btn btn-secondary">⬅ Quay lại danh sách</a>
     </div>
 
     @if ($users->isEmpty())
-        <p class="text-center">Không có người dùng nào trong thùng rác.</p>
+        <p class="text-center">Không có tài khoản admin nào bị ẩn.</p>
     @else
         <div class="table-responsive">
             <table class="table table-bordered">
@@ -19,7 +19,7 @@
                         <th>Tên</th>
                         <th>Email</th>
                         <th>Vai trò</th>
-                        <th>Ngày xóa</th>
+                        <th>Ngày ẩn</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
@@ -32,7 +32,7 @@
                             <td>{{ $user->role }}</td>
                             <td>{{ $user->deleted_at->format('Y-m-d H:i') }}</td>
                             <td>
-                                <form action="{{ route('admin.users.restore', $user->id) }}" method="POST"
+                                <form action="{{ route('admin.account.admin.restore', $user->id) }}" method="POST"
                                     style="display:inline">
                                     @csrf
                                     <button class="btn btn-success btn-sm">

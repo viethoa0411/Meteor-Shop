@@ -66,6 +66,20 @@
                 display: none;
             }
         }
+
+        /* Submenu */
+        .submenu {
+            display: none;
+            background-color: #3d434a;
+        }
+
+        .submenu a {
+            padding-left: 45px;
+        }
+
+        .dropdown-menu-item:hover .submenu {
+            display: block;
+        }
     </style>
 </head>
 
@@ -116,30 +130,14 @@
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
             <a href="{{ route('admin.orders.index') }}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
 
-            <!-- Menu con Người dùng -->
-            <ul class="nav nav-pills flex-column mb-sm-auto mb-0">
-                <li>
-                    <a class="nav-link text-white" data-bs-toggle="collapse" href="#userSubmenu" role="button"
-                        aria-expanded="false" aria-controls="userSubmenu">
-                        <i class="bi bi-people-fill me-2"></i> Người dùng
-                        <i class="fas fa-angle-down float-end"></i>
-                    </a>
-                    <div class="collapse ps-3" id="userSubmenu">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.users.list') }}" class="nav-link text-white">
-                                    <i class="fas fa-user-cog me-2"></i> Tài khoản quản trị
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link text-white">
-                                    <i class="fas fa-user me-2"></i> Tài khoản khách hàng
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-            </ul>
+            <!-- Quản lý tài khoản -->
+            <div class="dropdown-menu-item">
+                <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản <i class="bi bi-chevron-right float-end"></i></a>
+                <div class="submenu">
+                    <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin</a>
+                    <a href="{{ route('admin.account.users.list') }}"><i class="bi bi-people-fill me-2"></i> Quản lý User</a>
+                </div>
+            </div>
 
             <a href="#"><i class="bi bi-gear-fill me-2"></i> Cài đặt</a>
         </aside>

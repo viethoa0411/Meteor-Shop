@@ -145,12 +145,38 @@
 
                 {{-- Tiêu đề --}}
                 <h3 class="fw-bold text-primary mb-0">
-                    <i class="bi bi-people-fill me-2"></i>Danh sách người dùng
+                    <i class="bi bi-people-fill me-2"></i>Danh sách tài khoản User
                 </h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                
+                {{-- Bộ lọc trạng thái --}}
+                <div class="d-flex gap-1 align-items-center">
+                    <a href="{{ route('admin.account.users.list', ['status' => 'all'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'active') == 'all' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-list-ul"></i> Tất cả
+                    </a>
+                    <a href="{{ route('admin.account.users.list', ['status' => 'active'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'active') == 'active' ? 'btn-success' : 'btn-outline-success' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-check-circle-fill"></i> Hoạt động
+                    </a>
+                    <a href="{{ route('admin.account.users.list', ['status' => 'inactive'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'active') == 'inactive' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-pause-circle-fill"></i> Dừng hoạt động
+                    </a>
+                </div>
 
                 {{-- Ô tìm kiếm --}}
-                <form action="{{ route('admin.users.list') }}" method="GET"
+                <form action="{{ route('admin.account.users.list') }}" method="GET"
                     class="d-flex align-items-center flex-grow-1 mx-md-4" style="max-width: 500px;">
+                    {{-- Giữ lại tham số status khi tìm kiếm --}}
+                    <input type="hidden" name="status" value="{{ request('status', 'active') }}">
+
                     <div class="input-group w-100">
                         <input type="text" name="keyword" class="form-control"
                             placeholder="VD: nguyenvana, email hoặc số điện thoại..." value="{{ request('keyword') }}">
@@ -158,19 +184,21 @@
                             <i class="bi bi-search"></i> Tìm kiếm
                         </button>
                         @if (request('keyword'))
-                            <a href="{{ route('admin.users.list') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('admin.account.users.list', ['status' => request('status', 'active')]) }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle"></i>
                             </a>
                         @endif
                     </div>
                 </form>
 
+
+
                 {{-- Nút chức năng --}}
                 <div class="d-flex flex-shrink-0 gap-2">
-                    <a href="{{ route('admin.users.trash') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.account.users.trash') }}" class="btn btn-outline-secondary">
                         <i class="bi bi-person-fill-slash"></i> Tài khoản bị ẩn
                     </a>
-                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                    <a href="{{ route('admin.account.users.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Thêm người dùng
                     </a>
                 </div>
@@ -217,15 +245,14 @@
                             </td>
 
                             <td data-label="Ngày tạo">{{ $user->created_at->format('Y-m-d') }}</td>
-
-                            {{-- Các nút hành động --}}
+                                {{-- Các nút hành động --}}
                             <td data-label="Hành động">
                                 <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-info">
+                                    <a href="{{ route('admin.account.users.edit', $user->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-pencil-square"></i> Sửa
                                     </a>
 
-                                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
+                                    <form action="{{ route('admin.account.users.destroy', $user->id) }}" method="POST"
                                         onsubmit="return confirm('Bạn có chắc muốn ẩn người dùng này không?');">
                                         @csrf
                                         @method('DELETE')
@@ -233,8 +260,7 @@
                                             <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
                                         </button>
                                     </form>
-
-                                    <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-secondary">
+                                    <a href="{{ route('admin.account.users.show', $user->id) }}" class="btn btn-sm btn-secondary">
                                         <i class="bi bi-eye"></i> Xem Chi Tiết
                                     </a>
                                 </div>
@@ -244,9 +270,9 @@
                 </tbody>
             </table>
         </div>
-
-        <div class="d-flex justify-content-center">
-            {{ $users->links() }}
+        <!-- {{-- Phân trang --}} -->
+        <div class="d-flex justify-content-center mt-4">
+            {{ $users->links('pagination::bootstrap-5') }}
         </div>
     @endif
 @endsection

@@ -8,7 +8,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductPublicController;
-use App\Models\Category;
+use App\Http\Controllers\Admin\Account\AdminController;
+use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -65,5 +66,35 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
+    });
+
+    // ====== ACCOUNT MANAGEMENT ======
+    Route::prefix('account')->name('account.')->group(function () {
+
+        // ----- ADMIN -----
+        Route::prefix('admins')->name('admin.')->group(function () {
+            Route::get('/', [AdminController::class, 'index'])->name('list');
+            Route::get('/create', [AdminController::class, 'create'])->name('create');
+            Route::post('/', [AdminController::class, 'store'])->name('store');
+            Route::get('/trash', [AdminController::class, 'trash'])->name('trash');
+            Route::get('/{id}/edit', [AdminController::class, 'edit'])->name('edit');
+            Route::get('/{id}', [AdminController::class, 'show'])->name('show');
+            Route::put('/{id}', [AdminController::class, 'update'])->name('update');
+            Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/restore', [AdminController::class, 'restore'])->name('restore');
+        });
+
+        // ----- USER -----
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [AccountUserController::class, 'index'])->name('list');
+            Route::get('/create', [AccountUserController::class, 'create'])->name('create');
+            Route::post('/', [AccountUserController::class, 'store'])->name('store');
+            Route::delete('/{id}', [AccountUserController::class, 'destroy'])->name('destroy');
+            Route::get('/trash', [AccountUserController::class, 'trash'])->name('trash');
+            Route::post('/{id}/restore', [AccountUserController::class, 'restore'])->name('restore');
+            Route::get('/{id}/edit', [AccountUserController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
+            Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
+        });
     });
 });

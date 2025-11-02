@@ -6,7 +6,7 @@
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="mb-0">Chi tiết người dùng</h1>
-            <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">
+            <a href="{{ route('admin.account.admin.list') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Quay lại danh sách
             </a>
         </div>
@@ -64,12 +64,12 @@
             </div>
 
             <div class="card-footer text-end">
-                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-info">
+                <a href="{{ route('admin.account.admin.edit', $user->id) }}" class="btn btn-info">
                     <i class="bi bi-pencil-square"></i> Sửa
                 </a>
 
                 @if (!$user->deleted_at)
-                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline"
+                    <form action="{{ route('admin.account.admin.destroy', $user->id) }}" method="POST" class="d-inline"
                         onsubmit="return confirm('Bạn có chắc muốn ẩn tài khoản này không?');">
                         @csrf
                         @method('DELETE')
@@ -78,7 +78,7 @@
                         </button>
                     </form>
                 @else
-                    <form action="{{ route('admin.users.restore', $user->id) }}" method="POST" class="d-inline">
+                    <form action="{{ route('admin.account.admin.restore', $user->id) }}" method="POST" class="d-inline">
                         @csrf
                         <button type="submit" class="btn btn-success">
                             <i class="bi bi-person-check"></i> Khôi phục

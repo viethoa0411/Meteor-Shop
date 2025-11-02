@@ -11,7 +11,7 @@
                         <h4 class="mb-0">Sửa thông tin người dùng</h4>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+                        <form action="{{ route('admin.account.users.update', $user->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
@@ -50,8 +50,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Vai trò</label>
                                 <select name="role" class="form-select">
-                                    <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="staff" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option>
+                                    <!-- <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option> -->
+                                    <!-- <option value="staff" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option> -->
                                     <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
                                 </select>
                             </div>
@@ -75,7 +75,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">Quay lại</a>
+                                <a href="{{ route('admin.account.users.list') }}" class="btn btn-secondary">Quay lại</a>
                                 <button type="submit" class="btn btn-primary">Cập nhật</button>
                             </div>
                         </form>
