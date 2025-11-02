@@ -21,7 +21,6 @@
             display: flex;
             flex: 1;
             min-height: calc(100vh - 56px - 50px);
-            /* trừ header và footer */
         }
 
         .sidebar {
@@ -114,12 +113,9 @@
             <h5 class="text-center py-3 border-bottom border-secondary">Quản trị</h5>
             <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
-            <a href="#"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
-            <a href="#"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
+            <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
+            <a href="{{ route('admin.orders.index') }}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
             <a href="{{ route('admin.users.list') }}"><i class="bi bi-people-fill me-2"></i> Người dùng</a>
-
-
-
             <a href="#"><i class="bi bi-gear-fill me-2"></i> Cài đặt</a>
         </aside>
 
