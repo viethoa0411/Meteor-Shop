@@ -209,7 +209,9 @@
                                 {{-- Các nút hành động --}}
                             <td data-label="Hành động">
                                 <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                                    
+                                    <a href="{{ route('admin.account.users.edit', $user->id) }}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    </a>
 
                                     <form action="{{ route('admin.account.users.destroy', $user->id) }}" method="POST"
                                         onsubmit="return confirm('Bạn có chắc muốn ẩn người dùng này không?');">

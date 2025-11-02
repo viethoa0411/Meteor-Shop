@@ -105,4 +105,36 @@ class UserController extends Controller
         // Bước 3: Redirect về trang trash với thông báo
         return redirect()->route('admin.account.users.trash')->with('success', 'Khôi phục tài khoản user thành công.');
     }
+    // Sửa tài khoản
+    public function edit($id)
+    {
+        // Bước 1: Tìm user theo ID (chỉ lấy user chưa bị ẩn)
+        $user = User::findOrFail($id);
+
+        // Bước 2: Trả về view form chỉnh sửa với dữ liệu user
+        return view('admin.account.users.edit', compact('user'));
+    }
+    // Lưu vào database
+    public function update(Request $request, $id)
+    {
+        // Bước 1: Tìm user theo ID
+        $user = User::findOrFail($id);
+
+        
+
+        // Bước 3: Cập nhật thông tin user
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role,
+            'address' => $request->address,
+            'status' => $request->status,
+            // Nếu có nhập password mới thì mã hóa và cập nhật, không thì giữ nguyên password cũ
+            'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
+        ]);
+
+        // Bước 4: Redirect về danh sách user với thông báo thành công
+        return redirect()->route('admin.account.users.list')->with('success', 'Cập nhật người dùng thành công.');
+    }
 }

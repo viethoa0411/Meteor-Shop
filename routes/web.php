@@ -59,3 +59,8 @@ Route::post('/users', [UserController::class, 'store'])->name('admin.account.use
 Route::get('/users/trash', [UserController::class, 'trash'])->name('admin.account.users.trash');
 // Khôi phục user từ trash
 Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('admin.account.users.restore');
+// Hiển thị form chỉnh sửa thông tin user
+Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.account.users.edit');
+
+// Xử lý submit form cập nhật thông tin user
+Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.account.users.update');
