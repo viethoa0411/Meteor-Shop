@@ -6,14 +6,19 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
 
+// Trang chính
 Route::get('/', function () {
     return view('client.home');
 });
+
 Route::get('/admin', function () {
     return view('admin.dashboard');
 });
 
+// =================== ADMIN ROUTES ===================
 Route::prefix('/admin')->name('admin.')->group(function () {
+
+
 
     // ====== CATEGORIES ======
     Route::prefix('categories')->name('categories.')->group(function () {
@@ -42,26 +47,14 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/store', [UserController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [UserController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('destroy'); 
-        Route::get('/users/{id}', [UserController::class, 'show'])->name('admin.users.show');
+        Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}', [UserController::class, 'show'])->name('show');
     });
-
-    // ====== ORDERS ======
+        // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');
-        Route::get('/create', [OrderController::class, 'create'])->name('create');
-        Route::post('/store', [OrderController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [OrderController::class, 'edit'])->name('edit');
-        Route::put('/update/{id}', [OrderController::class, 'update'])->name('update');
-        Route::get('/{id}/restore', [OrderController::class, 'restore'])->name('restore');
-
+        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+        Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
 
-
 });
-
-
-
-
-
-
