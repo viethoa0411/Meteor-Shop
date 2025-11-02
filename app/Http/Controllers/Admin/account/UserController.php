@@ -44,6 +44,11 @@ class UserController extends Controller
         // Bước 6: Trả về view với dữ liệu danh sách user
         return view('admin.account.users.list', compact('users'));
     }
+    public function create()
+    {
+        // Trả về view form tạo user
+        return view('admin.account.users.create');
+    }
     //  * XỬ LÝ LƯU USER MỚI VÀO DATABASE
     public function store(Request $request)
     {

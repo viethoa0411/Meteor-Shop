@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin\Account\AdminController;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Admin\Account\UserController;
 
 Route::get('/', function () {
@@ -66,3 +65,7 @@ Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.acc
 Route::put('/users/{id}', [UserController::class, 'update'])->name('admin.account.users.update');
 // Hiển thị chi tiết thông tin 1 user
 Route::get('/users/{id}', [UserController::class, 'show'])->name('admin.account.users.show');
+
+
+
+
