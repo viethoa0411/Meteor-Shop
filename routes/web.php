@@ -2,9 +2,7 @@
 
 use App\Http\Controllers\Admin\Account\AdminController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\OrderController;
+
 use App\Http\Controllers\Admin\Account\UserController;
 
 Route::get('/', function () {
@@ -49,35 +47,3 @@ Route::post('/admins/{id}/restore', [AdminController::class, 'restore'])->name('
 // Hiển thị danh sách tất cả user (có phân trang + tìm kiếm)
 Route::get('/users', [UserController::class, 'index'])->name('admin.account.users.list');
 
-// ====== CATEGORIES ======
-
-Route::prefix('admin/categories')->name('admin.categories.')->group(function () {
-    Route::get('/', [CategoryController::class, 'list'])->name('list');
-    Route::get('/create', [CategoryController::class, 'create'])->name('create');
-    Route::post('/store', [CategoryController::class, 'store'])->name('store');
-    Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('edit');
-    Route::post('/update/{id}', [CategoryController::class, 'update'])->name('update');
-    Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
-    Route::get('/admin/categories', [CategoryController::class, 'list'])->name('admin.categories.list');
-});
-
- // ====== PRODUCTS ======
-    Route::prefix('products')->name('admin.products.')->group(function () {
-        Route::get('/', [ProductController::class, 'list'])->name('list');
-        Route::get('/create', [ProductController::class, 'create'])->name('create');
-        Route::post('/store', [ProductController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('edit');
-        Route::put('/update/{id}', [ProductController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [ProductController::class, 'destroy'])->name('destroy');
-    });
-
-    // ====== ORDERS ======
-    Route::prefix('orders')->name('admin.orders.')->group(function () {
-        Route::get('/', [OrderController::class, 'index'])->name('index');
-        Route::get('/create', [OrderController::class, 'create'])->name('create');
-        Route::post('/store', [OrderController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [OrderController::class, 'edit'])->name('edit');
-        Route::put('/update/{id}', [OrderController::class, 'update'])->name('update');
-        Route::get('/{id}/restore', [OrderController::class, 'restore'])->name('restore');
-
-    });
