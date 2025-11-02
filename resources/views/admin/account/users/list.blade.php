@@ -154,6 +154,23 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                
+                {{-- Bộ lọc trạng thái --}}
+                <div class="d-flex gap-1 align-items-center">
+                    <a href="{{ route('admin.account.users.list', ['status' => 'all'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'active') == 'all' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-list-ul"></i> Tất cả
+                    </a>
+                    <a href="{{ route('admin.account.users.list', ['status' => 'active'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'active') == 'active' ? 'btn-success' : 'btn-outline-success' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-check-circle-fill"></i> Hoạt động
+                    </a>
+                    <a href="{{ route('admin.account.users.list', ['status' => 'inactive'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'active') == 'inactive' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-pause-circle-fill"></i> Dừng hoạt động
+                    </a>
+                </div>
+
                 {{-- Ô tìm kiếm --}}
                 <form action="{{ route('admin.account.users.list') }}" method="GET"
                     class="d-flex align-items-center flex-grow-1 mx-md-4" style="max-width: 500px;">
@@ -175,7 +192,7 @@
                 </form>
 
 
-                
+
                 {{-- Nút chức năng --}}
                 <div class="d-flex flex-shrink-0 gap-2">
                     <a href="{{ route('admin.account.users.trash') }}" class="btn btn-outline-secondary">
