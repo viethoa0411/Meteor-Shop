@@ -156,7 +156,9 @@
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
                 {{-- Nút chức năng --}}
                 <div class="d-flex flex-shrink-0 gap-2">
-                    
+                    <a href="{{ route('admin.account.users.trash') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-person-fill-slash"></i> Tài khoản bị ẩn
+                    </a>
                     <a href="{{ route('admin.account.users.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Thêm người dùng
                     </a>

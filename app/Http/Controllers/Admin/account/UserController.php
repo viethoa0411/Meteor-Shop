@@ -84,4 +84,13 @@ class UserController extends Controller
         // Bước 3: Redirect về danh sách với thông báo
         return redirect()->route('admin.account.users.list')->with('success', 'Tài khoản user đã được ẩn.');
     }
+    // Danh sách tài khoản bị ẩn
+     public function trash()
+    {
+        // Bước 1: Lấy danh sách user đã bị ẩn, phân trang 15 bản ghi/trang
+        $users = User::onlyTrashed()->where('role', 'user')->paginate(15);
+
+        // Bước 2: Trả về view trash
+        return view('admin.account.users.trash', compact('users'));
+    }
 }
