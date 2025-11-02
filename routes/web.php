@@ -47,3 +47,8 @@ Route::post('/admins/{id}/restore', [AdminController::class, 'restore'])->name('
 // Hiển thị danh sách tất cả user (có phân trang + tìm kiếm)
 Route::get('/users', [UserController::class, 'index'])->name('admin.account.users.list');
 
+// Hiển thị form tạo user mới
+    Route::get('/users/create', [UserController::class, 'create'])->name('admin.account.users.create');
+
+// Xử lý submit form tạo user mới
+Route::post('/users', [UserController::class, 'store'])->name('admin.account.users.store');

@@ -44,4 +44,23 @@ class UserController extends Controller
         // Bước 6: Trả về view với dữ liệu danh sách user
         return view('admin.account.users.list', compact('users'));
     }
+    //  * XỬ LÝ LƯU USER MỚI VÀO DATABASE
+    public function store(Request $request)
+    {
+        
+
+        // Bước 2: Tạo bản ghi mới trong bảng users
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password), // Mã hóa password trước khi lưu
+            'role' => $request->role,
+            'address' => $request->address,
+            'status' => $request->status,
+        ]);
+
+        // Bước 3: Redirect về danh sách user với thông báo thành công
+        return redirect()->route('admin.account.users.list')->with('success', 'Đã thêm người dùng thành công.');
+    }
 }
