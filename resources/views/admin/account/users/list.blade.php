@@ -231,6 +231,9 @@
                 </tbody>
             </table>
         </div>
-        
+        <!-- {{-- Phân trang --}} -->
+        <div class="d-flex justify-content-center mt-4">
+            {{ $users->links('pagination::bootstrap-5') }}
+        </div>
     @endif
 @endsection
