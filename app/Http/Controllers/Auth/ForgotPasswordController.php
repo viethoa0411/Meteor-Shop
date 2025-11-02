@@ -129,5 +129,49 @@ class ForgotPasswordController extends Controller
         return redirect()->route('password.reset')->with('success', 'Xác nhận OTP thành công! Vui lòng nhập mật khẩu mới.');
     }
 
+    public function showResetForm()
+    {
+        // Kiểm tra xem có email và OTP đã được xác nhận không
+        if (!session('reset_email') || !session('otp_verified')) {
+            return redirect()->route('password.request')->with('error', 'Vui lòng xác nhận OTP trước.');
+        }
+        
+        return view('auth.reset-password');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        // Kiểm tra xem OTP đã được xác nhận chưa
+        if (!session('otp_verified') || !session('reset_email')) {
+            return redirect()->route('password.request')->with('error', 'Vui lòng xác nhận OTP trước.');
+        }
+
+        
+
+        $email = session('reset_email');
+
+        // Kiểm tra user có tồn tại và đang active
+        $user = \App\Models\User::where('email', $email)->first();
+        if (!$user || $user->status !== 'active') {
+            return back()->with('error', 'Tài khoản không tồn tại hoặc đã bị khóa.')->withInput();
+        }
+
+        try {
+            // Cập nhật mật khẩu
+            $user->password = bcrypt($request->password);
+            $user->save();
+
+            // Xóa OTP và thông tin liên quan
+            Cache::forget('otp_' . $email);
+            Cache::forget('otp_sent_' . $email);
+            
+            // Xóa session
+            session()->forget(['reset_email', 'otp_verified']);
+
+            return redirect()->route('login')->with('success', 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Có lỗi xảy ra khi đặt lại mật khẩu. Vui lòng thử lại.')->withInput();
+        }
+    }
     
   };

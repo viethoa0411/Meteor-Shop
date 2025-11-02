@@ -24,7 +24,8 @@ Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
 Route::get('/verify-otp', [ForgotPasswordController::class, 'showVerifyOtpForm'])->name('password.verify-otp');
 Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp.post');
-
+Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 
 // Trang chủ client
 Route::get('/', function () {
