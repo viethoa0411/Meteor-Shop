@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\OrderController;
 // Đăng nhập / Đăng xuất (không cần middleware)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Trang chủ client
 Route::get('/', function () {

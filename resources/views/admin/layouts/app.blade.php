@@ -132,7 +132,7 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <form action="#" method="POST" style="display: inline;">
+                                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                                     @csrf
                                     <button type="submit" class="dropdown-item"
                                         onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
