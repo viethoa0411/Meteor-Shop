@@ -12,7 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+
+        // 👇 THÊM ĐOẠN NÀY
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
+
+        // Nếu bạn có middleware khác, có thể thêm ở đây tương tự
+        // $middleware->alias([...]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

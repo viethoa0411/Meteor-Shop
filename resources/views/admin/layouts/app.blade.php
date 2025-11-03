@@ -21,7 +21,6 @@
             display: flex;
             flex: 1;
             min-height: calc(100vh - 56px - 50px);
-            /* trừ header và footer */
         }
 
         .sidebar {
@@ -41,6 +40,47 @@
         .sidebar a:hover,
         .sidebar a.active {
             background-color: #495057;
+        }
+
+        /* ----------- MENU CON (hover) ----------- */
+        .dropdown-menu-item {
+            position: relative;
+        }
+
+        .dropdown-menu-item > a {
+            cursor: pointer;
+            display: block;
+            padding: 12px 30px;
+        }
+
+        .submenu {
+            display: none;
+            flex-direction: column;
+            background-color: #3e444a;
+        }
+
+        .submenu a {
+            padding: 10px 50px;
+            font-size: 0.95rem;
+        }
+
+        /* Hiển thị submenu khi hover */
+        .dropdown-menu-item:hover .submenu {
+            display: flex;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Hiệu ứng hiển thị mượt */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         main {
@@ -67,6 +107,20 @@
                 display: none;
             }
         }
+
+        /* Submenu */
+        .submenu {
+            display: none;
+            background-color: #3d434a;
+        }
+
+        .submenu a {
+            padding-left: 45px;
+        }
+
+        .dropdown-menu-item:hover .submenu {
+            display: block;
+        }
     </style>
 </head>
 
@@ -79,13 +133,21 @@
                 <div class="ms-auto">
                     <div class="dropdown">
                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> Admin
+                            <i class="bi bi-person-circle"></i>
+                            {{ Auth::user()->name ?? 'Admin' }}
+                            <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick="return confirm('Đăng xuất khỏi hệ thống!!');">
-                                    Đăng xuất
-                                </a>
+                                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                                <form action="#" method="POST" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item"
+                                        onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
+                                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>
@@ -99,13 +161,17 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <h5 class="text-center py-3 border-bottom border-secondary">Quản trị</h5>
-            <a href="" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
+            <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
             <a href="{{ route('admin.orders.index')}}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
-            <a href="{{ route('admin.users.list') }}"><i class="bi bi-people-fill me-2"></i> Người dùng</a>
-
-
+            <div class="dropdown-menu-item">
+                <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản <i class="bi bi-chevron-right float-end"></i></a>
+                <div class="submenu">
+                    <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin</a>
+                    <a href="{{ route('admin.account.users.list') }}"><i class="bi bi-people-fill me-2"></i> Quản lý User</a>
+                </div>
+            </div>
 
             <a href="#"><i class="bi bi-gear-fill me-2"></i> Cài đặt</a>
         </aside>
@@ -118,11 +184,11 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <span>&copy; 2025 AdminPanel. All rights reserved.</span>
+        <span>© 2025 Xuất bản bởi <strong>Meteor-Shop</strong> — Cảm ơn bạn đã đồng hành cùng chúng tôi!</span>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 </body>
-
 </html>

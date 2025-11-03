@@ -78,15 +78,16 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        // Xử lý upload ảnh
+        // Ảnh
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
-        Product::create([
+        // Lưu sản phẩm chính
+        $product = Product::create([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => $request->slug ? Str::slug($request->slug) : Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
@@ -95,6 +96,22 @@ class ProductController extends Controller
             'brand_id' => $request->brand_id,
             'status' => $request->status,
         ]);
+
+        if ($request->has('colors') && $request->has('sizes')) {
+            $color = $request->colors[0];
+            $size  = $request->sizes[0];
+
+            $product->variants()->create([
+                'color_name' => $color['name'] ?? null,
+                'color_code' => $color['code'] ?? null,
+                'length'     => $size['length'] ?? null,
+                'width'      => $size['width'] ?? null,
+                'height'     => $size['height'] ?? null,
+                'price'      => $request->price,
+                'stock'      => $request->stock,
+            ]);
+        }
+
 
         return redirect()->route('admin.products.list')
             ->with('success', 'Thêm sản phẩm thành công!');
@@ -105,10 +122,10 @@ class ProductController extends Controller
     /**
      * Xem chi tiết
      */
-    public function show(Product $id)
+    public function show($id)
     {
-        $id->load(['category:id,name', 'brand:id,name']);
-        return view('admin.products.show', compact('products'));
+        $product = Product::with(['category:id,name', 'brand:id,name'])->findOrFail($id);
+        return view('admin.products.show', compact('product'));
     }
 
     /**
@@ -158,5 +175,4 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('admin.products.list')->with('success', 'Đã xoá sản phẩm!');
     }
-
 }

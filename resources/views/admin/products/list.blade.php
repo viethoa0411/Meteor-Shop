@@ -48,7 +48,6 @@
                     <th>Giá</th>
                     <th>Tồn kho</th>
                     <th>Danh mục</th>
-                    <th>Thương hiệu</th>
                     <th>Trạng thái</th>
                     <th width="150">Hành động</th>
                 </tr>
@@ -58,7 +57,7 @@
                     <tr class="text-center">
                         <td>{{ $product->id }}</td>
                         <td class="text-start">
-                            <a href="#" style="text-decoration:none;color:#0d6efd;"
+                            <a href="{{ route('admin.products.show', $product) }}" style="text-decoration:none;color:#0d6efd;"
                                 onmouseover="this.style.textDecoration='underline'"
                                 onmouseout="this.style.textDecoration='none'">
                                 {{ $product->name }}
@@ -76,7 +75,6 @@
                         <td>{{ number_format($product->price, 0, ',', '.') }}₫</td>
                         <td>{{ $product->stock }}</td>
                         <td>{{ $product->category->name ?? '—' }}</td>
-                        <td>{{ $product->brand->name ?? '—' }}</td>
                         <td>
                             <span class="badge {{ $product->status == 'active' ? 'bg-success' : 'bg-secondary' }}">
                                 {{ $product->status == 'active' ? 'Hoạt động' : 'Tạm ẩn' }}
