@@ -15,16 +15,15 @@ class AdminMiddleware
     {
         // Nếu chưa đăng nhập, chuyển hướng đến trang login
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Vui lòng đăng nhập trước');
+            return redirect()->route('login')->with('error', 'Vui lòng đăng nhập trước.');
         }
 
-        // Kiểm tra role - chỉ admin mới có quyền
+        // Kiểm tra role - chỉ admin hoặc staff mới có quyền
         $user = Auth::user();
-        if ($user->role !== 'admin') {
-            return redirect()->route('login')->with('error', 'Bạn không có quyền truy cập trang quản trị');
+        if (!in_array($user->role, ['admin', 'staff'])) {
+            return redirect()->route('login')->with('error', 'Bạn không có quyền truy cập trang quản trị.');
         }
 
         return $next($request);
     }
 }
-

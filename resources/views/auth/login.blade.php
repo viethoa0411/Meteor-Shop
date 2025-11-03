@@ -42,6 +42,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -115,7 +116,7 @@
             border-color: #667eea;
         }
 
-        .input-group .form-control:focus + .input-group-text {
+        .input-group .form-control:focus+.input-group-text {
             border-color: #667eea;
         }
 
@@ -154,6 +155,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -238,8 +240,9 @@
 
         .role-info {
             background-color: #e7f3ff;
-            border-left: 4px solid #667eea;
-            padding: 12px 15px;
+            <<<<<<< HEAD border-left: 4px solid #667eea;
+            =======border-left: 4px solid #667eea;
+            >>>>>>>login padding: 12px 15px;
             border-radius: 4px;
             margin-bottom: 20px;
             font-size: 13px;
@@ -312,9 +315,9 @@
                         <label for="email" class="form-label">
                             <i class="bi bi-envelope"></i> Email
                         </label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" placeholder="Nhập email của bạn" 
-                               value="{{ old('email') }}" required autofocus>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                            name="email" placeholder="Nhập email của bạn" value="{{ old('email') }}" required
+                            autofocus>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -323,13 +326,16 @@
                     <!-- Password -->
                     <div class="form-group">
                         <label for="password" class="form-label">
-                            <i class="bi bi-lock"></i> Mật khẩu
+                            <<<<<<< HEAD <i class="bi bi-lock"></i> Mật khẩu
+                                =======
+                                <i class="bi bi-lock"></i> Mật khẩu
+                                >>>>>>> login
                         </label>
                         <div class="input-group">
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                   id="password" name="password" placeholder="Nhập mật khẩu" required>
-                            <button class="input-group-text" type="button" id="togglePassword" 
-                                    style="cursor: pointer; border: 2px solid #e0e0e0;">
+                            <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                id="password" name="password" placeholder="Nhập mật khẩu" required>
+                            <button class="input-group-text" type="button" id="togglePassword"
+                                style="cursor: pointer; border: 2px solid #e0e0e0;">
                                 <i class="bi bi-eye" id="eyeIcon"></i>
                             </button>
                         </div>
@@ -346,21 +352,25 @@
                                 Ghi nhớ tôi
                             </label>
                         </div>
-                        <a href="#" class="forgot-password">Bạn chưa có tài khoản?</a>
-                        <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                        <<<<<<< HEAD <a href="#" class="forgot-password">Bạn chưa có tài khoản?</a>
+                            <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                            =======
+                            <a href="{{ route('register') }}" class="forgot-password">Bạn chưa có tài khoản?</a>
+                            <a href="{{ route('password.request') }}" class="forgot-password">Quên mật khẩu?</a>
+                            >>>>>>> login
                     </div>
 
                     <!-- Submit Button -->
                     <button type="submit" class="btn-login">
                         <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
                     </button>
-                    
+
                 </form>
             </div>
 
             <!-- Footer -->
             <div class="login-footer">
-                © 2025 <strong>Meteor Shop</strong> 
+                © 2025 <strong>Meteor Shop</strong>
             </div>
         </div>
     </div>
@@ -388,4 +398,4 @@
 </body>
 
 </html>
-
+<<<<<<< HEAD=======>>>>>>> login

@@ -42,6 +42,47 @@
             background-color: #495057;
         }
 
+        /* ----------- MENU CON (hover) ----------- */
+        .dropdown-menu-item {
+            position: relative;
+        }
+
+        .dropdown-menu-item > a {
+            cursor: pointer;
+            display: block;
+            padding: 12px 30px;
+        }
+
+        .submenu {
+            display: none;
+            flex-direction: column;
+            background-color: #3e444a;
+        }
+
+        .submenu a {
+            padding: 10px 50px;
+            font-size: 0.95rem;
+        }
+
+        /* Hiển thị submenu khi hover */
+        .dropdown-menu-item:hover .submenu {
+            display: flex;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Hiệu ứng hiển thị mượt */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         main {
             flex: 1;
             padding: 20px;
@@ -105,6 +146,7 @@
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                                <form action="#" method="POST" style="display: inline;">
                                     @csrf
                                     <button type="submit" class="dropdown-item"
                                         onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
@@ -124,13 +166,14 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <h5 class="text-center py-3 border-bottom border-secondary">Quản trị</h5>
-
             <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
             <a href="{{ route('admin.orders.index') }}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
-
-            <!-- Quản lý tài khoản -->
+            <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
+            <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
+            <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
+            <a href="{{ route('admin.orders.index')}}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
             <div class="dropdown-menu-item">
                 <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản <i class="bi bi-chevron-right float-end"></i></a>
                 <div class="submenu">
@@ -157,5 +200,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
-
 </html>
