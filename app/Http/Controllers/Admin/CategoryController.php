@@ -9,8 +9,10 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    // Hiển thị danh sách danh mục
-    public function list(Request $request)
+    /**
+     * Hiển thị danh sách danh mục
+     */
+    public function index(Request $request)
     {
         $query = Category::with('parent');
 
@@ -27,15 +29,18 @@ class CategoryController extends Controller
 
 
 
-    // Hiển thị form thêm danh mục
+    /**
+     * Hiển thị form thêm danh mục
+     */
     public function create()
     {
-        // Lấy tất cả danh mục cha để người dùng chọn
         $parents = Category::whereNull('parent_id')->get();
         return view('admin.categories.create', compact('parents'));
     }
 
-    // Xử lý lưu danh mục
+    /**
+     * Lưu danh mục mới
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -61,12 +66,12 @@ class CategoryController extends Controller
             ->with('success', 'Thêm danh mục thành công!');
     }
 
+    /**
+     * Hiển thị form chỉnh sửa danh mục
+     */
     public function edit($id)
     {
-        // Lấy danh mục cần sửa
         $category = Category::findOrFail($id);
-
-        // Lấy tất cả danh mục cha để chọn (trừ chính nó để tránh lỗi lặp)
         $parents = Category::whereNull('parent_id')
             ->where('id', '!=', $id)
             ->get();
@@ -74,6 +79,9 @@ class CategoryController extends Controller
         return view('admin.categories.edit', compact('category', 'parents'));
     }
 
+    /**
+     * Cập nhật danh mục
+     */
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
@@ -88,7 +96,7 @@ class CategoryController extends Controller
 
         $category->update([
             'name' => $request->name,
-            'slug' => $request->slug ?: \Illuminate\Support\Str::slug($request->name),
+            'slug' => $request->slug ?: Str::slug($request->name),
             'description' => $request->description,
             'parent_id' => $request->parent_id,
             'status' => $request->status,
@@ -97,6 +105,10 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.list')
             ->with('success', 'Cập nhật danh mục thành công!');
     }
+
+    /**
+     * Xóa danh mục
+     */
     public function destroy($id)
     {
         $category = Category::find($id);

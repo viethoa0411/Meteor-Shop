@@ -14,37 +14,35 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'          =>['required', 'string', 'max:255'],
-            'slug'          =>['nullable', 'string', 'max:255', 'unique:product,slug'],
-            'description'   =>['nullable', 'string'],
-            'price'         =>['required', 'numeric'],
-            'stock'         =>['required', 'integer', 'min:0'],
-            'image'         =>['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-           
-            'category_id'   =>['required', 'exists:categories,id'],
-            'brand_id'      =>['nullable', 'exists:brand,id'],
-            'status'        =>['required', 'in:active,inactive'],
+            'name'          => ['required', 'string', 'max:255'],
+            'slug'          => ['nullable', 'string', 'max:255', 'unique:products,slug'],
+            'description'   => ['nullable', 'string'],
+            'price'         => ['required', 'numeric', 'min:0'],
+            'stock'         => ['required', 'integer', 'min:0'],
+            'image'         => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'category_id'   => ['required', 'exists:categories,id'],
+            'brand_id'      => ['nullable', 'exists:brands,id'],
+            'status'        => ['required', 'in:active,inactive'],
 
-            'length'        =>'nullable|numeric|min:0', 
-            'width'         =>'nullable|numeric|min:0', 
-            'height'        =>'nullable|numeric|min:0', 
-            'color_code'    =>'nullable|string|max:20',
+            'length'        => 'nullable|numeric|min:0',
+            'width'         => 'nullable|numeric|min:0',
+            'height'        => 'nullable|numeric|min:0',
+            'color_code'    => 'nullable|string|max:20',
 
-            //Màu (mảng)
-            'colors'        =>'nullable|array',
-            'colors.*.name' =>'nullable|string|max:50',
-            'colors.*.code' =>'required_with:colors|string|max:20',
+            // Màu (mảng)
+            'colors'        => 'nullable|array',
+            'colors.*.name' => 'nullable|string|max:50',
+            'colors.*.code' => 'required_with:colors|string|max:20',
 
-            // Kích thước 
-            'sizes'         =>'nullable|array',
-            'sizes.*.length'=>'required_with:sizes|numeric|min:0',
-            'sizes.*.width' =>'required_with:sizes|numeric|min:0',
-            'sizes.*.height'=>'required_with:sizes|numeric|min:0',
+            // Kích thước
+            'sizes'         => 'nullable|array',
+            'sizes.*.length' => 'required_with:sizes|numeric|min:0',
+            'sizes.*.width'  => 'required_with:sizes|numeric|min:0',
+            'sizes.*.height' => 'required_with:sizes|numeric|min:0',
 
-            // giá mạc định cho biến thẻ mới
-            'variant_price' =>'nullable|numeric|min:0',
-            'variant_stock' =>'nullable|integer|min:0',
-
+            // Giá mặc định cho biến thể mới
+            'variant_price' => 'nullable|numeric|min:0',
+            'variant_stock' => 'nullable|integer|min:0',
         ];
     }
 }

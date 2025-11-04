@@ -100,13 +100,13 @@ class AdminController extends Controller
         return view('admin.account.admin.edit', compact('user'));
     }
     
-    //  * CẬP NHẬT THÔNG TIN ADMIN
+    /**
+     * Cập nhật thông tin admin
+     */
     public function update(Request $request, $id)
     {
-        // Bước 1: Tìm admin theo ID
         $user = User::findOrFail($id);
 
-        // Bước 2: Validate dữ liệu từ form
           $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -116,20 +116,31 @@ class AdminController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'username' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('users')->ignore($user->id), // Không được trùng username của user khác
-            ],
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:admin,staff,user',
             'address' => 'nullable|string|max:500',
             'status' => 'required|in:active,inactive,banned',
         ]);
-        // Bước 4: Redirect về danh sách admin với thông báo thành công
-        return redirect()->route('admin.account.admin.list')->with('success', 'Cập nhật người dùng thành công.');
+
+        $updateData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role,
+            'address' => $request->address,
+            'status' => $request->status,
+        ];
+
+        // Chỉ cập nhật password nếu có nhập
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->password);
+        }
+
+        $user->update($updateData);
+
+        return redirect()->route('admin.account.admin.list')
+            ->with('success', 'Cập nhật người dùng thành công.');
     }
     // Chức năng ẩn tài khoản
     public function destroy($id)

@@ -1,0 +1,24 @@
+/* Product Detail Page Styles */
+
+.thumb { border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,0,0,.08); }
+.thumb.active { outline: 2px solid #2563eb; outline-offset: 2px; }
+.color-dot { width: 28px; height: 28px; border-radius: 9999px; border: 1px solid rgba(0,0,0,.1); }
+.size-pill { padding: 6px 10px; border: 1px solid rgba(0,0,0,.12); border-radius: 9999px; background: #fff; font-size: 12px; }
+.size-pill.active, .color-dot.active { outline: 2px solid #2563eb; outline-offset: 2px; }
+
+.tab-link { padding: 10px 2px; color: #6b7280; font-weight: 600; border-bottom: 2px solid transparent; }
+.tab-link.active { color: #111827; border-bottom-color: #2563eb; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+.product-card { background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.06); padding:16px; display:flex; flex-direction:column; transition:transform .3s ease, box-shadow .3s ease; }
+.product-card:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(0,0,0,.12); }
+.product-img-container img { display:block; width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:10px; }
+
+.qty input { border-left: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; }
+
+/* Accordion */
+.acc-item { border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+.acc-title { cursor: pointer; padding: 12px 14px; font-weight: 600; color:#111827; list-style: none; }
+.acc-item[open]>.acc-title { background: #f8fafc; }
+.acc-content { padding: 0 14px 14px 14px; }

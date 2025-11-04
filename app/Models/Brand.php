@@ -2,19 +2,33 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 
 class Brand extends Model
 {
-<<<<<<< HEAD
-=======
-    protected $table = 'brands';
->>>>>>> quan_ly_products
+    use HasFactory;
+
     protected $fillable = [
-        'name', 'slug', 'description', 'status'
+        'name',
+        'slug',
+        'description',
+        'status',
+        'is_featured',
     ];
-    public function products() {
+
+    /**
+     * Quan hệ với sản phẩm
+     */
+    public function products(): HasMany
+    {
         return $this->hasMany(Product::class);
+    }
+
+    public function scopeFeatured(Builder $query): Builder
+    {
+        return $query->where('is_featured', true);
     }
 }

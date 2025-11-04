@@ -1,52 +1,125 @@
 @extends('client.layout')
 
 @section('title', 'Trang chủ')
+
+@push('head')
+@vite('resources/css/home.css')
+@endpush
+
 @section('content')
 
-{{-- Slide --}}
-<div class="slide-wrapper">
+{{-- Hero Section: lấy từ DB banners --}}
+<section class="relative w-full h-[70vh] md:h-[80vh] overflow-hidden">
+    <div class="hero-slider relative w-full h-full">
+        @if(($banners ?? collect())->count() > 0)
+            @foreach($banners as $idx => $bn)
+                <div class="slide {{ $idx === 0 ? 'active' : '' }}">
+                    <img src="{{ \Illuminate\Support\Str::startsWith($bn->image, ['http://','https://']) ? $bn->image : asset('storage/'.$bn->image) }}" alt="{{ $bn->title ?? 'Banner' }}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40"></div>
+                    <div class="absolute inset-0 flex items-center justify-center text-center text-white px-6">
+                        <div class="max-w-3xl">
+                            @if($bn->title)
+                                <h1 class="text-3xl md:text-5xl font-bold tracking-tight mb-4">{{ $bn->title }}</h1>
+                            @endif
+                            @if($bn->link)
+                                <a href="{{ $bn->link }}" class="btn-primary">Xem ngay</a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        @else
     <div class="slide active">
-        <img class="imageSlide" src="https://picsum.photos/1200/800?random=1">
-        <h2 style="color: #fff">Siêu ưu đãi</h2>
-        <button onclick="alert('Bạn đang ở slide 1')">Mua ngay</button>
+                <img src="https://picsum.photos/2000/1200?random=11" alt="Hero" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/40"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-center text-white px-6">
+                    <div class="max-w-3xl">
+                        <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-4">Nâng tầm không gian sống</h1>
+                        <p class="text-base md:text-lg text-gray-200 mb-8">Bộ sưu tập nội thất tối giản, tinh tế, lấy cảm hứng từ phong cách hiện đại.</p>
+                        <div class="flex items-center justify-center gap-3">
+                            <a href="#" class="btn-primary">Khám phá ngay</a>
+                            <a href="#collections" class="px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-100 transition">Xem bộ sưu tập</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
-    <div class="slide">
-        <img class="imageSlide" src="https://picsum.photos/1200/800?random=2">
-        <h2 style="color: #fff">Phong cách Minimalism </h2>
-        <button onclick="alert('Bạn đang ở slide 1')">Mua ngay</button>
-    </div>
-    <div class="slide">
-        <img class="imageSlide" src="https://picsum.photos/1200/800?random=3">
-        <h2 style="color: #fff">Phong cách nội thất Indochine </h2>
-        <button onclick="alert('Bạn đang ở slide 1')">Mua ngay</button>
-    </div>
-</div>
+    {{-- Dots --}}
+    @if(($banners ?? collect())->count() > 1)
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+            @foreach($banners as $i => $bn)
+                <button class="slider-dot {{ $i === 0 ? 'active' : '' }} w-3 h-3 rounded-full bg-white/70"></button>
+            @endforeach
+        </div>
+    @endif
+</section>
 
-{{-- Sản phẩm mới --}}
-    <div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
-        <h2 style="padding-left: 20px; font-size:20px; font-weight:600; margin-bottom:8px; display:flex; align-items: center; gap:8px">
-            Sản phẩm mới
+{{-- Feature bar: Shipping / Support / Return --}}
+<section class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-800">
+        <div class="feature-tile flex items-center gap-3 appear">
+            <i class="fa-solid fa-truck-fast text-blue-600 text-xl"></i>
+            <div>
+                <div class="font-semibold">Giao hàng nhanh</div>
+                <div class="text-sm text-gray-500">Miễn phí cho đơn từ 1.000.000đ</div>
+            </div>
+        </div>
+        <div class="feature-tile flex items-center gap-3 appear appear-delay-1">
+            <i class="fa-solid fa-headset text-blue-600 text-xl"></i>
+            <div>
+                <div class="font-semibold">Hỗ trợ 24/7</div>
+                <div class="text-sm text-gray-500">Tư vấn thiết kế miễn phí</div>
+            </div>
+        </div>
+        <div class="feature-tile flex items-center gap-3 appear appear-delay-2">
+            <i class="fa-solid fa-rotate-left text-blue-600 text-xl"></i>
+            <div>
+                <div class="font-semibold">Đổi trả dễ dàng</div>
+                <div class="text-sm text-gray-500">Trong vòng 7 ngày</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- Brand strip từ DB --}}
+<section class="bg-gray-50">
+    <div class="brand-strip max-w-7xl mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-6 gap-6 items-center">
+        @forelse(($featuredBrands ?? $brands ?? collect()) as $brand)
+            <a href="#" class="text-center text-gray-700 font-semibold hover:text-gray-900 transition">{{ $brand->name }}</a>
+        @empty
+            <span class="text-center text-gray-400 col-span-2 md:col-span-5">Chưa có thương hiệu</span>
+        @endforelse
+    </div>
+</section>
+
+{{-- New Products --}}
+<section class="py-12 md:py-16 px-4 md:px-8 bg-white" id="new">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-3 mb-4">
+            <h2 class="section-title text-2xl md:text-3xl text-gray-900">Sản phẩm mới</h2>
             <span class="badge-new">New</span>
-        </h2>
-        <p style="padding-left: 20px; color:#555; font-size:14px; margin:14px; margin:0 0 24px">
-            Hàng mới cập nhật gần đây.
-        </p>
-        <hr style="margin-left: 20px; margin-right: 20px">
+        </div>
+        <p class="text-gray-600 mb-8 text-sm md:text-base">Hàng mới cập nhật gần đây</p>
+        <hr class="mb-8 border-gray-200">
 
         @if ($newProducts->count() === 0)
-            <p>Hiện chưa có sản phẩm.</p>
+            <div class="text-center py-12">
+                <p class="text-gray-500">Hiện chưa có sản phẩm mới.</p>
+            </div>
         @else 
-            <div class="grid-products">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 @foreach ($newProducts as $p)
-                    <a href="{{ route('client.product.detail', $p->slug) }}" class="product-card">
-                        <div class="product-img">
-                            <img 
-                            src="{{ $p->image ? asset('storage/'.$p->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}" 
+                    <a href="{{ route('client.product.detail', $p->slug) }}" class="product-card group appear">
+                        <div class="product-img-container overflow-hidden rounded-lg mb-4">
+                            <img src="{{ $p->image ? asset('storage/'.$p->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}" 
                             alt="{{ $p->name }}"
-                            >
+                                 class="product-img w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110">
                         </div>
-                        <div class="product-name">{{ $p->name }}</div>
-                        <div class="product-price">
+                        <h3 class="product-name text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                            {{ $p->name }}
+                        </h3>
+                        <div class="product-price text-lg font-bold text-red-600">
                             {{ number_format($p->price, 0, ',', '.') }} đ
                         </div>
                     </a>
@@ -54,67 +127,66 @@
             </div>            
         @endif
     </div>
-{{-- end  --}}
+</section>
 
-{{-- danh mục theo đồ --}}
-<div style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
-    <div class="room" style="padding-top: 25px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px">
-        <div>
-            <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                <img src="https://picsum.photos/800/1200?random=11" alt=""
-                    style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                    onmouseover="this.style.transform='scale(1.2)'"
-                    onmouseout="this.style.transform='scale(1)'">
-                    
-            </div>
-            <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Sofa</h4>
-        </div>
-        <div>
-            <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                <img src="https://picsum.photos/800/1200?random=21" alt=""
-                    style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                    onmouseover="this.style.transform='scale(1.2)'" 
-                    onmouseout="this.style.transform='scale(1)'">
-            </div>
-            <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Giường</h4>
-        </div>
-         <div>
-            <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                <img src="https://picsum.photos/800/1200?random=31" alt=""
-                    style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                    onmouseover="this.style.transform='scale(1.2)'"
-                    onmouseout="this.style.transform='scale(1)'">
-            </div>
-            <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Bàn làm việc</h4>
-        </div>
-    </div>
-</div>
-{{-- end  --}}
-
-{{--  Sản phẩm bán chạy --}}
-<div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
-    <h2 style="padding-left: 20px; font-size:20px; font-weight:600; margin-bottom:8px; display:flex; align-items: center; gap:8px">
-        Sản phẩm bán chạy
-        <span class="badge-new">New</span>
-    </h2>
-    <p style="padding-left: 20px; color:#555; font-size:14px; margin:14px; margin:0 0 24px">
-            Hàng mới nổi bật.
-    </p>
-    <hr style="margin-left: 20px; margin-right:20px; ">
-    @if ($outstandingProducts->count() === 0)
-        <p>Hiện chưa có sản phẩm.</p>
-    @else   
-        <div class="grid-products">
-            @foreach ($outstandingProducts as $o)
-                <a href="{{ route('client.product.detail', $o->slug) }}" class="product-card">
-                    <div class="product-img">
-                        <img 
-                        src="{{ $o->image ? asset('storage/'.$o->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}" 
-                        alt="{{ $o->name }}"
-                        >
+{{-- Collections grid từ DB (danh mục cha) --}}
+<section id="collections" class="py-12 md:py-16 px-4 md:px-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch">
+            @php $first = ($topCategories ?? collect())->first(); $rest = ($topCategories ?? collect())->slice(1); @endphp
+            @if($first)
+                <a href="#" class="collection-card group appear">
+                    <img src="https://picsum.photos/1200/800?random=151" alt="{{ $first->name }}">
+                    <div class="overlay"></div>
+                    <div class="caption">
+                        <div class="text-sm uppercase tracking-wider opacity-80">Danh mục</div>
+                        <div class="text-2xl font-bold">{{ $first->name }}</div>
                     </div>
-                    <div class="product-name">{{ $o->name }}</div>
-                    <div class="product-price">
+                </a>
+            @endif
+            <div class="grid grid-cols-1 gap-6">
+                @foreach($rest as $i => $cat)
+                    <a href="#" class="collection-card group appear {{ $i === 0 ? 'appear-delay-1' : 'appear-delay-2' }}">
+                        <img src="https://picsum.photos/1200/800?random={{ 152 + $i }}" alt="{{ $cat->name }}">
+                        <div class="overlay"></div>
+                        <div class="caption">
+                            <div class="text-sm uppercase tracking-wider opacity-80">Danh mục</div>
+                            <div class="text-xl font-semibold">{{ $cat->name }}</div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+            </div>
+</section>
+
+{{-- Best Sellers --}}
+<section class="py-12 md:py-16 px-4 md:px-8 bg-white">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-3 mb-4">
+            <h2 class="section-title text-2xl md:text-3xl text-gray-900">Bán chạy</h2>
+            <span class="badge-new">Hot</span>
+        </div>
+        <p class="text-gray-600 mb-8 text-sm md:text-base">Lựa chọn nhiều nhất từ khách hàng</p>
+        <hr class="mb-8 border-gray-200">
+        
+        @if (($bestProducts ?? $outstandingProducts ?? collect())->count() === 0)
+            <div class="text-center py-12">
+                <p class="text-gray-500">Hiện chưa có sản phẩm.</p>
+            </div>
+    @else   
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                @foreach (($bestProducts ?? $outstandingProducts) as $o)
+                    <a href="{{ route('client.product.detail', $o->slug) }}" class="product-card group appear">
+                        <div class="product-img-container overflow-hidden rounded-lg mb-4">
+                            <img src="{{ $o->image ? asset('storage/'.$o->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}" 
+                        alt="{{ $o->name }}"
+                                 class="product-img w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                        <h3 class="product-name text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                            {{ $o->name }}
+                        </h3>
+                        <div class="product-price text-lg font-bold text-red-600">
                         {{ number_format($o->price, 0, ',', '.') }} đ
                     </div>
                 </a>
@@ -122,135 +194,46 @@
         </div>
     @endif
 </div>
-{{-- end --}}
+</section>
 
-{{-- bai content 1 --}}
-    <div style="display: flex; width:100%; height:130vh; gap:24px;padding:100px 10px 100px 0; box-sizing:border-box; background-color: rgb(1,49,49)"> 
-        <div style="width: 50%; height:100%;overflow:hidden;">
-            <img src="https://picsum.photos/1000/800?random=1" style="width:100%; height: 100%; object-fit:cover;transition:1s;" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'">
+{{-- Blog teaser --}}
+<section class="py-12 px-4 bg-white">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-3 mb-6">
+            <h2 class="section-title text-2xl md:text-3xl text-gray-900">Góc cảm hứng</h2>
         </div>
-
-        <div style="width: 50%; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:20px; text-align:center;">
-            <div style="width: 70%; height:40vh;overflow:hidden; border-radius:10px">
-                <img src="https://picsum.photos/600/400?random=2"  style="width:100%; height: 100%; object-fit:cover">
+        <div class="grid md:grid-cols-3 gap-6">
+            @forelse(($posts ?? collect()) as $post)
+                <a href="#" class="group rounded-2xl overflow-hidden border border-gray-100">
+                    <img src="{{ $post->image ? asset('storage/'.$post->image) : 'https://picsum.photos/1200/800?random=401' }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700" alt="{{ $post->title }}">
+                    <div class="p-4">
+                        <div class="text-sm text-gray-500">{{ optional($post->published_at)->format('d/m/Y') }}</div>
+                        <div class="font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600">{{ $post->title }}</div>
+                        <div class="text-sm text-gray-600 mt-1 line-clamp-2">{{ $post->excerpt }}</div>
             </div>
-            <div>
-                <h2 style="font-size:24px; font-weight:600; margin:12px 0; color:#fff">Phong cách hiện đại</h2>
-                <p style="color: #cecece; fonr-size:14px; line-height:1.6; margin-bottom:20px; margin:50px">
-                      Khám phá bộ sưu tập nội thất mới nhất mang đậm hơi thở đương đại.
-                        Ra đời vào năm 2024, là một trong những thương hiệu tiên phong 
-                        trong ngành nội thất, với nguồn cảm hứng văn hóa Việt và gu thẩm mỹ
-                        tinh tế. Qua 26 năm hoạt động, Nhà Xinh luôn chú trọng đổi mới để 
-                        duy trì vị thế là thương hiệu nội thất hàng đầu tại Việt Nam.
-                </p>
-                <button style="background: #393939; color:#fff; border:none; padding:10px 24px; border-radius: 6px; cursor: pointer; transition:.3s " onmouseover="this.style.background=#444" onmouseout="this.style.background='#222'">Xem ngay</button>
-            </div>
+                </a>
+            @empty
+                <div class="text-gray-500">Chưa có bài viết.</div>
+            @endforelse
         </div>
     </div>
-{{--  --}}
+</section>
 
-
-{{-- danh mục theo loại phòng --}}
-    <div style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
-        <div class="room" style="padding-top: 25px; display:grid; grid-template-columns:repeat(4,1fr); gap:16px">
-            <div>
-                <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                    <img src="https://picsum.photos/800/1200?random=11" alt=""
-                        style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                        onmouseover="this.style.transform='scale(1.2)'"
-                        onmouseout="this.style.transform=scale(1)'">
-                </div>
-                <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng khách</h4>
-            </div>
-            <div>
-                <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                    <img src="https://picsum.photos/800/1200?random=121" alt=""
-                        style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                        onmouseover="this.style.transform='scale(1.2)'"
-                        onmouseout="this.style.transform=scale(1)'">
-                </div>
-                <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng ngủ</h4>
-            </div>
-            <div>
-                <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                    <img src="https://picsum.photos/800/1200?random=131" alt=""
-                        style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                        onmouseover="this.style.transform='scale(1.2)'"
-                        onmouseout="this.style.transform=scale(1)'">
-                </div>
-                <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng ăn</h4>
-            </div>  
-            <div>
-                <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                    <img src="https://picsum.photos/800/1200?random=41" alt=""
-                        style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                        onmouseover="this.style.transform='scale(1.2)'"
-                        onmouseout="this.style.transform=scale(1)'">
-                </div>
-                <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng làm việc</h4>
-            </div>
-        </div>
+{{-- Newsletter CTA --}}
+<section class="py-16 md:py-20 px-4 md:px-8 bg-gray-50">
+    <div class="max-w-3xl mx-auto text-center newsletter">
+        <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">Nhận ưu đãi độc quyền</h3>
+        <p class="text-gray-600 mb-6">Đăng ký nhận bản tin để cập nhật sản phẩm mới và khuyến mãi</p>
+        <form class="flex flex-col sm:flex-row gap-3 justify-center p-4" method="post" action="{{ route('client.newsletter.subscribe') }}">
+            @csrf
+            <input type="email" name="email" placeholder="Email của bạn" class="px-4 py-3 bg-white border border-gray-200 rounded-lg flex-1 min-w-[240px] focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <button class="btn-primary">Đăng ký</button>
+        </form>
     </div>
-{{-- end  --}}
-
-
-{{-- goc chia sẻ --}}
-    <div style="text-align: center; padding: 40px 0; background: #f9f9f9; overflow:hidden;">
-        <h2 style="font-size: 28px; font-weight:700; margin-bottom:30px">Góc Cảm Hứng</h2>
-
-        <div style="display:flex;justify-content:center;gap:2vw;flex-wrap:nowrap;">
-            <div class="article-card" style="width:48vw;background:#fff;border-radius:10px;overflow:hidden;text-align:left;box-shadow:0 4px 12px  rgba(0,0,0,0.1);flex-shrink:0;transition: all 0.4s ease;">
-                <img src="https://picsum.photos/800/600?random=12" alt="Bài viết 1" style="width: 100%; height:60vh; object-fit: cover; display: block">
-                <h3 style="font-size: 20px; font-weight: 600; margin: 16px; ">Thiết kế hiện đại cho không gian nhỏ</h3>
-                <p style="font-size: 14px; color:#555; line-height: 1.6; margin: 0 16px 20px;">
-                    Những ý tưởng thông minh giúp tận dụng tối đa diện tích, mang lại sự tiện nghi và phong cách hiện đại.
-                    Từ màu sắc, ánh sáng đến cách bố trí nội thất, tất cả đều tạo nên cảm giác thoải mái và ấm cúng cho căn hộ của bạn.
-                </p>
-            </div>
-              <div class="article-card" style="width: 48vw; background: #fff; border-radius:10px; overflow:hidden; text-align: left; box-shadow: 0 4px 12px  rgba(0,0,0,0.1); flex-shrink:0;  transition: all 0.4s ease;">
-                <img src="https://picsum.photos/800/600?random=32" alt="Bài viết 1" style="width: 100%; height:60vh; object-fit: cover; display: block">
-                <h3 style="font-size: 20px; font-weight: 600; margin: 16px; ">Thiết kế hiện đại cho không gian nhỏ</h3>
-                <p style="font-size: 14px; color:#555; line-height: 1.6; margin: 0 16px 20px;">
-                    Cây xanh và ánh sáng tự nhiên đang trở thành xu hướng trong thiết kế nội thất hiện đại.
-                    Cùng khám phá cách đưa thiên nhiên vào ngôi nhà của bạn để tạo nên không gian thư giãn và tươi mới mỗi ngày.
-               </p>
-            </div>
-        </div>
-    </div>
-{{--  --}}
-
-
-
-{{-- bai content 2 --}}
-     <div style="display:flex;width:100%;height:60vh;gap:24px;padding:0;           
-                    box-sizing:border-box;background-color: rgb(4, 52, 110)">
-        <div style="width:50%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;text-align:center;">
-            <h2 style="font-size:24px;font-weight:600;margin:12px 0; color:#fff">Phong cách hiện đại</h2>
-            <p style="color:#cecece;font-size:14px;line-height:1.6
-                        ;margin-bottom:20px;margin:50px">
-                Khám phá bộ sưu tập nội thất mới nhất mang đậm hơi thở đương đại.
-                Ra đời vào năm 2024, là một trong những thương hiệu tiên phong 
-                trong ngành nội thất, với nguồn cảm hứng văn hóa Việt và gu thẩm mỹ
-                tinh tế. Qua 26 năm hoạt động, Nhà Xinh luôn chú trọng đổi mới để 
-                duy trì vị thế là thương hiệu nội thất hàng đầu tại Việt Nam.
-            </p>
-            <button style="background:#393939;color:#fff;border:none;
-                            padding:10px 24px; border-radius:6px;cursor:pointer;transition:.3s;" onmouseover="this.style.background='#444'" onmouseout="this.style.background='#222'">Xem ngay</button>
-        </div>
-        <div style="width:50%;height:100%;overflow:hidden;;">
-            <img src="https://picsum.photos/1000/800?random=9" style="width:100%;height:100%;object-fit:cover;transition:1s;" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'">
-        </div>
-    </div>
-               
-{{--  --}}
-
-    <script>
-        let i=0, s=document.querySelectorAll('.slide');
-        setInterval(() => {
-            s[i].classList.remove('active');
-            i=(i+1)%s.length;
-            s[i].classList.add('active');
-        }, 2);
-    </script>
+</section>
 
 @endsection
+
+@push('scripts')
+@vite('resources/js/home.js')
+@endpush

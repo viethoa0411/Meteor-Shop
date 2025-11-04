@@ -45,7 +45,23 @@ class User extends Authenticatable
     }
 
     /**
-     * 👇 Thêm cột deleted_at để Laravel biết đang bật soft delete
+     * Scope để lọc theo role
      */
-    protected $dates = ['deleted_at'];
+    public function scopeAdmin($query)
+    {
+        return $query->where('role', 'admin');
+    }
+
+    public function scopeUser($query)
+    {
+        return $query->where('role', 'user');
+    }
+
+    /**
+     * Các quan hệ với models khác
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

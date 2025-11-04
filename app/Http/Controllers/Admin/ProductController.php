@@ -18,10 +18,8 @@ class ProductController extends Controller
 {
     /**
      * Danh sách sản phẩm (có tìm kiếm và lọc)
-     * View: resources/views/admin/products/list.blade.php
-     * Route name: admin.products.list
      */
-    public function index(Request $req)
+    public function index(Request $request)
     {
         $q = Product::query()
             ->select(['id', 'name', 'slug', 'price', 'stock', 'image', 'category_id', 'brand_id', 'status', 'created_at'])
@@ -29,26 +27,26 @@ class ProductController extends Controller
             ->orderByDesc('id');
 
         // Tìm kiếm
-        if ($search = trim((string) $req->get('search'))) {
-            $q->where(function ($x) use ($search) {
-                $x->where('name', 'like', "%{$search}%")
+        if ($search = trim((string) $request->get('search'))) {
+            $q->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
                     ->orWhere('slug', 'like', "%{$search}%");
             });
         }
 
         // Lọc theo trạng thái
-        if ($status = $req->get('status')) {
+        if ($status = $request->get('status')) {
             $q->where('status', $status);
         }
 
         // Lọc theo danh mục
-        if ($cat = $req->get('category_id')) {
-            $q->where('category_id', $cat);
+        if ($categoryId = $request->get('category_id')) {
+            $q->where('category_id', $categoryId);
         }
 
-        // Lọc theo thương hiệu (nếu có)
-        if ($brand = $req->get('brand_id')) {
-            $q->where('brand_id', $brand);
+        // Lọc theo thương hiệu
+        if ($brandId = $request->get('brand_id')) {
+            $q->where('brand_id', $brandId);
         }
 
         $products   = $q->paginate(15)->withQueryString();
@@ -60,8 +58,6 @@ class ProductController extends Controller
 
     /**
      * Form tạo sản phẩm mới
-     * View: resources/views/admin/products/create.blade.php
-     * Route name: admin.products.create
      */
     public function create()
     {
@@ -73,7 +69,6 @@ class ProductController extends Controller
 
     /**
      * Lưu sản phẩm mới
-     * Route name: admin.products.store
      */
     public function store(StoreProductRequest $request)
     {
@@ -105,7 +100,7 @@ class ProductController extends Controller
             $variants = [];
 
             if ($colors->isEmpty() && $sizes->isEmpty()) {
-                // không tạo biến thể
+                // Không tạo biến thể nếu không có màu và kích thước
             } elseif ($colors->isEmpty()) {
                 foreach ($sizes as $sz) {
                     $variants[] = [
@@ -156,7 +151,6 @@ class ProductController extends Controller
 
     /**
      * Xem chi tiết sản phẩm
-     * View: resources/views/admin/products/show.blade.php
      */
     public function show(Product $product)
     {
@@ -166,7 +160,6 @@ class ProductController extends Controller
 
     /**
      * Form sửa sản phẩm
-     * View: resources/views/admin/products/edit.blade.php
      */
     public function edit(Product $product)
     {
@@ -178,7 +171,6 @@ class ProductController extends Controller
 
     /**
      * Cập nhật sản phẩm
-     * Route name: admin.products.update
      */
     public function update(UpdateProductRequest $request, Product $product)
     {

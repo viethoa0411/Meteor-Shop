@@ -1,0 +1,6 @@
+/* PLP styles */
+.product-card { background:#fff; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.06); padding:16px; display:flex; flex-direction:column; transition:transform .3s ease, box-shadow .3s ease; }
+.product-card:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(0,0,0,.12); }
+.product-img-container img { display:block; width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:10px; }
+
+

@@ -2,26 +2,44 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    protected $table = 'categories';
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'slug',
         'description',
         'parent_id',
-        'status'
+        'status',
     ];
 
-    public function parent()
+    /**
+     * Quan hệ với danh mục cha
+     */
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    public function children()
+    /**
+     * Quan hệ với danh mục con
+     */
+    public function children(): HasMany
     {
-        return $this->hasMany(Category::class, 'parent_id')->with('children');
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    /**
+     * Quan hệ với sản phẩm
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 }
