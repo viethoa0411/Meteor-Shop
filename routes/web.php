@@ -63,7 +63,6 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/show/{id}', [ProductController::class, 'show'])->name('show');
         Route::delete('/delete/{id}', [ProductController::class, 'destroy'])->name('destroy');
     });
-
     // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');

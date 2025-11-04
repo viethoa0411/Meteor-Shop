@@ -76,18 +76,24 @@ class ProductController extends Controller
             'brand_id' => 'nullable|exists:brands,id',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'status' => 'required|in:active,inactive',
+            'variants' => 'nullable|array',
+            'variants.*.color_name' => 'nullable|string|max:50',
+            'variants.*.color_code' => 'nullable|string|max:10',
+            'variants.*.length' => 'nullable|numeric',
+            'variants.*.width' => 'nullable|numeric',
+            'variants.*.height' => 'nullable|numeric',
         ]);
 
-        // Ảnh
+        // Upload ảnh chính
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
-        // Lưu sản phẩm chính
+        // Lưu sản phẩm
         $product = Product::create([
             'name' => $request->name,
-            'slug' => $request->slug ? Str::slug($request->slug) : Str::slug($request->name),
+            'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
@@ -97,24 +103,21 @@ class ProductController extends Controller
             'status' => $request->status,
         ]);
 
-        if ($request->has('colors') && $request->has('sizes')) {
-            $color = $request->colors[0];
-            $size  = $request->sizes[0];
-
-            $product->variants()->create([
-                'color_name' => $color['name'] ?? null,
-                'color_code' => $color['code'] ?? null,
-                'length'     => $size['length'] ?? null,
-                'width'      => $size['width'] ?? null,
-                'height'     => $size['height'] ?? null,
-                'price'      => $request->price,
-                'stock'      => $request->stock,
-            ]);
+        // Lưu biến thể (nếu có)
+        if ($request->has('variants')) {
+            foreach ($request->variants as $variant) {
+                $product->variants()->create([
+                    'color_name' => $variant['color_name'] ?? null,
+                    'color_code' => $variant['color_code'] ?? null,
+                    'length' => $variant['length'] ?? null,
+                    'width' => $variant['width'] ?? null,
+                    'height' => $variant['height'] ?? null,
+                ]);
+            }
         }
 
-
         return redirect()->route('admin.products.list')
-            ->with('success', 'Thêm sản phẩm thành công!');
+            ->with('success', 'Thêm sản phẩm và biến thể thành công!');
     }
 
 
