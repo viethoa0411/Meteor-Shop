@@ -127,54 +127,53 @@
 
                         <hr>
 
-                        {{-- Biến thể sản phẩm --}}
-                        <h5 class="mb-3">Danh sách biến thể</h5>
+                            {{-- Biến thể sản phẩm --}}
+                                <h5 class="mb-3">Danh sách biến thể</h5>
 
-                        @if ($product->variants->count())
-                            <div class="table-responsive">
-                                <table class="table table-bordered align-middle">
-                                    <thead class="table-light">
-                                        <tr class="text-center">
-                                            <th>#</th>
-                                            <th>Màu</th>
-                                            <th>Kích thước (D × R × C)</th>
-                                            <th>Giá</th>
-                                            <th>Tồn kho</th>
-                                            <th>SKU</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($product->variants as $i => $v)
-                                            <tr class="text-center">
-                                                <td>{{ $i + 1 }}</td>
-                                                <td>
-                                                    @if ($v->color_code)
-                                                        <span class="d-inline-block rounded border"
-                                                            style="width:25px;height:25px;background:{{ $v->color_code }}"></span>
-                                                        <div>{{ $v->color_name ?? $v->color_code }}</div>
-                                                    @else
-                                                        —
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if ($v->length || $v->width || $v->height)
-                                                        {{ $v->length ?? '—' }} × {{ $v->width ?? '—' }} ×
-                                                        {{ $v->height ?? '—' }} cm
-                                                    @else
-                                                        —
-                                                    @endif
-                                                </td>
-                                                <td>{{ number_format($v->price ?? $product->price, 0, ',', '.') }} VNĐ</td>
-                                                <td>{{ $v->stock }}</td>
-                                                <td>{{ $v->sku ?? '—' }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <p class="text-muted">Sản phẩm này chưa có biến thể nào.</p>
-                        @endif
+                                @if($product->variants->count())
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered align-middle">
+                                            <thead class="table-light">
+                                                <tr class="text-center">
+                                                    <th>#</th>
+                                                    <th>Màu</th>
+                                                    <th>Kích thước (D × R × C)</th>
+                                                    <th>Giá</th>
+                                                    <th>Tồn kho</th>
+                                                    <th>SKU</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($product->variants as $i => $v)
+                                                    <tr class="text-center">
+                                                        <td>{{ $i+1 }}</td>
+                                                        <td>
+                                                            @if($v->color_code)
+                                                                <span class="d-inline-block rounded border" style="width:25px;height:25px;background:{{ $v->color_code }}"></span>
+                                                                <div>{{ $v->color_name ?? $v->color_code }}</div>
+                                                            @else
+                                                                —
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if($v->length || $v->width || $v->height)
+                                                                {{ $v->length ?? '—' }} × {{ $v->width ?? '—' }} × {{ $v->height ?? '—' }} cm
+                                                            @else
+                                                                —
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ number_format($v->price ?? $product->price, 0, ',', '.') }} VNĐ</td>
+                                                        <td>{{ $v->stock }}</td>
+                                                        <td>{{ $v->sku ?? '—' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <p class="text-muted">Sản phẩm này chưa có biến thể nào.</p>
+                                @endif
+                            {{-- end Biến thể sản phẩm --}}
 
                         <div>
                             <div class="text-muted small mb-1">Mô tả</div>
@@ -185,7 +184,6 @@
                     </div>
                 </div>
 
-                {{-- Biến thể sản phẩm --}}
 
                 {{-- Action phụ --}}
                 <div class="d-flex gap-2 mt-3">

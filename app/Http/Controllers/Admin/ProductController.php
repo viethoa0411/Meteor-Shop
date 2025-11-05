@@ -10,6 +10,8 @@ use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -68,8 +70,9 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:products,slug',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
@@ -84,41 +87,89 @@ class ProductController extends Controller
             'variants.*.height' => 'nullable|numeric',
         ]);
 
-        // Upload ảnh chính
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
+        $data = $validated;
+
+        // nếu slug trống hoặc không có, tự động tạo slug mới
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['name']);
         }
-
-        // Lưu sản phẩm
-        $product = Product::create([
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'image' => $imagePath,
-            'category_id' => $request->category_id,
-            'brand_id' => $request->brand_id,
-            'status' => $request->status,
-        ]);
-
-        // Lưu biến thể (nếu có)
-        if ($request->has('variants')) {
-            foreach ($request->variants as $variant) {
-                $product->variants()->create([
-                    'color_name' => $variant['color_name'] ?? null,
-                    'color_code' => $variant['color_code'] ?? null,
-                    'length' => $variant['length'] ?? null,
-                    'width' => $variant['width'] ?? null,
-                    'height' => $variant['height'] ?? null,
-                ]);
+            // Upload ảnh (nếu có)
+            if ($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('products', 'public');
             }
-        }
 
-        return redirect()->route('admin.products.list')
-            ->with('success', 'Thêm sản phẩm và biến thể thành công!');
+            // Tạo sản phẩm và biến thể trong transaction
+            $product = DB::transaction(function () use ($request, $data) {
+
+                // Tạo sản phẩm
+                $product = Product::create($data);
+
+                // Lấy danh sách màu & kích thước từ form (được JS thêm input ẩn)
+                $colors = collect($request->input('colors', []))
+                    ->filter(fn($c) => !empty($c['code']))
+                    ->values();
+
+                $sizes = collect($request->input('sizes', []))
+                    ->filter(fn($s) => Arr::has($s, ['length', 'width', 'height']))
+                    ->values();
+
+                // Giá & tồn kho mặc định (nếu có)
+                $basePrice = $data['variant_price'] ?? ($data['price'] ?? null);
+                $baseStock = $data['variant_stock'] ?? ($data['stock'] ?? 0);
+
+                // Sinh tổ hợp biến thể
+                $variants = [];
+
+                if ($colors->isEmpty() && $sizes->isEmpty()) {
+                    // Không tạo biến thể
+                } elseif ($colors->isEmpty()) {
+                    foreach ($sizes as $sz) {
+                        $variants[] = [
+                            'length' => $sz['length'],
+                            'width'  => $sz['width'],
+                            'height' => $sz['height'],
+                            'price'  => $basePrice,
+                            'stock'  => $baseStock,
+                        ];
+                    }
+                } elseif ($sizes->isEmpty()) {
+                    foreach ($colors as $c) {
+                        $variants[] = [
+                            'color_name' => $c['name'] ?? null,
+                            'color_code' => $c['code'],
+                            'price'      => $basePrice,
+                            'stock'      => $baseStock,
+                        ];
+                    }
+                } else {
+                    foreach ($colors as $c) {
+                        foreach ($sizes as $sz) {
+                            $variants[] = [
+                                'color_name' => $c['name'] ?? null,
+                                'color_code' => $c['code'],
+                                'length'     => $sz['length'],
+                                'width'      => $sz['width'],
+                                'height'     => $sz['height'],
+                                'price'      => $basePrice,
+                                'stock'      => $baseStock,
+                            ];
+                        }
+                    }
+                }
+
+                // Lưu các biến thể
+                if (!empty($variants)) {
+                    $product->variants()->createMany($variants);
+                }
+
+                return $product;
+            });
+
+            return redirect()
+                ->route('admin.products.list', $product)
+                ->with('success', 'Đã tạo sản phẩm và các biến thể thành công!');
     }
+    
 
 
 

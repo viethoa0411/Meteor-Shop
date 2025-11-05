@@ -21,7 +21,6 @@ return new class extends Migration
             $table->decimal('length', 8, 2)->nullable();
             $table->decimal('width',  8, 2)->nullable();
             $table->decimal('height', 8, 2)->nullable();
-
             // Dữ liệu riêng cho biến thể (nếu cần)
             $table->decimal('price', 10, 2)->nullable();
             $table->integer('stock')->default(0);
