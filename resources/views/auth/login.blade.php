@@ -15,36 +15,18 @@
         }
 
         body {
-            background-image: url('{{ asset("images/nen_Login.jpg") }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 1;
         }
 
         .login-container {
             width: 100%;
             max-width: 450px;
             padding: 20px;
-            position: relative;
-            z-index: 2;
         }
 
         .login-card {
@@ -60,6 +42,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -73,21 +56,8 @@
             text-align: center;
         }
 
-        .logo-container {
-            margin-bottom: 20px;
-        }
-
-        .logo-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
         .login-header h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             margin-bottom: 10px;
         }
@@ -111,7 +81,7 @@
             color: #333;
             margin-bottom: 8px;
             display: block;
-font-size: 14px;
+            font-size: 14px;
         }
 
         .form-control {
@@ -146,7 +116,7 @@ font-size: 14px;
             border-color: #667eea;
         }
 
-        .input-group .form-control:focus + .input-group-text {
+        .input-group .form-control:focus+.input-group-text {
             border-color: #667eea;
         }
 
@@ -185,6 +155,7 @@ font-size: 14px;
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -237,7 +208,7 @@ font-size: 14px;
         }
 
         .form-check-input:checked {
-background-color: #667eea;
+            background-color: #667eea;
             border-color: #667eea;
         }
 
@@ -269,8 +240,9 @@ background-color: #667eea;
 
         .role-info {
             background-color: #e7f3ff;
-            border-left: 4px solid #667eea;
-            padding: 12px 15px;
+            <<<<<<< HEAD border-left: 4px solid #667eea;
+            =======border-left: 4px solid #667eea;
+            >>>>>>>login padding: 12px 15px;
             border-radius: 4px;
             margin-bottom: 20px;
             font-size: 13px;
@@ -307,10 +279,7 @@ background-color: #667eea;
         <div class="login-card">
             <!-- Header -->
             <div class="login-header">
-                <div class="logo-container">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="Meteor Shop Logo" class="logo-image">
-                </div>
-                <h1>Đăng nhập</h1>
+                <h1><i class="bi bi-shield-lock"></i> Meteor Shop</h1>
             </div>
 
             <!-- Body -->
@@ -338,7 +307,7 @@ background-color: #667eea;
                 </div> --}}
 
                 <!-- Form đăng nhập -->
-                <form  novalidate>
+                <form action="{{ route('login') }}" method="POST" novalidate>
                     @csrf
 
                     <!-- Email -->
@@ -346,9 +315,9 @@ background-color: #667eea;
                         <label for="email" class="form-label">
                             <i class="bi bi-envelope"></i> Email
                         </label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" placeholder="Nhập email của bạn" 
-                               value="{{ old('email') }}" required autofocus>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                            name="email" placeholder="Nhập email của bạn" value="{{ old('email') }}" required
+                            autofocus>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -356,14 +325,14 @@ background-color: #667eea;
 
                     <!-- Password -->
                     <div class="form-group">
-                        <label for="password" class="form-label">
-                            <i class="bi bi-lock"></i> Mật khẩu
+                        <label for="password" class="form-label"><i class="bi bi-lock"></i> Mật khẩu
+                                <i class="bi bi-lock"></i> Mật khẩu
                         </label>
                         <div class="input-group">
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                   id="password" name="password" placeholder="Nhập mật khẩu" required>
-                            <button class="input-group-text" type="button" id="togglePassword" 
-                                    style="cursor: pointer; border: 2px solid #e0e0e0;">
+                            <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                id="password" name="password" placeholder="Nhập mật khẩu" required>
+                            <button class="input-group-text" type="button" id="togglePassword"
+                                style="cursor: pointer; border: 2px solid #e0e0e0;">
                                 <i class="bi bi-eye" id="eyeIcon"></i>
                             </button>
                         </div>
@@ -380,22 +349,21 @@ background-color: #667eea;
                                 Ghi nhớ tôi
                             </label>
                         </div>
-                        <a href="#" class="forgot-password">Bạn chưa có tài khoản?</a>
-                        <a href="#" class="forgot-password">Quên mật khẩu?</a>
-
+                            <a href="{{ route('register') }}" class="forgot-password">Bạn chưa có tài khoản?</a>
+                            <a href="{{ route('password.request') }}" class="forgot-password">Quên mật khẩu?</a>
                     </div>
 
                     <!-- Submit Button -->
                     <button type="submit" class="btn-login">
                         <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
                     </button>
-                    
+
                 </form>
             </div>
 
             <!-- Footer -->
             <div class="login-footer">
-                © 2025 <strong>Meteor Shop</strong> 
+                © 2025 <strong>Meteor Shop</strong>
             </div>
         </div>
     </div>
@@ -404,7 +372,7 @@ background-color: #667eea;
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-// Toggle password visibility
+        // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
@@ -421,5 +389,4 @@ background-color: #667eea;
         });
     </script>
 </body>
-
 </html>

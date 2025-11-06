@@ -23,6 +23,7 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        // Xác thực dữ liệu đầu vào
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6',
@@ -30,19 +31,18 @@ class AuthController extends Controller
             'email.required' => 'Email là bắt buộc',
             'email.email' => 'Email không hợp lệ',
             'password.required' => 'Mật khẩu là bắt buộc',
-            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự',
+            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
         ]);
 
         $credentials = $request->only('email', 'password');
 
         // Kiểm tra xem user có tồn tại không
         $user = User::where('email', $request->email)->first();
-
         if (!$user) {
             return back()->withErrors(['email' => 'Email không tồn tại trong hệ thống'])->withInput();
         }
 
-        // Kiểm tra trạng thái user
+        // Kiểm tra trạng thái tài khoản
         if ($user->status === 'banned') {
             return back()->withErrors(['email' => 'Tài khoản của bạn đã bị cấm'])->withInput();
         }
@@ -51,7 +51,7 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Tài khoản của bạn chưa được kích hoạt'])->withInput();
         }
 
-        // Kiểm tra role - chỉ admin mới được đăng nhập
+        // Kiểm tra role - chỉ admin mới được đăng nhập vào trang quản trị
         if ($user->role !== 'admin') {
             return back()->withErrors(['email' => 'Bạn không có quyền truy cập vào trang quản trị'])->withInput();
         }
@@ -66,9 +66,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Xử lý đăng xuất
-     */
-    /**
      * Đăng xuất
      */
     public function logout(Request $request)
@@ -76,7 +73,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('login')->with('success', 'Đã đăng xuất thành công!');
     }
-    
 }

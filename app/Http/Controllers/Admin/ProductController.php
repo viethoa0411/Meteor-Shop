@@ -76,15 +76,22 @@ class ProductController extends Controller
             'brand_id' => 'nullable|exists:brands,id',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'status' => 'required|in:active,inactive',
+            'variants' => 'nullable|array',
+            'variants.*.color_name' => 'nullable|string|max:50',
+            'variants.*.color_code' => 'nullable|string|max:10',
+            'variants.*.length' => 'nullable|numeric',
+            'variants.*.width' => 'nullable|numeric',
+            'variants.*.height' => 'nullable|numeric',
         ]);
 
-        // Xử lý upload ảnh
+        // Upload ảnh chính
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
-        Product::create([
+        // Lưu sản phẩm
+        $product = Product::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'description' => $request->description,
@@ -96,8 +103,21 @@ class ProductController extends Controller
             'status' => $request->status,
         ]);
 
+        // Lưu biến thể (nếu có)
+        if ($request->has('variants')) {
+            foreach ($request->variants as $variant) {
+                $product->variants()->create([
+                    'color_name' => $variant['color_name'] ?? null,
+                    'color_code' => $variant['color_code'] ?? null,
+                    'length' => $variant['length'] ?? null,
+                    'width' => $variant['width'] ?? null,
+                    'height' => $variant['height'] ?? null,
+                ]);
+            }
+        }
+
         return redirect()->route('admin.products.list')
-            ->with('success', 'Thêm sản phẩm thành công!');
+            ->with('success', 'Thêm sản phẩm và biến thể thành công!');
     }
 
 
@@ -105,10 +125,10 @@ class ProductController extends Controller
     /**
      * Xem chi tiết
      */
-    public function show(Product $id)
+    public function show($id)
     {
-        $id->load(['category:id,name', 'brand:id,name']);
-        return view('admin.products.show', compact('products'));
+        $product = Product::with(['category:id,name', 'brand:id,name'])->findOrFail($id);
+        return view('admin.products.show', compact('product'));
     }
 
     /**
@@ -158,5 +178,4 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('admin.products.list')->with('success', 'Đã xoá sản phẩm!');
     }
-
 }

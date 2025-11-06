@@ -9,15 +9,18 @@ use Illuminate\Support\Facades\Auth;
 class AdminMiddleware
 {
     /**
-     * Kiểm tra xem user có phải admin không
+     * Kiểm tra xem user có phải admin hoặc staff không
      */
     public function handle(Request $request, Closure $next)
     {
+        // Nếu chưa đăng nhập, chuyển hướng đến trang login
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Vui lòng đăng nhập trước.');
         }
 
-        if (Auth::user()->role !== 'admin') {
+        // Kiểm tra role - chỉ admin hoặc staff mới có quyền
+        $user = Auth::user();
+        if (!in_array($user->role, ['admin', 'staff'])) {
             return redirect()->route('login')->with('error', 'Bạn không có quyền truy cập trang quản trị.');
         }
 

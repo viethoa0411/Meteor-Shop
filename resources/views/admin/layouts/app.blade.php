@@ -21,7 +21,6 @@
             display: flex;
             flex: 1;
             min-height: calc(100vh - 56px - 50px);
-            /* trừ header và footer */
         }
 
         .sidebar {
@@ -108,6 +107,20 @@
                 display: none;
             }
         }
+
+        /* Submenu */
+        .submenu {
+            display: none;
+            background-color: #3d434a;
+        }
+
+        .submenu a {
+            padding-left: 45px;
+        }
+
+        .dropdown-menu-item:hover .submenu {
+            display: block;
+        }
     </style>
 </head>
 
@@ -125,14 +138,10 @@
                             <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="bi bi-person"></i> Hồ sơ
-                                </a>
-                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                                <form action="#" method="POST" style="display: inline;">
                                     @csrf
                                     <button type="submit" class="dropdown-item"
                                         onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
@@ -156,9 +165,8 @@
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
             <a href="{{ route('admin.orders.index')}}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
-
             <div class="dropdown-menu-item">
-                <a><i class="bi bi-people-fill me-2"></i> Người dùng <i class="bi bi-chevron-right float-end"></i></a>
+                <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản <i class="bi bi-chevron-right float-end"></i></a>
                 <div class="submenu">
                     <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin</a>
                     <a href="{{ route('admin.account.users.list') }}"><i class="bi bi-people-fill me-2"></i> Quản lý User</a>
@@ -181,5 +189,6 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 </body>
 </html>
