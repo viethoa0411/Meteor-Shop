@@ -338,8 +338,8 @@ background-color: #667eea;
                 </div> --}}
 
                 <!-- Form đăng nhập -->
-                <form action="{{ route('login') }}" method="POST" novalidate>
-@csrf
+                <form  novalidate>
+                    @csrf
 
                     <!-- Email -->
                     <div class="form-group">
