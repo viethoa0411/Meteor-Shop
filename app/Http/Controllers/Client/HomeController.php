@@ -24,7 +24,7 @@ class HomeController extends Controller
             ->orderByDesc('stock')
             ->limit(4)
             ->get();
-            
+
         $cate = Category::query()
             ->select(['name', 'slug', 'description', 'parent_id', 'status'])
             ->where('status', 1)

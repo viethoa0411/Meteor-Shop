@@ -197,9 +197,9 @@
         }
 
         .product-img {
-            
+
         }
-        
+
         .product-name {
             font-size: 16px;
             font-weight: 600;
@@ -317,7 +317,7 @@
 
 </head>
 <body>
-    
+
     <header class="header">
         <div class="container-header">
             {{-- Logo --}}
@@ -355,8 +355,8 @@
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
                         <a href="">{{ $c->name }}</a>
-                    @endforeach    
-                </div>            
+                    @endforeach
+                </div>
             @endif
     </header>
 
@@ -394,7 +394,7 @@
                 <p style="margin: 6px 0">Hướng dẫn bán hàng</p>
                 <p style="margin: 6px 0">Thanh toán</p>
             </div>
-            
+
              <!-- Cột 4 -->
             <div style="flex:1; min-width:180px">
                 <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">DANH MỤC</h4>

@@ -33,7 +33,7 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 Route::get('/', [HomeController::class, 'index'])->name('client.home');
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/detail/{slug}', [ProductPublicController::class, 'show'])->name('client.product.detail');
-Route::get('/search', [HomeController::class, 'search'])->name('client.product.search');
+Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
@@ -98,5 +98,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
+
+
     });
 });
