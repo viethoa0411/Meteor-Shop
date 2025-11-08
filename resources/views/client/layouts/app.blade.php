@@ -350,7 +350,6 @@
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
                         <a href="">{{ $c->name }}</a>
-                    @endforeach
                         <a href="{{ route('client.product.category', $c->slug) }}">{{ $c->name }}</a>
                     @endforeach    
                 </div>      
