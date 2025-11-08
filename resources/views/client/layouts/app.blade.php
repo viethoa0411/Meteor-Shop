@@ -346,22 +346,17 @@
 
         <!-- Menu dọc -->
         <div class="overlay"></div>
-            {{-- Giờ đây $cate luôn tồn tại nhờ ViewServiceProvider --}}
             @if (isset($cate) && $cate->count() > 0)
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
-<<<<<<< HEAD
                         <a href="">{{ $c->name }}</a>
                     @endforeach
-=======
-                        {{-- ĐÃ SỬA: Thêm route('client.product.category') --}}
                         <a href="{{ route('client.product.category', $c->slug) }}">{{ $c->name }}</a>
                     @endforeach    
                 </div>      
             @else
                 <div class="vertical-menu">
                     <a href="#">Hiện chưa có danh mục</a>
->>>>>>> main
                 </div>
             @endif
     </header>
