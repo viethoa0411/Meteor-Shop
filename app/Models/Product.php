@@ -7,14 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
-        'name','slug','description','price','stock','image', 'length', 'width', 'height', 'color_code','category_id','brand_id','status'
+        'name',
+        'slug',
+        'description',
+        'price',
+        'stock',
+        'image',
+        'length',
+        'width',
+        'height',
+        'color_code',
+        'category_id',
+        'brand_id',
+        'status'
     ];
 
     // Quan hệ
-    public function category() {
-        return $this->belongsTo(Category::class);
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
-    public function brand() {
+    public function brand()
+    {
         return $this->belongsTo(Brand::class);
     }
 
@@ -22,7 +36,4 @@ class Product extends Model
     {
         return $this->hasMany(ProductVariant::class);
     }
-
-    
-
 }
