@@ -41,6 +41,36 @@ class BlogController extends Controller
     // Lưu bài viết mới vào database
     public function store(Request $request)
     {
+
+      // Validate dữ liệu đầu vào
+        $validated = $request->validate([
+            'title'     => 'required|string|min:3|max:255',
+            'content'   => 'required|string|min:10',
+            'excerpt'   => 'nullable|string|max:500',
+            'status'    => 'required|in:active,inactive',
+            'author'    => 'required|string|min:2',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048|dimensions:min_width=100,min_height=100',
+        ], [
+            'title.required' => 'Tiêu đề là bắt buộc.',
+            'title.min' => 'Tiêu đề phải có ít nhất 3 ký tự.',
+            'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
+            'title.string' => 'Tiêu đề phải là chuỗi ký tự.',
+            'content.required' => 'Nội dung là bắt buộc.',
+            'content.min' => 'Nội dung phải có ít nhất 10 ký tự.',
+            'content.string' => 'Nội dung phải là chuỗi ký tự.',
+            'excerpt.string' => 'Mô tả ngắn phải là chuỗi ký tự.',
+            'excerpt.max' => 'Mô tả ngắn không được vượt quá 500 ký tự.',
+            'status.required' => 'Trạng thái là bắt buộc.',
+            'status.in' => 'Trạng thái không hợp lệ. Chỉ chấp nhận: hoạt động hoặc dừng hoạt động.',
+            'author.required' => 'Tác giả là bắt buộc.',
+            'author.min' => 'Tác giả phải có ít nhất 2 ký tự.',
+            'author.string' => 'Tác giả phải là chuỗi ký tự.',
+            'thumbnail.image' => 'File phải là hình ảnh.',
+            'thumbnail.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif, webp.',
+            'thumbnail.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
+            'thumbnail.dimensions' => 'Hình ảnh phải có kích thước tối thiểu 100x100 pixel.',
+        ]);
+
          // Tìm user theo tên hoặc email
         $author = trim($request->author);
         $user = User::where('name', $author)
