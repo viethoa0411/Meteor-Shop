@@ -195,7 +195,7 @@
             display: block;
             transform-origin: center center; /* phóng to từ tâm ảnh */
         }
-        
+
         .product-name {
             font-size: 16px;
             font-weight: 600;
@@ -332,9 +332,8 @@
                 </ul>
             </nav>
             <!-- Ô tìm kiếm -->
-            {{-- <form action="{{ route('client.product.search') }}" method="GET" class="search-box"> --}}
-            <form action="#" method="GET" class="search-box">
-                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="">
+            <form action="{{ route('client.product.search') }}" method="GET" class="search-box">
+                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="{{ $searchQuery ?? '' }}">
                 <button type="submit">
                     <i class="fa fa-search"></i>
                 </button>
@@ -349,10 +348,9 @@
             @if (isset($cate) && $cate->count() > 0)
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
-                        <a href="">{{ $c->name }}</a>
                         <a href="{{ route('client.product.category', $c->slug) }}">{{ $c->name }}</a>
-                    @endforeach    
-                </div>      
+                    @endforeach
+                </div>
             @else
                 <div class="vertical-menu">
                     <a href="#">Hiện chưa có danh mục</a>
