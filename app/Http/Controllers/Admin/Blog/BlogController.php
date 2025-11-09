@@ -159,5 +159,13 @@ class BlogController extends Controller
         }
     }
 
+    // Hiển thị form chỉnh sửa bài viết
+    public function edit($id)
+    {
+        $blog = Blog::with('user')->findOrFail($id);
+        // Map status từ database sang form: published -> active, draft/archived -> inactive
+        $blog->form_status = $blog->status === 'published' ? 'active' : 'inactive';
+        return view('admin.blog.edit', compact('blog'));
+    }
     
 }
