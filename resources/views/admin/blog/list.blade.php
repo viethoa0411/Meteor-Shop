@@ -163,7 +163,7 @@ margin-bottom: 0.75rem;
 
                 {{-- Nút thêm blog mới --}}
                 <div class="d-flex flex-shrink-0 gap-2">
-                    <a href="#" class="btn btn-primary">
+                    <a href="{{ route('admin.blogs.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Thêm blog mới
                     </a>
                 </div>
