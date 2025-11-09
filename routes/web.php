@@ -108,5 +108,6 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     Route::get('/edit/{id}', [BlogController::class, 'edit'])->name('edit');
     Route::put('/update/{id}', [BlogController::class, 'update'])->name('update');
     Route::get('/show/{id}', [BlogController::class, 'show'])->name('show');
+    Route::delete('/delete/{id}', [BlogController::class, 'destroy'])->name('destroy');
 });
 });

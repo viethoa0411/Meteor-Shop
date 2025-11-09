@@ -75,7 +75,7 @@
                     <i class="bi bi-pencil-square"></i> Sửa
                 </a>
 
-                <form action="#" method="POST" class="d-inline"
+                <form action="{{ route('admin.blogs.destroy', $blog->id) }}" method="POST" class="d-inline"
                       onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này không?');">
                     @csrf
                     @method('DELETE')

@@ -254,7 +254,14 @@ margin-bottom: 0.75rem;
                                         <i class="bi bi-pencil-square"></i> Sửa
                                     </a>
 
-                                    <button>Xóa</button>
+                                    <form action="{{ route('admin.blogs.destroy', $blog->id) }}" method="POST"
+                                        onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này không?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                    </form>
                                    <a href="{{ route('admin.blogs.show', $blog->id) }}" class="btn btn-sm btn-secondary">
                                         <i class="bi bi-eye"></i> Xem Chi Tiết
                                     </a>
