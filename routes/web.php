@@ -106,5 +106,5 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     Route::get('/create', [BlogController::class, 'create'])->name('create');
     Route::post('/store', [BlogController::class, 'store'])->name('store');
     
-});
+    });
 });

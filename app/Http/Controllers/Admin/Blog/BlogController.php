@@ -20,6 +20,17 @@ class BlogController extends Controller
         // Bước 2: Lọc theo trạng thái (mặc định là 'all')
         $status = $request->get('status', 'all');
         
+        if ($status !== 'all') {
+            // Nếu không phải 'all' thì lọc theo status cụ thể
+            // 'active' = published, 'inactive' = draft hoặc archived
+            if ($status === 'active') {
+                $query->where('status', 'published');
+            } elseif ($status === 'inactive') {
+                $query->whereIn('status', ['draft', 'archived']);
+            } else {
+                $query->where('status', $status);
+            }
+        }
 
         // Bước 3: Xử lý tìm kiếm (nếu có)
         if ($request->has('keyword') && $request->keyword != '') {
@@ -147,6 +158,8 @@ class BlogController extends Controller
             return back()->withInput()->with('error', 'Lỗi lưu database: ' . $e->getMessage());
         }
     }
+
+    
 
     
 }
