@@ -46,7 +46,7 @@
                         <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
 
-                    <form action="#" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.blogs.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="row">
