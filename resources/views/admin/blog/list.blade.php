@@ -255,7 +255,7 @@ margin-bottom: 0.75rem;
                                     </a>
 
                                     <button>Xóa</button>
-                                    <a href="#" class="btn btn-sm btn-secondary">
+                                   <a href="{{ route('admin.blogs.show', $blog->id) }}" class="btn btn-sm btn-secondary">
                                         <i class="bi bi-eye"></i> Xem Chi Tiết
                                     </a>
                                 </div>
