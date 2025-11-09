@@ -32,8 +32,8 @@ class BlogController extends Controller
             });
         }
         
-        // Bước 4: Sắp xếp theo ID giảm dần 
-        $blogs = $query->orderBy('id', 'desc')->paginate();
+        // Bước 4: Sắp xếp theo ID giảm dần và phân trang
+        $blogs = $query->orderBy('id', 'desc')->paginate(7);
 
         // Bước 5: Giữ lại từ khóa tìm kiếm và status khi chuyển trang
         $blogs->appends($request->only(['keyword', 'status']));

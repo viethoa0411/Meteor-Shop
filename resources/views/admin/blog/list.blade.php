@@ -250,6 +250,9 @@ margin-bottom: 0.75rem;
                 </tbody>
             </table>
         </div>
-        
+        {{-- Phân trang --}}
+        <div class="d-flex justify-content-center mt-4">
+            {{ $blogs->links('pagination::bootstrap-5') }}
+        </div>
     @endif
 @endsection
