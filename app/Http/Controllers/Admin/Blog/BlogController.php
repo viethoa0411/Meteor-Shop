@@ -33,6 +33,11 @@ class BlogController extends Controller
         // Bước 6: Trả về view với dữ liệu danh sách blog
         return view('admin.blog.list', compact('blogs'));
     }
+    // Hiển thị form tạo bài viết mới
+    public function create()
+    {
+        return view('admin.blog.create');
+    }
 
     
 }
