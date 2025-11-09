@@ -286,5 +286,26 @@ class BlogController extends Controller
         $blog = Blog::with('user')->findOrFail($id);
         return view('admin.blog.show', compact('blog'));
     }
+    // Xóa bài viết
+    public function destroy($id)
+    {
+        try {
+            $blog = Blog::findOrFail($id);
+
+            // Xóa ảnh thumbnail nếu có
+            if ($blog->thumbnail) {
+                $path = public_path('blog/images/' . $blog->thumbnail);
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
+
+            $blog->delete();
+
+            return redirect()->route('admin.blogs.index')->with('success', 'Đã xóa bài viết thành công!');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.blogs.index')->with('error', 'Lỗi khi xóa bài viết: ' . $e->getMessage());
+        }
+    }
     
 }
