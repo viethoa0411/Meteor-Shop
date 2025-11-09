@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Client\HomeController;
 // --- ĐÃ SỬA: Đổi thành ProductController mới ---
 use App\Http\Controllers\Client\ProductController as ClientProductController;
+use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
 
@@ -33,6 +34,7 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 // ============ CLIENT ROUTES ============
 Route::get('/', [HomeController::class, 'index'])->name('client.home');
 Route::get('/home', [HomeController::class, 'index']);
+Route::get('/detail/{slug}', [ProductPublicController::class, 'show'])->name('client.product.detail');
 Route::get('/search', [HomeController::class, 'search'])->name('client.product.search');
 Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category');
 Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail');

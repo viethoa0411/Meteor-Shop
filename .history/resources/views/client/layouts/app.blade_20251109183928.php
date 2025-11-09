@@ -349,7 +349,6 @@
             @if (isset($cate) && $cate->count() > 0)
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
-                        <a href="">{{ $c->name }}</a>
                         <a href="{{ route('client.product.category', $c->slug) }}">{{ $c->name }}</a>
                     @endforeach    
                 </div>      

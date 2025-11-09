@@ -33,7 +33,7 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 // ============ CLIENT ROUTES ============
 Route::get('/', [HomeController::class, 'index'])->name('client.home');
 Route::get('/home', [HomeController::class, 'index']);
-Route::get('/search', [HomeController::class, 'search'])->name('client.product.search');
+Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
 Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category');
 Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail');
 
