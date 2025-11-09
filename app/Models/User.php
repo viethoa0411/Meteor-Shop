@@ -2,31 +2,31 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+// 👉 Thêm dòng này để kích hoạt SoftDeletes
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes; // 👈 Thêm SoftDeletes ở đây
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Các trường được phép gán giá trị hàng loạt
      */
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+        'role',
+        'address',
+        'status',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Ẩn khi chuyển đổi sang JSON
      */
     protected $hidden = [
         'password',
@@ -34,9 +34,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Kiểu dữ liệu tự động ép kiểu
      */
     protected function casts(): array
     {
@@ -45,4 +43,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * 👇 Thêm cột deleted_at để Laravel biết đang bật soft delete
+     */
+    protected $dates = ['deleted_at'];
 }
