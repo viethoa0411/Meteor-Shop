@@ -280,5 +280,11 @@ class BlogController extends Controller
             return back()->withInput()->with('error', 'Lỗi cập nhật: ' . $e->getMessage());
         }
     }
+    // Hiển thị chi tiết bài viết
+    public function show($id)
+    {
+        $blog = Blog::with('user')->findOrFail($id);
+        return view('admin.blog.show', compact('blog'));
+    }
     
 }
