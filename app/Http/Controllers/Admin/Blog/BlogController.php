@@ -19,11 +19,19 @@ class BlogController extends Controller
 
         // Bước 2: Lọc theo trạng thái (mặc định là 'all')
         $status = $request->get('status', 'all');
-
         
 
+        // Bước 3: Xử lý tìm kiếm (nếu có)
+        if ($request->has('keyword') && $request->keyword != '') {
+            $keyword = $request->keyword;
+            // Tìm kiếm theo tiêu đề HOẶC excerpt HOẶC slug
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('excerpt', 'like', "%{$keyword}%")
+                    ->orWhere('slug', 'like', "%{$keyword}%");
+            });
+        }
         
-
         // Bước 4: Sắp xếp theo ID giảm dần 
         $blogs = $query->orderBy('id', 'desc')->paginate();
 

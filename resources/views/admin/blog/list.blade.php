@@ -161,6 +161,27 @@ margin-bottom: 0.75rem;
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
 
+
+                {{-- Ô tìm kiếm --}}
+                <form action="{{ route('admin.blogs.index') }}" method="GET"
+                    class="d-flex align-items-center flex-grow-1 mx-md-4" style="max-width: 500px;">
+                    {{-- Giữ lại tham số status khi tìm kiếm --}}
+                    <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+
+                    <div class="input-group w-100">
+                        <input type="text" name="keyword" class="form-control"
+                            placeholder="VD: tiêu đề, mô tả hoặc slug..." value="{{ request('keyword') }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                        @if (request('keyword'))
+                            <a href="{{ route('admin.blogs.index', ['status' => request('status', 'all')]) }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        @endif
+                    </div>
+                </form>
+
                 {{-- Nút thêm blog mới --}}
                 <div class="d-flex flex-shrink-0 gap-2">
                     <a href="{{ route('admin.blogs.create') }}" class="btn btn-primary">
