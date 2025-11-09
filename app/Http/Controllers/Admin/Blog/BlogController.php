@@ -12,13 +12,18 @@ use Illuminate\Support\Facades\File;
 class BlogController extends Controller
 {
     // Hiển thị danh sách bài viết với tìm kiếm và lọc
+<<<<<<< HEAD
     public function list(Request $request)
+=======
+    public function index(Request $request)
+>>>>>>>  Hiển thị tất cả bài viết
     {
         // Bước 1: Tạo query với quan hệ user
         $query = Blog::with('user');
 
         // Bước 2: Lọc theo trạng thái (mặc định là 'all')
         $status = $request->get('status', 'all');
+<<<<<<< HEAD
         
          if ($status !== 'all') {
             // Nếu không phải 'all' thì lọc theo status cụ thể
@@ -45,11 +50,21 @@ class BlogController extends Controller
         
         // Bước 4: Sắp xếp theo ID giảm dần và phân trang
         $blogs = $query->orderBy('id', 'desc')->paginate(7);
+=======
+
+        
+
+        
+
+        // Bước 4: Sắp xếp theo ID giảm dần 
+        $blogs = $query->orderBy('id', 'desc')->paginate();
+>>>>>>>  Hiển thị tất cả bài viết
 
         // Bước 5: Giữ lại từ khóa tìm kiếm và status khi chuyển trang
         $blogs->appends($request->only(['keyword', 'status']));
 
         // Bước 6: Trả về view với dữ liệu danh sách blog
+<<<<<<< HEAD
         return view('admin.blogs.list', compact('blogs'));
     }
     // Hiển thị form tạo bài viết mới
@@ -308,6 +323,10 @@ class BlogController extends Controller
         }
     }
     
+=======
+        return view('admin.blog.list', compact('blogs'));
+    }
+>>>>>>>  Hiển thị tất cả bài viết
 
     
 }

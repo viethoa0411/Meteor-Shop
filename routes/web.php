@@ -12,8 +12,11 @@ use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
 use App\Http\Controllers\Admin\Blog\BlogController;
+<<<<<<< HEAD
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\ProductPublicController;
+=======
+>>>>>>>  Hiển thị tất cả bài viết
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -108,6 +111,10 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
     });
+     // ====== BLOGS ======
+      Route::prefix('blogs')->name('blogs.')->group(function () {
+    Route::get('/', [BlogController::class, 'index'])->name('index');
+});
 });
 
 // ============ CLIENT ROUTES ============

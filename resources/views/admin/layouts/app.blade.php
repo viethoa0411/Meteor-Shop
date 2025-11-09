@@ -169,8 +169,13 @@
             <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
+<<<<<<< HEAD
             <a href="{{ route('admin.orders.list') }}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
             <a href="{{ route('admin.blogs.list') }}"><i class="bi bi-list-ul me-2"></i> Danh sách bài viết</a>
+=======
+            <a href="{{ route('admin.orders.index')}}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
+            <a href="{{ route('admin.blogs.index') }}"><i class="bi bi-list-ul me-2"></i> Danh sách bài viết</a>
+>>>>>>>  Hiển thị tất cả bài viết
             <div class="dropdown-menu-item">
                 <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản <i
                         class="bi bi-chevron-right float-end"></i></a>
