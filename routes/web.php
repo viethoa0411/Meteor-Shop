@@ -11,6 +11,7 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductPublicController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
+use App\Http\Controllers\Admin\Blog\BlogController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -99,4 +100,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
     });
+     // ====== BLOGS ======
+      Route::prefix('blogs')->name('blogs.')->group(function () {
+    Route::get('/', [BlogController::class, 'index'])->name('index');
+});
 });
