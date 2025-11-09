@@ -250,7 +250,7 @@ margin-bottom: 0.75rem;
                             {{-- Các nút hành động --}}
                             <td data-label="Hành động">
                                 <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                                    <a href="#" class="btn btn-sm btn-info">
+                                    <a href="{{ route('admin.blogs.edit', $blog->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-pencil-square"></i> Sửa
                                     </a>
 
