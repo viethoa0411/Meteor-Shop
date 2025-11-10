@@ -12,6 +12,7 @@ use App\Http\Controllers\Client\ProductPublicController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
 use App\Http\Controllers\Admin\Blog\BlogController;
+use App\Http\Controllers\Client\Blog\BlogController as ClientBlogController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -35,6 +36,7 @@ Route::get('/', [HomeController::class, 'index'])->name('client.home');
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/detail/{slug}', [ProductPublicController::class, 'show'])->name('client.product.detail');
 Route::get('/search', [HomeController::class, 'search'])->name('client.product.search');
+Route::get('/blog/list', [ClientBlogController::class, 'list'])->name('client.blog.list');
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {

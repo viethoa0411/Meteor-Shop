@@ -407,8 +407,12 @@
                     </li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
+<<<<<<< HEAD
                     {{-- Lấy link Bài Viết từ File 2 --}}
                     <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
+=======
+                    <li><a href="{{ route('client.blog.list') }}">Bài Viết</a></li>
+>>>>>>>  Giao diện trang blog ở phía người dùng
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </nav>
