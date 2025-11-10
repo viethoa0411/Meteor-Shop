@@ -361,9 +361,10 @@
             @endif
     </header>
 
-    <main class="container">
+    <main   class="container">
         @yield('content')
     </main>
+</div>
 
     <footer style="background: #000000; padding:40px 0 20px; font-size:13px; color:#555">
         <div style="max-width:1200px; margin:auto; display:flex; justify-content:space-between;flex-wrap:wrap; gap:30px">

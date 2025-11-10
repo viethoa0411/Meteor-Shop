@@ -40,7 +40,6 @@
             justify-content: space-between;
             gap: 16px;
         }
-        
 
         /* Logo */
         .logo a{
@@ -361,7 +360,7 @@
             @endif
     </header>
 
-    <main class="container">
+<main class="container">
         @yield('content')
     </main>
 

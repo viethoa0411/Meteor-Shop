@@ -361,8 +361,8 @@
             @endif
     </header>
 
-    <main class="container">
-        @yield('content')
+    <main   class="container">
+        @yield('')
     </main>
 
     <footer style="background: #000000; padding:40px 0 20px; font-size:13px; color:#555">

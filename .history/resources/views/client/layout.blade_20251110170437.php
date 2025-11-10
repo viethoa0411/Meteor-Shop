@@ -40,7 +40,14 @@
             justify-content: space-between;
             gap: 16px;
         }
-        
+         .container-header {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
 
         /* Logo */
         .logo a{
@@ -361,7 +368,7 @@
             @endif
     </header>
 
-    <main class="container">
+<main class="container">
         @yield('content')
     </main>
 
