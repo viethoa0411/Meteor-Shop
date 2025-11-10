@@ -2,12 +2,12 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title',  'Meteor Shop' )</title>
+    <title>@yield('title', 'Meteor Shop')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -109,7 +109,7 @@
         }
 
         .menu-toggle:hover {
-              color: #ffb703;
+             color: #ffb703;
         }
 
         /* MENU DỌC */
@@ -196,10 +196,6 @@
             transform-origin: center center; /* phóng to từ tâm ảnh */
         }
 
-        .product-img {
-            
-        }
-        
         .product-name {
             font-size: 16px;
             font-weight: 600;
@@ -287,7 +283,7 @@
             z-index: 1
         }
 
-        button {
+        /* button {
             z-index: 1;
             padding: 10px 20px ;
             border: none;
@@ -296,7 +292,7 @@
             color: #fff;
             cursor: pointer;
             font-style: 1em;
-        }
+        } */
 
         .article-card:hover {
             transform: translateY(-10px);
@@ -317,7 +313,7 @@
 
 </head>
 <body>
-    
+
     <header class="header">
         <div class="container-header">
             {{-- Logo --}}
@@ -349,14 +345,16 @@
 
         <!-- Menu dọc -->
         <div class="overlay"></div>
-            @if ($cate->count() === 0)
-                <p>Hiện chưa có danh mục.</p>
-            @else
+            @if (isset($cate) && $cate->count() > 0)
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
-                        <a href="">{{ $c->name }}</a>
-                    @endforeach    
-                </div>            
+                        <a href="{{ route('client.product.category', $c->slug) }}">{{ $c->name }}</a>
+                    @endforeach
+                </div>
+            @else
+                <div class="vertical-menu">
+                    <a href="#">Hiện chưa có danh mục</a>
+                </div>
             @endif
     </header>
 
@@ -394,7 +392,7 @@
                 <p style="margin: 6px 0">Hướng dẫn bán hàng</p>
                 <p style="margin: 6px 0">Thanh toán</p>
             </div>
-            
+
              <!-- Cột 4 -->
             <div style="flex:1; min-width:180px">
                 <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">DANH MỤC</h4>
@@ -408,8 +406,34 @@
         <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
         <div style="text-align: center; color:#bdbdbd; font-size: 16px">
             © 2025 METEOR SHOP. Tất cả các quyền được bảo lưu.
-
         </div>
     </footer>
+
+    {{-- Script cho menu dọc --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const verticalMenu = document.querySelector('.vertical-menu');
+            const overlay = document.querySelector('.overlay');
+
+            function closeMenu() {
+                verticalMenu.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                verticalMenu.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', closeMenu);
+            document.addEventListener('click', function(e) {
+                if (!verticalMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
