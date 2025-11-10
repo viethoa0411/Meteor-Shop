@@ -37,6 +37,7 @@ Route::get('/home', [HomeController::class, 'index']);
 Route::get('/detail/{slug}', [ProductPublicController::class, 'show'])->name('client.product.detail');
 Route::get('/search', [HomeController::class, 'search'])->name('client.product.search');
 Route::get('/blog/list', [ClientBlogController::class, 'list'])->name('client.blog.list');
+Route::get('/blog/{slug}', [ClientBlogController::class, 'show'])->name('client.blog.show');
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {

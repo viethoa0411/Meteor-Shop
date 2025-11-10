@@ -265,7 +265,7 @@
         <div class="blog-grid">
             @foreach($blogs as $blog)
                 <article class="blog-card">
-                    <a href="#" class="blog-card-link">
+                    <a href="{{ route('client.blog.show', $blog->slug) }}" class="blog-card-link">
                         <div class="blog-card-image-wrapper">
                             @if($blog->thumbnail)
                                 <img src="{{ asset('blog/images/' . $blog->thumbnail) }}" alt="{{ $blog->title }}" class="blog-card-image">
