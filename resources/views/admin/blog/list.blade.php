@@ -116,7 +116,7 @@
             }
 
             .table tr {
-margin-bottom: 0.75rem;
+                margin-bottom: 0.75rem;
                 border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
             }
 
@@ -161,6 +161,21 @@ margin-bottom: 0.75rem;
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
                 
+                {{-- Bộ lọc trạng thái --}}
+                <div class="d-flex gap-1 align-items-center">
+                    <a href="{{ route('admin.blogs.index', ['status' => 'all'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'all') == 'all' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-list-ul"></i> Tất cả
+                    </a>
+                    <a href="{{ route('admin.blogs.index', ['status' => 'active'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'all') == 'active' ? 'btn-success' : 'btn-outline-success' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-check-circle-fill"></i> Hoạt động
+                    </a>
+                    <a href="{{ route('admin.blogs.index', ['status' => 'inactive'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'all') == 'inactive' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-pause-circle-fill"></i> Dừng hoạt động
+                    </a>
+                </div>
 
                 {{-- Ô tìm kiếm --}}
                 <form action="{{ route('admin.blogs.index') }}" method="GET"
@@ -218,7 +233,7 @@ margin-bottom: 0.75rem;
                                 @else
                                     <span class="text-muted">Không có ảnh</span>
                                 @endif
-</td>
+                            </td>
                             <td data-label="Tiêu đề">{{ \Illuminate\Support\Str::limit($blog->title, 50) }}</td>
                             <td data-label="Người tạo">{{ $blog->user->name ?? 'N/A' }}</td>
 
@@ -235,12 +250,19 @@ margin-bottom: 0.75rem;
                             {{-- Các nút hành động --}}
                             <td data-label="Hành động">
                                 <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                                    <a href="#" class="btn btn-sm btn-info">
+                                    <a href="{{ route('admin.blogs.edit', $blog->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-pencil-square"></i> Sửa
                                     </a>
 
-                                    <button>Xóa</button>
-                                    <a href="#" class="btn btn-sm btn-secondary">
+                                    <form action="{{ route('admin.blogs.destroy', $blog->id) }}" method="POST"
+                                        onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này không?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                    <a href="{{ route('admin.blogs.show', $blog->id) }}" class="btn btn-sm btn-secondary">
                                         <i class="bi bi-eye"></i> Xem Chi Tiết
                                     </a>
                                 </div>
@@ -256,3 +278,4 @@ margin-bottom: 0.75rem;
         </div>
     @endif
 @endsection
+
