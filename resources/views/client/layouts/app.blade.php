@@ -332,6 +332,7 @@
                     <li><a href="#">Phòng</a></li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
+                    <li><a href="{{ route('client.blog.list') }}">Bài Viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </nav>
