@@ -344,36 +344,17 @@
             <!-- Icon menu dọc -->
             <div class="menu-toggle">☰</div>
             
-            <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
+
+           <div class="ms-auto w-100">
                 @auth
-                    {{-- ICON GIỎ HÀNG --}}
-                    <a href="{{ route('client.cart') }}" class="text-white" style="font-size:20px;">
-                        <i class="fa fa-shopping-cart"></i>
-                    </a>
-
-                    {{-- DROPDOWN USER --}}
-                    <div class="dropdown">
-                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            {{ Auth::user()->name }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{{ route('client.profile') }}">
-                                    Thông tin tài khoản
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <button class="dropdown-item" type="submit">Đăng xuất</button>
-                                </form>
-                            </li>
-                        </ul>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-white">Xin chào, {{ Auth::user()->name }}</span>
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button class="btn btn-outline-light btn-sm" type="submit">Đăng xuất</button>
+                        </form>
                     </div>
-
                 @else
-                    {{-- NẾU CHƯA ĐĂNG NHẬP --}}
                     <div class="d-flex w-100">
                         <a class="btn btn-outline-light flex-fill" href="{{ route('login') }}">Đăng nhập</a>
                         <a class="btn btn-primary flex-fill ms-2" href="{{ route('register') }}">Đăng ký</a>
@@ -381,13 +362,14 @@
                 @endauth
             </div>
 
-            </div>
+        </div>
 
         <!-- Menu dọc -->
         <div class="overlay"></div>
             @if (isset($cate) && $cate->count() > 0)
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
+                        <a href="">{{ $c->name }}</a>
                         <a href="{{ route('client.product.category', $c->slug) }}">{{ $c->name }}</a>
                     @endforeach    
                 </div>      
@@ -398,7 +380,7 @@
             @endif
     </header>
 
-    <main class="container">
+    <main>
         @yield('content')
     </main>
 

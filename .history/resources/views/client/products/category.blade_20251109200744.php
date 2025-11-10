@@ -7,7 +7,7 @@
     <div class="row mt-4">
         @forelse($products as $product)
             <div class="col-6 col-md-3 mb-4">
-                <div class="card h-100 product-card">
+                <div class="card h-100">
                      {{-- Giả sử đường dẫn ảnh lưu trong DB là 'uploads/sp1.jpg' --}}
                         <img src="{{ $product->image ? asset('storage/'.$product->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}" 
                              alt="{{ $product->name }}">

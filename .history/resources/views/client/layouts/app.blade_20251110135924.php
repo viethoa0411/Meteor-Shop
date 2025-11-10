@@ -344,7 +344,7 @@
             <!-- Icon menu dọc -->
             <div class="menu-toggle">☰</div>
             
-            <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
+           <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
                 @auth
                     {{-- ICON GIỎ HÀNG --}}
                     <a href="{{ route('client.cart') }}" class="text-white" style="font-size:20px;">
@@ -398,7 +398,7 @@
             @endif
     </header>
 
-    <main class="container">
+    <main>
         @yield('content')
     </main>
 

@@ -344,50 +344,44 @@
             <!-- Icon menu dọc -->
             <div class="menu-toggle">☰</div>
             
-            <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
-                @auth
-                    {{-- ICON GIỎ HÀNG --}}
-                    <a href="{{ route('client.cart') }}" class="text-white" style="font-size:20px;">
-                        <i class="fa fa-shopping-cart"></i>
-                    </a>
+           <div class="ms-auto" style="display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+    @auth
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:#fff; font-size:14px;">Xin chào, {{ Auth::user()->name }}</span>
+            <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                @csrf
+                <button type="submit"
+                        style="background:transparent; border:1px solid #fff; color:#fff; border-radius:20px;
+                               padding:6px 16px; font-size:14px; cursor:pointer; transition:all 0.3s;">
+                    Đăng xuất
+                </button>
+            </form>
+        </div>
+    @else
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a href="{{ route('login') }}"
+               style="flex:1; text-align:center; background:transparent; border:1px solid #fff; color:#fff;
+                      border-radius:20px; padding:6px 18px; font-weight:500; font-size:14px;
+                      text-decoration:none; transition:all 0.3s;">
+                Đăng nhập
+            </a>
+            <a href="{{ route('register') }}"
+               style="flex:1; text-align:center; background:#ffb703; border:none; color:#111;
+                      border-radius:20px; padding:6px 18px; font-weight:600; font-size:14px;
+                      text-decoration:none; transition:all 0.3s;">
+                Đăng ký
+            </a>
+        </div>
+    @endauth
+</div>
 
-                    {{-- DROPDOWN USER --}}
-                    <div class="dropdown">
-                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            {{ Auth::user()->name }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{{ route('client.profile') }}">
-                                    Thông tin tài khoản
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <button class="dropdown-item" type="submit">Đăng xuất</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-
-                @else
-                    {{-- NẾU CHƯA ĐĂNG NHẬP --}}
-                    <div class="d-flex w-100">
-                        <a class="btn btn-outline-light flex-fill" href="{{ route('login') }}">Đăng nhập</a>
-                        <a class="btn btn-primary flex-fill ms-2" href="{{ route('register') }}">Đăng ký</a>
-                    </div>
-                @endauth
-            </div>
-
-            </div>
 
         <!-- Menu dọc -->
         <div class="overlay"></div>
             @if (isset($cate) && $cate->count() > 0)
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
+                        <a href="">{{ $c->name }}</a>
                         <a href="{{ route('client.product.category', $c->slug) }}">{{ $c->name }}</a>
                     @endforeach    
                 </div>      
@@ -398,7 +392,7 @@
             @endif
     </header>
 
-    <main class="container">
+    <main>
         @yield('content')
     </main>
 

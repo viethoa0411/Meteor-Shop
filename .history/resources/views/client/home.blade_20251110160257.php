@@ -194,14 +194,14 @@
 {{-- goc chia sẻ --}}
 
 {{-- <div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px"> --}}
-<div style="text-align:center; padding: 30px 0; background:#f9f9f9;">
+<div style="text-align:center; padding:10px 0; background:#f9f9f9;">
     <h2 style="font-size:28px; font-weight:700; margin-bottom:30px;">Góc Cảm Hứng</h2>
 
-    <div style="max-width:1300px; margin:0 auto; padding:0 20px;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 20px;">
         <div style="display:flex; justify-content:center; gap:30px; flex-wrap:wrap;">
 
             <div class="article-card" 
-                style="width:500px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
+                style="width:550px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
                 box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:.3s; cursor:pointer;">
                 <img src="https://picsum.photos/800/600?random=12" style="width:100%; height:300px; object-fit:cover;">
                 <h3 style="font-size:20px; font-weight:600; margin:16px;">Thiết kế hiện đại cho không gian nhỏ</h3>
@@ -211,7 +211,7 @@
             </div>
 
             <div class="article-card"
-                style="width:500px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
+                style="width:530px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
                 box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:.3s; cursor:pointer;">
                 <img src="https://picsum.photos/800/600?random=32" style="width:100%; height:300px; object-fit:cover;">
                 <h3 style="font-size:20px; font-weight:600; margin:16px;">Thiết kế hiện đại cho không gian nhỏ</h3>

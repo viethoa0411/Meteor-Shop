@@ -398,7 +398,7 @@
             @endif
     </header>
 
-    <main class="container">
+    <main>
         @yield('content')
     </main>
 

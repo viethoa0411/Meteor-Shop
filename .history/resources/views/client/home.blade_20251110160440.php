@@ -201,7 +201,7 @@
         <div style="display:flex; justify-content:center; gap:30px; flex-wrap:wrap;">
 
             <div class="article-card" 
-                style="width:500px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
+                style="width:550px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
                 box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:.3s; cursor:pointer;">
                 <img src="https://picsum.photos/800/600?random=12" style="width:100%; height:300px; object-fit:cover;">
                 <h3 style="font-size:20px; font-weight:600; margin:16px;">Thiết kế hiện đại cho không gian nhỏ</h3>
@@ -211,7 +211,7 @@
             </div>
 
             <div class="article-card"
-                style="width:500px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
+                style="width:550px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
                 box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:.3s; cursor:pointer;">
                 <img src="https://picsum.photos/800/600?random=32" style="width:100%; height:300px; object-fit:cover;">
                 <h3 style="font-size:20px; font-weight:600; margin:16px;">Thiết kế hiện đại cho không gian nhỏ</h3>

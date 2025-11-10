@@ -194,36 +194,32 @@
 {{-- goc chia sẻ --}}
 
 {{-- <div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px"> --}}
-<div style="text-align:center; padding: 30px 0; background:#f9f9f9;">
-    <h2 style="font-size:28px; font-weight:700; margin-bottom:30px;">Góc Cảm Hứng</h2>
 
-    <div style="max-width:1300px; margin:0 auto; padding:0 20px;">
-        <div style="display:flex; justify-content:center; gap:30px; flex-wrap:wrap;">
+    {{-- <div style="text-align: center; padding: 0; background: #f9f9f9; overflow:hidden;"> --}}
+    {{-- <div style="display: flex; width:100%;text-align: center; gap:24px;padding: 0; box-sizing:border-box; overflow:hidden">  --}}
 
-            <div class="article-card" 
-                style="width:500px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
-                box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:.3s; cursor:pointer;">
-                <img src="https://picsum.photos/800/600?random=12" style="width:100%; height:300px; object-fit:cover;">
-                <h3 style="font-size:20px; font-weight:600; margin:16px;">Thiết kế hiện đại cho không gian nhỏ</h3>
-                <p style="font-size:14px; color:#555; line-height:1.6; margin:0 16px 20px;">
-                    Những ý tưởng thông minh giúp tận dụng tối đa diện tích, mang lại sự tiện nghi và phong cách hiện đại.
+        <h2 style="font-size: 28px; font-weight:700; margin-bottom:30px">Góc Cảm Hứng</h2> <br>
+        <div class="container">
+            <div style="display:flex;justify-content:center;gap:2vw;flex-wrap:nowrap;">
+                <div class="article-card" style=";background:#fff;border-radius:10px;overflow:hidden;text-align:left;box-shadow:0 4px 12px  rgba(0,0,0,0.1);flex-shrink:0;transition: all 0.4s ease;">
+                    <img src="https://picsum.photos/800/600?random=12" alt="Bài viết 1" style="width: 100%; height:60vh; object-fit: cover; display: block">
+                    <h3 style="font-size: 20px; font-weight: 600; margin: 16px; ">Thiết kế hiện đại cho không gian nhỏ</h3>
+                    <p style="font-size: 14px; color:#555; line-height: 1.6; margin: 0 16px 20px;">
+                        Những ý tưởng thông minh giúp tận dụng tối đa diện tích, mang lại sự tiện nghi và phong cách hiện đại.
+                        Từ màu sắc, ánh sáng đến cách bố trí nội thất, tất cả đều tạo nên cảm giác thoải mái và ấm cúng cho căn hộ của bạn.
+                    </p>
+                </div>
+                <div class="article-card" style="; background: #fff; border-radius:10px; overflow:hidden; text-align: left; box-shadow: 0 4px 12px  rgba(0,0,0,0.1); flex-shrink:0;  transition: all 0.4s ease;">
+                    <img src="https://picsum.photos/800/600?random=32" alt="Bài viết 2" style="width: 100%; height:60vh; object-fit: cover; display: block">
+                    <h3 style="font-size: 20px; font-weight: 600; margin: 16px; ">Thiết kế hiện đại cho không gian nhỏ</h3>
+                    <p style="font-size: 14px; color:#555; line-height: 1.6; margin: 0 16px 20px;">
+                        Cây xanh và ánh sáng tự nhiên đang trở thành xu hướng trong thiết kế nội thất hiện đại.
+                        Cùng khám phá cách đưa thiên nhiên vào ngôi nhà của bạn để tạo nên không gian thư giãn và tươi mới mỗi ngày.
                 </p>
+                </div>
             </div>
-
-            <div class="article-card"
-                style="width:500px; background:#fff; border-radius:10px; overflow:hidden; text-align:left;
-                box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:.3s; cursor:pointer;">
-                <img src="https://picsum.photos/800/600?random=32" style="width:100%; height:300px; object-fit:cover;">
-                <h3 style="font-size:20px; font-weight:600; margin:16px;">Thiết kế hiện đại cho không gian nhỏ</h3>
-                <p style="font-size:14px; color:#555; line-height:1.6; margin:0 16px 20px;">
-                    Cây xanh và ánh sáng tự nhiên đang trở thành xu hướng trong thiết kế nội thất hiện đại.
-                </p>
-            </div>
-
         </div>
     </div>
-</div>
-
 {{--  --}}
 
 

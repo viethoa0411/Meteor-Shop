@@ -194,10 +194,10 @@
 {{-- goc chia sẻ --}}
 
 {{-- <div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px"> --}}
-<div style="text-align:center; padding: 30px 0; background:#f9f9f9;">
+<div style="text-align:center; padding:10px 0; background:#f9f9f9;">
     <h2 style="font-size:28px; font-weight:700; margin-bottom:30px;">Góc Cảm Hứng</h2>
 
-    <div style="max-width:1300px; margin:0 auto; padding:0 20px;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 20px;">
         <div style="display:flex; justify-content:center; gap:30px; flex-wrap:wrap;">
 
             <div class="article-card" 

@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Client\HomeController;
-use App\Http\Controllers\Client\ProductPublicController;
+use App\Http\Controllers\Client\HomeController;
 // --- ĐÃ SỬA: Đổi thành ProductController mới ---
 use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Admin\Account\AdminController;
