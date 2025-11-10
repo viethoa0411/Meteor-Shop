@@ -242,7 +242,7 @@
         </div>
     </div>
                
-{{--  --}}
+ {{--  --}}
 
     <script>
         let i=0, s=document.querySelectorAll('.slide');
