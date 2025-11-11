@@ -48,7 +48,7 @@
                                     <input class="form-check-input" type="checkbox" id="remember" name="remember">
                                     <label class="form-check-label" for="remember">Ghi nhớ đăng nhập</label>
                                 </div>
-                                <a href="#">Quên mật khẩu?</a>
+                               <a href="{{ route('password.request', ['from' => 'client']) }}">Quên mật khẩu?</a>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
@@ -56,7 +56,7 @@
                         </form>
 
                         <div class="text-center mt-3">
-                             <a href="#">Đăng ký</a>
+                             <a href="{{ route('register') }}">Đăng ký</a>
                         </div>
                     </div>
                 </div>
