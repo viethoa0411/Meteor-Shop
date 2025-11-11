@@ -35,7 +35,6 @@ class ProductController extends Controller
                             ->where('id', '!=', $product->id)
                             ->take(4)
                             ->get();
-
         return view('client.products.detail', compact('product', 'relatedProducts', 'cate'));
     }
 
@@ -52,6 +51,5 @@ class ProductController extends Controller
         }
         return view('client.products.index', compact('categories'));
     }
-
 
 }

@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="container py-4">
-    <h2 class="mb-4 text-center">Danh mục nổi bật</h2>
+    <h2 class="mb-4 text-center" style="padding-bottom: 20px">Danh mục nổi bật</h2>
     @foreach ($categories as $category)
         <div class="mb-5">
-            <h3 style="font-weight: 600">
+            <h3 style="font-weight: 600; padding-bottom: 10px">
                 {{ $category->name }}
                 <a href="{{ route('client.product.category', $category->slug) }}" style="font-size: 14px; color: rgb(0, 132, 221); margin-left: 10px ">
                     Xem tất cả →
