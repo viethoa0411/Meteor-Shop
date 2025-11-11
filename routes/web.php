@@ -13,6 +13,13 @@ use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Client\Blog\BlogController as ClientBlogController;
+use App\Http\Controllers\Client\Auth\LoginController;
+
+
+// Ưu tiên chuyển hướng /login sang /login-client 
+Route::get('/login', function () {
+    return redirect('/login-client');
+});
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -30,6 +37,16 @@ Route::get('/verify-otp', [ForgotPasswordController::class, 'showVerifyOtpForm']
 Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp.post');
 Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
+
+//  ROUTES LOGIN/LOGOUT CLIENT
+Route::middleware('guest')->group(function () {
+    Route::get('/login-client', [LoginController::class, 'showClientLoginForm'])->name('client.login');
+    Route::post('/login-client', [LoginController::class, 'loginClient'])->name('client.login.post');
+});
+Route::post('/logout-client', [LoginController::class, 'logoutClient'])->name('client.logout');
+
+
 
 // ============ CLIENT ROUTES ============
 Route::get('/', [HomeController::class, 'index'])->name('client.home');
