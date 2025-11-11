@@ -361,7 +361,7 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <form action="#" method="POST">
+                                <form action="{{ route('client.logout') }}" method="POST">
                                     @csrf
                                     <button class="dropdown-item" type="submit">Đăng xuất</button>
                                 </form>

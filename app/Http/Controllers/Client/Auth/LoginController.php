@@ -74,7 +74,14 @@ class LoginController extends Controller
             'email' => 'Thông tin đăng nhập không chính xác.',
         ]);
     }
-    
+    public function logoutClient(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('client.home')->with('success', 'Bạn đã đăng xuất.');
+    }
 
 }
 
