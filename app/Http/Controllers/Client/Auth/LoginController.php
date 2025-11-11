@@ -74,6 +74,7 @@ class LoginController extends Controller
             'email' => 'Thông tin đăng nhập không chính xác.',
         ]);
     }
+    
 
 }
 
