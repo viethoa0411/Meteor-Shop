@@ -15,7 +15,13 @@
                     <div class="card-body p-4">
                         <h4 class="mb-3 text-center">Đăng nhập khách hàng</h4>
 
-                      
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                @foreach ($errors->all() as $error)
+                                    <div>{{ $error }}</div>
+                                @endforeach
+                            </div>
+                        @endif
 
                         @if (session('success'))
                             <div class="alert alert-success">{{ session('success') }}</div>

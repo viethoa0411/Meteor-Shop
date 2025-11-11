@@ -18,7 +18,27 @@ class LoginController extends Controller
 
     public function loginClient(Request $request)
     {
-        
+        //  Validate dữ liệu đầu vào
+        $validated = $request->validate([
+            'email' => [
+                'required',
+                'email',
+                'exists:users,email',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'max:64',
+            ],
+        ], [
+            'email.required' => 'Vui lòng nhập địa chỉ email.',
+            'email.email' => 'Địa chỉ email không hợp lệ.',
+            'email.exists' => 'Email này chưa được đăng ký trong hệ thống.',
+            'password.required' => 'Vui lòng nhập mật khẩu.',
+            'password.min' => 'Mật khẩu phải có ít nhất :min ký tự.',
+            'password.max' => 'Mật khẩu không được vượt quá :max ký tự.',
+        ]);
 
         $remember = $request->boolean('remember', false);
 
