@@ -35,8 +35,8 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 Route::get('/', [HomeController::class, 'index'])->name('client.home');
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
-Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category');
-Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail');
+Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category'); // hiển thị tất cả sản phẩm của 1 danh mục
+Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail'); // hiển thị chi tiết sản phẩm
 
 
 // ============ ADMIN ROUTES ============

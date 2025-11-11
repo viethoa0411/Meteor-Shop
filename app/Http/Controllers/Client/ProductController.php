@@ -9,13 +9,24 @@ use App\Models\Category;
 
 class ProductController extends Controller
 {
+    // Hiển thị sản phẩm theo danh mục
     public function productsByCategory($slug)
     {
         $cate = Category::all();
         $category = Category::where('slug', $slug)->firstOrFail();
-        $products = Product::where('category_id', $category->id)->paginate(12);
+        $childIds = Category::where('parent_id', $category->id)->pluck('id');
+            if ($childIds->count() > 0) {
+                $products = Product::whereIn('category_id', $childIds)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(12);
+            } else {
+                $products = Product::where('category_id', $category->id)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(12);
+            }
         return view('client.products.category', compact('category', 'products', 'cate'));
     }
+    //
     public function showDetail($slug)
     {
         $cate = Category::all();
