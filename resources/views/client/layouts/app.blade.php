@@ -324,7 +324,7 @@
             {{-- Menu ngang --}}
             <nav class="main-nav">
                 <ul>
-                    <li><a href="#">Sản phẩm</a></li>
+                    <li><a href="{{ route('client.products.index') }}">Sản phẩm</a></li>
                     <li><a href="#">Phòng</a></li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>

@@ -38,4 +38,20 @@ class ProductController extends Controller
 
         return view('client.products.detail', compact('product', 'relatedProducts', 'cate'));
     }
+
+    public function index() 
+    {
+        // Hiển thị 6 danh mục + 4 sản phẩm mới nhất mỗi danh mục
+        $categories = Category::take(6)->get();
+        foreach ($categories as $category) {
+            $childIds = Category::where('parent_id', $category->id)->pluck('id'); 
+            $category->latestProducts = Product::whereIn('category_id', $childIds)
+                ->orderBy('created_at', 'desc')
+                ->take(4)
+                ->get();
+        }
+        return view('client.products.index', compact('categories'));
+    }
+
+
 }

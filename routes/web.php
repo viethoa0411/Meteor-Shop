@@ -37,6 +37,8 @@ Route::get('/home', [HomeController::class, 'index']);
 Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
 Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category'); // hiển thị tất cả sản phẩm của 1 danh mục
 Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail'); // hiển thị chi tiết sản phẩm
+Route::get('/categories', [ProductController::class, 'index'])->name('client.product.listProductsByCategory'); // Hiển thị trang tổng hợp nhiều danh mục + 4 sản phẩm mới nhất mỗi danh mục
+Route::get('/products', [ClientProductController::class, 'index'])->name('client.products.index'); // Hiển thị trang sản phẩm sắp xếp theo danh mục
 
 
 // ============ ADMIN ROUTES ============
