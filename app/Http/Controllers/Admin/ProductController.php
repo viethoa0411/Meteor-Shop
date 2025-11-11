@@ -7,7 +7,6 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -20,8 +19,8 @@ class ProductController extends Controller
     public function list(Request $req)
     {
         $q = Product::query()
-            ->select(['id', 'name', 'slug', 'price', 'stock', 'image', 'category_id', 'brand_id', 'status', 'created_at'])
-            ->with(['category:id,name', 'brand:id,name'])
+            ->select(['id', 'name', 'slug', 'price', 'stock', 'image', 'category_id', 'status', 'created_at'])
+            ->with(['category:id,name'])
             ->orderByDesc('id');
 
         // Tìm kiếm
@@ -42,16 +41,10 @@ class ProductController extends Controller
             $q->where('category_id', $cat);
         }
 
-        // Lọc theo thương hiệu (nếu có)
-        if ($brand = $req->get('brand_id')) {
-            $q->where('brand_id', $brand);
-        }
-
         $products   = $q->paginate(15)->withQueryString();
         $categories = Category::orderBy('name')->get(['id', 'name']);
-        $brands     = Brand::orderBy('name')->get(['id', 'name']);
 
-        return view('admin.products.list', compact('products', 'categories', 'brands'));
+        return view('admin.products.list', compact('products', 'categories',));
     }
 
     /**
@@ -60,9 +53,8 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::orderBy('name')->get(['id', 'name']);
-        $brands     = Brand::orderBy('name')->get(['id', 'name']);
 
-        return view('admin.products.create', compact('categories', 'brands'));
+        return view('admin.products.create', compact('categories',));
     }
 
 
@@ -73,15 +65,10 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'nullable|exists:brands,id',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'images' => 'nullable',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
             'status' => 'required|in:active,inactive',
-            'variants' => 'nullable|array',
-            'variants.*.color_name' => 'nullable|string|max:50',
-            'variants.*.color_code' => 'nullable|string|max:10',
-            'variants.*.length' => 'nullable|numeric',
-            'variants.*.width' => 'nullable|numeric',
-            'variants.*.height' => 'nullable|numeric',
         ]);
 
         // Upload ảnh chính
@@ -99,9 +86,18 @@ class ProductController extends Controller
             'stock' => $request->stock,
             'image' => $imagePath,
             'category_id' => $request->category_id,
-            'brand_id' => $request->brand_id,
             'status' => $request->status,
         ]);
+
+        // Lưu nhiều ảnh chi tiết
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $img) {
+                $path = $img->store('products', 'public');
+                $product->images()->create([
+                    'image' => $path
+                ]);
+            }
+        }
 
         // Lưu biến thể (nếu có)
         if ($request->has('variants')) {
@@ -117,9 +113,8 @@ class ProductController extends Controller
         }
 
         return redirect()->route('admin.products.list')
-            ->with('success', 'Thêm sản phẩm và biến thể thành công!');
+            ->with('success', 'Thêm sản phẩm thành công 🎉');
     }
-
 
 
     /**
@@ -127,9 +122,15 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::with(['category:id,name', 'brand:id,name'])->findOrFail($id);
+        $product = Product::with([
+            'category:id,name',
+            'variants',   // load biến thể sản phẩm
+            'images'      // load tất cả ảnh phụ
+        ])->findOrFail($id);
+
         return view('admin.products.show', compact('product'));
     }
+
 
     /**
      * Form sửa sản phẩm

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title',  'Meteor Shop' )</title>
+    <title>@yield('title', 'Meteor Shop')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -42,7 +43,7 @@
         }
 
         /* Logo */
-        .logo a{
+        .logo a {
             color: #fff;
             text-decoration: none;
             font-size: 20px;
@@ -109,7 +110,7 @@
         }
 
         .menu-toggle:hover {
-              color: #ffb703;
+            color: #ffb703;
         }
 
         /* MENU DỌC */
@@ -123,7 +124,7 @@
             display: flex;
             flex-direction: column;
             padding: 20px;
-            box-shadow: -4px 0 12px  rgba(0, 0, 0, 0.3);
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
             transition: right 0.3s ease;
             z-index: 1001;
         }
@@ -172,34 +173,38 @@
         .product-card {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
             padding: 16px;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* giữ ảnh trong khung khi zoom */
-            transition: transform 0.3s ease; /* mượt khi hover */
+            overflow: hidden;
+            /* giữ ảnh trong khung khi zoom */
+            transition: transform 0.3s ease;
+            /* mượt khi hover */
         }
 
         .product-card:hover {
-            transform: translateY(-20px);  /* nâng nhẹ toàn thẻ */
+            transform: translateY(-20px);
+            /* nâng nhẹ toàn thẻ */
             padding: 16px;
         }
 
         .product-card img {
             width: 100%;
-            aspect-ratio: 1/1; /* giữ tỉ lệ vuông */
+            aspect-ratio: 1/1;
+            /* giữ tỉ lệ vuông */
             object-fit: cover;
             border-radius: 6px;
             background: #eee;
-            transition: transform 0.4s ease; /* hiệu ứng phóng to mượt */
+            transition: transform 0.4s ease;
+            /* hiệu ứng phóng to mượt */
             display: block;
-            transform-origin: center center; /* phóng to từ tâm ảnh */
+            transform-origin: center center;
+            /* phóng to từ tâm ảnh */
         }
 
-        .product-img {
-            
-        }
-        
+        .product-img {}
+
         .product-name {
             font-size: 16px;
             font-weight: 600;
@@ -207,7 +212,8 @@
             margin: 12px 0 4px;
             line-height: 1.4;
             display: -webkit-box;
-            -webkit-line-clamp: 2 ; /* số dòng muốn hiển thị */
+            -webkit-line-clamp: 2;
+            /* số dòng muốn hiển thị */
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -227,7 +233,8 @@
         .grid-products {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
-            align-items: stretch;  /* đảm bảo các ô cao bằng nhau */
+            align-items: stretch;
+            /* đảm bảo các ô cao bằng nhau */
             gap: 24px;
         }
 
@@ -237,17 +244,17 @@
             background: #111;
             color: #fff;
             display: inline-block;
-            padding: 2px 8px ;
+            padding: 2px 8px;
             border-radius: 10px;
         }
 
         .related-wrap {
             display: grid;
-            grid-template-columns:  repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 20px;
         }
 
-        .slide-wrapper  {
+        .slide-wrapper {
             position: relative;
             width: 100%;
             max-width: 100%;
@@ -259,7 +266,7 @@
         .slide {
             position: absolute;
             inset: 0;
-            display:flex;
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -267,8 +274,8 @@
             transition: opacity .7s
         }
 
-        .slide.active{
-            opacity:  1;
+        .slide.active {
+            opacity: 1;
         }
 
         .imageSlide {
@@ -289,7 +296,7 @@
 
         button {
             z-index: 1;
-            padding: 10px 20px ;
+            padding: 10px 20px;
             border: none;
             border-radius: 8px;
             background: #09f;
@@ -300,24 +307,28 @@
 
         .article-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 8ox 20px rgba(0,0,0,0.15);
+            box-shadow: 0 8ox 20px rgba(0, 0, 0, 0.15);
         }
 
         @media (max-width:776px) {
-            .room{grid-template-columns: 1fr !important;
-        }}
+            .room {
+                grid-template-columns: 1fr !important;
+            }
+        }
 
         @media (max-width:776px) {
-            .grid-products{
+            .grid-products {
                 grid-template-columns: repeat(2, 1fr) !important;
                 gap: 16px;
-        }}
+            }
+        }
     </style>
     @stack('head')
 
 </head>
+
 <body>
-    
+
     <header class="header">
         <div class="container-header">
             {{-- Logo --}}
@@ -332,12 +343,14 @@
                     <li><a href="#">Phòng</a></li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
+                    <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </nav>
             <!-- Ô tìm kiếm -->
             <form action="{{ route('client.product.search') }}" method="GET" class="search-box">
-                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="{{ $searchQuery ?? '' }}">
+                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..."
+                    value="{{ $searchQuery ?? '' }}">
                 <button type="submit">
                     <i class="fa fa-search"></i>
                 </button>
@@ -349,67 +362,171 @@
 
         <!-- Menu dọc -->
         <div class="overlay"></div>
-            @if ($cate->count() === 0)
-                <p>Hiện chưa có danh mục.</p>
-            @else
-                <div class="vertical-menu">
-                    @foreach ($cate as $c)
-                        <a href="">{{ $c->name }}</a>
-                    @endforeach    
-                </div>            
-            @endif
+        @if ($cate->count() === 0)
+            <p>Hiện chưa có danh mục.</p>
+        @else
+            <div class="vertical-menu">
+                @foreach ($cate as $c)
+                    <a href="">{{ $c->name }}</a>
+                @endforeach
+            </div>
+        @endif
     </header>
 
     <main>
         @yield('content')
     </main>
 
-    <footer style="background: #000000; padding:40px 0 20px; font-size:13px; color:#555">
-        <div style="max-width:1200px; margin:auto; display:flex; justify-content:space-between;flex-wrap:wrap; gap:30px">
-            <!-- Cột 1 -->
-            <div style="flex:1; min-width:180px">
-                <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">CHĂM SÓC KHÁCH HÀNG</h4>
-                <p style="margin: 6px 0">Trung tâm trợ giúp</p>
-                <p style="margin: 6px 0">Meteor Blog</p>
-                <p style="margin: 6px 0">Hướng dẫn mua hàng</p>
-                <p style="margin: 6px 0">Hướng dẫn bán hàng</p>
-                <p style="margin: 6px 0">Thanh toán</p>
-            </div>
+    <footer id="footer" class="footer-wrapper">
+        <div class="footer-widgets footer footer-2 dark">
+            <div class="row dark large-columns-4 mb-0">
+                <div id="text-14" class="col pb-0 widget widget_text"><span class="widget-title">Kết nối với
+                        Meteor</span>
+                    <div class="is-divider small"></div>
+                    <div class="textwidget">
+                        <p>
+                            <img decoding="async" class="logo_ft img-fluid"
+                                src="{{ asset('storage/images/meteor.jpg') }}" alt="Logo Meteor"
+                                style="max-width: 120px;">
+                        </p>
 
-             <!-- Cột 2-->
-            <div style="flex:1; min-width:180px">
-                <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">VỀ METEOR</h4>
-                <p style="margin: 6px 0">Facebook</p>
-                <p style="margin: 6px 0">Instagram</p>
-                <p style="margin: 6px 0">Tiktok</p>
-                <p style="margin: 6px 0">YouTube</p>
-            </div>
 
-             <!-- Cột 3 -->
-            <div style="flex:1; min-width:180px">
-                <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">THEO DÕI CHÚNG TÔI TRÊN</h4>
-                <p style="margin: 6px 0">Trung tâm trợ giúp</p>
-                <p style="margin: 6px 0">Meteor Blog</p>
-                <p style="margin: 6px 0">Hướng dẫn mua hàng</p>
-                <p style="margin: 6px 0">Hướng dẫn bán hàng</p>
-                <p style="margin: 6px 0">Thanh toán</p>
-            </div>
-            
-             <!-- Cột 4 -->
-            <div style="flex:1; min-width:180px">
-                <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">DANH MỤC</h4>
-                <a href="" style="margin: 6px 0">Nội thất phòng khách</a> <br>
-                <a href="" style="margin: 6px 0">Nội thất phòng ngủ</a> <br>
-                <a href="" style="margin: 6px 0">Nội thất phòng ăn</a> <br>
-                <a href="" style="margin: 6px 0">Nội thất văn phòng</a> <br>
-                <a href="" style="margin: 6px 0">Nội thất ngoài trời</a> <br>
+                        <div class="follow">
+                            <h4>Follow us</h4>
+                            <p><a href="">Instagram</a>–<a href="">Youtube</a>–<a
+                                    href="">Facebook</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div id="nav_menu-2" class="col pb-0 widget widget_nav_menu"><span class="widget-title">Meteor</span>
+                    <div class="is-divider small"></div>
+                    <div class="menu-ve-nha-xinh-container">
+                        <ul id="menu-ve-nha-xinh" class="menu">
+                            <li id="menu-item-41004"
+                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41004"><a
+                                    href="#">Giới thiệu</a></li>
+                            <li id="menu-item-41005"
+                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-41005"><a
+                                    href="">Chuyện meteor</a></li>
+                            <li id="menu-item-41000"
+                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41000"><a
+                                    href="">Tổng công ty</a></li>
+                            <li id="menu-item-41002"
+                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41002"><a
+                                    href="">Tuyển dụng</a></li>
+                            <li id="menu-item-41001"
+                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41001"><a
+                                    href="">Thẻ hội viên</a></li>
+                            <li id="menu-item-41003"
+                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41003"><a
+                                    href="">Đổi trả hàng</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="nav_menu-3" class="col pb-0 widget widget_nav_menu"><span class="widget-title">CẢM HỨNG
+                        Meteor</span>
+                    <div class="is-divider small"></div>
+                    <div class="menu-cam-hung-nha-xinh-container">
+                        <ul id="menu-cam-hung-nha-xinh" class="menu">
+                            <li id="menu-item-449"
+                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-449"><a
+                                    href="">Sản phẩm</a></li>
+                            <li id="menu-item-450"
+                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-450"><a
+                                    href="">Ý tưởng và cảm hứng</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="block_widget-3" class="col pb-0 widget block_widget">
+                    <span class="widget-title">Newsletter</span>
+                    <div class="is-divider small"></div>
+                    <div id="text-2944331817" class="text">
+
+
+                        <p>Hãy để lại email của bạn để nhận được những ý tưởng trang trí mới và những thông tin, ưu đãi
+                            từ Meteor</p>
+                        <p>Email: meteor</p>
+                        <p>Hotline: <strong>0397766836</strong></p>
+
+
+                        <style>
+                            #text-2944331817 {
+                                font-size: 0.75rem;
+                            }
+                        </style>
+                    </div>
+
+                    <div role="form" class="wpcf7" id="wpcf7-f9-o1" lang="en-US" dir="ltr">
+                        <div class="screen-reader-response">
+                            <p role="status" aria-live="polite" aria-atomic="true"></p>
+                            <ul></ul>
+                        </div>
+                        <form action="" method="post" class="wpcf7-form init" novalidate="novalidate"
+                            data-status="init">
+                            <div style="display: none;">
+                                <input type="hidden" name="_wpcf7" value="9">
+                                <input type="hidden" name="_wpcf7_version" value="5.5.2">
+                                <input type="hidden" name="_wpcf7_locale" value="en_US">
+                                <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f9-o1">
+                                <input type="hidden" name="_wpcf7_container_post" value="0">
+                                <input type="hidden" name="_wpcf7_posted_data_hash" value="">
+                                <input type="hidden" name="_wpcf7_recaptcha_response"
+                                    value="0cAFcWeA7swwLl_8VvpFI06BH3gsjO68Ua_z5VNFU3hy53nMAl1Ib7MeCY5iXtu94dRupk7wiA0keDJ5HgJdgtgo0EYcDooyKZ63qDfxkzaFXYp5nkEMhcr5_ue_kmeQU92aHNxsy1mWUxkQSKxN8OWCh6dzQdp-KzwjpGSFz4OPB-SOb1hbW1z8pZO8-hDZet1qfO2B5uU3s3GdEUfy1YJxrd7si21y0xUlVXLGtRiCG0t8dNFC_5oplJUw-1SX90fY-210RRm1Ee7D2dBieO58yWy-vKauhvB0yohn7yrNyo9CIvSYVz-QUfGqHLrgkOtkGddun16vrAHo8Z_ElyFdzntv7DI6ZDLfUi_mPDOnaataHiFt2X4nDFOq97xzSs9xEZxMR6SB5R9WTqJtC8lLASyMMnBeUsZBH-PB0yjNhs6B4kD2RMULDnqLynhTXu5sprEQIi3oh-hij4WC9plTBrZgcT5pcoRABIzY5xI6IGrLQfVwqY5tqcpPr0COV8-bFAlVDRQa9NO7AaXdPYQCCeM4aLO9CQvgA4oV4SsCs7gbTRZofv0P1hswqLW-dN1WYbDYRn0OPu3-A1A2RTbPNWikLvekFLE23T5y62gi5akjQVwaIdh5W9dOAcP6Se3m65nJCIk5AJ_fUhmc8HmBG4ieMc9ezZSLa0lG7_WqkTJ4AHm28pSwdK9SYiUdG4xQwZcxHHBW05E3Jex1l4im_aN5gAmzXxOrbckL8vXAzrYDQ7L2jNxTHuzTncUOIs1i8soQ_wUrerU40dgDRKcz-5qMYD6HwW-h8feMooaH2QXYRmbn2FByIMFCr7Bw8jvgyKCDlCJRz7">
+                            </div>
+                            <div class="flex-row form-flat medium-flex-wrap">
+                                <div class="flex-col flex-grow">
+                                    <span class="wpcf7-form-control-wrap your-email"><input type="email"
+                                            name="your-email" value="" size="40"
+                                            class="wpcf7-form-control wpcf7-text wpcf7-email wpcf7-validates-as-required wpcf7-validates-as-email"
+                                            aria-required="true" aria-invalid="false"
+                                            placeholder="Nhập email của bạn"></span>
+                                </div>
+                                <div class="flex-col ml-half">
+                                    <input type="submit" value="Đăng ký"
+                                        class="wpcf7-form-control has-spinner wpcf7-submit button"><span
+                                        class="wpcf7-spinner"></span>
+                                </div>
+                            </div>
+                            <div class="wpcf7-response-output" aria-hidden="true"></div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-        <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
-        <div style="text-align: center; color:#bdbdbd; font-size: 16px">
-            © 2025 METEOR SHOP. Tất cả các quyền được bảo lưu.
-
+        <div class="absolute-footer dark medium-text-center small-text-center">
+            <div class="container clearfix">
+                <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
+                <div style="text-align: center; color:#bdbdbd; font-size: 16px">
+                    © 2025 METEOR SHOP. Tất cả các quyền được bảo lưu.
+                </div>
+            </div>
         </div>
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const verticalMenu = document.querySelector('.vertical-menu');
+            const overlay = document.querySelector('.overlay');
+
+            function closeMenu() {
+                verticalMenu.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                verticalMenu.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', closeMenu);
+            document.addEventListener('click', function(e) {
+                if (!verticalMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>

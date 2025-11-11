@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         // lấy 4 sp mới nhât(theo ngày tạo)
         $newProducts = Product::query()
             ->select(['id', 'name',  'slug', 'price', 'image', 'status', 'created_at'])
@@ -24,7 +25,7 @@ class HomeController extends Controller
             ->orderByDesc('stock')
             ->limit(4)
             ->get();
-            
+
         $cate = Category::query()
             ->select(['name', 'slug', 'description', 'parent_id', 'status'])
             ->where('status', 1)
