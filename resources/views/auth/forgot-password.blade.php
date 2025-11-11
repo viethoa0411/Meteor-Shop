@@ -204,7 +204,8 @@
         </form>
         
         <div class="back-link">
-            <p><a href="{{ route('login') }}"><i class="bi bi-arrow-left"></i> Quay lại đăng nhập</a></p>
+          @php($backRoute = session('back_login_route', 'login'))
+            <p><a href="{{ route($backRoute) }}"><i class="bi bi-arrow-left"></i> Quay lại đăng nhập</a></p>
         </div>
     </div>
 

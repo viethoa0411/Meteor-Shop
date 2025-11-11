@@ -349,8 +349,8 @@
                                 Ghi nhớ tôi
                             </label>
                         </div>
-                            <a href="{{ route('register') }}" class="forgot-password">Bạn chưa có tài khoản?</a>
-                            <a href="{{ route('password.request') }}" class="forgot-password">Quên mật khẩu?</a>
+                            <!-- <a href="{{ route('register') }}" class="forgot-password">Bạn chưa có tài khoản?</a> -->
+                            <a href="{{ route('password.request', ['from' => 'admin']) }}" class="forgot-password">Quên mật khẩu?</a>
                     </div>
 
                     <!-- Submit Button -->

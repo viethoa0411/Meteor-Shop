@@ -11,8 +11,14 @@ use Carbon\Carbon;
 
 class ForgotPasswordController extends Controller
 {
-    public function showForgotForm()
+    public function showForgotForm(Request $request)
     {
+        $from = $request->query('from');
+        if ($from === 'client') {
+            session(['back_login_route' => 'client.login']);
+        } elseif ($from === 'admin') {
+            session(['back_login_route' => 'login']);
+        }
         return view('auth.forgot-password');
     }
 
