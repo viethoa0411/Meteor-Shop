@@ -325,7 +325,7 @@
 
                     <!-- Password -->
                     <div class="form-group">
-                        <label for="password" class="form-label"><i class="bi bi-lock"></i> Mật khẩu
+                        <label for="password" class="form-label">
                                 <i class="bi bi-lock"></i> Mật khẩu
                         </label>
                         <div class="input-group">

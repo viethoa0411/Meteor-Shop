@@ -18,22 +18,22 @@ class Product extends Model
         'height',
         'color_code',
         'category_id',
-        'brand_id',
         'status'
     ];
 
     // Quan hệ
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id');
-    }
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
     }
 }

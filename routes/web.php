@@ -116,6 +116,7 @@ Route::get('/home', [HomeController::class, 'index']);
 Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
 Route::get('/category/{slug}', [ProductClientController::class, 'productsByCategory'])->name('client.product.category');
 Route::get('/products/{slug}', [ProductClientController::class, 'showDetail'])->name('client.product.detail');
+Route::get('/products', [ProductClientController::class, 'index'])->name('client.products.index');
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
 

@@ -47,7 +47,7 @@
             position: relative;
         }
 
-        .dropdown-menu-item > a {
+        .dropdown-menu-item>a {
             cursor: pointer;
             display: block;
             padding: 12px 30px;
@@ -129,25 +129,30 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">AdminPanel</a>
+                <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Meteor-Shop</a>
+
                 <div class="ms-auto">
                     <div class="dropdown">
-                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="btn btn-secondary dropdown-toggle" href="{{ route('admin.dashboard') }}"
+                            role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i>
                             {{ Auth::user()->name ?? 'Admin' }}
                             <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="#">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-                                <form action="#" method="POST" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item"
-                                        onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
-                                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                                    </button>
-                                </form>
+                                    <form action="#" method="POST" style="display: inline;">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item"
+                                            onclick="return confirm('Bạn chắc chắn muốn đăng xuất?');">
+                                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                        </button>
+                                    </form>
                             </li>
                         </ul>
                     </div>
@@ -164,12 +169,16 @@
             <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
-            <a href="{{ route('admin.orders.index')}}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
+            <a href="{{ route('admin.orders.list') }}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
+            <a href="{{ route('admin.blogs.list') }}"><i class="bi bi-list-ul me-2"></i> Danh sách bài viết</a>
             <div class="dropdown-menu-item">
-                <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản <i class="bi bi-chevron-right float-end"></i></a>
+                <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản <i
+                        class="bi bi-chevron-right float-end"></i></a>
                 <div class="submenu">
-                    <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin</a>
-                    <a href="{{ route('admin.account.users.list') }}"><i class="bi bi-people-fill me-2"></i> Quản lý User</a>
+                    <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản
+                        lý Admin</a>
+                    <a href="{{ route('admin.account.users.list') }}"><i class="bi bi-people-fill me-2"></i> Quản lý
+                        User</a>
                 </div>
             </div>
 
@@ -191,4 +200,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
+
 </html>

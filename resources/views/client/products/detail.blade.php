@@ -146,50 +146,50 @@
     </div>
 
 {{-- Sản phẩm cùng danh mục --}}
-    <div class="product" 
-        style="margin-top:60px; padding:30px 20px 50px;border:1px solid #e6e6e6;border-radius:16px; background:#fffaf3; box-shadow:0 4px 16px rgba(0,0,0,0.08); transition:all 0.3s ease;">             
-        <h2 style="padding-left:20px; font-size:20px; font-weight:600; margin-bottom:8px; 
+    <div class="product"
+        style="margin-top:60px; padding:30px 20px 50px;border:1px solid #e6e6e6;border-radius:16px; background:#fffaf3; box-shadow:0 4px 16px rgba(0,0,0,0.08); transition:all 0.3s ease;">
+        <h2 style="padding-left:20px; font-size:20px; font-weight:600; margin-bottom:8px;
                 display:flex; align-items:center; gap:8px;">
             Sản phẩm cùng danh mục
-            <span class="badge-new" 
-                style="background:#111; color:#fff; font-size:12px; font-weight:500; 
+            <span class="badge-new"
+                style="background:#111; color:#fff; font-size:12px; font-weight:500;
                         border-radius:10px; padding:2px 8px;">Related</span>
         </h2>
         <p style="padding-left:20px; color:#555; font-size:14px; margin:0 0 24px;">
-            Những sản phẩm khác trong danh mục 
+            Những sản phẩm khác trong danh mục
             <strong>{{ $product->category->name ?? '' }}</strong>.
         </p>
         <hr style="margin-left:20px; margin-right:20px; border:0; border-top:1px solid #eee; margin-bottom:24px;">
 
         @if ($relatedProducts->count() === 0)
             <p style="padding-left:20px;">Hiện chưa có sản phẩm liên quan.</p>
-        @else 
+        @else
             <div class="grid-products"
                 style="display:grid; grid-template-columns:repeat(4, 1fr); gap:24px; padding:0 20px;">
                 @foreach ($relatedProducts as $p)
-                    <a href="{{ route('client.product.detail', ['slug' => $p->slug]) }}" 
+                    <a href="{{ route('client.product.detail', ['slug' => $p->slug]) }}"
                     class="product-card"
                     style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05);
                             text-decoration:none; color:#111; overflow:hidden; transition:all 0.3s ease;
                             padding:12px; display:flex; flex-direction:column; align-items:center;">
                         <div class="product-img" style="width:100%; overflow:hidden; border-radius:6px;">
-                            <img src="{{ $p->image ? asset('storage/'.$p->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}" 
+                            <img src="{{ $p->image ? asset('storage/'.$p->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}"
                                 alt="{{ $p->name }}"
                                 style="width:100%; aspect-ratio:1/1; object-fit:cover; transition:transform 0.35s ease;">
                         </div>
-                        <div class="product-name" 
+                        <div class="product-name"
                             style="font-size:15px; font-weight:600; color:#111; margin:10px 0 4px; text-align:center;
-                                    line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; 
+                                    line-height:1.3; display:-webkit-box; -webkit-line-clamp:2;
                                     -webkit-box-orient:vertical; overflow:hidden;">
                             {{ $p->name }}
                         </div>
-                        <div class="product-price" 
+                        <div class="product-price"
                             style="color:#d41; font-weight:600; font-size:14px;">
                             {{ number_format($p->price, 0, ',', '.') }} đ
                         </div>
                     </a>
                 @endforeach
-            </div>            
+            </div>
         @endif
     </div>
 
