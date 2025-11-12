@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Meteor Shop')</title>
@@ -8,7 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    {{-- Giữ lại cả hai link CSS nếu bạn có file 'css/app.css' --}}
+    {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -16,18 +16,15 @@
             margin: 0;
         }
 
+        /* Tùy chỉnh chung cho Header */
         header {
             max-width: 100%;
-            padding: 24px;
             background: #111;
-            margin: 0 auto;
             color: #fff;
-            padding: 5px 10px;
+            padding: 5px 10px; /* Tùy chỉnh theo file 1 */
         }
 
-        /* Header chính */
         .header {
-            bottom: #111;
             color: #fff;
             padding: 10px 0;
             position: relative;
@@ -42,6 +39,10 @@
             gap: 16px;
         }
 
+        .container-header > * {
+            align-self: center;
+        }
+
         /* Logo */
         .logo a {
             color: #fff;
@@ -51,7 +52,7 @@
         }
 
         /* Menu ngang */
-        .main-nav ul {
+        .main-nav > ul {
             list-style: none;
             display: flex;
             gap: 20px;
@@ -71,6 +72,39 @@
             color: #ffb703;
         }
 
+        /* Dropdown Menu CSS */
+        .menu-item {
+            position: relative;
+        }
+        .dropdown-menu {
+            display: none !important;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            min-width: 220px;
+            z-index: 1002;
+            padding: 8px 0;
+            flex-direction: column;
+        }
+        .dropdown-menu li a {
+            display: block;
+            padding: 10px 14px;
+            color: #333;
+            white-space: nowrap;
+        }
+        .dropdown-menu li a:hover {
+            background: #f5f5f5;
+            color: #007bff;
+        }
+        .menu-item:hover > .dropdown-menu {
+            display: block !important;
+        }
+        /* End Dropdown Menu CSS */
+
+
         /* Ô tìm kiếm */
         .search-box {
             display: flex;
@@ -79,10 +113,12 @@
             border-radius: 20px;
             overflow: hidden;
             width: 20%;
+            align-self: center;
+            margin: 0;
         }
 
         .search-box input {
-            float: 1;
+            flex: 1; /* Đã sửa lỗi chính tả từ 'float: 1' thành 'flex: 1' */
             padding: 8px 12px;
             border: none;
             background: transparent;
@@ -101,7 +137,7 @@
             color: #ffb703;
         }
 
-        /* Icon ☰ nằm cùng dòng */
+        /* Icon menu dọc */
         .menu-toggle {
             font-size: 22px;
             cursor: pointer;
@@ -113,7 +149,7 @@
             color: #ffb703;
         }
 
-        /* MENU DỌC */
+        /* MENU DỌC (Sidebar) */
         .vertical-menu {
             position: fixed;
             top: 0;
@@ -156,15 +192,16 @@
             display: block;
         }
 
+        /* Footer */
         footer {
             max-width: 100%;
-            padding: 24px;
             background-color: #111;
             margin: 0 auto;
             color: #fff;
             padding: 10px 15px;
         }
 
+        /* Các style khác */
         a {
             text-decoration: none;
             color: inherit;
@@ -178,32 +215,24 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            /* giữ ảnh trong khung khi zoom */
             transition: transform 0.3s ease;
-            /* mượt khi hover */
         }
 
         .product-card:hover {
             transform: translateY(-20px);
-            /* nâng nhẹ toàn thẻ */
             padding: 16px;
         }
 
         .product-card img {
             width: 100%;
             aspect-ratio: 1/1;
-            /* giữ tỉ lệ vuông */
             object-fit: cover;
             border-radius: 6px;
             background: #eee;
             transition: transform 0.4s ease;
-            /* hiệu ứng phóng to mượt */
             display: block;
             transform-origin: center center;
-            /* phóng to từ tâm ảnh */
         }
-
-        .product-img {}
 
         .product-name {
             font-size: 16px;
@@ -213,7 +242,6 @@
             line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2;
-            /* số dòng muốn hiển thị */
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -234,7 +262,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
             align-items: stretch;
-            /* đảm bảo các ô cao bằng nhau */
             gap: 24px;
         }
 
@@ -294,6 +321,7 @@
             z-index: 1
         }
 
+        /* Đã bỏ comment cho button, sử dụng style từ file 2 */
         button {
             z-index: 1;
             padding: 10px 20px;
@@ -326,8 +354,20 @@
     @stack('head')
 
 </head>
-
 <body>
+
+    @php
+        // Lấy danh mục cha (Phòng) nếu chưa có sẵn
+        // Giữ lại logic Laravel Blade từ File 1 để đảm bảo Menu Dropdown hoạt động
+        $parentCategories = $parentCategories
+            ?? \App\Models\Category::whereNull('parent_id')->where('status', 1)->get();
+
+        // Giả định $childCategories hoặc $cate được truyền vào View hoặc cần được định nghĩa
+        // Nếu $childCategories chưa được truyền, bạn cần phải định nghĩa nó ở đây hoặc trong Controller
+        $childCategories = $childCategories ?? [];
+        // Giả định $cate là danh mục dùng cho Menu dọc
+        $cate = $cate ?? ($parentCategories->isNotEmpty() ? $parentCategories : collect());
+    @endphp
 
     <header class="header">
         <div class="container-header">
@@ -336,39 +376,64 @@
                 <a href="{{ route('client.home') }}">METEOR SHOP</a>
             </div>
 
-            {{-- Menu ngang --}}
+            {{-- Menu ngang (Đã gộp và giữ lại Dropdown từ File 1) --}}
             <nav class="main-nav">
                 <ul>
-                    <li><a href="#">Sản phẩm</a></li>
-                    <li><a href="#">Phòng</a></li>
+                    {{-- Dropdown Sản phẩm (Child Categories) --}}
+                    <li class="menu-item dropdown">
+                        <a href="#" class="dropdown-toggle">Sản phẩm</a>
+                        <ul class="dropdown-menu">
+                            @foreach($childCategories as $child)
+                                <li>
+                                    <a href="{{ route('client.product.category', $child->slug) }}">
+                                        {{ $child->name }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
+                    {{-- Dropdown Phòng (Parent Categories) --}}
+                    <li class="menu-item dropdown">
+                        <a href="#" class="dropdown-toggle">Phòng</a>
+                        <ul class="dropdown-menu">
+                            @foreach($parentCategories as $parent)
+                                <li>
+                                    <a href="{{ route('client.product.category', $parent->slug) }}">
+                                        {{ $parent->name }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
+                    {{-- Lấy link Bài Viết từ File 2 --}}
                     <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </nav>
-            <!-- Ô tìm kiếm -->
+
             <form action="{{ route('client.product.search') }}" method="GET" class="search-box">
-                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..."
-                    value="{{ $searchQuery ?? '' }}">
+                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="{{ $searchQuery ?? '' }}">
                 <button type="submit">
                     <i class="fa fa-search"></i>
                 </button>
             </form>
 
-            <!-- Icon menu dọc -->
             <div class="menu-toggle">☰</div>
         </div>
 
-        <!-- Menu dọc -->
         <div class="overlay"></div>
-        @if ($cate->count() === 0)
-            <p>Hiện chưa có danh mục.</p>
-        @else
+        {{-- Đã điều chỉnh logic hiển thị Menu dọc --}}
+        @if ($cate->count() > 0)
             <div class="vertical-menu">
                 @foreach ($cate as $c)
-                    <a href="">{{ $c->name }}</a>
+                    <a href="{{ route('client.product.category', $c->slug) }}">{{ $c->name }}</a>
                 @endforeach
+            </div>
+        @else
+            <div class="vertical-menu">
+                <a href="#">Hiện chưa có danh mục</a>
             </div>
         @endif
     </header>
@@ -377,131 +442,82 @@
         @yield('content')
     </main>
 
-    <footer id="footer" class="footer-wrapper">
+    {{-- Footer chi tiết từ File 2 (sử dụng HTML structure từ File 2 và style của File 1) --}}
+    <footer id="footer" class="footer-wrapper" style="background: #000000; padding:40px 0 20px; font-size:13px; color:#555">
         <div class="footer-widgets footer footer-2 dark">
-            <div class="row dark large-columns-4 mb-0">
-                <div id="text-14" class="col pb-0 widget widget_text"><span class="widget-title">Kết nối với
-                        Meteor</span>
-                    <div class="is-divider small"></div>
+            <div style="max-width:1200px; margin:auto; display:flex; justify-content:space-between;flex-wrap:wrap; gap:30px">
+
+                {{-- Cột 1: Kết nối với Meteor --}}
+                <div style="flex:1; min-width:180px">
+                    <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">Kết nối với Meteor</h4>
                     <div class="textwidget">
                         <p>
                             <img decoding="async" class="logo_ft img-fluid"
                                 src="{{ asset('storage/images/meteor.jpg') }}" alt="Logo Meteor"
                                 style="max-width: 120px;">
                         </p>
-
-
                         <div class="follow">
                             <h4>Follow us</h4>
-                            <p><a href="">Instagram</a>–<a href="">Youtube</a>–<a
-                                    href="">Facebook</a></p>
+                            <p>
+                                <a href="">Instagram</a> –
+                                <a href="">Youtube</a> –
+                                <a href="">Facebook</a>
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div id="nav_menu-2" class="col pb-0 widget widget_nav_menu"><span class="widget-title">Meteor</span>
-                    <div class="is-divider small"></div>
+
+                {{-- Cột 2: Về METEOR --}}
+                <div style="flex:1; min-width:180px">
+                    <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">Meteor</h4>
                     <div class="menu-ve-nha-xinh-container">
-                        <ul id="menu-ve-nha-xinh" class="menu">
-                            <li id="menu-item-41004"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41004"><a
-                                    href="#">Giới thiệu</a></li>
-                            <li id="menu-item-41005"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-41005"><a
-                                    href="">Chuyện meteor</a></li>
-                            <li id="menu-item-41000"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41000"><a
-                                    href="">Tổng công ty</a></li>
-                            <li id="menu-item-41002"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41002"><a
-                                    href="">Tuyển dụng</a></li>
-                            <li id="menu-item-41001"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41001"><a
-                                    href="">Thẻ hội viên</a></li>
-                            <li id="menu-item-41003"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41003"><a
-                                    href="">Đổi trả hàng</a></li>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin: 6px 0"><a href="#">Giới thiệu</a></li>
+                            <li style="margin: 6px 0"><a href="">Chuyện meteor</a></li>
+                            <li style="margin: 6px 0"><a href="">Tổng công ty</a></li>
+                            <li style="margin: 6px 0"><a href="">Tuyển dụng</a></li>
+                            <li style="margin: 6px 0"><a href="">Thẻ hội viên</a></li>
+                            <li style="margin: 6px 0"><a href="">Đổi trả hàng</a></li>
                         </ul>
                     </div>
                 </div>
-                <div id="nav_menu-3" class="col pb-0 widget widget_nav_menu"><span class="widget-title">CẢM HỨNG
-                        Meteor</span>
-                    <div class="is-divider small"></div>
+
+                {{-- Cột 3: CẢM HỨNG Meteor --}}
+                <div style="flex:1; min-width:180px">
+                    <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">CẢM HỨNG Meteor</h4>
                     <div class="menu-cam-hung-nha-xinh-container">
-                        <ul id="menu-cam-hung-nha-xinh" class="menu">
-                            <li id="menu-item-449"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-449"><a
-                                    href="">Sản phẩm</a></li>
-                            <li id="menu-item-450"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-450"><a
-                                    href="">Ý tưởng và cảm hứng</a></li>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin: 6px 0"><a href="">Sản phẩm</a></li>
+                            <li style="margin: 6px 0"><a href="">Ý tưởng và cảm hứng</a></li>
                         </ul>
                     </div>
                 </div>
-                <div id="block_widget-3" class="col pb-0 widget block_widget">
-                    <span class="widget-title">Newsletter</span>
-                    <div class="is-divider small"></div>
-                    <div id="text-2944331817" class="text">
 
-
-                        <p>Hãy để lại email của bạn để nhận được những ý tưởng trang trí mới và những thông tin, ưu đãi
-                            từ Meteor</p>
+                {{-- Cột 4: Newsletter/Thông tin liên hệ --}}
+                <div style="flex:1; min-width:180px">
+                    <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">Newsletter</h4>
+                    <div class="text" style="font-size: 0.75rem;">
+                        <p>Hãy để lại email của bạn để nhận được những ý tưởng trang trí mới và những thông tin, ưu đãi từ Meteor</p>
                         <p>Email: meteor</p>
                         <p>Hotline: <strong>0397766836</strong></p>
-
-
-                        <style>
-                            #text-2944331817 {
-                                font-size: 0.75rem;
-                            }
-                        </style>
                     </div>
-
+                    {{-- Giữ lại phần form (chưa hoàn chỉnh) để developer tự hoàn thiện --}}
                     <div role="form" class="wpcf7" id="wpcf7-f9-o1" lang="en-US" dir="ltr">
-                        <div class="screen-reader-response">
-                            <p role="status" aria-live="polite" aria-atomic="true"></p>
-                            <ul></ul>
-                        </div>
-                        <form action="" method="post" class="wpcf7-form init" novalidate="novalidate"
-                            data-status="init">
-                            <div style="display: none;">
-                                <input type="hidden" name="_wpcf7" value="9">
-                                <input type="hidden" name="_wpcf7_version" value="5.5.2">
-                                <input type="hidden" name="_wpcf7_locale" value="en_US">
-                                <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f9-o1">
-                                <input type="hidden" name="_wpcf7_container_post" value="0">
-                                <input type="hidden" name="_wpcf7_posted_data_hash" value="">
-                                <input type="hidden" name="_wpcf7_recaptcha_response"
-                                    value="0cAFcWeA7swwLl_8VvpFI06BH3gsjO68Ua_z5VNFU3hy53nMAl1Ib7MeCY5iXtu94dRupk7wiA0keDJ5HgJdgtgo0EYcDooyKZ63qDfxkzaFXYp5nkEMhcr5_ue_kmeQU92aHNxsy1mWUxkQSKxN8OWCh6dzQdp-KzwjpGSFz4OPB-SOb1hbW1z8pZO8-hDZet1qfO2B5uU3s3GdEUfy1YJxrd7si21y0xUlVXLGtRiCG0t8dNFC_5oplJUw-1SX90fY-210RRm1Ee7D2dBieO58yWy-vKauhvB0yohn7yrNyo9CIvSYVz-QUfGqHLrgkOtkGddun16vrAHo8Z_ElyFdzntv7DI6ZDLfUi_mPDOnaataHiFt2X4nDFOq97xzSs9xEZxMR6SB5R9WTqJtC8lLASyMMnBeUsZBH-PB0yjNhs6B4kD2RMULDnqLynhTXu5sprEQIi3oh-hij4WC9plTBrZgcT5pcoRABIzY5xI6IGrLQfVwqY5tqcpPr0COV8-bFAlVDRQa9NO7AaXdPYQCCeM4aLO9CQvgA4oV4SsCs7gbTRZofv0P1hswqLW-dN1WYbDYRn0OPu3-A1A2RTbPNWikLvekFLE23T5y62gi5akjQVwaIdh5W9dOAcP6Se3m65nJCIk5AJ_fUhmc8HmBG4ieMc9ezZSLa0lG7_WqkTJ4AHm28pSwdK9SYiUdG4xQwZcxHHBW05E3Jex1l4im_aN5gAmzXxOrbckL8vXAzrYDQ7L2jNxTHuzTncUOIs1i8soQ_wUrerU40dgDRKcz-5qMYD6HwW-h8feMooaH2QXYRmbn2FByIMFCr7Bw8jvgyKCDlCJRz7">
-                            </div>
-                            <div class="flex-row form-flat medium-flex-wrap">
-                                <div class="flex-col flex-grow">
-                                    <span class="wpcf7-form-control-wrap your-email"><input type="email"
-                                            name="your-email" value="" size="40"
-                                            class="wpcf7-form-control wpcf7-text wpcf7-email wpcf7-validates-as-required wpcf7-validates-as-email"
-                                            aria-required="true" aria-invalid="false"
-                                            placeholder="Nhập email của bạn"></span>
-                                </div>
-                                <div class="flex-col ml-half">
-                                    <input type="submit" value="Đăng ký"
-                                        class="wpcf7-form-control has-spinner wpcf7-submit button"><span
-                                        class="wpcf7-spinner"></span>
-                                </div>
-                            </div>
-                            <div class="wpcf7-response-output" aria-hidden="true"></div>
-                        </form>
+                        <form action="" method="post" class="wpcf7-form init" novalidate="novalidate" data-status="init">
+                             </form>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="absolute-footer dark medium-text-center small-text-center">
-            <div class="container clearfix">
-                <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
-                <div style="text-align: center; color:#bdbdbd; font-size: 16px">
-                    © 2025 METEOR SHOP. Tất cả các quyền được bảo lưu.
-                </div>
-            </div>
+
+        <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #333;"> {{-- Đã điều chỉnh màu border cho phù hợp nền đen --}}
+        <div style="text-align: center; color:#bdbdbd; font-size: 13px"> {{-- Đã điều chỉnh font size --}}
+            © 2025 METEOR SHOP. Tất cả các quyền được bảo lưu.
         </div>
     </footer>
+
+
+    {{-- Script cho menu dọc (giữ lại từ File 1) --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.querySelector('.menu-toggle');
@@ -528,5 +544,4 @@
         });
     </script>
 </body>
-
 </html>

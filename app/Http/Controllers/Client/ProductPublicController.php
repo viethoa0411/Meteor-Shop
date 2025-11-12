@@ -9,11 +9,11 @@ use Illuminate\Http\Request;
 
 class ProductPublicController extends Controller
 {
-    public function search(Request $request)
+    public function search(Request $request, ?string $slug = null)
     {
         $searchQuery = trim($request->input('query'));
         $sort = $request->input('sort', 'newest');
-        $categoryId = $request->input('category');
+        $categoryInput = $request->input('category');
         $minPrice = $request->input('minPrice');
         $maxPrice = $request->input('maxPrice');
 
@@ -30,10 +30,19 @@ class ProductPublicController extends Controller
 
         // ✅ Lọc theo danh mục nếu có
         $selectedCategory = null;
-        if ($categoryId) {
-            $selectedCategory = Category::find($categoryId);
-            // Lọc theo tất cả danh mục con (bao gồm chính nó)
-            $categoryIds = $this->getDescendantCategoryIds((int)$categoryId);
+        if ($slug) {
+            $selectedCategory = Category::where('slug', $slug)->firstOrFail();
+        } elseif ($categoryInput) {
+            $selectedCategory = is_numeric($categoryInput)
+                ? Category::find($categoryInput)
+                : Category::where('slug', $categoryInput)->first();
+            if (!$selectedCategory && is_numeric($categoryInput)) {
+                abort(404);
+            }
+        }
+
+        if ($selectedCategory) {
+            $categoryIds = $this->getDescendantCategoryIds((int) $selectedCategory->id);
             $query->whereIn('category_id', $categoryIds);
         }
 
