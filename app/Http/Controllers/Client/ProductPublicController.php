@@ -12,37 +12,50 @@ class ProductPublicController extends Controller
     public function search(Request $request)
     {
         $searchQuery = trim($request->input('query'));
-        $sort = $request->input('sort', 'popular');
+        $sort = $request->input('sort', 'newest');
         $categoryId = $request->input('category');
+        $minPrice = $request->input('minPrice');
+        $maxPrice = $request->input('maxPrice');
 
-        // Lấy tất cả danh mục đang hoạt động
+        // Lấy danh mục đang hoạt động (cần thiết để truyền sang view cho menu/filter)
         $cate = Category::query()
             ->select(['id', 'name', 'slug', 'description', 'parent_id', 'status'])
             ->where('status', 1)
             ->get();
 
-        // Nếu không có từ khóa tìm kiếm, trả về danh sách rỗng
-        if (!$searchQuery) {
-            $products = collect();
-            return view('client.search', compact('products', 'searchQuery', 'cate'));
-        }
-
-        // Truy vấn sản phẩm theo từ khóa
+        // Khởi tạo truy vấn sản phẩm
         $query = Product::query()
             ->select(['id', 'name', 'slug', 'price', 'image', 'status', 'description', 'created_at', 'category_id'])
-            ->where('status', 1)
-            ->where(function ($q) use ($searchQuery) {
-                $q->where('name', 'LIKE', "%{$searchQuery}%")
-                  ->orWhere('description', 'LIKE', "%{$searchQuery}%")
-                  ->orWhere('slug', 'LIKE', "%{$searchQuery}%");
-            });
+            ->where('status', 1);
 
-        // Lọc theo danh mục nếu có
+        // ✅ Lọc theo danh mục nếu có
+        $selectedCategory = null;
         if ($categoryId) {
-            $query->where('category_id', $categoryId);
+            $selectedCategory = Category::find($categoryId);
+            // Lọc theo tất cả danh mục con (bao gồm chính nó)
+            $categoryIds = $this->getDescendantCategoryIds((int)$categoryId);
+            $query->whereIn('category_id', $categoryIds);
         }
 
-        // Sắp xếp theo lựa chọn
+        // ✅ Lọc theo từ khóa nếu người dùng nhập
+        if ($searchQuery) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('name', 'LIKE', "%{$searchQuery}%")
+                    ->orWhere('description', 'LIKE', "%{$searchQuery}%")
+                    ->orWhere('slug', 'LIKE', "%{$searchQuery}%");
+            });
+        }
+
+        // ✅ Lọc theo giá slider
+        if ($minPrice && $maxPrice) {
+            $query->whereBetween('price', [$minPrice, $maxPrice]);
+        } elseif ($minPrice) {
+            $query->where('price', '>=', $minPrice);
+        } elseif ($maxPrice) {
+            $query->where('price', '<=', $maxPrice);
+        }
+
+        // ✅ Sắp xếp
         switch ($sort) {
             case 'price_asc':
                 $query->orderBy('price', 'asc');
@@ -51,12 +64,40 @@ class ProductPublicController extends Controller
                 $query->orderBy('price', 'desc');
                 break;
             case 'newest':
+            default:
                 $query->orderBy('created_at', 'desc');
                 break;
         }
 
+        // ✅ Phân trang
         $products = $query->paginate(8)->withQueryString();
 
-        return view('client.search', compact('products', 'searchQuery', 'cate'));
+        return view('client.search', compact('products', 'searchQuery', 'cate', 'selectedCategory'));
+    }
+
+    /**
+     * Lấy danh sách ID của danh mục và toàn bộ danh mục con (đệ quy/BFS).
+     *
+     * @param int $rootCategoryId ID của danh mục gốc
+     * @return array Mảng chứa ID của danh mục gốc và tất cả danh mục con
+     */
+    private function getDescendantCategoryIds(int $rootCategoryId)
+    {
+        $allIds = [$rootCategoryId];
+        $queue = [$rootCategoryId];
+
+        while (!empty($queue)) {
+            $currentId = array_shift($queue);
+            $children = Category::where('parent_id', $currentId)->pluck('id')->all();
+
+            foreach ($children as $childId) {
+                if (!in_array($childId, $allIds, true)) {
+                    $allIds[] = $childId;
+                    $queue[] = $childId;
+                }
+            }
+        }
+
+        return $allIds;
     }
 }

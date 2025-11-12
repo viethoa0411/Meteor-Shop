@@ -8,11 +8,12 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Client\HomeController;
-use App\Http\Controllers\Client\ProductPublicController;
-// --- ĐÃ SỬA: Đổi thành ProductController mới ---
-use App\Http\Controllers\Client\ProductController as ClientProductController;
+use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
+use App\Http\Controllers\Admin\Blog\BlogController;
+use App\Http\Controllers\Client\Blog\BlogClientController;
+use App\Http\Controllers\Client\ProductPublicController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -30,16 +31,6 @@ Route::get('/verify-otp', [ForgotPasswordController::class, 'showVerifyOtpForm']
 Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp.post');
 Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
-
-// ============ CLIENT ROUTES ============
-Route::get('/', [HomeController::class, 'index'])->name('client.home');
-Route::get('/home', [HomeController::class, 'index']);
-Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
-Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category'); // hiển thị tất cả sản phẩm của 1 danh mục
-Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail'); // hiển thị chi tiết sản phẩm
-Route::get('/categories', [ProductController::class, 'index'])->name('client.product.listProductsByCategory'); // Hiển thị trang tổng hợp nhiều danh mục + 4 sản phẩm mới nhất mỗi danh mục
-Route::get('/products', [ClientProductController::class, 'index'])->name('client.products.index'); // Hiển thị trang sản phẩm sắp xếp theo danh mục
-
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
@@ -69,11 +60,23 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/show/{id}', [ProductController::class, 'show'])->name('show');
         Route::delete('/delete/{id}', [ProductController::class, 'destroy'])->name('destroy');
     });
+
     // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/', [OrderController::class, 'list'])->name('list');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
+    });
+
+    // ====== BLOGS ======
+    Route::prefix('blogs')->name('blogs.')->group(function () {
+        Route::get('/', [BlogController::class, 'list'])->name('list');
+        Route::get('/create', [BlogController::class, 'create'])->name('create');
+        Route::post('/store', [BlogController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [BlogController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [BlogController::class, 'update'])->name('update');
+        Route::get('/show/{id}', [BlogController::class, 'show'])->name('show');
+        Route::delete('/delete/{id}', [BlogController::class, 'destroy'])->name('destroy');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
@@ -104,7 +107,19 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
-
-
     });
+});
+
+// ============ CLIENT ROUTES ============
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
+Route::get('/home', [HomeController::class, 'index']);
+Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
+Route::get('/category/{slug}', [ProductClientController::class, 'productsByCategory'])->name('client.product.category');
+Route::get('/products/{slug}', [ProductClientController::class, 'showDetail'])->name('client.product.detail');
+Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
+Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
+
+
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
 });
