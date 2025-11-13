@@ -89,7 +89,12 @@ class BannerController extends Controller
         // Upload ảnh
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('banners', 'public');
+            try {
+                $imagePath = $request->file('image')->store('banners', 'public');
+            } catch (\Exception $e) {
+                return back()->withInput()
+                    ->withErrors(['image' => 'Lỗi khi upload ảnh: ' . $e->getMessage()]);
+            }
         }
 
         // Lấy sort_order cao nhất + 1 nếu không nhập
@@ -156,11 +161,24 @@ class BannerController extends Controller
         // Upload ảnh mới nếu có
         $imagePath = $banner->image;
         if ($request->hasFile('image')) {
-            // Xóa ảnh cũ
-            if ($banner->image && Storage::disk('public')->exists($banner->image)) {
-                Storage::disk('public')->delete($banner->image);
+            // Xóa ảnh cũ nếu có
+            if (!empty($banner->image)) {
+                try {
+                    $oldImagePath = $banner->image;
+                    if (Storage::disk('public')->exists($oldImagePath)) {
+                        Storage::disk('public')->delete($oldImagePath);
+                    }
+                } catch (\Exception $e) {
+                    // Bỏ qua lỗi nếu không xóa được ảnh cũ
+                }
             }
-            $imagePath = $request->file('image')->store('banners', 'public');
+            // Upload ảnh mới
+            try {
+                $imagePath = $request->file('image')->store('banners', 'public');
+            } catch (\Exception $e) {
+                return back()->withInput()
+                    ->withErrors(['image' => 'Lỗi khi upload ảnh: ' . $e->getMessage()]);
+            }
         }
 
         $banner->update([
@@ -185,9 +203,15 @@ class BannerController extends Controller
     {
         $banner = Banner::findOrFail($id);
         
-        // Xóa ảnh
-        if ($banner->image && Storage::disk('public')->exists($banner->image)) {
-            Storage::disk('public')->delete($banner->image);
+        // Xóa ảnh nếu có
+        if (!empty($banner->image)) {
+            try {
+                if (Storage::disk('public')->exists($banner->image)) {
+                    Storage::disk('public')->delete($banner->image);
+                }
+            } catch (\Exception $e) {
+                // Bỏ qua lỗi nếu không xóa được ảnh
+            }
         }
 
         $banner->delete();
@@ -209,8 +233,15 @@ class BannerController extends Controller
         $banners = Banner::whereIn('id', $request->ids)->get();
         
         foreach ($banners as $banner) {
-            if ($banner->image && Storage::disk('public')->exists($banner->image)) {
-                Storage::disk('public')->delete($banner->image);
+            // Xóa ảnh nếu có
+            if (!empty($banner->image)) {
+                try {
+                    if (Storage::disk('public')->exists($banner->image)) {
+                        Storage::disk('public')->delete($banner->image);
+                    }
+                } catch (\Exception $e) {
+                    // Bỏ qua lỗi nếu không xóa được ảnh
+                }
             }
             $banner->delete();
         }
@@ -293,8 +324,15 @@ class BannerController extends Controller
     {
         $banner = Banner::onlyTrashed()->findOrFail($id);
         
-        if ($banner->image && Storage::disk('public')->exists($banner->image)) {
-            Storage::disk('public')->delete($banner->image);
+        // Xóa ảnh nếu có
+        if (!empty($banner->image)) {
+            try {
+                if (Storage::disk('public')->exists($banner->image)) {
+                    Storage::disk('public')->delete($banner->image);
+                }
+            } catch (\Exception $e) {
+                // Bỏ qua lỗi nếu không xóa được ảnh
+            }
         }
 
         $banner->forceDelete();
