@@ -198,22 +198,13 @@ class BannerController extends Controller
 
     /**
      * Xóa banner (soft delete)
+     * Lưu ý: Không xóa ảnh khi soft delete để có thể khôi phục
      */
     public function destroy($id)
     {
         $banner = Banner::findOrFail($id);
         
-        // Xóa ảnh nếu có
-        if (!empty($banner->image)) {
-            try {
-                if (Storage::disk('public')->exists($banner->image)) {
-                    Storage::disk('public')->delete($banner->image);
-                }
-            } catch (\Exception $e) {
-                // Bỏ qua lỗi nếu không xóa được ảnh
-            }
-        }
-
+        // Soft delete - không xóa ảnh để có thể khôi phục
         $banner->delete();
 
         return redirect()->route('admin.banners.list')
@@ -233,16 +224,7 @@ class BannerController extends Controller
         $banners = Banner::whereIn('id', $request->ids)->get();
         
         foreach ($banners as $banner) {
-            // Xóa ảnh nếu có
-            if (!empty($banner->image)) {
-                try {
-                    if (Storage::disk('public')->exists($banner->image)) {
-                        Storage::disk('public')->delete($banner->image);
-                    }
-                } catch (\Exception $e) {
-                    // Bỏ qua lỗi nếu không xóa được ảnh
-                }
-            }
+            // Soft delete - không xóa ảnh để có thể khôi phục
             $banner->delete();
         }
 
