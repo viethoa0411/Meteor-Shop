@@ -5,7 +5,7 @@
     <h2 class="mb-4">Danh sách đơn hàng</h2>
 
     {{-- BỘ LỌC TRẠNG THÁI + TÌM KIẾM --}}
-    <form method="GET" action="{{ route('admin.orders.index') }}" class="row g-2 mb-3 align-items-center">
+    <form method="GET" action="{{ route('admin.orders.list') }}" class="row g-2 mb-3 align-items-center">
         <div class="col-md-3">
             <select name="status" class="form-select" onchange="this.form.submit()">
                 <option value="all" {{ ($status == 'all' || $status == null) ? 'selected' : '' }}>Tất cả</option>

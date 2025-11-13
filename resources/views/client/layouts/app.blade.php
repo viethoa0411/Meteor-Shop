@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Meteor Shop')</title>
@@ -8,8 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <style>
+    {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
+   <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background: #f9fafb;
@@ -326,7 +325,6 @@
     @stack('head')
 
 </head>
-
 <body>
 
     <header class="header">
@@ -339,7 +337,7 @@
             {{-- Menu ngang --}}
             <nav class="main-nav">
                 <ul>
-                    <li><a href="#">Sản phẩm</a></li>
+                   <li><a href="#">Sản phẩm</a></li>
                     <li><a href="#">Phòng</a></li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
@@ -348,36 +346,71 @@
                 </ul>
             </nav>
             <!-- Ô tìm kiếm -->
-            <form action="{{ route('client.product.search') }}" method="GET" class="search-box">
-                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..."
-                    value="{{ $searchQuery ?? '' }}">
+{{-- <form action="#" method="GET" class="search-box"> --}}
+            <form action="#" method="GET" class="search-box">
+                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="{{ $searchQuery ?? '' }}">
                 <button type="submit">
                     <i class="fa fa-search"></i>
                 </button>
             </form>
 
+
             <!-- Icon menu dọc -->
             <div class="menu-toggle">☰</div>
-        </div>
+            
+            <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
+                @auth
+
+                    {{-- DROPDOWN USER --}}
+                    <div class="dropdown">
+                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    Thông tin tài khoản
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('client.logout') }}" method="POST">
+                                    @csrf
+                                    <button class="dropdown-item" type="submit">Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+
+                @else
+                    {{-- NẾU CHƯA ĐĂNG NHẬP --}}
+                    <div class="d-flex w-100">
+                        <a class="btn btn-outline-light flex-fill" href="{{ route('client.login') }}">Đăng nhập</a>
+                    </div>
+                @endauth
+            </div>
+
+            </div>
 
         <!-- Menu dọc -->
         <div class="overlay"></div>
-        @if ($cate->count() === 0)
-            <p>Hiện chưa có danh mục.</p>
-        @else
-            <div class="vertical-menu">
-                @foreach ($cate as $c)
-                    <a href="">{{ $c->name }}</a>
-                @endforeach
-            </div>
-        @endif
+            @if (isset($cate) && $cate->count() > 0)
+                <div class="vertical-menu">
+                    @foreach ($cate as $c)
+                        <a href="#">{{ $c->name }}</a>
+                    @endforeach    
+                </div>      
+            @else
+                <div class="vertical-menu">
+                    <a href="#">Hiện chưa có danh mục</a>
+                </div>
+            @endif
     </header>
-
-    <main>
+<main class="container">
         @yield('content')
     </main>
 
-    <footer id="footer" class="footer-wrapper">
+<footer id="footer" class="footer-wrapper">
         <div class="footer-widgets footer footer-2 dark">
             <div class="row dark large-columns-4 mb-0">
                 <div id="text-14" class="col pb-0 widget widget_text"><span class="widget-title">Kết nối với
@@ -441,14 +474,10 @@
                     <span class="widget-title">Newsletter</span>
                     <div class="is-divider small"></div>
                     <div id="text-2944331817" class="text">
-
-
                         <p>Hãy để lại email của bạn để nhận được những ý tưởng trang trí mới và những thông tin, ưu đãi
                             từ Meteor</p>
                         <p>Email: meteor</p>
                         <p>Hotline: <strong>0397766836</strong></p>
-
-
                         <style>
                             #text-2944331817 {
                                 font-size: 0.75rem;
@@ -502,6 +531,8 @@
             </div>
         </div>
     </footer>
+
+    {{-- Script cho menu dọc --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.querySelector('.menu-toggle');
@@ -509,7 +540,7 @@
             const overlay = document.querySelector('.overlay');
 
             function closeMenu() {
-                verticalMenu.classList.remove('active');
+verticalMenu.classList.remove('active');
                 overlay.classList.remove('active');
             }
 
@@ -527,6 +558,7 @@
             });
         });
     </script>
+    <!-- Bootstrap JS Bundle to enable dropdown -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

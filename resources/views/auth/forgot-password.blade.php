@@ -192,7 +192,7 @@
                 <input type="email" class="form-control @error('email') is-invalid @enderror" 
                        id="email" name="email" value="{{ old('email') }}" 
                        placeholder="Email" required autofocus>
-                <label for="email"><i class="bi bi-envelope"></i> Email đăng ký</label>
+                <label for="email"><i class="bi bi-envelope"></i> Email đã đăng ký</label>
                 @error('email')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -204,7 +204,7 @@
         </form>
         
         <div class="back-link">
-            <p><a href="{{ route('login') }}"><i class="bi bi-arrow-left"></i> Quay lại đăng nhập</a></p>
+            <p><a href="{{ route('client.login') }}"><i class="bi bi-arrow-left"></i> Quay lại đăng nhập</a></p>
         </div>
     </div>
 

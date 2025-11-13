@@ -82,31 +82,27 @@
                 <div class="card-body">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                         <div>
-                            <div class="text-muted small">Tên sản phẩm</div>
-                            <div class="fw-semibold">{{ $product->name }}</div>
+                            <div class="fw-semibold">Tên sản phẩm</div>
+                            <div class="text-muted small">{{ $product->name }}</div>
                         </div>
                         <div class="text-end">
-                            <div class="text-muted small">Giá</div>
-                            <div class="fs-4 fw-bold">{{ number_format($product->price, 0, ',', '.') }} đ</div>
+                            <div class="fw-semibold">Giá</div>
+                            <div class="text-muted small">{{ number_format($product->price, 0, ',', '.') }} đ</div>
                         </div>
                     </div>
                     <hr>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <div class="text-muted small">Tồn kho</div>
-                            <div class="fw-semibold">{{ $product->stock }}</div>
+                            <div class="fw-semibold">Danh mục</div>
+                            <div class="text-muted small">{{ $product->category->name ?? '—' }}</div>
                         </div>
                         <div class="col-md-6">
-                            <div class="text-muted small">Danh mục</div>
-                            <div class="fw-semibold">{{ $product->category->name ?? '—' }}</div>
+                            <div class="fw-semibold">Cập nhật</div>
+                            <div class="text-muted small">{{ $product->updated_at?->format('d/m/Y H:i') }}</div>
                         </div>
                         <div class="col-md-6">
-                            <div class="text-muted small">Cập nhật</div>
-                            <div class="fw-semibold">{{ $product->updated_at?->format('d/m/Y H:i') }}</div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="text-muted small">Trạng thái</div>
-                            <div class="fw-semibold">{{ $product->status }}</div>
+                            <div class="fw-semibold">Trạng thái</div>
+                            <div class="text-muted small">{{ $product->status }}</div>
                         </div>
                     </div>
 
@@ -122,7 +118,6 @@
                                         <th>Kích thước (D × R × C)</th>
                                         <th>Giá</th>
                                         <th>Tồn kho</th>
-                                        <th>SKU</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-center">
@@ -147,7 +142,6 @@
                                             </td>
                                             <td>{{ number_format($v->price ?? $product->price, 0, ',', '.') }} đ</td>
                                             <td>{{ $v->stock }}</td>
-                                            <td>{{ $v->sku ?? '—' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -159,7 +153,7 @@
 
                     {{-- Mô tả --}}
                     <div class="mt-3">
-                        <div class="text-muted small mb-1">Mô tả</div>
+                        <div class="fw-semibold">Mô tả</div>
                         <div class="lh-base">
                             {!! nl2br(e($product->description)) ?: '<span class="text-secondary">—</span>' !!}
                         </div>
