@@ -119,9 +119,10 @@
                                                 class="form-check-input banner-checkbox">
                                         </td>
                                         <td>
-                                            @if ($banner->image)
+                                            @if (!empty($banner->image))
                                                 <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}"
-                                                    class="img-thumbnail" style="width: 60px; height: 40px; object-fit: cover;">
+                                                    class="img-thumbnail" style="width: 60px; height: 40px; object-fit: cover;"
+                                                    onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light d-flex align-items-center justify-content-center\' style=\'width: 60px; height: 40px;\'><i class=\'bi bi-image text-muted\'></i></div>';">
                                             @else
                                                 <div class="bg-light d-flex align-items-center justify-content-center"
                                                     style="width: 60px; height: 40px;">

@@ -50,10 +50,12 @@
                                 @foreach ($banners as $banner)
                                     <tr>
                                         <td>
-                                            @if ($banner->image)
+                                            @if (!empty($banner->image))
                                                 <img src="{{ asset('storage/' . $banner->image) }}"
-                                                    alt="{{ $banner->title }}" class="img-thumbnail"
-                                                    style="width: 60px; height: 40px; object-fit: cover;">
+                                                    alt="{{ $banner->title ?? 'Banner' }}" 
+                                                    class="img-thumbnail"
+                                                    style="width: 60px; height: 40px; object-fit: cover;"
+                                                    onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;bg-light d-flex align-items-center justify-content-center&quot; style=&quot;width: 60px; height: 40px;&quot;><i class=&quot;bi bi-image text-muted&quot;></i></div>';">
                                             @else
                                                 <div class="bg-light d-flex align-items-center justify-content-center"
                                                     style="width: 60px; height: 40px;">
