@@ -84,16 +84,16 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/', [BannerController::class, 'list'])->name('list');
         Route::get('/create', [BannerController::class, 'create'])->name('create');
         Route::post('/store', [BannerController::class, 'store'])->name('store');
+        Route::get('/trash', [BannerController::class, 'trash'])->name('trash');
+        Route::post('/bulk-delete', [BannerController::class, 'bulkDelete'])->name('bulkDelete');
+        Route::post('/update-sort-order', [BannerController::class, 'updateSortOrder'])->name('updateSortOrder');
         Route::get('/{id}', [BannerController::class, 'show'])->name('show');
         Route::get('/{id}/edit', [BannerController::class, 'edit'])->name('edit');
         Route::put('/{id}', [BannerController::class, 'update'])->name('update');
         Route::delete('/{id}', [BannerController::class, 'destroy'])->name('destroy');
-        Route::get('/trash', [BannerController::class, 'trash'])->name('trash');
         Route::post('/{id}/restore', [BannerController::class, 'restore'])->name('restore');
         Route::delete('/{id}/force-delete', [BannerController::class, 'forceDelete'])->name('forceDelete');
-        Route::post('/bulk-delete', [BannerController::class, 'bulkDelete'])->name('bulkDelete');
         Route::put('/{id}/status', [BannerController::class, 'updateStatus'])->name('updateStatus');
-        Route::post('/update-sort-order', [BannerController::class, 'updateSortOrder'])->name('updateSortOrder');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
