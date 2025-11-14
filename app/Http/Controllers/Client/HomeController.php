@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Banner;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -31,6 +32,12 @@ class HomeController extends Controller
             ->where('status', 1)
             ->get();
 
-        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate'));
+        // Lấy banners đang hoạt động, sắp xếp theo sort_order
+        $banners = Banner::active()
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners'));
     }
 }
