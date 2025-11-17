@@ -15,8 +15,9 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MonthlyTargetController;
+use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
-use Illuminate\Container\Attributes\Auth;
+
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -152,6 +153,10 @@ Route::get('/products/{slug}', [ProductClientController::class, 'showDetail'])->
 Route::get('/products', [HomeController::class, 'index'])->name('client.products.index');
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update-qty', [CartController::class, 'updateQty'])->name('cart.updateQty');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 
 

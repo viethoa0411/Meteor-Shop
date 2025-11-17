@@ -1,0 +1,115 @@
+@extends('client.layouts.app')
+
+@section('content')
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2>Giỏ hàng</h2>
+        </div>
+        @if (count($cart) > 0)
+            <table class="table table-bordered">
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Tên</th>
+                    <th class="text-end">Giá</th>
+                    <th>Số lượng</th>
+                    <th class="text-end">Thành tiền</th>
+                    <th>Hành động</th>
+                </tr>
+
+                @foreach ($cart as $id => $item)
+                    <tr id="row-{{ $id }}">
+                        <td>
+                            <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/70x70?text=No+Image' }}"
+                                width="70" alt="{{ $item['name'] }}">
+                        </td>
+
+                        <td>
+                            {{ $item['name'] }}
+                            <div class="mt-1 text-muted" style="font-size: 0.9em;">
+                                @if ($item['color'])
+                                    <span>Màu: <strong>{{ $item['color'] }}</strong></span>
+                                @endif
+                                @if ($item['size'])
+                                    <span class="ms-2">Size: <strong>{{ $item['size'] }}</strong></span>
+                                @endif
+                            </div>
+                        </td>
+
+                        <td class="text-end">{{ number_format($item['price']) }}đ</td>
+
+                        <td class="d-flex align-items-center gap-2">
+                            <button class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
+                                data-type="minus">-</button>
+                            <span id="qty-{{ $id }}">{{ $item['quantity'] }}</span>
+                            <button class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
+                                data-type="plus">+</button>
+                        </td>
+
+                        <td class="text-end">
+                            <span
+                                id="subtotal-{{ $id }}">{{ number_format($item['price'] * $item['quantity']) }}đ</span>
+                        </td>
+
+                        <td>
+                            <button class="btn btn-danger btn-sm removeItem" data-id="{{ $id }}">Xóa</button>
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
+            <div class="text-end mt-3">
+                <h4>Tổng tiền: <span id="total">{{ number_format($total) }}đ</span></h4>
+                <a href="" class="btn btn-dark mt-2">Đặt hàng</a>
+            </div>
+        @else
+            <div class="text-center mt-4">
+                <p>Hiện tại giỏ hàng của bạn trống.</p>
+                <a href="{{ route('client.home') }}" class="btn btn-primary mt-3">Quay lại trang chủ</a>
+            </div>
+        @endif
+    </div>
+@endsection
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+
+        // Update số lượng
+        $(document).on('click', '.updateQty', function() {
+            let id = $(this).data('id');
+            let type = $(this).data('type');
+
+            $.post("{{ route('cart.updateQty') }}", {
+                id: id,
+                type: type,
+                _token: "{{ csrf_token() }}"
+            }, function(data) {
+                if (data.status === 'success') {
+                    $("#qty-" + id).text(data.quantity);
+                    $("#subtotal-" + id).text(Number(data.subtotal).toLocaleString() + "đ");
+                    $("#total").text(Number(data.total).toLocaleString() + "đ");
+                }
+            });
+        });
+
+        // Xóa sản phẩm
+        $(document).on('click', '.removeItem', function() {
+            let id = $(this).data('id');
+
+            $.post("{{ route('cart.remove') }}", {
+                id: id,
+                _token: "{{ csrf_token() }}"
+            }, function(data) {
+                if (data.status === 'success') {
+                    $("#row-" + id).remove();
+                    $("#total").text(Number(data.total).toLocaleString() + "đ");
+
+                    if (data.total == 0) {
+                        $("table").remove();
+                        $(".container").append("<p>Giỏ hàng của bạn trống.</p>");
+                    }
+                }
+            });
+        });
+
+    });
+</script>

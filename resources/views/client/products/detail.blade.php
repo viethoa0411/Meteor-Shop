@@ -144,7 +144,7 @@
                         style="display:flex; align-items:center; border:1px solid #ccc; border-radius:6px; overflow:hidden;">
                         <button type="button" class="minus"
                             style="border:none; background:#fff; color:#000;padding:8px 14px; font-size:18px; cursor:pointer;border-right:1px solid #ccc;">−</button>
-                        <input type="number" value="1" min="1" autocomplete="off"
+                        <input id="product-quantity" type="number" value="1" min="1" autocomplete="off"
                             style="width:60px; text-align:center; border:none; outline:none; font-size:16px; border-right:1px solid #ccc;">
                         <button type="button" class="plus"
                             style="border:none; background:#fff; color:#000;padding:8px 14px; font-size:18px; cursor:pointer;">+</button>
@@ -155,13 +155,16 @@
                 {{-- Nút hành động --}}
                 <div style="display:flex; flex-wrap:wrap; gap:16px;">
                     <button
-                        style="background:#d41; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:500; cursor:pointer;">
+                        style="color:#fff; background:#111; border:none; padding:10px 20px; border-radius:6px; font-weight:500; cursor:pointer;">
                         Mua ngay
                     </button>
-                    <button
-                        style="background:#111; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:500; cursor:pointer;">
+
+                    <button id="add-to-cart"
+                        style="border: 2px solid #000; background-color: #000; color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
                         <i class="bi bi-cart"></i> Thêm vào giỏ
                     </button>
+
+
                 </div>
             </div>
         </div>
@@ -215,7 +218,9 @@
 
         {{-- Hiệu ứng hover --}}
         <script>
-            document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('DOMContentLoaded', function() {
+
+                // ----- Hiệu ứng hover thẻ sản phẩm liên quan -----
                 document.querySelectorAll('.product-card').forEach(card => {
                     card.addEventListener('mouseenter', () => {
                         card.style.transform = 'translateY(-8px)';
@@ -230,53 +235,79 @@
                         if (img) img.style.transform = 'scale(1)';
                     });
                 });
-            });
-        </script>
 
-
-        {{-- Script tăng giảm số lượng + chọn biến thể --}}
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
+                // ----- Tăng/giảm số lượng -----
+                const qtyInput = document.querySelector('input[type="number"]');
                 const minus = document.querySelector('.minus');
                 const plus = document.querySelector('.plus');
-                const input = document.querySelector('input[type="number"]');
-                if (minus && plus && input) {
-                    minus.addEventListener('click', () => {
-                        if (parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
-                    });
-                    plus.addEventListener('click', () => {
-                        input.value = parseInt(input.value) + 1;
-                    });
-                }
 
+                minus?.addEventListener('click', () => {
+                    if (parseInt(qtyInput.value) > 1) qtyInput.value = parseInt(qtyInput.value) - 1;
+                });
+                plus?.addEventListener('click', () => {
+                    qtyInput.value = parseInt(qtyInput.value) + 1;
+                });
+
+                // ----- Chọn variant (màu, kích cỡ) -----
                 document.querySelectorAll('.btn-variant').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        btn.parentElement.querySelectorAll('.btn-variant').forEach(b => {
+                        const group = btn.classList.contains('color-btn') ? '.color-btn' : '.size-btn';
+                        document.querySelectorAll(group).forEach(b => {
+                            b.classList.remove('active');
                             b.style.background = '#fff';
                             b.style.color = '#111';
                         });
+                        btn.classList.add('active');
                         btn.style.background = '#111';
                         btn.style.color = '#fff';
                     });
                 });
-            });
-            document.querySelectorAll('.btn-variant').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // bỏ active trong nhóm tương ứng
-                    const isColor = btn.classList.contains('color-btn');
-                    const group = isColor ? '.color-btn' : '.size-btn';
-                    document.querySelectorAll(group).forEach(b => b.classList.remove('active'));
 
-                    // thêm active cho nút được chọn
-                    btn.classList.add('active');
+                // ----- Thêm vào giỏ hàng -----
+                const addBtn = document.getElementById('add-to-cart');
+                addBtn.addEventListener('click', () => {
+                    const quantity = parseInt(qtyInput.value);
+                    const colorBtn = document.querySelector('.color-btn.active');
+                    const sizeBtn = document.querySelector('.size-btn.active');
 
-                    // cập nhật style
-                    btn.style.background = '#111';
-                    btn.style.color = '#fff';
+                    // Kiểm tra variant nếu sản phẩm có variant
+                    @if ($product->variants->count() > 0)
+                        if (!colorBtn || !sizeBtn) {
+                            alert('Vui lòng chọn màu và kích cỡ');
+                            return;
+                        }
+                    @endif
+
+                    const color = colorBtn ? colorBtn.dataset.color : null;
+                    const size = sizeBtn ? sizeBtn.dataset.size : null;
+
+                    fetch("{{ route('cart.add') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                product_id: {{ $product->id }},
+                                quantity: quantity,
+                                color: color,
+                                size: size
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                alert('Đã thêm vào giỏ hàng!');
+                                // Reload toàn bộ trang
+                                window.location.reload();
+                            } else {
+                                alert(data.message);
+                            }
+                        });
                 });
+
             });
         </script>
-
         <style>
             .btn-variant.active {
                 border: 1px solid #111 !important;
@@ -289,6 +320,8 @@
                 -webkit-appearance: none;
                 margin: 0;
             }
+
+
         </style>
     </div>
 @endsection

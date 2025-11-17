@@ -1,3 +1,12 @@
+@php
+    $cart = session()->get('cart', []);
+    $cartCount = 0;
+
+    foreach ($cart as $item) {
+        $cartCount += $item['quantity'];
+    }
+@endphp
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -435,7 +444,17 @@
 
             <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
                 @auth
-
+                    <div class="position-relative">
+                        <a class="text-white fs-4" data-bs-toggle="offcanvas" href="#cartCanvas" role="button">
+                            <i class="bi bi-cart3"></i>
+                        </a>
+                        @if ($cartCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 12px;">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </div>
                     {{-- DROPDOWN USER --}}
                     <div class="dropdown">
                         <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -485,7 +504,52 @@
     <main class="container">
         @yield('content')
     </main>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartCanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Giỏ hàng</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        {{-- giỏ hàng --}}
+        <div class="offcanvas-body d-flex flex-column" style="height: 100%;">
+            @php
+                $cart = session('cart', []);
+            @endphp
 
+            @if ($cart && count($cart))
+                <ul class="list-group mb-3">
+                    @foreach ($cart as $id => $item)
+                        <li class="list-group-item d-flex justify-content-between align-items-center position-relative"
+                            id="cart-item-{{ $id }}">
+                            <div>
+                                <strong>{{ $item['name'] }}</strong> <br>
+                                Số lượng: {{ $item['quantity'] }}
+                            </div>
+                            <span>{{ number_format($item['price'] * $item['quantity']) }}₫</span>
+                            <button class="btn-close position-absolute top-0 end-0 m-2 remove-cart-item"
+                                data-id="{{ $id }}"></button>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="d-flex justify-content-between fw-bold mb-3">
+                    <span>Tổng:</span>
+                    <span
+                        id="cart-total">{{ number_format(array_sum(array_map(fn($i) => $i['price'] * $i['quantity'], $cart))) }}₫</span>
+                </div>
+
+                <!-- Nút luôn ở cuối -->
+                <div class="mt-auto d-flex flex-column gap-2">
+                    <a href="{{ route('cart.index') }}" class="btn btn-dark w-100">Xem giỏ hàng</a>
+                    <a href="" class="btn btn-white w-100">Đặt Hàng</a>
+                </div>
+            @else
+                <p>Giỏ hàng trống.</p>
+                <a href="{{ route('client.home') }}" class="btn btn-primary w-100 mt-2">Quay về trang chủ</a>
+            @endif
+        </div>
+
+
+    </div>
     <footer id="footer" class="footer-wrapper">
         <div class="footer-widgets footer footer-2 dark">
             <div class="row dark large-columns-4 mb-0">
@@ -602,7 +666,7 @@
             <div class="container clearfix">
                 <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
                 <div style="text-align: center; color:#bdbdbd; font-size: 16px">
-                    © 2025 METEOR SHOP. Tất cả các quyền được bảo lưu.
+                    © 2025 METEOR SHOP 
                 </div>
             </div>
         </div>
@@ -620,20 +684,51 @@
                 overlay.classList.remove('active');
             }
 
-            menuToggle.addEventListener('click', function(e) {
+            menuToggle?.addEventListener('click', function(e) {
                 e.stopPropagation();
                 verticalMenu.classList.toggle('active');
                 overlay.classList.toggle('active');
             });
 
-            overlay.addEventListener('click', closeMenu);
+            overlay?.addEventListener('click', closeMenu);
             document.addEventListener('click', function(e) {
                 if (!verticalMenu.contains(e.target) && !menuToggle.contains(e.target)) {
                     closeMenu();
                 }
             });
+
+            // ----- Xóa sản phẩm khỏi giỏ hàng và reload -----
+            document.querySelectorAll('.remove-cart-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+
+                    fetch("{{ route('cart.remove') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                id
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                // Reload lại toàn bộ trang
+                                window.location.reload();
+                            } else {
+                                alert(data.message || 'Có lỗi xảy ra!');
+                            }
+                        })
+                        .catch(err => console.error(err));
+                });
+            });
         });
     </script>
+
+
+
     <!-- Bootstrap JS Bundle to enable dropdown -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
