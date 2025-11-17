@@ -78,7 +78,7 @@
             position: relative;
         }
 
-        .dropdown-menu {
+        .main-nav .dropdown-menu {
             display: none !important;
             position: absolute;
             top: 100%;
@@ -92,19 +92,19 @@
             flex-direction: column;
         }
 
-        .dropdown-menu li a {
+        .main-nav .dropdown-menu li a {
             display: block;
             padding: 10px 14px;
             color: #333;
             white-space: nowrap;
         }
 
-        .dropdown-menu li a:hover {
+        .main-nav .dropdown-menu li a:hover {
             background: #f5f5f5;
             color: #007bff;
         }
 
-        .menu-item:hover>.dropdown-menu {
+        .main-nav .menu-item:hover>.dropdown-menu {
             display: block !important;
         }
 
@@ -417,6 +417,9 @@
                     {{-- Lấy link Bài Viết từ File 2 --}}
                     <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
+                    <li><a class="dropdown-item" href="{{ route('client.account.orders.index') }}">
+                        Đơn hàng của tôi
+                    </a></li>
                 </ul>
             </nav>
 
@@ -443,8 +446,8 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="#">
-                                    Thông tin tài khoản
+                                <a class="dropdown-item" href="{{ route('client.account.orders.index') }}">
+                                    Đơn hàng của tôi
                                 </a>
                             </li>
                             <li>
