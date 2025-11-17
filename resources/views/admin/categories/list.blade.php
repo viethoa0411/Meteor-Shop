@@ -55,7 +55,7 @@
 
                         <div class="input-group w-100">
                             <input type="text" name="keyword" class="form-control"
-                                placeholder="VD: nguyenvana, email hoặc số điện thoại..." value="{{ request('keyword') }}">
+                                placeholder="Tìm kiếm theo tên danh mục" value="{{ request('keyword') }}">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-search"></i> Tìm kiếm
                             </button>

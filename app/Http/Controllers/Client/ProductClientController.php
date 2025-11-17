@@ -32,7 +32,12 @@ class ProductClientController extends Controller
         return view('client.products.detail', compact('product', 'relatedProducts', 'cate'));
     }
 
-
+    /**
+     * Lấy danh sách ID của danh mục và toàn bộ danh mục con (đệ quy/BFS).
+     *
+     * @param int $rootCategoryId ID của danh mục gốc
+     * @return array Mảng chứa ID của danh mục gốc và tất cả danh mục con
+     */
     public function search(Request $request, ?string $slug = null)
     {
         $searchQuery = trim($request->input('query'));

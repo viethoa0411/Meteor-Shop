@@ -11,6 +11,7 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
+use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use Illuminate\Container\Attributes\Auth;
@@ -80,6 +81,23 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::delete('/delete/{id}', [BlogController::class, 'destroy'])->name('destroy');
     });
 
+    // ====== BANNERS ======
+    Route::prefix('banners')->name('banners.')->group(function () {
+        Route::get('/', [BannerController::class, 'list'])->name('list');
+        Route::get('/create', [BannerController::class, 'create'])->name('create');
+        Route::post('/store', [BannerController::class, 'store'])->name('store');
+        Route::get('/trash', [BannerController::class, 'trash'])->name('trash');
+        Route::post('/bulk-delete', [BannerController::class, 'bulkDelete'])->name('bulkDelete');
+        Route::post('/update-sort-order', [BannerController::class, 'updateSortOrder'])->name('updateSortOrder');
+        Route::get('/{id}', [BannerController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [BannerController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [BannerController::class, 'update'])->name('update');
+        Route::delete('/{id}', [BannerController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/restore', [BannerController::class, 'restore'])->name('restore');
+        Route::delete('/{id}/force-delete', [BannerController::class, 'forceDelete'])->name('forceDelete');
+        Route::put('/{id}/status', [BannerController::class, 'updateStatus'])->name('updateStatus');
+    });
+
     // ====== ACCOUNT MANAGEMENT ======
     Route::prefix('account')->name('account.')->group(function () {
 
@@ -124,7 +142,7 @@ Route::get('/home', [HomeController::class, 'index']);
 Route::get('/search', [ProductClientController::class, 'search'])->name('client.product.search');
 Route::get('/category/{slug}', [ProductClientController::class, 'productsByCategory'])->name('client.product.category');
 Route::get('/products/{slug}', [ProductClientController::class, 'showDetail'])->name('client.product.detail');
-Route::get('/products', [ProductClientController::class, 'index'])->name('client.products.index');
+Route::get('/products', [HomeController::class, 'index'])->name('client.products.index');
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
 

@@ -5,21 +5,34 @@
 
     {{-- Slide --}}
     <div class="slide-wrapper">
-        <div class="slide active">
-            <img class="imageSlide" src="https://picsum.photos/1200/800?random=1">
-            <h2 style="color: #fff">Siêu ưu đãi</h2>
-            <button onclick="alert('Bạn đang ở slide 1')">Mua ngay</button>
-        </div>
-        <div class="slide">
-            <img class="imageSlide" src="https://picsum.photos/1200/800?random=2">
-            <h2 style="color: #fff">Phong cách Minimalism </h2>
-            <button onclick="alert('Bạn đang ở slide 1')">Mua ngay</button>
-        </div>
-        <div class="slide">
-            <img class="imageSlide" src="https://picsum.photos/1200/800?random=3">
-            <h2 style="color: #fff">Phong cách nội thất Indochine </h2>
-            <button onclick="alert('Bạn đang ở slide 1')">Mua ngay</button>
-        </div>
+        @if ($banners->count() > 0)
+            @foreach ($banners as $index => $banner)
+                <div class="slide {{ $index === 0 ? 'active' : '' }}">
+                    @if (!empty($banner->image))
+                        <img class="imageSlide" 
+                             src="{{ asset('storage/' . $banner->image) }}" 
+                             alt="{{ $banner->title ?? 'Banner' }}"
+                             onerror="this.src='https://via.placeholder.com/1200x800?text=Banner'">
+                    @else
+                        <img class="imageSlide" src="https://via.placeholder.com/1200x800?text=Banner" alt="Banner">
+                    @endif
+                    @if (!empty($banner->link))
+                        <a href="{{ $banner->link }}" style="text-decoration: none;">
+                            <button>Xem ngay</button>
+                        </a>
+                    @else
+                        <button onclick="alert('{{ $banner->title ?? 'Banner' }}')">Xem ngay</button>
+                    @endif
+                </div>
+            @endforeach
+        @else
+            {{-- Fallback nếu không có banner --}}
+            <div class="slide active">
+                <img class="imageSlide" src="https://picsum.photos/1200/800?random=1">
+                <h2 style="color: #fff">Chào mừng đến với Meteor Shop</h2>
+                <button onclick="alert('Khám phá ngay')">Xem ngay</button>
+            </div>
+        @endif
     </div>
 
     {{-- Sản phẩm mới --}}

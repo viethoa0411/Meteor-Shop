@@ -13,7 +13,7 @@
             <p class="text-muted mb-0">Mã đơn hàng: <strong>{{ $order->order_code }}</strong></p>
         </div>
         <div>
-            <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
+            <a href="{{ route('admin.orders.list') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Quay lại
             </a>
             <a href="{{ route('admin.orders.edit', $order) }}" class="btn btn-warning">
