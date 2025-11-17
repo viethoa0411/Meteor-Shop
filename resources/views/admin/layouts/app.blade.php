@@ -76,7 +76,7 @@
 
         .dropdown-menu-item.active > a .bi-chevron-right {
             transform: rotate(90deg);
-        }
+            }
 
         /* Header */
         .navbar {
@@ -166,7 +166,7 @@
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg px-3 shadow-sm">
-        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Meteor-Shop</a>
+                <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Meteor-Shop</a>
 
         <div class="ms-auto d-flex align-items-center">
 
@@ -176,30 +176,30 @@
             </button>
 
             <!-- Tài khoản -->
-            <div class="dropdown">
+                    <div class="dropdown">
                 <a class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle"></i>
-                    {{ Auth::user()->name ?? 'Admin' }}
-                    <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
+                            <i class="bi bi-person-circle"></i>
+                            {{ Auth::user()->name ?? 'Admin' }}
+                            <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
                     <li><a href="" class="dropdown-item">Profile</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
                         <form action="{{ route('logout') }}" method="POST">
-                            @csrf
+                                        @csrf
                             <button class="dropdown-item">
-                                <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
+                                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                        </button>
+                                    </form>
+                            </li>
+                        </ul>
+                    </div>
 
-        </div>
-    </nav>
+            </div>
+        </nav>
 
     <!-- Admin Layout -->
     <div class="admin-container">
