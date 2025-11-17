@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\Blog\BlogController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MonthlyTargetController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use Illuminate\Container\Attributes\Auth;
 
@@ -37,9 +39,14 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
 
     // ===== DASHBOARD =====
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/revenue/filter', [DashboardController::class, 'index'])->name('revenue.filter');
+    Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])
+        ->name('monthly_target.create');
+
+    Route::post('monthly-target/store', [MonthlyTargetController::class, 'store'])
+        ->name('monthly_target.store');
+
 
     // ====== CATEGORIES ======
     Route::prefix('categories')->name('categories.')->group(function () {
