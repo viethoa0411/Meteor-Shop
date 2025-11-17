@@ -1,4 +1,4 @@
-@extends('admin.dashboard')
+@extends('admin.layouts.app')
 
 @section('content')
 <div class="container mt-3">
@@ -68,6 +68,6 @@
         </tbody>
     </table>
 
-    <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary mt-3">Quay lại danh sách</a>
+    <a href="{{ route('admin.orders.list) }}" class="btn btn-secondary mt-3">Quay lại danh sách</a>
 </div>
 @endsection

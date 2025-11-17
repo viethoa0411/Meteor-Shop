@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -16,18 +16,16 @@
             margin: 0;
         }
 
+        /* Tùy chỉnh chung cho Header */
         header {
             max-width: 100%;
-            padding: 24px;
             background: #111;
-            margin: 0 auto;
             color: #fff;
             padding: 5px 10px;
+            /* Tùy chỉnh theo file 1 */
         }
 
-        /* Header chính */
         .header {
-            bottom: #111;
             color: #fff;
             padding: 10px 0;
             position: relative;
@@ -42,6 +40,10 @@
             gap: 16px;
         }
 
+        .container-header>* {
+            align-self: center;
+        }
+
         /* Logo */
         .logo a {
             color: #fff;
@@ -51,7 +53,7 @@
         }
 
         /* Menu ngang */
-        .main-nav ul {
+        .main-nav>ul {
             list-style: none;
             display: flex;
             gap: 20px;
@@ -71,6 +73,44 @@
             color: #ffb703;
         }
 
+        /* Dropdown Menu CSS */
+        .menu-item {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            display: none !important;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            min-width: 220px;
+            z-index: 1002;
+            padding: 8px 0;
+            flex-direction: column;
+        }
+
+        .dropdown-menu li a {
+            display: block;
+            padding: 10px 14px;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .dropdown-menu li a:hover {
+            background: #f5f5f5;
+            color: #007bff;
+        }
+
+        .menu-item:hover>.dropdown-menu {
+            display: block !important;
+        }
+
+        /* End Dropdown Menu CSS */
+
+
         /* Ô tìm kiếm */
         .search-box {
             display: flex;
@@ -79,10 +119,13 @@
             border-radius: 20px;
             overflow: hidden;
             width: 20%;
+            align-self: center;
+            margin: 0;
         }
 
         .search-box input {
-            float: 1;
+            flex: 1;
+            /* Đã sửa lỗi chính tả từ 'float: 1' thành 'flex: 1' */
             padding: 8px 12px;
             border: none;
             background: transparent;
@@ -101,7 +144,7 @@
             color: #ffb703;
         }
 
-        /* Icon ☰ nằm cùng dòng */
+        /* Icon menu dọc */
         .menu-toggle {
             font-size: 22px;
             cursor: pointer;
@@ -113,7 +156,7 @@
             color: #ffb703;
         }
 
-        /* MENU DỌC */
+        /* MENU DỌC (Sidebar) */
         .vertical-menu {
             position: fixed;
             top: 0;
@@ -156,15 +199,16 @@
             display: block;
         }
 
+        /* Footer */
         footer {
             max-width: 100%;
-            padding: 24px;
             background-color: #111;
             margin: 0 auto;
             color: #fff;
             padding: 10px 15px;
         }
 
+        /* Các style khác */
         a {
             text-decoration: none;
             color: inherit;
@@ -178,32 +222,24 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            /* giữ ảnh trong khung khi zoom */
             transition: transform 0.3s ease;
-            /* mượt khi hover */
         }
 
         .product-card:hover {
             transform: translateY(-20px);
-            /* nâng nhẹ toàn thẻ */
             padding: 16px;
         }
 
         .product-card img {
             width: 100%;
             aspect-ratio: 1/1;
-            /* giữ tỉ lệ vuông */
             object-fit: cover;
             border-radius: 6px;
             background: #eee;
             transition: transform 0.4s ease;
-            /* hiệu ứng phóng to mượt */
             display: block;
             transform-origin: center center;
-            /* phóng to từ tâm ảnh */
         }
-
-        .product-img {}
 
         .product-name {
             font-size: 16px;
@@ -213,7 +249,6 @@
             line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2;
-            /* số dòng muốn hiển thị */
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -234,7 +269,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
             align-items: stretch;
-            /* đảm bảo các ô cao bằng nhau */
             gap: 24px;
         }
 
@@ -294,6 +328,7 @@
             z-index: 1
         }
 
+        /* Đã bỏ comment cho button, sử dụng style từ file 2 */
         button {
             z-index: 1;
             padding: 10px 20px;
@@ -328,6 +363,18 @@
 </head>
 
 <body>
+    @php
+        // Lấy danh mục cha (Phòng) nếu chưa có sẵn
+        // Giữ lại logic Laravel Blade từ File 1 để đảm bảo Menu Dropdown hoạt động
+        $parentCategories =
+            $parentCategories ?? \App\Models\Category::whereNull('parent_id')->where('status', 1)->get();
+
+        // Giả định $childCategories hoặc $cate được truyền vào View hoặc cần được định nghĩa
+        // Nếu $childCategories chưa được truyền, bạn cần phải định nghĩa nó ở đây hoặc trong Controller
+        $childCategories = $childCategories ?? [];
+        // Giả định $cate là danh mục dùng cho Menu dọc
+        $cate = $cate ?? ($parentCategories->isNotEmpty() ? $parentCategories : collect());
+    @endphp
 
     <header class="header">
         <div class="container-header">
@@ -339,14 +386,40 @@
             {{-- Menu ngang --}}
             <nav class="main-nav">
                 <ul>
-                    <li><a href="#">Sản phẩm</a></li>
-                    <li><a href="#">Phòng</a></li>
+                    {{-- Dropdown Sản phẩm (Child Categories) --}}
+                    <li class="menu-item dropdown">
+                        <a href="#" class="dropdown-toggle">Sản phẩm</a>
+                        <ul class="dropdown-menu">
+                            @foreach ($childCategories as $child)
+                                <li>
+                                    <a href="{{ route('client.product.category', $child->slug) }}">
+                                        {{ $child->name }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
+                    {{-- Dropdown Phòng (Parent Categories) --}}
+                    <li class="menu-item dropdown">
+                        <a href="#" class="dropdown-toggle">Phòng</a>
+                        <ul class="dropdown-menu">
+                            @foreach ($parentCategories as $parent)
+                                <li>
+                                    <a href="{{ route('client.product.category', $parent->slug) }}">
+                                        {{ $parent->name }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
+                    {{-- Lấy link Bài Viết từ File 2 --}}
                     <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </nav>
+
             <!-- Ô tìm kiếm -->
             <form action="{{ route('client.product.search') }}" method="GET" class="search-box">
                 <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..."
@@ -356,24 +429,60 @@
                 </button>
             </form>
 
+
             <!-- Icon menu dọc -->
             <div class="menu-toggle">☰</div>
+
+            <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
+                @auth
+
+                    {{-- DROPDOWN USER --}}
+                    <div class="dropdown">
+                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    Thông tin tài khoản
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form action="{{ route('client.logout') }}" method="POST">
+                                    @csrf
+                                    <button class="dropdown-item" type="submit">Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @else
+                    {{-- NẾU CHƯA ĐĂNG NHẬP --}}
+                    <div class="d-flex w-100">
+                        <a class="btn btn-outline-light flex-fill" href="{{ route('client.login') }}">Đăng nhập</a>
+                    </div>
+                @endauth
+            </div>
+
         </div>
 
         <!-- Menu dọc -->
         <div class="overlay"></div>
-        @if ($cate->count() === 0)
-            <p>Hiện chưa có danh mục.</p>
-        @else
+        @if (isset($cate) && $cate->count() > 0)
             <div class="vertical-menu">
                 @foreach ($cate as $c)
-                    <a href="">{{ $c->name }}</a>
+                    <a href="#">{{ $c->name }}</a>
                 @endforeach
+            </div>
+        @else
+            <div class="vertical-menu">
+                <a href="#">Hiện chưa có danh mục</a>
             </div>
         @endif
     </header>
-
-    <main>
+    <main class="container">
         @yield('content')
     </main>
 
@@ -441,14 +550,10 @@
                     <span class="widget-title">Newsletter</span>
                     <div class="is-divider small"></div>
                     <div id="text-2944331817" class="text">
-
-
                         <p>Hãy để lại email của bạn để nhận được những ý tưởng trang trí mới và những thông tin, ưu đãi
                             từ Meteor</p>
                         <p>Email: meteor</p>
                         <p>Hotline: <strong>0397766836</strong></p>
-
-
                         <style>
                             #text-2944331817 {
                                 font-size: 0.75rem;
@@ -502,6 +607,8 @@
             </div>
         </div>
     </footer>
+
+    {{-- Script cho menu dọc --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.querySelector('.menu-toggle');
@@ -527,6 +634,8 @@
             });
         });
     </script>
+    <!-- Bootstrap JS Bundle to enable dropdown -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

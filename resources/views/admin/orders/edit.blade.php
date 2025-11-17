@@ -13,7 +13,7 @@
             <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-info me-2">
                 <i class="fas fa-eye me-2"></i>Xem chi tiết
             </a>
-            <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
+            <a href="{{ route('admin.orders.list') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Quay lại
             </a>
         </div>
@@ -281,7 +281,7 @@
                         <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-info btn-lg me-3">
                             <i class="fas fa-eye me-2"></i>Xem chi tiết
                         </a>
-                        <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary btn-lg">
+                        <a href="{{ route('admin.orders.list') }}" class="btn btn-secondary btn-lg">
                             <i class="fas fa-times me-2"></i>Hủy
                         </a>
                     </div>

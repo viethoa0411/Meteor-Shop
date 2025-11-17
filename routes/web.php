@@ -11,12 +11,14 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
-use App\Http\Controllers\Admin\Blog\BlogController;
-use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\Blog\BlogController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MonthlyTargetController;
+use App\Http\Controllers\Client\Blog\BlogClientController;
 
 // ============ AUTHENTICATION ROUTES ============
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -36,9 +38,14 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
 
     // ===== DASHBOARD =====
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/revenue/filter', [DashboardController::class, 'index'])->name('revenue.filter');
+    Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])
+        ->name('monthly_target.create');
+
+    Route::post('monthly-target/store', [MonthlyTargetController::class, 'store'])
+        ->name('monthly_target.store');
+
 
     // ====== CATEGORIES ======
     Route::prefix('categories')->name('categories.')->group(function () {
@@ -59,6 +66,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::put('/update/{id}', [ProductController::class, 'update'])->name('update');
         Route::get('/show/{id}', [ProductController::class, 'show'])->name('show');
         Route::delete('/delete/{id}', [ProductController::class, 'destroy'])->name('destroy');
+        Route::delete('{product}/images/{image}', [ProductController::class, 'destroyImage'])->name('images.destroy');
     });
 
     // ====== ORDERS ======
@@ -128,13 +136,22 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
 });
 
 // ============ CLIENT ROUTES ============
+
+Route::middleware('guest')->group(function () {
+    Route::get('/login-client', [AuthController::class, 'showLoginFormClient'])->name('client.login');
+    Route::post('/login-client', [AuthController::class, 'loginClient'])->name('client.login.post');
+});
+
+Route::post('/logout-client', [AuthController::class, 'logoutClient'])->name('client.logout');
 Route::get('/', [HomeController::class, 'index'])->name('client.home');
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/search', [ProductClientController::class, 'search'])->name('client.product.search');
 Route::get('/category/{slug}', [ProductClientController::class, 'productsByCategory'])->name('client.product.category');
 Route::get('/products/{slug}', [ProductClientController::class, 'showDetail'])->name('client.product.detail');
+Route::get('/products', [HomeController::class, 'index'])->name('client.products.index');
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
+
 
 
 Route::fallback(function () {

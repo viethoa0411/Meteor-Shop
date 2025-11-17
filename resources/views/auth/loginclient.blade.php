@@ -278,7 +278,7 @@
         <div class="login-card">
             <!-- Header -->
             <div class="login-header">
-                <h1><i class="bi bi-shield-lock"></i>Admin Meteor Shop</h1>
+                <h1><i class="bi bi-shield-lock"></i>Meteor Shop</h1>
             </div>
 
             <!-- Body -->
@@ -298,15 +298,8 @@
                         <i class="bi bi-check-circle"></i> {{ session('success') }}
                     </div>
                 @endif
-
-                <!-- Thông tin vai trò -->
-                {{-- <div class="role-info">
-                    <strong><i class="bi bi-info-circle"></i> Thông tin đăng nhập:</strong>
-                    Chỉ tài khoản có vai trò <strong>Admin</strong> mới có thể đăng nhập vào trang quản trị
-                </div> --}}
-
                 <!-- Form đăng nhập -->
-                <form action="{{ route('login') }}" method="POST" novalidate>
+                <form action="{{ route('client.login.post') }}" method="POST" novalidate>
                     @csrf
 
                     <!-- Email -->
@@ -325,7 +318,7 @@
                     <!-- Password -->
                     <div class="form-group">
                         <label for="password" class="form-label">
-                                <i class="bi bi-lock"></i> Mật khẩu
+                            <i class="bi bi-lock"></i> Mật khẩu
                         </label>
                         <div class="input-group">
                             <input type="password" class="form-control @error('password') is-invalid @enderror"
@@ -348,20 +341,23 @@
                                 Ghi nhớ tôi
                             </label>
                         </div>
-                            <a href="{{ route('password.request') }}" class="forgot-password">Quên mật khẩu?</a>
+                        <a href="{{ route('password.request') }}" class="forgot-password">Quên mật khẩu?</a>
                     </div>
 
                     <!-- Submit Button -->
                     <button type="submit" class="btn-login">
                         <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
                     </button>
+                    <div class="text-center mt-3">
+                        <p>Bạn Chưa Có Tài Khoản ? <a href="{{ route('register') }}">Đăng ký</a></p>
+                    </div>
 
                 </form>
             </div>
 
             <!-- Footer -->
             <div class="login-footer">
-                © 2025 <strong>Admin Meteor Shop</strong>
+                © 2025 <strong>Meteor Shop</strong>
             </div>
         </div>
     </div>
@@ -387,4 +383,5 @@
         });
     </script>
 </body>
+
 </html>

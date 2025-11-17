@@ -75,12 +75,6 @@
                                 <label class="form-label">Giá (VNĐ) <span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" name="price" class="form-control" value="{{ old('price') }}" required>
                             </div>
-
-                            {{-- Tồn kho --}}
-                            <div class="col-md-3">
-                                <label class="form-label">Tồn kho <span class="text-danger">*</span></label>
-                                <input type="number" name="stock" class="form-control" value="{{ old('stock',0) }}" required>
-                            </div>
                         </div>
 
                         {{-- Danh mục --}}
@@ -135,17 +129,20 @@
                             </div>
                         </div>
                         <div class="row g-3 mt-2">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <input type="number" id="length" step="0.01" class="form-control" placeholder="Chiều dài (cm)">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <input type="number" id="width" step="0.01" class="form-control" placeholder="Chiều rộng (cm)">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <input type="number" id="height" step="0.01" class="form-control" placeholder="Chiều cao (cm)">
                             </div>
+                            <div class="col-md-3">
+                                <input type="number" id="variant_stock" class="form-control" placeholder="số lượng sản phẩm">
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-primary mt-2 mb-3" id="add_variant">+ Thêm biến thể</button>
+                        <button type="button" class="btn btn-primary mt-2 mb-3" id="add_variant">Thêm biến thể</button>
 
                         <div id="variant-list" class="mb-3"></div>
                         <div id="hidden-variants"></div>
@@ -179,18 +176,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const length = document.getElementById('length').value.trim();
         const width = document.getElementById('width').value.trim();
         const height = document.getElementById('height').value.trim();
+        const stock = document.getElementById('variant_stock').value.trim();
 
         if (!length || !width || !height) return alert('Nhập đủ kích thước!');
         if (!colorCode) return alert('Chọn màu!');
+        if (!stock) return alert('Nhập tồn kho cho biến thể!');
 
-        // Hiển thị trên giao diện
         const row = document.createElement('div');
         row.className = 'variant-row';
-        row.innerHTML = `<div class="variant-swatch" style="background:${colorCode}"></div>
-                         <span>${colorName || colorCode} - ${length}×${width}×${height} cm</span>
-                         <button type="button" class="btn btn-sm btn-link text-danger">x</button>`;
+        row.innerHTML = `
+            <div class="variant-swatch" style="background:${colorCode}"></div>
+            <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp</span>
+            <button type="button" class="btn btn-sm btn-link text-danger">x</button>
+        `;
 
         const delBtn = row.querySelector('button');
+        const hiddenDiv = document.createElement('div');
         delBtn.addEventListener('click', () => {
             variantList.removeChild(row);
             hiddenVariants.removeChild(hiddenDiv);
@@ -198,14 +199,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         variantList.appendChild(row);
 
-        // Hidden inputs
-        const hiddenDiv = document.createElement('div');
         hiddenDiv.innerHTML = `
             <input type="hidden" name="variants[${idx}][color_name]" value="${colorName}">
             <input type="hidden" name="variants[${idx}][color_code]" value="${colorCode}">
             <input type="hidden" name="variants[${idx}][length]" value="${length}">
             <input type="hidden" name="variants[${idx}][width]" value="${width}">
             <input type="hidden" name="variants[${idx}][height]" value="${height}">
+            <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
         `;
         hiddenVariants.appendChild(hiddenDiv);
         idx++;
@@ -216,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('length').value = '';
         document.getElementById('width').value = '';
         document.getElementById('height').value = '';
+        document.getElementById('variant_stock').value = '';
     });
 });
 </script>
