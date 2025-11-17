@@ -96,7 +96,7 @@
                             </div>
                             <div class="card-body text-center">
                                 @if (!empty($banner->image))
-                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}"
+                                    <img src="{{ asset($banner->image) }}" alt="{{ $banner->title }}"
                                         class="img-fluid rounded shadow-sm" style="max-width: 100%;"
                                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light p-5 rounded\'><i class=\'bi bi-image text-muted\' style=\'font-size: 3rem;\'></i><p class=\'text-muted mt-2\'>Ảnh không tồn tại</p></div>';">
                                 @else

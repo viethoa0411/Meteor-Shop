@@ -51,7 +51,7 @@
                                     <tr>
                                         <td>
                                             @if (!empty($banner->image))
-                                                <img src="{{ asset('storage/' . $banner->image) }}"
+                                                <img src="{{ asset($banner->image) }}"
                                                     alt="{{ $banner->title ?? 'Banner' }}" 
                                                     class="img-thumbnail"
                                                     style="width: 60px; height: 40px; object-fit: cover;"

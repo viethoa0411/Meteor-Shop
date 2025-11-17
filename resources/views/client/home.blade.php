@@ -10,7 +10,7 @@
                 <div class="slide {{ $index === 0 ? 'active' : '' }}">
                     @if (!empty($banner->image))
                         <img class="imageSlide" 
-                             src="{{ asset('storage/' . $banner->image) }}" 
+                             src="{{ asset($banner->image) }}" 
                              alt="{{ $banner->title ?? 'Banner' }}"
                              onerror="this.src='https://via.placeholder.com/1200x800?text=Banner'">
                     @else

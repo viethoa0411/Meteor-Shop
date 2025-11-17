@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
 {
@@ -86,11 +85,14 @@ class BannerController extends Controller
             'end_date.after_or_equal' => 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu',
         ]);
 
-        // Upload ảnh
+        // Upload ảnh vào public/banners/images
         $imagePath = null;
         if ($request->hasFile('image')) {
             try {
-                $imagePath = $request->file('image')->store('banners', 'public');
+                $image = $request->file('image');
+                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('banners/images'), $imageName);
+                $imagePath = 'banners/images/' . $imageName;
             } catch (\Exception $e) {
                 return back()->withInput()
                     ->withErrors(['image' => 'Lỗi khi upload ảnh: ' . $e->getMessage()]);
@@ -164,17 +166,20 @@ class BannerController extends Controller
             // Xóa ảnh cũ nếu có
             if (!empty($banner->image)) {
                 try {
-                    $oldImagePath = $banner->image;
-                    if (Storage::disk('public')->exists($oldImagePath)) {
-                        Storage::disk('public')->delete($oldImagePath);
+                    $oldImagePath = public_path($banner->image);
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
                     }
                 } catch (\Exception $e) {
                     // Bỏ qua lỗi nếu không xóa được ảnh cũ
                 }
             }
-            // Upload ảnh mới
+            // Upload ảnh mới vào public/banners/images
             try {
-                $imagePath = $request->file('image')->store('banners', 'public');
+                $image = $request->file('image');
+                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('banners/images'), $imageName);
+                $imagePath = 'banners/images/' . $imageName;
             } catch (\Exception $e) {
                 return back()->withInput()
                     ->withErrors(['image' => 'Lỗi khi upload ảnh: ' . $e->getMessage()]);
@@ -309,8 +314,9 @@ class BannerController extends Controller
         // Xóa ảnh nếu có
         if (!empty($banner->image)) {
             try {
-                if (Storage::disk('public')->exists($banner->image)) {
-                    Storage::disk('public')->delete($banner->image);
+                $imagePath = public_path($banner->image);
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
                 }
             } catch (\Exception $e) {
                 // Bỏ qua lỗi nếu không xóa được ảnh
