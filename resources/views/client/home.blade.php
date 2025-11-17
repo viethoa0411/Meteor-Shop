@@ -30,11 +30,11 @@
             @endforeach
         @else
             {{-- Fallback nếu không có banner --}}
-            <div class="slide active">
-                <img class="imageSlide" src="https://picsum.photos/1200/800?random=1">
+        <div class="slide active">
+            <img class="imageSlide" src="https://picsum.photos/1200/800?random=1">
                 <h2 style="color: #fff">Chào mừng đến với Meteor Shop</h2>
                 <button onclick="alert('Khám phá ngay')">Xem ngay</button>
-            </div>
+        </div>
         @endif
     </div>
 
@@ -275,11 +275,11 @@
         let i = 0,
             s = document.querySelectorAll('.slide');
         if (s.length > 0) {
-            setInterval(() => {
-                s[i].classList.remove('active');
-                i = (i + 1) % s.length;
-                s[i].classList.add('active');
-            }, 3000); // 3000ms = 3 giây
+        setInterval(() => {
+            s[i].classList.remove('active');
+            i = (i + 1) % s.length;
+            s[i].classList.add('active');
+        }, 3000); // 3000ms = 3 giây
         }
         @endif
     </script>
