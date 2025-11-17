@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MonthlyTargetController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
+use App\Http\Controllers\Client\Account\OrderController as ClientOrderController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -152,6 +153,14 @@ Route::get('/products', [HomeController::class, 'index'])->name('client.products
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
 
+Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
+    Route::get('/orders', [ClientOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [ClientOrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/tracking', [ClientOrderController::class, 'tracking'])->name('orders.tracking');
+    Route::post('/orders/{order}/cancel', [ClientOrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/reorder', [ClientOrderController::class, 'reorder'])->name('orders.reorder');
+    Route::post('/orders/{order}/return', [ClientOrderController::class, 'returnRequest'])->name('orders.return');
+});
 
 
 Route::fallback(function () {
