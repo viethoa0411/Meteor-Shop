@@ -31,10 +31,10 @@
         {{-- Toolbar --}}
         <div class="card shadow-sm mb-4">
             <div class="card-body">
-                <form action="{{ route('admin.banners.list') }}" method="GET" class="row g-3">
+                <form action="{{ route('admin.banners.list') }}" method="GET" class="row g-3 align-items-end">
                     {{-- Tìm kiếm --}}
                     <div class="col-md-4">
-                        <div class="input-group">
+                        <div class="input-group toolbar-input-group">
                             <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm theo tiêu đề, mô tả..."
                                 value="{{ request('keyword') }}">
                             <button type="submit" class="btn btn-primary">
@@ -45,7 +45,7 @@
 
                     {{-- Lọc trạng thái --}}
                     <div class="col-md-3">
-                        <select name="status" class="form-select">
+                        <select name="status" class="form-select toolbar-select">
                             <option value="all">Tất cả trạng thái</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Hoạt động</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Tạm ẩn</option>
@@ -53,14 +53,14 @@
                     </div>
 
                     {{-- Nút hành động --}}
-                    <div class="col-md-3 d-flex gap-2">
-                        <button type="submit" class="btn btn-outline-primary">
+                    <div class="col-md-5 d-flex gap-2 align-items-end">
+                        <button type="submit" class="btn btn-outline-primary toolbar-btn">
                             <i class="bi bi-funnel"></i> Lọc
                         </button>
-                        <a href="{{ route('admin.banners.list') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.banners.list') }}" class="btn btn-outline-secondary toolbar-btn">
                             <i class="bi bi-arrow-clockwise"></i> Reset
                         </a>
-                        <a href="{{ route('admin.banners.create') }}" class="btn btn-primary">
+                        <a href="{{ route('admin.banners.create') }}" class="btn btn-primary toolbar-btn">
                             <i class="bi bi-plus-circle"></i> Thêm mới
                         </a>
                     </div>
@@ -205,6 +205,46 @@
             </div>
         @endif
     </div>
+
+    @push('styles')
+        <style>
+            /* Đảm bảo tất cả các phần tử trong toolbar có cùng chiều cao */
+            .toolbar-input-group,
+            .toolbar-select,
+            .toolbar-btn {
+                height: 38px;
+            }
+            
+            .toolbar-input-group .form-control,
+            .toolbar-input-group .btn {
+                height: 100%;
+            }
+            
+            .toolbar-select {
+                display: flex;
+                align-items: center;
+            }
+            
+            /* Responsive: trên mobile, các phần tử sẽ tự điều chỉnh */
+            @media (max-width: 768px) {
+                .toolbar-input-group,
+                .toolbar-select,
+                .toolbar-btn {
+                    height: auto;
+                    min-height: 38px;
+                }
+                
+                .col-md-5.d-flex {
+                    flex-wrap: wrap;
+                }
+                
+                .toolbar-btn {
+                    flex: 1;
+                    min-width: 100px;
+                }
+            }
+        </style>
+    @endpush
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
