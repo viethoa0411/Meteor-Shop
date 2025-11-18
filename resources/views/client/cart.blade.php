@@ -63,7 +63,7 @@
             </table>
             <div class="text-end mt-3">
                 <h4>Tổng tiền: <span id="total">{{ number_format($total) ?? 0 }}đ</span></h4>
-                <a href="{{ route('client.checkout.index') }}" class="btn btn-dark mt-2">Đặt hàng</a>
+                <a href="{{ route('client.checkout.index', ['type' => 'cart']) }}" class="btn btn-dark mt-2">Đặt hàng</a>
             </div>
         @else
             <div class="text-center mt-4">

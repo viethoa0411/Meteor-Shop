@@ -169,13 +169,12 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
 });
 
 // ============ CHECKOUT ROUTES ============
-Route::middleware('auth')->group(function () {
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('client.checkout.index');
-    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('client.checkout.process');
-    Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('client.checkout.confirm');
-    Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
-    Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
-});
+// Không dùng middleware auth ở đây vì CheckoutController đã tự kiểm tra và redirect đến client.login
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('client.checkout.index');
+Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('client.checkout.process');
+Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('client.checkout.confirm');
+Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
+Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

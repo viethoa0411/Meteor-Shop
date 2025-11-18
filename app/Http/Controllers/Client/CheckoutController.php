@@ -17,7 +17,8 @@ class CheckoutController extends Controller
 {
     /**
      * Trang checkout - Thanh toán
-     * URL: /checkout?product_id=xxx&variant_id=xxx&qty=1&type=buy_now
+     * URL: /checkout?product_id=xxx&variant_id=xxx&qty=1&type=buy_now (mua ngay)
+     * URL: /checkout?type=cart (từ giỏ hàng)
      */
     public function index(Request $request)
     {
@@ -27,10 +28,82 @@ class CheckoutController extends Controller
                 ->with('error', 'Vui lòng đăng nhập để tiếp tục đặt hàng');
         }
 
+        $type = $request->get('type', 'buy_now');
+        $user = Auth::user();
+
+        // Xử lý checkout từ giỏ hàng
+        if ($type === 'cart') {
+            $cart = session()->get('cart', []);
+            
+            if (empty($cart)) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Giỏ hàng của bạn đang trống');
+            }
+
+            // Kiểm tra tồn kho cho tất cả sản phẩm trong giỏ
+            $cartItems = [];
+            $subtotal = 0;
+
+            foreach ($cart as $key => $item) {
+                $product = Product::find($item['product_id']);
+                if (!$product) {
+                    continue; // Bỏ qua sản phẩm không tồn tại
+                }
+
+                $stock = $product->stock ?? 0;
+                $price = $item['price'];
+                $variant = null;
+
+                if (!empty($item['variant_id'])) {
+                    $variant = ProductVariant::find($item['variant_id']);
+                    if ($variant) {
+                        $stock = $variant->stock ?? 0;
+                        $price = $variant->price ?? $product->price;
+                    }
+                }
+
+                // Kiểm tra tồn kho
+                if ($stock < $item['quantity']) {
+                    return redirect()->route('cart.index')
+                        ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                }
+
+                $itemSubtotal = $price * $item['quantity'];
+                $subtotal += $itemSubtotal;
+
+                $cartItems[] = [
+                    'key' => $key,
+                    'product_id' => $item['product_id'],
+                    'variant_id' => $item['variant_id'] ?? null,
+                    'name' => $item['name'],
+                    'price' => $price,
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $itemSubtotal,
+                    'image' => $item['image'] ?? $product->image,
+                    'color' => $item['color'] ?? null,
+                    'size' => $item['size'] ?? null,
+                    'product' => $product,
+                    'variant' => $variant,
+                ];
+            }
+
+            // Lưu thông tin vào session
+            $checkoutData = [
+                'type' => 'cart',
+                'items' => $cartItems,
+                'subtotal' => $subtotal,
+                'created_at' => now(),
+            ];
+
+            session(['checkout_session' => $checkoutData]);
+
+            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData'));
+        }
+
+        // Xử lý checkout mua ngay (1 sản phẩm)
         $productId = $request->get('product_id');
         $variantId = $request->get('variant_id');
         $qty = max(1, (int) $request->get('qty', 1));
-        $type = $request->get('type', 'buy_now');
 
         if (!$productId) {
             return redirect()->route('client.home')
@@ -80,9 +153,6 @@ class CheckoutController extends Controller
 
         session(['checkout_session' => $checkoutData]);
 
-        // Lấy thông tin user
-        $user = Auth::user();
-
         return view('client.checkout.index', compact('product', 'variant', 'qty', 'price', 'stock', 'user', 'checkoutData'));
     }
 
@@ -91,6 +161,12 @@ class CheckoutController extends Controller
      */
     public function process(Request $request)
     {
+        // Kiểm tra đăng nhập
+        if (!Auth::check()) {
+            return redirect()->route('client.login')
+                ->with('error', 'Vui lòng đăng nhập để tiếp tục đặt hàng');
+        }
+
         $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:20',
@@ -112,8 +188,9 @@ class CheckoutController extends Controller
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
         }
 
-        // Cập nhật số lượng nếu có thay đổi
-        if ($request->has('quantity')) {
+
+        // Cập nhật số lượng cho buy_now (nếu có)
+        if ($checkoutSession['type'] === 'buy_now' && $request->has('quantity')) {
             $newQuantity = max(1, (int) $request->quantity);
             
             // Kiểm tra lại tồn kho với số lượng mới
@@ -171,6 +248,12 @@ class CheckoutController extends Controller
      */
     public function confirm()
     {
+        // Kiểm tra đăng nhập
+        if (!Auth::check()) {
+            return redirect()->route('client.login')
+                ->with('error', 'Vui lòng đăng nhập để tiếp tục đặt hàng');
+        }
+
         $checkoutSession = session('checkout_session');
         
         if (!$checkoutSession) {
@@ -178,7 +261,12 @@ class CheckoutController extends Controller
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
         }
 
-        // Lấy lại sản phẩm và variant
+        // Nếu là checkout từ cart
+        if ($checkoutSession['type'] === 'cart') {
+            return view('client.checkout.confirm-cart', compact('checkoutSession'));
+        }
+
+        // Lấy lại sản phẩm và variant cho buy_now
         $product = Product::with(['variants', 'images'])->findOrFail($checkoutSession['product_id']);
         $variant = null;
         if ($checkoutSession['variant_id']) {
@@ -193,6 +281,12 @@ class CheckoutController extends Controller
      */
     public function createOrder()
     {
+        // Kiểm tra đăng nhập
+        if (!Auth::check()) {
+            return redirect()->route('client.login')
+                ->with('error', 'Vui lòng đăng nhập để tiếp tục đặt hàng');
+        }
+
         $checkoutSession = session('checkout_session');
         
         if (!$checkoutSession) {
@@ -202,26 +296,6 @@ class CheckoutController extends Controller
 
         DB::beginTransaction();
         try {
-            // Kiểm tra lại tồn kho
-            $product = Product::findOrFail($checkoutSession['product_id']);
-            $stock = $product->stock ?? 0;
-            $variant = null;
-            
-            if (!empty($checkoutSession['variant_id'])) {
-                $variant = ProductVariant::where('id', $checkoutSession['variant_id'])
-                    ->where('product_id', $product->id)
-                    ->first();
-                if ($variant) {
-                    $stock = $variant->stock ?? 0;
-                }
-            }
-
-            if ($stock < $checkoutSession['quantity']) {
-                DB::rollBack();
-                return redirect()->back()
-                    ->with('error', 'Số lượng sản phẩm không đủ. Tồn kho hiện tại: ' . $stock);
-            }
-
             // Tạo mã đơn hàng
             $orderCode = 'DH' . strtoupper(Str::random(8)) . Carbon::now()->format('Ymd');
 
@@ -249,37 +323,113 @@ class CheckoutController extends Controller
                 'order_date' => now(),
             ]);
 
-            // Lấy thông tin sản phẩm để lưu snapshot (đã lấy ở trên)
-            // $product và $variant đã được lấy ở phần kiểm tra tồn kho
+            // Xử lý checkout từ cart (nhiều sản phẩm)
+            if ($checkoutSession['type'] === 'cart' && isset($checkoutSession['items'])) {
+                foreach ($checkoutSession['items'] as $item) {
+                    // Kiểm tra lại tồn kho
+                    $product = Product::findOrFail($item['product_id']);
+                    $stock = $product->stock ?? 0;
+                    $variant = null;
+                    
+                    if (!empty($item['variant_id'])) {
+                        $variant = ProductVariant::where('id', $item['variant_id'])
+                            ->where('product_id', $product->id)
+                            ->first();
+                        if ($variant) {
+                            $stock = $variant->stock ?? 0;
+                        }
+                    }
 
-            // Lấy lại product với images để lưu snapshot
-            $productForSnapshot = Product::with('images')->findOrFail($product->id);
-            
-            // Tạo order detail với snapshot đầy đủ
-            $orderDetail = OrderDetail::create([
-                'order_id' => $order->id,
-                'product_id' => $productForSnapshot->id,
-                'product_name' => $productForSnapshot->name,
-                'variant_id' => $variant ? $variant->id : null,
-                'variant_name' => $variant ? (
-                    ($variant->color_name ?? '') . 
-                    ($variant->length && $variant->width && $variant->height 
-                        ? ' - ' . $variant->length . 'x' . $variant->width . 'x' . $variant->height . ' cm'
-                        : '')
-                ) : null,
-                'variant_sku' => $variant ? $variant->sku : null,
-                'quantity' => $checkoutSession['quantity'],
-                'price' => $checkoutSession['price'],
-                'subtotal' => $checkoutSession['subtotal'],
-                'total_price' => $checkoutSession['subtotal'],
-                'image_path' => $productForSnapshot->image ?? ($productForSnapshot->images->first()->image ?? null),
-            ]);
+                    if ($stock < $item['quantity']) {
+                        DB::rollBack();
+                        return redirect()->back()
+                            ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                    }
 
-            // Cập nhật tồn kho
-            if ($variant) {
-                $variant->decrement('stock', $checkoutSession['quantity']);
+                    // Lấy product với images để lưu snapshot
+                    $productForSnapshot = Product::with('images')->findOrFail($product->id);
+                    
+                    // Tạo order detail
+                    OrderDetail::create([
+                        'order_id' => $order->id,
+                        'product_id' => $productForSnapshot->id,
+                        'product_name' => $item['name'],
+                        'variant_id' => $variant ? $variant->id : null,
+                        'variant_name' => $variant ? (
+                            ($variant->color_name ?? '') . 
+                            ($variant->length && $variant->width && $variant->height 
+                                ? ' - ' . $variant->length . 'x' . $variant->width . 'x' . $variant->height . ' cm'
+                                : '')
+                        ) : null,
+                        'variant_sku' => $variant ? $variant->sku : null,
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price'],
+                        'subtotal' => $item['subtotal'],
+                        'total_price' => $item['subtotal'],
+                        'image_path' => $item['image'] ?? ($productForSnapshot->image ?? ($productForSnapshot->images->first()->image ?? null)),
+                    ]);
+
+                    // Cập nhật tồn kho
+                    if ($variant) {
+                        $variant->decrement('stock', $item['quantity']);
+                    } else {
+                        $product->decrement('stock', $item['quantity']);
+                    }
+                }
+
+                // Xóa giỏ hàng sau khi đặt hàng thành công
+                session()->forget('cart');
             } else {
-                $product->decrement('stock', $checkoutSession['quantity']);
+                // Xử lý checkout mua ngay (1 sản phẩm)
+                // Kiểm tra lại tồn kho
+                $product = Product::findOrFail($checkoutSession['product_id']);
+                $stock = $product->stock ?? 0;
+                $variant = null;
+                
+                if (!empty($checkoutSession['variant_id'])) {
+                    $variant = ProductVariant::where('id', $checkoutSession['variant_id'])
+                        ->where('product_id', $product->id)
+                        ->first();
+                    if ($variant) {
+                        $stock = $variant->stock ?? 0;
+                    }
+                }
+
+                if ($stock < $checkoutSession['quantity']) {
+                    DB::rollBack();
+                    return redirect()->back()
+                        ->with('error', 'Số lượng sản phẩm không đủ. Tồn kho hiện tại: ' . $stock);
+                }
+
+                // Lấy lại product với images để lưu snapshot
+                $productForSnapshot = Product::with('images')->findOrFail($product->id);
+                
+                // Tạo order detail với snapshot đầy đủ
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $productForSnapshot->id,
+                    'product_name' => $productForSnapshot->name,
+                    'variant_id' => $variant ? $variant->id : null,
+                    'variant_name' => $variant ? (
+                        ($variant->color_name ?? '') . 
+                        ($variant->length && $variant->width && $variant->height 
+                            ? ' - ' . $variant->length . 'x' . $variant->width . 'x' . $variant->height . ' cm'
+                            : '')
+                    ) : null,
+                    'variant_sku' => $variant ? $variant->sku : null,
+                    'quantity' => $checkoutSession['quantity'],
+                    'price' => $checkoutSession['price'],
+                    'subtotal' => $checkoutSession['subtotal'],
+                    'total_price' => $checkoutSession['subtotal'],
+                    'image_path' => $productForSnapshot->image ?? ($productForSnapshot->images->first()->image ?? null),
+                ]);
+
+                // Cập nhật tồn kho
+                if ($variant) {
+                    $variant->decrement('stock', $checkoutSession['quantity']);
+                } else {
+                    $product->decrement('stock', $checkoutSession['quantity']);
+                }
             }
 
             DB::commit();
@@ -302,6 +452,12 @@ class CheckoutController extends Controller
      */
     public function success($orderCode)
     {
+        // Kiểm tra đăng nhập
+        if (!Auth::check()) {
+            return redirect()->route('client.login')
+                ->with('error', 'Vui lòng đăng nhập để xem đơn hàng');
+        }
+
         $order = Order::with(['items.product', 'user'])
             ->where('order_code', $orderCode)
             ->where('user_id', Auth::id())

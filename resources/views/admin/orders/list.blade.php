@@ -11,8 +11,11 @@
                 <option value="all" {{ ($status == 'all' || $status == null) ? 'selected' : '' }}>Tất cả</option>
                 <option value="pending" {{ $status == 'pending' ? 'selected' : '' }}>Chờ xác nhận</option>
                 <option value="processing" {{ $status == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
+                <option value="shipping" {{ $status == 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
                 <option value="completed" {{ $status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
                 <option value="cancelled" {{ $status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                <option value="return_requested" {{ $status == 'return_requested' ? 'selected' : '' }}>Yêu cầu trả hàng</option>
+                <option value="returned" {{ $status == 'returned' ? 'selected' : '' }}>Đã trả hàng</option>
             </select>
         </div>
 
@@ -50,18 +53,25 @@
                 {{-- Badge màu trạng thái --}}
                 <td>
     @php
+        // 7 Trạng thái mới với màu sắc và tên tiếng Việt
         $colors = [
-            'pending' => 'secondary',
-            'processing' => 'primary',
-            'completed' => 'success',
-            'cancelled' => 'danger'
+            'pending'          => 'dark',      // Xám đậm
+            'processing'       => 'primary',   // Xanh dương
+            'shipping'         => 'info',      // Xanh nhạt
+            'completed'        => 'success',   // Xanh lá
+            'cancelled'        => 'danger',    // Đỏ
+            'return_requested' => 'warning',   // Vàng/Cam
+            'returned'         => 'secondary', // Xám
         ];
 
         $labels = [
-            'pending' => 'Chờ xác nhận',
-            'processing' => 'Đang xử lý',
-            'completed' => 'Hoàn thành',
-            'cancelled' => 'Đã hủy'
+            'pending'          => 'Chờ xác nhận',
+            'processing'       => 'Đang xử lý',
+            'shipping'         => 'Đang giao hàng',
+            'completed'        => 'Hoàn thành',
+            'cancelled'        => 'Đã hủy',
+            'return_requested' => 'Yêu cầu trả hàng',
+            'returned'         => 'Đã trả hàng',
         ];
 
         $color = $colors[$order->order_status] ?? 'light';

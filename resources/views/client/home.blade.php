@@ -9,10 +9,9 @@
             @foreach ($banners as $index => $banner)
                 <div class="slide {{ $index === 0 ? 'active' : '' }}">
                     @if (!empty($banner->image))
-                        <img class="imageSlide" 
-                             src="{{ asset('storage/' . $banner->image) }}" 
-                             alt="{{ $banner->title ?? 'Banner' }}"
-                             onerror="this.src='https://via.placeholder.com/1200x800?text=Banner'">
+                        <img class="imageSlide" src="{{ asset('storage/' . $banner->image) }}"
+                            alt="{{ $banner->title ?? 'Banner' }}"
+                            onerror="this.src='https://via.placeholder.com/1200x800?text=Banner'">
                     @else
                         <img class="imageSlide" src="https://via.placeholder.com/1200x800?text=Banner" alt="Banner">
                     @endif
@@ -205,34 +204,59 @@
 
 
     {{-- goc chia sẻ --}}
-    <div style="text-align: center; padding: 40px 0; background: #f9f9f9; overflow:hidden;">
-        <h2 style="font-size: 28px; font-weight:700; margin-bottom:30px">Góc Cảm Hứng</h2>
+    <div class="container" style="max-width:1200px; margin:0 auto; padding:40px 15px;">
 
-        <div style="display:flex;justify-content:center;gap:2vw;flex-wrap:nowrap;">
-            <div class="article-card"
-                style="width:48vw;background:#fff;border-radius:10px;overflow:hidden;text-align:left;box-shadow:0 4px 12px  rgba(0,0,0,0.1);flex-shrink:0;transition: all 0.4s ease;">
-                <img src="https://picsum.photos/800/600?random=12" alt="Bài viết 1"
-                    style="width: 100%; height:60vh; object-fit: cover; display: block">
-                <h3 style="font-size: 20px; font-weight: 600; margin: 16px; ">Thiết kế hiện đại cho không gian nhỏ</h3>
-                <p style="font-size: 14px; color:#555; line-height: 1.6; margin: 0 16px 20px;">
-                    Những ý tưởng thông minh giúp tận dụng tối đa diện tích, mang lại sự tiện nghi và phong cách hiện đại.
-                    Từ màu sắc, ánh sáng đến cách bố trí nội thất, tất cả đều tạo nên cảm giác thoải mái và ấm cúng cho căn
-                    hộ của bạn.
-                </p>
-            </div>
-            <div class="article-card"
-                style="width: 48vw; background: #fff; border-radius:10px; overflow:hidden; text-align: left; box-shadow: 0 4px 12px  rgba(0,0,0,0.1); flex-shrink:0;  transition: all 0.4s ease;">
-                <img src="https://picsum.photos/800/600?random=32" alt="Bài viết 1"
-                    style="width: 100%; height:60vh; object-fit: cover; display: block">
-                <h3 style="font-size: 20px; font-weight: 600; margin: 16px; ">Thiết kế hiện đại cho không gian nhỏ</h3>
-                <p style="font-size: 14px; color:#555; line-height: 1.6; margin: 0 16px 20px;">
-                    Cây xanh và ánh sáng tự nhiên đang trở thành xu hướng trong thiết kế nội thất hiện đại.
-                    Cùng khám phá cách đưa thiên nhiên vào ngôi nhà của bạn để tạo nên không gian thư giãn và tươi mới mỗi
-                    ngày.
-                </p>
-            </div>
+        <div style="text-align:center; margin-bottom:30px;">
+            <h2 style="font-size: 28px; font-weight:700; margin:0;">Góc Cảm Hứng</h2>
         </div>
+
+        <div class="row g-4 justify-content-center">
+            @foreach ($latestBlogs as $blog)
+                <div class="col-12 col-md-6">
+                    <div class="article-card"
+                        style="
+                    height:100%;
+                    background:#fff;
+                    border-radius:10px;
+                    overflow:hidden;
+                    text-align:left;
+                    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                    transition: all 0.4s ease;
+                    box-sizing:border-box;
+                ">
+                        <img src="{{ $blog->thumbnail ? asset('blogs/images/' . $blog->thumbnail) : 'https://picsum.photos/800/600?random=' . rand(10, 99) }}"
+                            alt="{{ $blog->title }}" style="width:100%; height:300px; object-fit:cover; display:block;">
+
+                        <h3 style="font-size:20px; font-weight:600; margin:16px;">
+                            <a href="{{ route('client.blog.show', $blog->slug) }}"
+                                style="text-decoration:none; color:#222; display:inline-block;">
+                                {{ $blog->title }}
+                            </a>
+                        </h3>
+
+                        <p style="font-size:14px; color:#555; line-height:1.6; margin:0 16px 20px;">
+                            {{ $blog->excerpt }}
+                        </p>
+
+                        <a href="{{ route('client.blog.show', $blog->slug) }}"
+                            style="
+                            display:inline-block;
+                            margin: 0 16px 20px;
+                            font-size:18px;
+                            font-weight:600;
+                            color:#007bff;
+                            text-decoration:none;
+                            transition:0.3s;
+                        ">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
     </div>
+
     {{--  --}}
 
 
@@ -274,7 +298,7 @@
             s[i].classList.remove('active');
             i = (i + 1) % s.length;
             s[i].classList.add('active');
-        }, 3000); // 3000ms = 3 giây
+        }, 4000); // 4000ms = 4 giây
     </script>
 
 

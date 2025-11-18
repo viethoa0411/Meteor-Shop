@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
+use App\Models\Blog;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -37,6 +38,11 @@ class HomeController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners'));
+        $latestBlogs = Blog::where('status', 'published')
+            ->orderByDesc('created_at')
+            ->take(2)
+            ->get();
+
+        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners','latestBlogs'));
     }
 }

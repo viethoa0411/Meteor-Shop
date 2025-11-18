@@ -11,10 +11,9 @@ class ProductClientController extends Controller
 {
     public function productsByCategory($slug)
     {
-        $cate = Category::all();
-        $category = Category::where('slug', $slug)->firstOrFail();
-        $products = Product::where('category_id', $category->id)->paginate(12);
-        return view('client.products.category', compact('category', 'products', 'cate'));
+        Category::where('slug', $slug)->firstOrFail();
+
+        return redirect()->route('client.product.search', ['category' => $slug]);
     }
     public function showDetail($slug)
     {
