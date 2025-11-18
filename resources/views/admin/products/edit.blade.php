@@ -194,6 +194,7 @@
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                     'Accept': 'application/json'
                                 }
+
                             })
 
                         .then(res => res.json())
@@ -209,3 +210,4 @@
         });
     </script>
 @endpush
+
