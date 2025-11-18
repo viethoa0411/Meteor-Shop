@@ -215,7 +215,12 @@
                         alt="{{ $blog->title }}"
                         style="width:100%; height:300px; object-fit:cover; display:block;">
 
-                    <h3 style="font-size:20px; font-weight:600; margin:16px;">{{ $blog->title }}</h3>
+<h3 style="font-size:20px; font-weight:600; margin:16px;">
+    <a href="{{ route('client.blog.show', $blog->slug) }}"
+       style="text-decoration:none; color:#222; display:inline-block;">
+        {{ $blog->title }}
+    </a>
+</h3>
 
                     <p style="font-size:14px; color:#555; line-height:1.6; margin:0 16px 20px;">
                         {{ $blog->excerpt }}
