@@ -58,6 +58,11 @@
                 <p style="font-size:24px; font-weight:600; color:#d41; margin-bottom:10px;">
                     {{ number_format($product->price, 0, ',', '.') }} đ
                 </p>
+                
+                {{-- Hiển thị tồn kho (sẽ được JS cập nhật) --}}
+                <p style="font-size:14px; color:#555; margin-bottom:10px;">
+                    Tồn kho: <span id="stock-display" style="font-weight:bold;">--</span>
+                </p>
 
                 {{-- Mã giảm giá giả lập --}}
                 <div style="margin-bottom:15px;">
@@ -216,9 +221,67 @@
             @endif
         </div>
 
-        {{-- Hiệu ứng hover --}}
+        {{-- Pass data xuống JS --}}
+        <script>
+            var productVariants = @json($product->variants);
+            var simpleStock = {{ $product->variants->count() == 0 ? ($product->stock ?? 0) : 0 }};
+        </script>
+
+        {{-- Script xử lý --}}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+
+                // --- Biến toàn cục ---
+                const qtyInput = document.getElementById('product-quantity');
+                const minus = document.querySelector('.minus');
+                const plus = document.querySelector('.plus');
+                const stockDisplay = document.getElementById('stock-display');
+                let currentMaxStock = simpleStock; // Mặc định
+
+                // --- Hàm cập nhật tồn kho ---
+                function updateStockInfo() {
+                    // Nếu là sản phẩm đơn giản (không có variant)
+                    if (productVariants.length === 0) {
+                        stockDisplay.textContent = currentMaxStock;
+                        qtyInput.setAttribute('max', currentMaxStock);
+                        return;
+                    }
+
+                    // Nếu có variant, phải check xem đã chọn màu/size chưa
+                    const colorBtn = document.querySelector('.color-btn.active');
+                    const sizeBtn = document.querySelector('.size-btn.active');
+
+                    if (colorBtn && sizeBtn) {
+                        const color = colorBtn.dataset.color;
+                        const sizeStr = sizeBtn.dataset.size; // "10x20x30"
+                        const [l, w, h] = sizeStr.split('x').map(Number);
+
+                        // Tìm variant
+                        const variant = productVariants.find(v => 
+                            v.color_name === color && 
+                            parseInt(v.length) === l && 
+                            parseInt(v.width) === w && 
+                            parseInt(v.height) === h
+                        );
+
+                        if (variant) {
+                            currentMaxStock = variant.stock;
+                            stockDisplay.textContent = currentMaxStock;
+                            qtyInput.setAttribute('max', currentMaxStock);
+                            qtyInput.value = 1; // Reset về 1 khi đổi loại
+                        } else {
+                            stockDisplay.textContent = '0 (Hết hàng)';
+                            currentMaxStock = 0;
+                            qtyInput.setAttribute('max', 0);
+                        }
+                    } else {
+                        stockDisplay.textContent = '-- (Vui lòng chọn phân loại)';
+                        currentMaxStock = 0;
+                    }
+                }
+
+                // Chạy lần đầu
+                updateStockInfo();
 
                 // ----- Hiệu ứng hover thẻ sản phẩm liên quan -----
                 document.querySelectorAll('.product-card').forEach(card => {
@@ -236,16 +299,36 @@
                     });
                 });
 
-                // ----- Tăng/giảm số lượng -----
-                const qtyInput = document.querySelector('input[type="number"]');
-                const minus = document.querySelector('.minus');
-                const plus = document.querySelector('.plus');
-
+                // ----- Tăng/giảm số lượng (CÓ CHECK MAX STOCK) -----
                 minus?.addEventListener('click', () => {
-                    if (parseInt(qtyInput.value) > 1) qtyInput.value = parseInt(qtyInput.value) - 1;
+                    let val = parseInt(qtyInput.value) || 1;
+                    if (val > 1) qtyInput.value = val - 1;
                 });
+
                 plus?.addEventListener('click', () => {
-                    qtyInput.value = parseInt(qtyInput.value) + 1;
+                    let val = parseInt(qtyInput.value) || 1;
+                    
+                    // Kiểm tra xem đã chọn variant chưa
+                    if (productVariants.length > 0 && currentMaxStock === 0) {
+                        alert('Vui lòng chọn Màu và Kích cỡ trước!');
+                        return;
+                    }
+
+                    if (val < currentMaxStock) {
+                        qtyInput.value = val + 1;
+                    } else {
+                        alert('Đã đạt giới hạn tồn kho (' + currentMaxStock + ')');
+                    }
+                });
+
+                // Chặn nhập tay quá số lượng
+                qtyInput.addEventListener('change', function(){
+                    let val = parseInt(this.value);
+                    if(val > currentMaxStock){
+                         alert('Quá số lượng tồn kho!');
+                         this.value = currentMaxStock;
+                    }
+                    if(val < 1) this.value = 1;
                 });
 
                 // ----- Chọn variant (màu, kích cỡ) -----
@@ -260,6 +343,9 @@
                         btn.classList.add('active');
                         btn.style.background = '#111';
                         btn.style.color = '#fff';
+
+                        // Cập nhật lại stock
+                        updateStockInfo();
                     });
                 });
 
@@ -267,19 +353,25 @@
                 const addBtn = document.getElementById('add-to-cart');
                 addBtn.addEventListener('click', () => {
                     const quantity = parseInt(qtyInput.value);
-                    const colorBtn = document.querySelector('.color-btn.active');
-                    const sizeBtn = document.querySelector('.size-btn.active');
-
-                    // Kiểm tra variant nếu sản phẩm có variant
+                    
+                    // Kiểm tra chọn variant
                     @if ($product->variants->count() > 0)
+                        const colorBtn = document.querySelector('.color-btn.active');
+                        const sizeBtn = document.querySelector('.size-btn.active');
                         if (!colorBtn || !sizeBtn) {
                             alert('Vui lòng chọn màu và kích cỡ');
                             return;
                         }
                     @endif
 
-                    const color = colorBtn ? colorBtn.dataset.color : null;
-                    const size = sizeBtn ? sizeBtn.dataset.size : null;
+                    // Kiểm tra lại số lượng lần cuối
+                    if (quantity > currentMaxStock) {
+                        alert('Số lượng vượt quá tồn kho!');
+                        return;
+                    }
+
+                    const color = document.querySelector('.color-btn.active')?.dataset.color || null;
+                    const size = document.querySelector('.size-btn.active')?.dataset.size || null;
 
                     fetch("{{ route('cart.add') }}", {
                             method: 'POST',
@@ -298,9 +390,9 @@
                         .then(data => {
                             if (data.status === 'success') {
                                 alert('Đã thêm vào giỏ hàng!');
-                                // Reload toàn bộ trang
                                 window.location.reload();
                             } else {
+                                // Hiển thị lỗi từ Controller (vd: hết hàng)
                                 alert(data.message);
                             }
                         });
@@ -320,8 +412,6 @@
                 -webkit-appearance: none;
                 margin: 0;
             }
-
-
         </style>
     </div>
 @endsection

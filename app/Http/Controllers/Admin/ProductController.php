@@ -83,6 +83,20 @@ class ProductController extends Controller
             'variants.*.stock' => 'required|integer|min:0',
         ]);
 
+        // --- BẮT ĐẦU PHẦN SỬA: TÍNH TOÁN STOCK ---
+        $stock = 0; // Mặc định là 0
+
+        // Nếu có biến thể, cộng dồn số lượng từ biến thể
+        if ($request->has('variants') && is_array($request->variants)) {
+            foreach ($request->variants as $variant) {
+                $stock += isset($variant['stock']) ? (int)$variant['stock'] : 0;
+            }
+        } else {
+            // Nếu không có biến thể, lấy từ input stock (nếu không có thì là 0)
+            $stock = $request->input('stock', 0);
+        }
+        // --- KẾT THÚC PHẦN SỬA ---
+
         // 🖼 Upload ảnh đại diện
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -98,7 +112,7 @@ class ProductController extends Controller
             'image' => $imagePath,
             'category_id' => $request->category_id,
             'status' => $request->status,
-            'stock' => $request->stock,
+            'stock' => $stock, // <--- Đã thay $request->stock bằng biến $stock đã tính toán
         ]);
 
         // 🖼 Lưu ảnh chi tiết (nếu có)

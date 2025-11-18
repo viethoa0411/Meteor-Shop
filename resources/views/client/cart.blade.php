@@ -77,6 +77,11 @@
         $(document).on('click', '.updateQty', function() {
             let id = $(this).data('id');
             let type = $(this).data('type');
+            let qtySpan = $("#qty-" + id);
+            let currentQty = parseInt(qtySpan.text());
+
+            // Chặn bớt request nếu giảm về 1
+            if (type === 'minus' && currentQty <= 1) return;
 
             $.post("{{ route('cart.updateQty') }}", {
                 id: id,
@@ -84,10 +89,16 @@
                 _token: "{{ csrf_token() }}"
             }, function(data) {
                 if (data.status === 'success') {
+                    // Cập nhật giao diện nếu thành công
                     $("#qty-" + id).text(data.quantity);
                     $("#subtotal-" + id).text(Number(data.subtotal).toLocaleString() + "đ");
                     $("#total").text(Number(data.total).toLocaleString() + "đ");
+                } else if (data.status === 'error') {
+                    // Nếu lỗi (hết hàng), alert ra và KHÔNG tăng số lượng
+                    alert(data.message);
                 }
+            }).fail(function() {
+                alert('Có lỗi xảy ra, vui lòng thử lại');
             });
         });
 
