@@ -87,6 +87,7 @@
                             @foreach ($product->variants->unique('color_name') as $variant)
                                 <button type="button" class="btn-variant color-btn"
                                     data-color="{{ $variant->color_name }}"
+                                    data-variant-id="{{ $variant->id }}"
                                     style="border:1px solid #ccc;
                                background-color: {{ $variant->color_code ?? '#fff' }};
                                color: {{ strtolower($variant->color_name) === 'trắng' ? '#000' : '#fff' }};
@@ -106,6 +107,7 @@
                             @foreach ($product->variants->unique(fn($v) => "{$v->length}x{$v->width}x{$v->height}") as $variant)
                                 <button type="button" class="btn-variant size-btn"
                                     data-size="{{ intval($variant->length) }}x{{ intval($variant->width) }}x{{ intval($variant->height) }}"
+                                    data-variant-id="{{ $variant->id }}"
                                     style="border:1px solid #111;
                        background:#fff;
                        color:#111;
@@ -154,11 +156,11 @@
 
                 {{-- Nút hành động --}}
                 <div style="display:flex; flex-wrap:wrap; gap:16px;">
-                    <button
+                    <button type="button" id="buyNowBtn"
                         style="background:#d41; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:500; cursor:pointer;">
                         Mua ngay
                     </button>
-                    <button
+                    <button type="button" id="addToCartBtn"
                         style="background:#111; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:500; cursor:pointer;">
                         <i class="bi bi-cart"></i> Thêm vào giỏ
                     </button>
@@ -234,9 +236,12 @@
         </script>
 
 
-        {{-- Script tăng giảm số lượng + chọn biến thể --}}
+        {{-- Script tăng giảm số lượng + chọn biến thể + Mua ngay --}}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                let selectedVariantId = null;
+                const productId = {{ $product->id }};
+
                 const minus = document.querySelector('.minus');
                 const plus = document.querySelector('.plus');
                 const input = document.querySelector('input[type="number"]');
@@ -249,30 +254,51 @@
                     });
                 }
 
+                // Xử lý chọn variant
                 document.querySelectorAll('.btn-variant').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        btn.parentElement.querySelectorAll('.btn-variant').forEach(b => {
-                            b.style.background = '#fff';
+                        // bỏ active trong nhóm tương ứng
+                        const isColor = btn.classList.contains('color-btn');
+                        const group = isColor ? '.color-btn' : '.size-btn';
+                        document.querySelectorAll(group).forEach(b => {
+                            b.classList.remove('active');
+                            b.style.background = isColor ? (b.dataset.color ? 'transparent' : '#fff') : '#fff';
                             b.style.color = '#111';
                         });
+
+                        // thêm active cho nút được chọn
+                        btn.classList.add('active');
                         btn.style.background = '#111';
                         btn.style.color = '#fff';
+
+                        // Lưu variant_id nếu có
+                        if (btn.dataset.variantId) {
+                            selectedVariantId = btn.dataset.variantId;
+                        }
                     });
                 });
-            });
-            document.querySelectorAll('.btn-variant').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // bỏ active trong nhóm tương ứng
-                    const isColor = btn.classList.contains('color-btn');
-                    const group = isColor ? '.color-btn' : '.size-btn';
-                    document.querySelectorAll(group).forEach(b => b.classList.remove('active'));
 
-                    // thêm active cho nút được chọn
-                    btn.classList.add('active');
+                // Nút Mua ngay
+                document.getElementById('buyNowBtn')?.addEventListener('click', function() {
+                    const qty = parseInt(input.value) || 1;
+                    
+                    // Kiểm tra đăng nhập
+                    @auth
+                        // Tạo URL checkout
+                        let url = '{{ route("client.checkout.index") }}?product_id=' + productId + '&qty=' + qty + '&type=buy_now';
+                        if (selectedVariantId) {
+                            url += '&variant_id=' + selectedVariantId;
+                        }
+                        window.location.href = url;
+                    @else
+                        // Chưa đăng nhập, chuyển đến trang login
+                        window.location.href = '{{ route("client.login") }}';
+                    @endauth
+                });
 
-                    // cập nhật style
-                    btn.style.background = '#111';
-                    btn.style.color = '#fff';
+                // Nút Thêm vào giỏ (có thể implement sau)
+                document.getElementById('addToCartBtn')?.addEventListener('click', function() {
+                    alert('Tính năng thêm vào giỏ đang được phát triển');
                 });
             });
         </script>

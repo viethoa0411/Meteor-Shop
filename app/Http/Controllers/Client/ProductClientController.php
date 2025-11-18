@@ -20,8 +20,8 @@ class ProductClientController extends Controller
     {
         $cate = Category::all();
 
-        // Lấy sản phẩm + ảnh phụ
-        $product = Product::with('images')->where('slug', $slug)->firstOrFail();
+        // Lấy sản phẩm + ảnh phụ + variants
+        $product = Product::with(['images', 'variants'])->where('slug', $slug)->firstOrFail();
 
         // Lấy sản phẩm liên quan
         $relatedProducts = Product::where('category_id', $product->category_id)
