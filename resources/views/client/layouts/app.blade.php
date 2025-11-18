@@ -458,7 +458,8 @@
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="">Đơn hàng của tôi</a></li>
+                            <li><a class="dropdown-item" href="{{ route('client.account.orders.index') }}">Đơn hàng của
+                                    tôi</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -531,7 +532,6 @@
                 <!-- Nút luôn ở cuối -->
                 <div class="mt-auto d-flex flex-column gap-2">
                     <a href="{{ route('cart.index') }}" class="btn btn-dark w-100">Xem giỏ hàng</a>
-                    <a href="" class="btn btn-white w-100">Đặt Hàng</a>
                 </div>
             @else
                 <p>Giỏ hàng trống.</p>
@@ -695,6 +695,8 @@
         });
     </script>
 
+
+    @stack('scripts')
 
     <!-- Bootstrap JS Bundle to enable dropdown -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

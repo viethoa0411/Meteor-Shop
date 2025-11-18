@@ -37,12 +37,17 @@
 
                         <td class="text-end">{{ number_format($item['price']) }}đ</td>
 
-                        <td class="d-flex align-items-center gap-2">
+                        <td class="d-flex align-items-center gap-2 flex-column flex-sm-row">
                             <button class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
                                 data-type="minus">-</button>
-                            <span id="qty-{{ $id }}">{{ $item['quantity'] }}</span>
+                            <span id="qty-{{ $id }}" data-max="{{ $item['max_stock'] ?? '' }}">{{ $item['quantity'] }}</span>
                             <button class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
                                 data-type="plus">+</button>
+                            @if (!empty($item['max_stock']))
+                                <small class="text-muted" id="stock-note-{{ $id }}">Tối đa: {{ $item['max_stock'] }}</small>
+                            @else
+                                <small class="text-muted" id="stock-note-{{ $id }}"></small>
+                            @endif
                         </td>
 
                         <td class="text-end">
@@ -57,8 +62,8 @@
                 @endforeach
             </table>
             <div class="text-end mt-3">
-                <h4>Tổng tiền: <span id="total">{{ number_format($total) }}đ</span></h4>
-                <a href="" class="btn btn-dark mt-2">Đặt hàng</a>
+                <h4>Tổng tiền: <span id="total">{{ number_format($total) ?? 0 }}đ</span></h4>
+                <a href="{{ route('client.checkout.index') }}" class="btn btn-dark mt-2">Đặt hàng</a>
             </div>
         @else
             <div class="text-center mt-4">
@@ -77,6 +82,16 @@
         $(document).on('click', '.updateQty', function() {
             let id = $(this).data('id');
             let type = $(this).data('type');
+            let qtySpan = $("#qty-" + id);
+            let currentQty = parseInt(qtySpan.text());
+            let maxStock = parseInt(qtySpan.attr('data-max'));
+
+            // Chặn bớt request nếu giảm về 1
+            if (type === 'minus' && currentQty <= 1) return;
+            if (type === 'plus' && maxStock && currentQty >= maxStock) {
+                alert('Bạn chỉ có thể mua tối đa ' + maxStock + ' sản phẩm cho lựa chọn này.');
+                return;
+            }
 
             $.post("{{ route('cart.updateQty') }}", {
                 id: id,
@@ -84,10 +99,24 @@
                 _token: "{{ csrf_token() }}"
             }, function(data) {
                 if (data.status === 'success') {
-                    $("#qty-" + id).text(data.quantity);
+                    // Cập nhật giao diện nếu thành công
+                    $("#qty-" + id).text(data.quantity)
+                        .attr('data-max', data.max_stock ?? '');
                     $("#subtotal-" + id).text(Number(data.subtotal).toLocaleString() + "đ");
                     $("#total").text(Number(data.total).toLocaleString() + "đ");
+                    if (typeof data.max_stock !== 'undefined') {
+                        if (data.max_stock) {
+                            $("#stock-note-" + id).text('Tối đa: ' + data.max_stock);
+                        } else {
+                            $("#stock-note-" + id).text('');
+                        }
+                    }
+                } else if (data.status === 'error') {
+                    // Nếu lỗi (hết hàng), alert ra và KHÔNG tăng số lượng
+                    alert(data.message);
                 }
+            }).fail(function() {
+                alert('Có lỗi xảy ra, vui lòng thử lại');
             });
         });
 
