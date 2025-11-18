@@ -7,10 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<<<<<<< HEAD
     {{-- Giữ lại cả hai link CSS nếu bạn có file 'css/app.css' --}}
-=======
->>>>>>>  Chức năng login client
     {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
     <style>
         body {
@@ -149,11 +146,7 @@
         }
 
         .menu-toggle:hover {
-<<<<<<< HEAD
             color: #ffb703;
-=======
-color: #ffb703;
->>>>>>>  Chức năng login client
         }
 
         /* MENU DỌC (Sidebar) */
@@ -240,11 +233,7 @@ color: #ffb703;
             display: block;
             transform-origin: center center;
         }
-<<<<<<< HEAD
-
-=======
         
->>>>>>>  Chức năng login client
         .product-name {
             font-size: 16px;
             font-weight: 600;
@@ -271,13 +260,8 @@ color: #ffb703;
 
         .grid-products {
             display: grid;
-<<<<<<< HEAD
             grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
-            align-items: stretch;
-=======
-grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
             align-items: stretch;  /* đảm bảo các ô cao bằng nhau */
->>>>>>>  Chức năng login client
             gap: 24px;
         }
 
@@ -337,12 +321,8 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
             z-index: 1
         }
 
-<<<<<<< HEAD
-        /* Đã bỏ comment cho button, sử dụng style từ file 2 */
-        button {
-=======
+
         /* button {
->>>>>>>  Chức năng login client
             z-index: 1;
             padding: 10px 20px;
             border: none;
@@ -376,7 +356,6 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
 </head>
 <body>
 
-<<<<<<< HEAD
     @php
         // Lấy danh mục cha (Phòng) nếu chưa có sẵn
         // Giữ lại logic Laravel Blade từ File 1 để đảm bảo Menu Dropdown hoạt động
@@ -389,9 +368,7 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
         // Giả định $cate là danh mục dùng cho Menu dọc
         $cate = $cate ?? ($parentCategories->isNotEmpty() ? $parentCategories : collect());
     @endphp
-
-=======
->>>>>>>  Chức năng login client
+    
     <header class="header">
         <div class="container-header">
             {{-- Logo --}}
@@ -402,14 +379,13 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
             {{-- Menu ngang (Đã gộp và giữ lại Dropdown từ File 1) --}}
             <nav class="main-nav">
                 <ul>
-<<<<<<< HEAD
                     {{-- Dropdown Sản phẩm (Child Categories) --}}
                     <li class="menu-item dropdown">
                         <a href="#" class="dropdown-toggle">Sản phẩm</a>
                         <ul class="dropdown-menu">
                             @foreach($childCategories as $child)
                                 <li>
-                                    <a href="{{ route('client.product.category', $child->slug) }}">
+                                    <a href="{{ route('client.products.index', $child->slug) }}">
                                         {{ $child->name }}
                                     </a>
                                 </li>
@@ -429,42 +405,25 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
                             @endforeach
                         </ul>
                     </li>
-=======
-                   <li><a href="#">Sản phẩm</a></li>
-                    <li><a href="#">Phòng</a></li>
->>>>>>>  Chức năng login client
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
-<<<<<<< HEAD
                     {{-- Lấy link Bài Viết từ File 2 --}}
-                    <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
-=======
                     <li><a href="{{ route('client.blog.list') }}">Bài Viết</a></li>
->>>>>>>  Giao diện trang blog ở phía người dùng
+                    <li><a href="{{ route('client.blog.list') }}">Bài Viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </nav>
-<<<<<<< HEAD
 
-            <form action="{{ route('client.product.search') }}" method="GET" class="search-box">
-=======
             <!-- Ô tìm kiếm -->
-{{-- <form action="#" method="GET" class="search-box"> --}}
             <form action="#" method="GET" class="search-box">
->>>>>>>  Chức năng login client
                 <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="{{ $searchQuery ?? '' }}">
                 <button type="submit">
                     <i class="fa fa-search"></i>
                 </button>
             </form>
 
-<<<<<<< HEAD
-=======
-
             <!-- Icon menu dọc -->
->>>>>>>  Chức năng login client
-            <div class="menu-toggle">☰</div>
-            
+            <div class="menu-toggle">☰</div>            
             <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
                 @auth
 
@@ -501,7 +460,6 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
             </div>
 
         <div class="overlay"></div>
-<<<<<<< HEAD
         {{-- Đã điều chỉnh logic hiển thị Menu dọc --}}
         @if ($cate->count() > 0)
             <div class="vertical-menu">
@@ -514,7 +472,6 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
                 <a href="#">Hiện chưa có danh mục</a>
             </div>
         @endif
-=======
             @if (isset($cate) && $cate->count() > 0)
                 <div class="vertical-menu">
                     @foreach ($cate as $c)
@@ -526,13 +483,11 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
                     <a href="#">Hiện chưa có danh mục</a>
                 </div>
             @endif
->>>>>>>  Chức năng login client
     </header>
-<main class="container">
+    <main class="container">
         @yield('content')
     </main>
 
-<<<<<<< HEAD
     {{-- Footer chi tiết từ File 2 (sử dụng HTML structure từ File 2 và style của File 1) --}}
     <footer id="footer" class="footer-wrapper" style="background: #000000; padding:40px 0 20px; font-size:13px; color:#555">
         <div class="footer-widgets footer footer-2 dark">
@@ -603,61 +558,11 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
 
         <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #333;"> {{-- Đã điều chỉnh màu border cho phù hợp nền đen --}}
         <div style="text-align: center; color:#bdbdbd; font-size: 13px"> {{-- Đã điều chỉnh font size --}}
-=======
-    <footer style="background: #000000; padding:40px 0 20px; font-size:13px; color:#555">
-        <div style="max-width:1200px; margin:auto; display:flex; justify-content:space-between;flex-wrap:wrap; gap:30px">
-            <!-- Cột 1 -->
-            <div style="flex:1; min-width:180px">
-                <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">CHĂM SÓC KHÁCH HÀNG</h4>
-                <p style="margin: 6px 0">Trung tâm trợ giúp</p>
-                <p style="margin: 6px 0">Meteor Blog</p>
-                <p style="margin: 6px 0">Hướng dẫn mua hàng</p>
-                <p style="margin: 6px 0">Hướng dẫn bán hàng</p>
-                <p style="margin: 6px 0">Thanh toán</p>
-            </div>
 
-             <!-- Cột 2-->
-            <div style="flex:1; min-width:180px">
-                <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">VỀ METEOR</h4>
-                <p style="margin: 6px 0">Facebook</p>
-                <p style="margin: 6px 0">Instagram</p>
-                <p style="margin: 6px 0">Tiktok</p>
-                <p style="margin: 6px 0">YouTube</p>
-            </div>
-
-             <!-- Cột 3 -->
-            <div style="flex:1; min-width:180px">
-                <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">THEO DÕI CHÚNG TÔI TRÊN</h4>
-                <p style="margin: 6px 0">Trung tâm trợ giúp</p>
-                <p style="margin: 6px 0">Meteor Blog</p>
-                <p style="margin: 6px 0">Hướng dẫn mua hàng</p>
-                <p style="margin: 6px 0">Hướng dẫn bán hàng</p>
-                <p style="margin: 6px 0">Thanh toán</p>
-            </div>
-
-             <!-- Cột 4 -->
-            <div style="flex:1; min-width:180px">
-                <h4 style="font-size: 14px; font-weight:600;margin-bottom:12px">DANH MỤC</h4>
-                <a href="" style="margin: 6px 0">Nội thất phòng khách</a> <br>
-                <a href="" style="margin: 6px 0">Nội thất phòng ngủ</a> <br>
-                <a href="" style="margin: 6px 0">Nội thất phòng ăn</a> <br>
-                <a href="" style="margin: 6px 0">Nội thất văn phòng</a> <br>
-                <a href="" style="margin: 6px 0">Nội thất ngoài trời</a> <br>
-            </div>
-        </div>
-        <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
-        <div style="text-align: center; color:#bdbdbd; font-size: 16px">
->>>>>>>  Chức năng login client
             © 2025 METEOR SHOP. Tất cả các quyền được bảo lưu.
         </div>
     </footer>
 
-<<<<<<< HEAD
-
-    {{-- Script cho menu dọc (giữ lại từ File 1) --}}
-=======
-    {{-- Script cho menu dọc --}}
->>>>>>>  Chức năng login client
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.querySelector('.menu-toggle');
@@ -665,11 +570,7 @@ grid-template-columns: repeat(auto-fill, minmax(calc(90%/4), 1fr));
             const overlay = document.querySelector('.overlay');
 
             function closeMenu() {
-<<<<<<< HEAD
                 verticalMenu.classList.remove('active');
-=======
-verticalMenu.classList.remove('active');
->>>>>>>  Chức năng login client
                 overlay.classList.remove('active');
             }
 
@@ -687,10 +588,7 @@ verticalMenu.classList.remove('active');
             });
         });
     </script>
-<<<<<<< HEAD
-=======
     <!-- Bootstrap JS Bundle to enable dropdown -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
->>>>>>>  Chức năng login client
 </body>
 </html>

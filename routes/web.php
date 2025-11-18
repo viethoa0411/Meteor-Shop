@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Client\Blog\BlogController as ClientBlogController;
 use App\Http\Controllers\Client\Auth\LoginController;
+use App\Http\Controllers\Client\ProductController as ClientProductController;
+
 
 
 // Ưu tiên chuyển hướng /login sang /login-client 
@@ -55,6 +57,19 @@ Route::get('/detail/{slug}', [ProductPublicController::class, 'show'])->name('cl
 Route::get('/search', [HomeController::class, 'search'])->name('client.product.search');
 Route::get('/blog/list', [ClientBlogController::class, 'list'])->name('client.blog.list');
 Route::get('/blog/{slug}', [ClientBlogController::class, 'show'])->name('client.blog.show');
+
+// đường dẫn đến trang chi tiết sản phẩm
+Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail');
+// Hiển thị trang tổng hợp 6 danh mục + 4 sản phẩm mới nhất mỗi danh mục
+Route::get('/categories', [ProductController::class, 'index'])->name('client.product.listProductsByCategory');
+
+// Hiển thị tất cả sản phẩm của 1 danh mục cụ thể
+Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category');
+
+// đường dẫn đến trang sản phẩm sắp xếp theo danh mục
+Route::get('/products', [ClientProductController::class, 'index'])->name('client.products.index');
+//khi Người dùng click vào link: click Laravel tự động tạo URL: /category/noi-that-phong-khach
+
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
