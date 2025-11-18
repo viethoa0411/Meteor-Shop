@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MonthlyTargetController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\Account\OrderController as ClientOrderController;
+use App\Http\Controllers\Client\CheckoutController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -160,6 +161,15 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
     Route::post('/orders/{order}/cancel', [ClientOrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/reorder', [ClientOrderController::class, 'reorder'])->name('orders.reorder');
     Route::post('/orders/{order}/return', [ClientOrderController::class, 'returnRequest'])->name('orders.return');
+});
+
+// ============ CHECKOUT ROUTES ============
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('client.checkout.index');
+    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('client.checkout.process');
+    Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('client.checkout.confirm');
+    Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
+    Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
 });
 
 
