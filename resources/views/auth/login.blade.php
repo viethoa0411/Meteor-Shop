@@ -240,9 +240,8 @@
 
         .role-info {
             background-color: #e7f3ff;
-            <<<<<<< HEAD border-left: 4px solid #667eea;
-            =======border-left: 4px solid #667eea;
-            >>>>>>>login padding: 12px 15px;
+            border-left: 4px solid #667eea;
+            padding: 12px 15px;
             border-radius: 4px;
             margin-bottom: 20px;
             font-size: 13px;
