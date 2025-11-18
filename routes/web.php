@@ -136,10 +136,14 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         });
     });
      // ====== BLOGS ======
+      // ====== BLOGS ======
       Route::prefix('blogs')->name('blogs.')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('index');
     Route::get('/create', [BlogController::class, 'create'])->name('create');
     Route::post('/store', [BlogController::class, 'store'])->name('store');
-    
+    Route::get('/edit/{id}', [BlogController::class, 'edit'])->name('edit');
+    Route::put('/update/{id}', [BlogController::class, 'update'])->name('update');
+    Route::get('/show/{id}', [BlogController::class, 'show'])->name('show');
+    Route::delete('/delete/{id}', [BlogController::class, 'destroy'])->name('destroy');
     });
 });

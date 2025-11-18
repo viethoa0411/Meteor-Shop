@@ -409,7 +409,6 @@
                     <li><a href="#">Thiết kế nội thất</a></li>
                     {{-- Lấy link Bài Viết từ File 2 --}}
                     <li><a href="{{ route('client.blog.list') }}">Bài Viết</a></li>
-                    <li><a href="{{ route('client.blog.list') }}">Bài Viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </nav>

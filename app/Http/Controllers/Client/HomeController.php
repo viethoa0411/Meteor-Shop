@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\Blog; 
+
 
 class HomeController extends Controller
 {
@@ -31,6 +33,11 @@ class HomeController extends Controller
             ->where('status', 1)
             ->get();
 
-        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate'));
+        $latestBlogs = Blog::where('status', 'published')
+            ->orderByDesc('created_at')
+            ->take(2)
+            ->get();
+
+        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate' ,'latestBlogs'));
     }
 }
