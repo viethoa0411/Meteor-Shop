@@ -82,21 +82,36 @@ class OrderController extends Controller
         // Quy tắc chuyển trạng thái hợp lệ
         $validTransitions = [
             'pending' => ['processing', 'cancelled'],
-            'processing' => ['completed', 'cancelled'],
+            'processing' => ['shipping', 'completed', 'cancelled'],
+            'shipping' => ['completed', 'return_requested', 'cancelled'],
+            'return_requested' => ['returned'],
             'completed' => [],
+            'returned' => [],
             'cancelled' => []
         ];
 
-        if (!in_array($newStatus, $validTransitions[$currentStatus])) {
+        if (!isset($validTransitions[$currentStatus]) || !in_array($newStatus, $validTransitions[$currentStatus])) {
             return back()->with('error', 'Trạng thái không hợp lệ!');
+        }
+        $statusTimestamps = [
+            'processing' => 'confirmed_at',
+            'shipping' => 'shipped_at',
+            'completed' => 'delivered_at',
+            'cancelled' => 'cancelled_at',
+        ];
+
+        $updatePayload = [
+            'order_status' => $newStatus,
+            'updated_at' => now(),
+        ];
+
+        if (isset($statusTimestamps[$newStatus])) {
+            $updatePayload[$statusTimestamps[$newStatus]] = now();
         }
 
         DB::table('orders')
             ->where('id', $id)
-            ->update([
-                'order_status' => $newStatus,
-                'updated_at' => now()
-            ]);
+            ->update($updatePayload);
 
         return back()->with('success', 'Cập nhật trạng thái thành công!');
     }
