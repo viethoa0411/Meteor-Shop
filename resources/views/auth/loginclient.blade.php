@@ -292,6 +292,13 @@
                     </div>
                 @endif
 
+                <!-- Thông báo lỗi từ session -->
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-circle"></i> {{ session('error') }}
+                    </div>
+                @endif
+
                 <!-- Thông báo thành công -->
                 @if (session('success'))
                     <div class="alert alert-success">
