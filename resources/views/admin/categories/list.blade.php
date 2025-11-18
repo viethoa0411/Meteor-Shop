@@ -13,7 +13,7 @@
         @endif
 
         {{-- Tiêu đề --}}
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4 bg-body">
             <div class="card-body">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
 
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div class="card shadow-sm">
+        <div class="card shadow-sm bg-body">
             <div class="card-body">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
                     {{-- Bộ lọc trạng thái --}}

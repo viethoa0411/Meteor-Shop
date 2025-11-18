@@ -70,11 +70,11 @@
             display: block;
         }
 
-        .dropdown-menu-item > a .bi-chevron-right {
+        .dropdown-menu-item>a .bi-chevron-right {
             transition: transform 0.3s;
         }
 
-        .dropdown-menu-item.active > a .bi-chevron-right {
+        .dropdown-menu-item.active>a .bi-chevron-right {
             transform: rotate(90deg);
         }
 
@@ -159,6 +159,28 @@
             background-color: #2b2b2b !important;
             color: #ddd;
         }
+
+        body.dark .dropdown-menu {
+            background-color: #2b2b2b;
+            /* nền tối */
+            color: #ddd;
+            /* chữ sáng */
+        }
+
+        body.dark .dropdown-menu .dropdown-item {
+            color: #ddd;
+        }
+
+        body.dark .dropdown-menu .dropdown-item:hover,
+        body.dark .dropdown-menu .dropdown-item:focus {
+            background-color: #3a3a3a;
+            /* hover màu tối hơn */
+            color: #fff;
+        }
+
+        body.dark .dropdown-divider {
+            border-color: #444;
+        }
     </style>
 </head>
 
@@ -183,19 +205,24 @@
                     <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a href="" class="dropdown-item">Profile</a></li>
+                    <li>
+                        <a href="" class="dropdown-item">
+                            <i class="bi bi-person-circle me-2"></i> Profile
+                        </a>
+                    </li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button class="dropdown-item">
-                                <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                            <button type="submit" class="dropdown-item">
+                                <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
                             </button>
                         </form>
                     </li>
                 </ul>
+
             </div>
 
         </div>
@@ -208,7 +235,8 @@
         <aside class="sidebar">
             <h5 class="navbar navbar-expand-lg px-3 shadow-sm">Quản trị</h5>
 
-            <a href="{{ route('admin.dashboard') }}" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
+            <a href="{{ route('admin.dashboard') }}" class="active"><i class="bi bi-house-door-fill me-2"></i>
+                Dashboard</a>
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
             <a href="{{ route('admin.orders.list') }}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
@@ -217,12 +245,14 @@
 
             <!-- Quản lý tài khoản -->
             <div class="dropdown-menu-item">
-                <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản
+                <a href=""><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản
                     <i class="bi bi-chevron-right float-end"></i>
                 </a>
                 <div class="submenu">
-                    <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin</a>
-                    <a href="{{ route('admin.account.users.list') }}"><i class="bi bi-people-fill me-2"></i> Quản lý User</a>
+                    <a href="{{ route('admin.account.admin.list') }}"><i class="bi bi-person-badge-fill me-2"></i> Quản
+                        lý Admin</a>
+                    <a href="{{ route('admin.account.users.list') }}"><i class="bi bi-people-fill me-2"></i> Quản lý
+                        User</a>
                 </div>
             </div>
 

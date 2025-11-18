@@ -88,7 +88,6 @@
         }
 
         .dropdown-menu {
-            display: none !important;
             position: absolute;
             top: 100%;
             left: 0;
@@ -438,10 +437,6 @@
                 </button>
             </form>
 
-
-            <!-- Icon menu dọc -->
-            <div class="menu-toggle">☰</div>
-
             <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
                 @auth
                     <div class="position-relative">
@@ -457,15 +452,13 @@
                     </div>
                     {{-- DROPDOWN USER --}}
                     <div class="dropdown">
-                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                             {{ Auth::user()->name }}
                         </a>
+
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    Thông tin tài khoản
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" href="">Đơn hàng của tôi</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -478,28 +471,26 @@
                         </ul>
                     </div>
                 @else
-                    {{-- NẾU CHƯA ĐĂNG NHẬP --}}
-                    <div class="d-flex w-100">
-                        <a class="btn btn-outline-light flex-fill" href="{{ route('client.login') }}">Đăng nhập</a>
+                    <div class="d-flex align-items-center gap-3">
+                        {{-- ICON GIỎ HÀNG --}}
+                        <div class="position-relative">
+                            <a class="text-white fs-4" data-bs-toggle="offcanvas" href="#cartCanvas" role="button">
+                                <i class="bi bi-cart3"></i>
+                            </a>
+                            @if ($cartCount > 0)
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                    style="font-size: 12px;">
+                                    {{ $cartCount }}
+                                </span>
+                            @endif
+                        </div>
+                        {{-- NÚT ĐĂNG NHẬP --}}
+                        <a class="btn btn-outline-light" href="{{ route('client.login') }}">Đăng nhập</a>
                     </div>
                 @endauth
             </div>
-
         </div>
-
-        <!-- Menu dọc -->
-        <div class="overlay"></div>
-        @if (isset($cate) && $cate->count() > 0)
-            <div class="vertical-menu">
-                @foreach ($cate as $c)
-                    <a href="#">{{ $c->name }}</a>
-                @endforeach
-            </div>
-        @else
-            <div class="vertical-menu">
-                <a href="#">Hiện chưa có danh mục</a>
-            </div>
-        @endif
     </header>
     <main class="container">
         @yield('content')
@@ -547,8 +538,6 @@
                 <a href="{{ route('client.home') }}" class="btn btn-primary w-100 mt-2">Quay về trang chủ</a>
             @endif
         </div>
-
-
     </div>
     <footer id="footer" class="footer-wrapper">
         <div class="footer-widgets footer footer-2 dark">
@@ -666,36 +655,14 @@
             <div class="container clearfix">
                 <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
                 <div style="text-align: center; color:#bdbdbd; font-size: 16px">
-                    © 2025 METEOR SHOP 
+                    © 2025 METEOR SHOP
                 </div>
             </div>
         </div>
     </footer>
 
-    {{-- Script cho menu dọc --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const verticalMenu = document.querySelector('.vertical-menu');
-            const overlay = document.querySelector('.overlay');
-
-            function closeMenu() {
-                verticalMenu.classList.remove('active');
-                overlay.classList.remove('active');
-            }
-
-            menuToggle?.addEventListener('click', function(e) {
-                e.stopPropagation();
-                verticalMenu.classList.toggle('active');
-                overlay.classList.toggle('active');
-            });
-
-            overlay?.addEventListener('click', closeMenu);
-            document.addEventListener('click', function(e) {
-                if (!verticalMenu.contains(e.target) && !menuToggle.contains(e.target)) {
-                    closeMenu();
-                }
-            });
 
             // ----- Xóa sản phẩm khỏi giỏ hàng và reload -----
             document.querySelectorAll('.remove-cart-item').forEach(btn => {
@@ -724,9 +691,9 @@
                         .catch(err => console.error(err));
                 });
             });
+
         });
     </script>
-
 
 
     <!-- Bootstrap JS Bundle to enable dropdown -->

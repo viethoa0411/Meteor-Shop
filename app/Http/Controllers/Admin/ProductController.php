@@ -81,6 +81,8 @@ class ProductController extends Controller
             'variants.*.width' => 'nullable|numeric|min:0',
             'variants.*.height' => 'nullable|numeric|min:0',
             'variants.*.stock' => 'required|integer|min:0',
+            'variants.*.price' => 'nullable|numeric|min:0',
+
         ]);
 
         // 🖼 Upload ảnh đại diện
@@ -112,6 +114,7 @@ class ProductController extends Controller
         }
 
         // 🧩 Lưu biến thể kèm tồn kho riêng
+        // 🧩 Lưu biến thể kèm tồn kho riêng
         if ($request->has('variants')) {
             foreach ($request->variants as $variant) {
                 $product->variants()->create([
@@ -121,10 +124,10 @@ class ProductController extends Controller
                     'width'      => $variant['width'] ?? null,
                     'height'     => $variant['height'] ?? null,
                     'stock'      => $variant['stock'] ?? 0,
+                    'price'      => $variant['price'] ?? $request->price,
                 ]);
             }
         }
-
         return redirect()->route('admin.products.list')
             ->with('success', 'Thêm sản phẩm thành công 🎉');
     }
