@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 // 👉 Thêm dòng này để kích hoạt SoftDeletes
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -48,4 +49,12 @@ class User extends Authenticatable
      * 👇 Thêm cột deleted_at để Laravel biết đang bật soft delete
      */
     protected $dates = ['deleted_at'];
+
+    /**
+     * 获取用户的所有订单
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
 }
