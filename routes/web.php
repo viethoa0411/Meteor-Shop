@@ -7,6 +7,11 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\OrderShipmentController;
+use App\Http\Controllers\Admin\OrderPaymentController;
+use App\Http\Controllers\Admin\OrderRefundController;
+use App\Http\Controllers\Admin\OrderReturnController;
+use App\Http\Controllers\Admin\OrderNoteController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
@@ -80,8 +85,51 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'list'])->name('list');
-        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+        Route::post('/bulk-action', [OrderController::class, 'bulkAction'])->name('bulkAction');
+        Route::get('/export', [OrderController::class, 'export'])->name('export');
+        Route::get('/create', [OrderController::class, 'create'])->name('create');
+        Route::post('/', [OrderController::class, 'store'])->name('store');
+     
+        Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [OrderController::class, 'update'])->name('update');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
+        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+
+        // Shipments
+        Route::prefix('{orderId}/shipments')->name('shipments.')->group(function () {
+            Route::get('/', [OrderShipmentController::class, 'index'])->name('index');
+            Route::get('/create', [OrderShipmentController::class, 'create'])->name('create');
+            Route::post('/', [OrderShipmentController::class, 'store'])->name('store');
+            Route::put('/{shipmentId}/status', [OrderShipmentController::class, 'updateStatus'])->name('updateStatus');
+        });
+
+        // Payments
+        Route::prefix('{orderId}/payments')->name('payments.')->group(function () {
+            Route::get('/', [OrderPaymentController::class, 'index'])->name('index');
+            Route::post('/', [OrderPaymentController::class, 'store'])->name('store');
+        });
+
+        // Refunds
+        Route::prefix('{orderId}/refunds')->name('refunds.')->group(function () {
+            Route::get('/', [OrderRefundController::class, 'index'])->name('index');
+            Route::get('/create', [OrderRefundController::class, 'create'])->name('create');
+            Route::post('/', [OrderRefundController::class, 'store'])->name('store');
+            Route::put('/{refundId}/status', [OrderRefundController::class, 'updateStatus'])->name('updateStatus');
+        });
+
+        // Returns
+        Route::prefix('{orderId}/returns')->name('returns.')->group(function () {
+            Route::get('/', [OrderReturnController::class, 'index'])->name('index');
+            Route::get('/{returnId}', [OrderReturnController::class, 'show'])->name('show');
+            Route::put('/{returnId}/status', [OrderReturnController::class, 'updateStatus'])->name('updateStatus');
+        });
+
+        // Notes
+        Route::prefix('{orderId}/notes')->name('notes.')->group(function () {
+            Route::post('/', [OrderNoteController::class, 'store'])->name('store');
+            Route::put('/{noteId}', [OrderNoteController::class, 'update'])->name('update');
+            Route::delete('/{noteId}', [OrderNoteController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // ====== BLOGS ======
