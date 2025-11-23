@@ -37,12 +37,12 @@
                                     @if ($banner->link)
                                         <a href="{{ $banner->link }}" class="banner-btn">
                                             <span>Khám phá ngay</span>
-                                            <i class="bi bi-arrow-right"></i>
+                                            
                                         </a>
                                     @else
                                         <button class="banner-btn" onclick="alert('{{ $banner->title ?? 'Banner' }}')">
                                             <span>Khám phá ngay</span>
-                                            <i class="bi bi-arrow-right"></i>
+                                    
                                         </button>
                                     @endif
                                 </div>
