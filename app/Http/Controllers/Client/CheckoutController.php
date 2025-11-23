@@ -317,11 +317,20 @@ class CheckoutController extends Controller
                 'total_price' => $checkoutSession['subtotal'],
                 'discount_amount' => 0,
                 'final_total' => $checkoutSession['final_total'],
-                'order_status' => 'pending',
-                'payment_status' => 'pending',
+                'order_status' => $checkoutSession['payment_method'] === 'cash' ? 'pending' : 'awaiting_payment',
+                'payment_status' => $checkoutSession['payment_method'] === 'cash' ? 'pending' : 'awaiting_payment',
                 'notes' => $checkoutSession['notes'] ?? null,
                 'order_date' => now(),
             ]);
+
+            // 添加时间线记录
+            $order->addTimeline(
+                'order_created',
+                'Tạo đơn hàng',
+                "Đơn hàng được tạo bởi khách hàng. Phương thức thanh toán: {$checkoutSession['payment_method']}",
+                null,
+                $order->order_status
+            );
 
             // Xử lý checkout từ cart (nhiều sản phẩm)
             if ($checkoutSession['type'] === 'cart' && isset($checkoutSession['items'])) {
