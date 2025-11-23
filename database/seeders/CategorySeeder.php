@@ -25,7 +25,7 @@ class CategorySeeder extends Seeder
                 ['slug' => Str::slug($name) ],
                 [
                     'name'              => $name,
-                    'description'       => 'Danh mục demo ' . $name,
+                    'description'       => 'Danh mục demo' .$name,
                     'parent_id'         => null,
                     'status'            => 'active',
                 ]

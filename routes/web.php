@@ -15,7 +15,15 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MonthlyTargetController;
+use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
+use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
+use App\Http\Controllers\AssetController;
+
+// ============ ASSET ROUTES ============
+Route::get('/assets/css/{file}', [AssetController::class, 'css'])->name('assets.css');
+Route::get('/assets/js/{file}', [AssetController::class, 'js'])->name('assets.js');
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -94,9 +102,13 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/store', [BannerController::class, 'store'])->name('store');
         Route::get('/trash', [BannerController::class, 'trash'])->name('trash');
         Route::post('/bulk-delete', [BannerController::class, 'bulkDelete'])->name('bulkDelete');
+        Route::post('/bulk-restore', [BannerController::class, 'bulkRestore'])->name('bulkRestore');
+        Route::post('/bulk-force-delete', [BannerController::class, 'bulkForceDelete'])->name('bulkForceDelete');
+        Route::post('/bulk-update-status', [BannerController::class, 'bulkUpdateStatus'])->name('bulkUpdateStatus');
         Route::post('/update-sort-order', [BannerController::class, 'updateSortOrder'])->name('updateSortOrder');
         Route::get('/{id}', [BannerController::class, 'show'])->name('show');
         Route::get('/{id}/edit', [BannerController::class, 'edit'])->name('edit');
+        Route::post('/{id}/duplicate', [BannerController::class, 'duplicate'])->name('duplicate');
         Route::put('/{id}', [BannerController::class, 'update'])->name('update');
         Route::delete('/{id}', [BannerController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/restore', [BannerController::class, 'restore'])->name('restore');
@@ -151,8 +163,27 @@ Route::get('/products/{slug}', [ProductClientController::class, 'showDetail'])->
 Route::get('/products', [HomeController::class, 'index'])->name('client.products.index');
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update-qty', [CartController::class, 'updateQty'])->name('cart.updateQty');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
+Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
+    Route::get('/orders', [ClientAccountOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [ClientAccountOrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/tracking', [ClientAccountOrderController::class, 'tracking'])->name('orders.tracking');
+    Route::post('/orders/{order}/cancel', [ClientAccountOrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/reorder', [ClientAccountOrderController::class, 'reorder'])->name('orders.reorder');
+    Route::post('/orders/{order}/return', [ClientAccountOrderController::class, 'returnRequest'])->name('orders.return');
+});
 
+// ============ CHECKOUT ROUTES ============
+// Không dùng middleware auth ở đây vì CheckoutController đã tự kiểm tra và redirect đến client.login
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('client.checkout.index');
+Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('client.checkout.process');
+Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('client.checkout.confirm');
+Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
+Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

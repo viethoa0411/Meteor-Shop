@@ -53,8 +53,8 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Tài khoản của bạn chưa được kích hoạt'])->withInput();
         }
 
-        // Kiểm tra role - chỉ admin và staff mới được đăng nhập vào trang quản trị
-        if (!in_array($user->role, ['admin', 'staff'])) {
+        // Kiểm tra role - chỉ admin mới được đăng nhập vào trang quản trị
+        if ($user->role !== 'admin') {
             return back()->withErrors(['email' => 'Bạn không có quyền truy cập vào trang quản trị'])->withInput();
         }
 

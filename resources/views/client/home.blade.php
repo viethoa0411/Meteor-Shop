@@ -3,40 +3,102 @@
 @section('title', 'Trang chủ')
 @section('content')
 
-    {{-- Slide Banner --}}
-    <div class="slide-wrapper">
+    {{-- Banner Carousel --}}
+    <section class="banner-carousel-wrapper">
         @if ($banners->count() > 0)
-            @foreach ($banners as $index => $banner)
-                <div class="slide {{ $index === 0 ? 'active' : '' }}">
-                    @if (!empty($banner->image))
-                        <img class="imageSlide" 
-                             src="{{ asset($banner->image) }}" 
-                             alt="{{ $banner->title ?? 'Banner' }}"
-                             onerror="this.src='https://via.placeholder.com/1200x800?text=Banner'">
-                    @else
-                        <img class="imageSlide" src="https://via.placeholder.com/1200x800?text=Banner" alt="Banner">
-                    @endif
-                    @if (!empty($banner->title))
-                        <h2 style="color: #fff">{{ $banner->title }}</h2>
-                    @endif
-                    @if (!empty($banner->link))
-                        <a href="{{ $banner->link }}" style="text-decoration: none;">
-                            <button>Xem ngay</button>
-                        </a>
-                    @else
-                        <button onclick="alert('{{ $banner->title ?? 'Banner' }}')">Xem ngay</button>
-                    @endif
-                </div>
-            @endforeach
+            <div class="banner-carousel" id="bannerCarousel">
+                @foreach ($banners as $index => $banner)
+                    <div class="banner-slide {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}">
+                        <div class="banner-image-wrapper">
+                            @if ($banner->image_url)
+                                <img class="banner-image" 
+                                     src="{{ $banner->image_url }}" 
+                                     alt="{{ $banner->title ?? 'Banner' }}"
+                                     loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/1920x800?text=Banner';">
+                            @else
+                                <img class="banner-image" 
+                                     src="https://via.placeholder.com/1920x800?text=Banner" 
+                                     alt="Banner"
+                                     loading="{{ $index === 0 ? 'eager' : 'lazy' }}">
+                            @endif
+                            <div class="banner-overlay"></div>
+                        </div>
+                        
+                        <div class="banner-content">
+                            <div class="container">
+                                <div class="banner-content-inner">
+                                    @if ($banner->title)
+                                        <h2 class="banner-title">{{ $banner->title }}</h2>
+                                    @endif
+                                    @if ($banner->description)
+                                        <p class="banner-description">{{ $banner->description }}</p>
+                                    @endif
+                                    @if ($banner->link)
+                                        <a href="{{ $banner->link }}" class="banner-btn">
+                                            <span>Khám phá ngay</span>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    @else
+                                        <button class="banner-btn" onclick="alert('{{ $banner->title ?? 'Banner' }}')">
+                                            <span>Khám phá ngay</span>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- Navigation Controls --}}
+            <button class="banner-nav-btn banner-prev" aria-label="Previous banner">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="banner-nav-btn banner-next" aria-label="Next banner">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+
+            {{-- Indicators --}}
+            <div class="banner-indicators">
+                @foreach ($banners as $index => $banner)
+                    <button class="banner-indicator {{ $index === 0 ? 'active' : '' }}" 
+                            data-slide-to="{{ $index }}" 
+                            aria-label="Go to slide {{ $index + 1 }}"></button>
+                @endforeach
+            </div>
+
+            {{-- Progress Bar --}}
+            <div class="banner-progress">
+                <div class="banner-progress-bar"></div>
+            </div>
         @else
             {{-- Fallback nếu không có banner --}}
-            <div class="slide active">
-                <img class="imageSlide" src="https://picsum.photos/1200/800?random=1">
-                <h2 style="color: #fff">Chào mừng đến với Meteor Shop</h2>
-                <button onclick="alert('Khám phá ngay')">Xem ngay</button>
+            <div class="banner-carousel">
+                <div class="banner-slide active">
+                    <div class="banner-image-wrapper">
+                        <img class="banner-image" 
+                             src="https://picsum.photos/1920/800?random=1" 
+                             alt="Welcome Banner">
+                        <div class="banner-overlay"></div>
+                    </div>
+                    <div class="banner-content">
+                        <div class="container">
+                            <div class="banner-content-inner">
+                                <h2 class="banner-title">Chào mừng đến với Meteor Shop</h2>
+                                <p class="banner-description">Khám phá bộ sưu tập nội thất hiện đại và sang trọng</p>
+                                <button class="banner-btn" onclick="alert('Khám phá ngay')">
+                                    <span>Khám phá ngay</span>
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         @endif
-    </div>
+    </section>
 
     {{-- Sản phẩm mới --}}
     <div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
@@ -208,34 +270,59 @@
 
 
     {{-- goc chia sẻ --}}
-    <div style="text-align: center; padding: 40px 0; background: #f9f9f9; overflow:hidden;">
-        <h2 style="font-size: 28px; font-weight:700; margin-bottom:30px">Góc Cảm Hứng</h2>
+    <div class="container" style="max-width:1200px; margin:0 auto; padding:40px 15px;">
 
-        <div style="display:flex;justify-content:center;gap:2vw;flex-wrap:nowrap;">
-            <div class="article-card"
-                style="width:48vw;background:#fff;border-radius:10px;overflow:hidden;text-align:left;box-shadow:0 4px 12px  rgba(0,0,0,0.1);flex-shrink:0;transition: all 0.4s ease;">
-                <img src="https://picsum.photos/800/600?random=12" alt="Bài viết 1"
-                    style="width: 100%; height:60vh; object-fit: cover; display: block">
-                <h3 style="font-size: 20px; font-weight: 600; margin: 16px; ">Thiết kế hiện đại cho không gian nhỏ</h3>
-                <p style="font-size: 14px; color:#555; line-height: 1.6; margin: 0 16px 20px;">
-                    Những ý tưởng thông minh giúp tận dụng tối đa diện tích, mang lại sự tiện nghi và phong cách hiện đại.
-                    Từ màu sắc, ánh sáng đến cách bố trí nội thất, tất cả đều tạo nên cảm giác thoải mái và ấm cúng cho căn
-                    hộ của bạn.
-                </p>
-            </div>
-            <div class="article-card"
-                style="width: 48vw; background: #fff; border-radius:10px; overflow:hidden; text-align: left; box-shadow: 0 4px 12px  rgba(0,0,0,0.1); flex-shrink:0;  transition: all 0.4s ease;">
-                <img src="https://picsum.photos/800/600?random=32" alt="Bài viết 1"
-                    style="width: 100%; height:60vh; object-fit: cover; display: block">
-                <h3 style="font-size: 20px; font-weight: 600; margin: 16px; ">Thiết kế hiện đại cho không gian nhỏ</h3>
-                <p style="font-size: 14px; color:#555; line-height: 1.6; margin: 0 16px 20px;">
-                    Cây xanh và ánh sáng tự nhiên đang trở thành xu hướng trong thiết kế nội thất hiện đại.
-                    Cùng khám phá cách đưa thiên nhiên vào ngôi nhà của bạn để tạo nên không gian thư giãn và tươi mới mỗi
-                    ngày.
-                </p>
-            </div>
+        <div style="text-align:center; margin-bottom:30px;">
+            <h2 style="font-size: 28px; font-weight:700; margin:0;">Góc Cảm Hứng</h2>
         </div>
+
+        <div class="row g-4 justify-content-center">
+            @foreach ($latestBlogs as $blog)
+                <div class="col-12 col-md-6">
+                    <div class="article-card"
+                        style="
+                    height:100%;
+                    background:#fff;
+                    border-radius:10px;
+                    overflow:hidden;
+                    text-align:left;
+                    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                    transition: all 0.4s ease;
+                    box-sizing:border-box;
+                ">
+                        <img src="{{ $blog->thumbnail ? asset('blogs/images/' . $blog->thumbnail) : 'https://picsum.photos/800/600?random=' . rand(10, 99) }}"
+                            alt="{{ $blog->title }}" style="width:100%; height:300px; object-fit:cover; display:block;">
+
+                        <h3 style="font-size:20px; font-weight:600; margin:16px;">
+                            <a href="{{ route('client.blog.show', $blog->slug) }}"
+                                style="text-decoration:none; color:#222; display:inline-block;">
+                                {{ $blog->title }}
+                            </a>
+                        </h3>
+
+                        <p style="font-size:14px; color:#555; line-height:1.6; margin:0 16px 20px;">
+                            {{ $blog->excerpt }}
+                        </p>
+
+                        <a href="{{ route('client.blog.show', $blog->slug) }}"
+                            style="
+                            display:inline-block;
+                            margin: 0 16px 20px;
+                            font-size:18px;
+                            font-weight:600;
+                            color:#007bff;
+                            text-decoration:none;
+                            transition:0.3s;
+                        ">
+                            Đọc thêm →
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
     </div>
+
     {{--  --}}
 
 
@@ -270,19 +357,13 @@
 
     {{--  --}}
 
-    <script>
-        @if ($banners->count() > 0)
-        let i = 0,
-            s = document.querySelectorAll('.slide');
-        if (s.length > 0) {
-            setInterval(() => {
-                s[i].classList.remove('active');
-                i = (i + 1) % s.length;
-                s[i].classList.add('active');
-            }, 3000); // 3000ms = 3 giây
-        }
-        @endif
-    </script>
+    @push('styles')
+    <link rel="stylesheet" href="{{ route('assets.css', ['file' => 'banner-carousel']) }}">
+    @endpush
+
+    @push('scripts')
+    <script src="{{ route('assets.js', ['file' => 'banner-carousel']) }}"></script>
+    @endpush
 
 
 @endsection

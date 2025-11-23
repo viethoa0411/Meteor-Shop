@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->text('description')->nullable()->after('title');
             $table->string('display_location')->default('home')->after('link'); // home, sidebar, popup, product_detail, etc.
             $table->dateTime('start_date')->nullable()->after('display_location');
             $table->dateTime('end_date')->nullable()->after('start_date');
@@ -27,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->dropColumn(['description', 'display_location', 'start_date', 'end_date', 'sort_order', 'deleted_at']);
+            $table->dropColumn(['display_location', 'start_date', 'end_date', 'sort_order', 'deleted_at']);
         });
     }
 };

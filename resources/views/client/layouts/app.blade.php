@@ -1,3 +1,12 @@
+@php
+    $cart = session()->get('cart', []);
+    $cartCount = 0;
+
+    foreach ($cart as $item) {
+        $cartCount += $item['quantity'];
+    }
+@endphp
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -9,6 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
+    @stack('styles')
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -79,7 +89,6 @@
         }
 
         .dropdown-menu {
-            display: none !important;
             position: absolute;
             top: 100%;
             left: 0;
@@ -288,57 +297,6 @@
             gap: 20px;
         }
 
-        .slide-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 100%;
-            height: 600px;
-            overflow: hidden;
-            margin-bottom: 24px;
-        }
-
-        .slide {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity .7s
-        }
-
-        .slide.active {
-            opacity: 1;
-        }
-
-        .imageSlide {
-            width: 100vw;
-            height: 90vh;
-            object-fit: cover;
-            position: absolute;
-            z-index: -1;
-            filter: brightness(0.6)
-        }
-
-        h2 {
-            color: #000;
-            font-size: 2em;
-            margin-bottom: 20px;
-            z-index: 1
-        }
-
-        /* Đã bỏ comment cho button, sử dụng style từ file 2 */
-        button {
-            z-index: 1;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            background: #09f;
-            color: #fff;
-            cursor: pointer;
-            font-style: 1em;
-        }
 
         .article-card:hover {
             transform: translateY(-10px);
@@ -429,24 +387,29 @@
                 </button>
             </form>
 
-
-            <!-- Icon menu dọc -->
-            <div class="menu-toggle">☰</div>
-
             <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
                 @auth
-
+                    <div class="position-relative">
+                        <a class="text-white fs-4" data-bs-toggle="offcanvas" href="#cartCanvas" role="button">
+                            <i class="bi bi-cart3"></i>
+                        </a>
+                        @if ($cartCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 12px;">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </div>
                     {{-- DROPDOWN USER --}}
                     <div class="dropdown">
-                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                             {{ Auth::user()->name }}
                         </a>
+
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    Thông tin tài khoản
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" href="{{ route('client.account.orders.index') }}">Đơn hàng của
+                                    tôi</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -459,33 +422,73 @@
                         </ul>
                     </div>
                 @else
-                    {{-- NẾU CHƯA ĐĂNG NHẬP --}}
-                    <div class="d-flex w-100">
-                        <a class="btn btn-outline-light flex-fill" href="{{ route('client.login') }}">Đăng nhập</a>
+                    <div class="d-flex align-items-center gap-3">
+                        {{-- ICON GIỎ HÀNG --}}
+                        <div class="position-relative">
+                            <a class="text-white fs-4" data-bs-toggle="offcanvas" href="#cartCanvas" role="button">
+                                <i class="bi bi-cart3"></i>
+                            </a>
+                            @if ($cartCount > 0)
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                    style="font-size: 12px;">
+                                    {{ $cartCount }}
+                                </span>
+                            @endif
+                        </div>
+                        {{-- NÚT ĐĂNG NHẬP --}}
+                        <a class="btn btn-outline-light" href="{{ route('client.login') }}">Đăng nhập</a>
                     </div>
                 @endauth
             </div>
-
         </div>
-
-        <!-- Menu dọc -->
-        <div class="overlay"></div>
-        @if (isset($cate) && $cate->count() > 0)
-            <div class="vertical-menu">
-                @foreach ($cate as $c)
-                    <a href="#">{{ $c->name }}</a>
-                @endforeach
-            </div>
-        @else
-            <div class="vertical-menu">
-                <a href="#">Hiện chưa có danh mục</a>
-            </div>
-        @endif
     </header>
     <main class="container">
         @yield('content')
     </main>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartCanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Giỏ hàng</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        {{-- giỏ hàng --}}
+        <div class="offcanvas-body d-flex flex-column" style="height: 100%;">
+            @php
+                $cart = session('cart', []);
+            @endphp
 
+            @if ($cart && count($cart))
+                <ul class="list-group mb-3">
+                    @foreach ($cart as $id => $item)
+                        <li class="list-group-item d-flex justify-content-between align-items-center position-relative"
+                            id="cart-item-{{ $id }}">
+                            <div>
+                                <strong>{{ $item['name'] }}</strong> <br>
+                                Số lượng: {{ $item['quantity'] }}
+                            </div>
+                            <span>{{ number_format($item['price'] * $item['quantity']) }}₫</span>
+                            <button class="btn-close position-absolute top-0 end-0 m-2 remove-cart-item"
+                                data-id="{{ $id }}"></button>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="d-flex justify-content-between fw-bold mb-3">
+                    <span>Tổng:</span>
+                    <span
+                        id="cart-total">{{ number_format(array_sum(array_map(fn($i) => $i['price'] * $i['quantity'], $cart))) }}₫</span>
+                </div>
+
+                <!-- Nút luôn ở cuối -->
+                <div class="mt-auto d-flex flex-column gap-2">
+                    <a href="{{ route('cart.index') }}" class="btn btn-dark w-100">Xem giỏ hàng</a>
+                </div>
+            @else
+                <p>Giỏ hàng trống.</p>
+                <a href="{{ route('client.home') }}" class="btn btn-primary w-100 mt-2">Quay về trang chủ</a>
+            @endif
+        </div>
+    </div>
     <footer id="footer" class="footer-wrapper">
         <div class="footer-widgets footer footer-2 dark">
             <div class="row dark large-columns-4 mb-0">
@@ -602,38 +605,49 @@
             <div class="container clearfix">
                 <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
                 <div style="text-align: center; color:#bdbdbd; font-size: 16px">
-                    © 2025 METEOR SHOP. Tất cả các quyền được bảo lưu.
+                    © 2025 METEOR SHOP
                 </div>
             </div>
         </div>
     </footer>
 
-    {{-- Script cho menu dọc --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const verticalMenu = document.querySelector('.vertical-menu');
-            const overlay = document.querySelector('.overlay');
 
-            function closeMenu() {
-                verticalMenu.classList.remove('active');
-                overlay.classList.remove('active');
-            }
+            // ----- Xóa sản phẩm khỏi giỏ hàng và reload -----
+            document.querySelectorAll('.remove-cart-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
 
-            menuToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                verticalMenu.classList.toggle('active');
-                overlay.classList.toggle('active');
+                    fetch("{{ route('cart.remove') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                id
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                // Reload lại toàn bộ trang
+                                window.location.reload();
+                            } else {
+                                alert(data.message || 'Có lỗi xảy ra!');
+                            }
+                        })
+                        .catch(err => console.error(err));
+                });
             });
 
-            overlay.addEventListener('click', closeMenu);
-            document.addEventListener('click', function(e) {
-                if (!verticalMenu.contains(e.target) && !menuToggle.contains(e.target)) {
-                    closeMenu();
-                }
-            });
         });
     </script>
+
+
+    @stack('scripts')
+
     <!-- Bootstrap JS Bundle to enable dropdown -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

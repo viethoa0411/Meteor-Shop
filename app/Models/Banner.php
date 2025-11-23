@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Banner extends Model
 {
@@ -62,6 +63,31 @@ class Banner extends Model
         }
 
         return true;
+    }
+
+    /**
+     * Lấy URL đầy đủ của ảnh
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (empty($this->image)) {
+            return null;
+        }
+
+        // Kiểm tra file có tồn tại không
+        if (Storage::disk('public')->exists($this->image)) {
+            return asset('storage/' . $this->image);
+        }
+
+        return null;
+    }
+
+    /**
+     * Kiểm tra ảnh có tồn tại không
+     */
+    public function hasImage(): bool
+    {
+        return !empty($this->image) && Storage::disk('public')->exists($this->image);
     }
 }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
 {
@@ -29,7 +30,7 @@ class BannerController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Lọc theo thời gian
+        // Lọc theo thời gian - tìm banner đang hoạt động trong khoảng thời gian
         if ($request->filled('date_from')) {
             $query->where(function ($q) use ($request) {
                 $q->whereNull('start_date')
@@ -73,8 +74,8 @@ class BannerController extends Controller
             'link' => 'nullable|url|max:500',
             'sort_order' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'start_date' => 'nullable|date_format:Y-m-d\TH:i',
+            'end_date' => 'nullable|date_format:Y-m-d\TH:i|after_or_equal:start_date',
         ], [
             'title.required' => 'Vui lòng nhập tiêu đề banner',
             'image.required' => 'Vui lòng chọn hình ảnh banner',
@@ -85,18 +86,22 @@ class BannerController extends Controller
             'end_date.after_or_equal' => 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu',
         ]);
 
-        // Upload ảnh vào public/banners/images
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            try {
-                $image = $request->file('image');
-                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('banners/images'), $imageName);
-                $imagePath = 'banners/images/' . $imageName;
-            } catch (\Exception $e) {
-                return back()->withInput()
-                    ->withErrors(['image' => 'Lỗi khi upload ảnh: ' . $e->getMessage()]);
+        // Upload ảnh
+        try {
+            // Đảm bảo thư mục tồn tại
+            if (!Storage::disk('public')->exists('banners')) {
+                Storage::disk('public')->makeDirectory('banners');
             }
+            
+            $imagePath = $request->file('image')->store('banners', 'public');
+            
+            // Kiểm tra file đã được upload thành công
+            if (!$imagePath || !Storage::disk('public')->exists($imagePath)) {
+                throw new \Exception('File không được upload thành công');
+            }
+        } catch (\Exception $e) {
+            return back()->withInput()
+                ->withErrors(['image' => 'Lỗi khi upload ảnh: ' . $e->getMessage()]);
         }
 
         // Lấy sort_order cao nhất + 1 nếu không nhập
@@ -104,13 +109,13 @@ class BannerController extends Controller
 
         Banner::create([
             'title' => $request->title,
-            'description' => $request->description,
+            'description' => $request->description ?? null,
             'image' => $imagePath,
-            'link' => $request->link,
+            'link' => $request->link ?? null,
             'sort_order' => $sortOrder,
             'status' => $request->status,
-            'start_date' => $request->start_date ? date('Y-m-d H:i:s', strtotime($request->start_date)) : null,
-            'end_date' => $request->end_date ? date('Y-m-d H:i:s', strtotime($request->end_date)) : null,
+            'start_date' => $request->start_date ? date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $request->start_date))) : null,
+            'end_date' => $request->end_date ? date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $request->end_date))) : null,
         ]);
 
         return redirect()->route('admin.banners.list')
@@ -149,8 +154,8 @@ class BannerController extends Controller
             'link' => 'nullable|url|max:500',
             'sort_order' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'start_date' => 'nullable|date_format:Y-m-d\TH:i',
+            'end_date' => 'nullable|date_format:Y-m-d\TH:i|after_or_equal:start_date',
         ], [
             'title.required' => 'Vui lòng nhập tiêu đề banner',
             'image.image' => 'File phải là hình ảnh',
@@ -166,20 +171,27 @@ class BannerController extends Controller
             // Xóa ảnh cũ nếu có
             if (!empty($banner->image)) {
                 try {
-                    $oldImagePath = public_path($banner->image);
-                    if (file_exists($oldImagePath)) {
-                        unlink($oldImagePath);
+                    $oldImagePath = $banner->image;
+                    if (Storage::disk('public')->exists($oldImagePath)) {
+                        Storage::disk('public')->delete($oldImagePath);
                     }
                 } catch (\Exception $e) {
                     // Bỏ qua lỗi nếu không xóa được ảnh cũ
                 }
             }
-            // Upload ảnh mới vào public/banners/images
+            // Upload ảnh mới
             try {
-                $image = $request->file('image');
-                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('banners/images'), $imageName);
-                $imagePath = 'banners/images/' . $imageName;
+                // Đảm bảo thư mục tồn tại
+                if (!Storage::disk('public')->exists('banners')) {
+                    Storage::disk('public')->makeDirectory('banners');
+                }
+                
+                $imagePath = $request->file('image')->store('banners', 'public');
+                
+                // Kiểm tra file đã được upload thành công
+                if (!$imagePath || !Storage::disk('public')->exists($imagePath)) {
+                    throw new \Exception('File không được upload thành công');
+                }
             } catch (\Exception $e) {
                 return back()->withInput()
                     ->withErrors(['image' => 'Lỗi khi upload ảnh: ' . $e->getMessage()]);
@@ -188,13 +200,13 @@ class BannerController extends Controller
 
         $banner->update([
             'title' => $request->title,
-            'description' => $request->description,
+            'description' => $request->description ?? null,
             'image' => $imagePath,
-            'link' => $request->link,
+            'link' => $request->link ?? null,
             'sort_order' => $request->sort_order ?? $banner->sort_order,
             'status' => $request->status,
-            'start_date' => $request->start_date ? date('Y-m-d H:i:s', strtotime($request->start_date)) : null,
-            'end_date' => $request->end_date ? date('Y-m-d H:i:s', strtotime($request->end_date)) : null,
+            'start_date' => $request->start_date ? date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $request->start_date))) : null,
+            'end_date' => $request->end_date ? date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $request->end_date))) : null,
         ]);
 
         return redirect()->route('admin.banners.list')
@@ -242,6 +254,10 @@ class BannerController extends Controller
      */
     public function updateStatus(Request $request, $id)
     {
+        $request->validate([
+            'status' => 'required|in:active,inactive',
+        ]);
+
         $banner = Banner::findOrFail($id);
         $banner->update(['status' => $request->status]);
 
@@ -259,7 +275,7 @@ class BannerController extends Controller
         $request->validate([
             'banners' => 'required|array',
             'banners.*.id' => 'required|exists:banners,id',
-            'banners.*.sort_order' => 'required|integer',
+            'banners.*.sort_order' => 'required|integer|min:0',
         ]);
 
         foreach ($request->banners as $item) {
@@ -314,9 +330,8 @@ class BannerController extends Controller
         // Xóa ảnh nếu có
         if (!empty($banner->image)) {
             try {
-                $imagePath = public_path($banner->image);
-                if (file_exists($imagePath)) {
-                    unlink($imagePath);
+                if (Storage::disk('public')->exists($banner->image)) {
+                    Storage::disk('public')->delete($banner->image);
                 }
             } catch (\Exception $e) {
                 // Bỏ qua lỗi nếu không xóa được ảnh
@@ -327,5 +342,106 @@ class BannerController extends Controller
 
         return redirect()->route('admin.banners.trash')
             ->with('success', 'Xóa vĩnh viễn banner thành công!');
+    }
+
+    /**
+     * Khôi phục hàng loạt
+     */
+    public function bulkRestore(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:banners,id',
+        ]);
+
+        $banners = Banner::onlyTrashed()->whereIn('id', $request->ids)->get();
+        
+        foreach ($banners as $banner) {
+            $banner->restore();
+        }
+
+        return redirect()->route('admin.banners.trash')
+            ->with('success', 'Đã khôi phục ' . count($request->ids) . ' banner thành công!');
+    }
+
+    /**
+     * Xóa vĩnh viễn hàng loạt
+     */
+    public function bulkForceDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:banners,id',
+        ]);
+
+        $banners = Banner::onlyTrashed()->whereIn('id', $request->ids)->get();
+        
+        foreach ($banners as $banner) {
+            // Xóa ảnh nếu có
+            if (!empty($banner->image)) {
+                try {
+                    if (Storage::disk('public')->exists($banner->image)) {
+                        Storage::disk('public')->delete($banner->image);
+                    }
+                } catch (\Exception $e) {
+                    // Bỏ qua lỗi nếu không xóa được ảnh
+                }
+            }
+            $banner->forceDelete();
+        }
+
+        return redirect()->route('admin.banners.trash')
+            ->with('success', 'Đã xóa vĩnh viễn ' . count($request->ids) . ' banner thành công!');
+    }
+
+    /**
+     * Cập nhật trạng thái hàng loạt
+     */
+    public function bulkUpdateStatus(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:banners,id',
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        Banner::whereIn('id', $request->ids)->update(['status' => $request->status]);
+
+        return redirect()->route('admin.banners.list')
+            ->with('success', 'Đã cập nhật trạng thái ' . count($request->ids) . ' banner thành công!');
+    }
+
+    /**
+     * Duplicate banner
+     */
+    public function duplicate($id)
+    {
+        $banner = Banner::findOrFail($id);
+        
+        // Tạo banner mới từ banner hiện tại
+        $newBanner = $banner->replicate();
+        $newBanner->title = $banner->title . ' (Copy)';
+        $newBanner->sort_order = (Banner::max('sort_order') ?? 0) + 1;
+        $newBanner->status = 'inactive'; // Mặc định inactive khi duplicate
+        $newBanner->save();
+
+        // Copy ảnh nếu có
+        if (!empty($banner->image)) {
+            try {
+                $oldPath = $banner->image;
+                $extension = pathinfo($oldPath, PATHINFO_EXTENSION);
+                $newPath = 'banners/' . uniqid() . '_' . time() . '.' . $extension;
+                
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->copy($oldPath, $newPath);
+                    $newBanner->update(['image' => $newPath]);
+                }
+            } catch (\Exception $e) {
+                // Bỏ qua lỗi nếu không copy được ảnh
+            }
+        }
+
+        return redirect()->route('admin.banners.edit', $newBanner->id)
+            ->with('success', 'Đã tạo bản sao banner thành công!');
     }
 }
