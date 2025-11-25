@@ -4,12 +4,28 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderStatusHistory;
+use App\Models\OrderLog;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 
 class OrderController extends Controller
 {
+    private const ADMIN_EDITABLE_STATUSES = ['processing', 'shipping', 'returned'];
+
+    private const STATUS_TRANSITIONS = [
+        'pending' => ['processing'],
+        'processing' => ['shipping', 'returned'],
+        'shipping' => ['returned'],
+        'return_requested' => ['returned'],
+        'returned' => [],
+        'completed' => [],
+        'cancelled' => [],
+    ];
+
     public function list(Request $request)
     {
         $status = $request->get('status', 'all');
@@ -66,7 +82,23 @@ class OrderController extends Controller
             ->where('order_details.order_id', $id)
             ->get();
 
-        return view('admin.orders.detail', compact('order', 'orderDetails'));
+        // Lấy lịch sử cập nhật trạng thái
+        $statusHistory = collect();
+        $orderLogs = collect();
+        if (Schema::hasTable('order_status_history')) {
+            $statusHistory = OrderStatusHistory::where('order_id', $id)
+                ->with('admin:id,name,email')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        if (Schema::hasTable('order_logs')) {
+            $orderLogs = OrderLog::where('order_id', $id)
+                ->with('admin:id,name,email,role')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        return view('admin.orders.detail', compact('order', 'orderDetails', 'statusHistory', 'orderLogs'));
     }
 
     public function updateStatus(Request $request, $id)
@@ -79,25 +111,20 @@ class OrderController extends Controller
         $newStatus = $request->order_status;
         $currentStatus = $order->order_status;
 
-        // Quy tắc chuyển trạng thái hợp lệ
-        $validTransitions = [
-            'pending' => ['processing', 'cancelled'],
-            'processing' => ['shipping', 'completed', 'cancelled'],
-            'shipping' => ['completed', 'return_requested', 'cancelled'],
-            'return_requested' => ['returned'],
-            'completed' => [],
-            'returned' => [],
-            'cancelled' => []
-        ];
+        if (!in_array($newStatus, self::ADMIN_EDITABLE_STATUSES, true)) {
+            return back()->with('error', 'Trạng thái này do khách hàng thao tác, không thể sửa từ Admin.');
+        }
 
-        if (!isset($validTransitions[$currentStatus]) || !in_array($newStatus, $validTransitions[$currentStatus])) {
+        $validTransitions = self::STATUS_TRANSITIONS[$currentStatus] ?? [];
+
+        if (!in_array($newStatus, $validTransitions, true)) {
             return back()->with('error', 'Trạng thái không hợp lệ!');
         }
+
         $statusTimestamps = [
             'processing' => 'confirmed_at',
             'shipping' => 'shipped_at',
-            'completed' => 'delivered_at',
-            'cancelled' => 'cancelled_at',
+            'returned' => 'returned_at',
         ];
 
         $updatePayload = [
@@ -113,6 +140,57 @@ class OrderController extends Controller
             ->where('id', $id)
             ->update($updatePayload);
 
+        // Lưu lịch sử cập nhật trạng thái
+        if (Schema::hasTable('order_status_history')) {
+            OrderStatusHistory::create([
+                'order_id' => $id,
+                'admin_id' => Auth::id(),
+                'old_status' => $currentStatus,
+                'new_status' => $newStatus,
+                'note' => $request->note ?? null,
+            ]);
+        }
+
+        if (Schema::hasTable('order_logs')) {
+            $authUser = Auth::user();
+            OrderLog::create([
+                'order_id' => $id,
+                'status' => $newStatus,
+                'updated_by' => $authUser?->id,
+                'role' => ($authUser?->role === 'staff') ? 'staff' : 'admin',
+                'created_at' => now(),
+            ]);
+        }
+
         return back()->with('success', 'Cập nhật trạng thái thành công!');
+    }
+
+    // Thêm method này để lấy danh sách trạng thái cho dropdown (không hiển thị pending)
+    public function getAvailableStatuses($id)
+    {
+        $order = DB::table('orders')->where('id', $id)->first();
+
+        if (!$order) {
+            return response()->json(['error' => 'Đơn hàng không tồn tại'], 404);
+        }
+
+        $statusLabels = [
+            'processing' => 'Đang xử lý',
+            'shipping' => 'Đang giao hàng',
+            'returned' => 'Đã trả hàng',
+        ];
+
+        $availableStatuses = self::STATUS_TRANSITIONS[$order->order_status] ?? [];
+        $allowedStatuses = array_values(array_filter(
+            $availableStatuses,
+            fn ($status) => in_array($status, self::ADMIN_EDITABLE_STATUSES, true)
+        ));
+
+        return response()->json(array_map(function ($status) use ($statusLabels) {
+            return [
+                'value' => $status,
+                'label' => $statusLabels[$status] ?? ucfirst($status),
+            ];
+        }, $allowedStatuses));
     }
 }

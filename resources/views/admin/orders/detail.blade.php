@@ -31,15 +31,23 @@
 
                     {{-- TRẠNG THÁI HIỆN TẠI --}}
                     @php
-                        // Logic dịch và màu trạng thái (Giữ nguyên)
+                        // Logic dịch và màu trạng thái
                         $colors = [
-                            'pending' => 'dark', 'processing' => 'primary', 'shipping' => 'info',
-                            'completed' => 'success', 'cancelled' => 'danger', 'return_requested' => 'warning',
+                            'pending' => 'dark',
+                            'processing' => 'primary',
+                            'shipping' => 'info',
+                            'completed' => 'success',
+                            'cancelled' => 'danger',
+                            'return_requested' => 'warning',
                             'returned' => 'secondary',
                         ];
                         $labels = [
-                            'pending' => 'Chờ xác nhận', 'processing' => 'Đang xử lý', 'shipping' => 'Đang giao hàng',
-                            'completed' => 'Hoàn thành', 'cancelled' => 'Đã hủy', 'return_requested' => 'Yêu cầu trả hàng',
+                            'pending' => 'Chờ xác nhận',
+                            'processing' => 'Đang xử lý',
+                            'shipping' => 'Đang giao hàng',
+                            'completed' => 'Hoàn thành',
+                            'cancelled' => 'Đã hủy',
+                            'return_requested' => 'Yêu cầu hoàn hàng',
                             'returned' => 'Đã trả hàng',
                         ];
                         $currentStatusColor = $colors[$order->order_status] ?? 'light';
@@ -51,34 +59,68 @@
                         <span class="badge bg-{{ $currentStatusColor }} py-2 px-3">{{ $currentStatusLabel }}</span>
                     </p>
 
-                    @if ($order->order_status == 'cancelled' && $order->cancel_reason)
-                        <div class="alert alert-danger small py-1 mt-2">
-                            **Lý do hủy:** {{ $order->cancel_reason }}
+                    {{-- FORM UPDATE TRẠNG THÁI --}}
+                    @php
+                        // Admin chỉ được cập nhật các trạng thái xử lý - không gồm hủy/hoàn thành
+                        $adminAllowedStatuses = ['processing', 'shipping', 'returned'];
+
+                        // Quy tắc chuyển trạng thái đồng bộ với backend
+                        $validTransitions = [
+                            'pending' => ['processing'],
+                            'processing' => ['shipping', 'returned'],
+                            'shipping' => ['returned'],
+                            'return_requested' => ['returned'],
+                            'returned' => [],
+                            'completed' => [],
+                            'cancelled' => [],
+                        ];
+
+                        $statusLabels = [
+                            'processing' => 'Đang xử lý',
+                            'shipping' => 'Đang giao hàng',
+                            'returned' => 'Đã trả hàng',
+                        ];
+
+                        // Lấy các trạng thái tiếp theo có thể chuyển
+                        $nextStatuses = isset($validTransitions[$order->order_status])
+                            ? $validTransitions[$order->order_status]
+                            : [];
+
+                        // Lọc chỉ lấy các trạng thái admin được phép cập nhật
+                        $allowedNextStatuses = array_filter($nextStatuses, function($status) use ($adminAllowedStatuses) {
+                            return in_array($status, $adminAllowedStatuses);
+                        });
+                    @endphp
+
+                    @if (!empty($allowedNextStatuses))
+                        <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
+                            @csrf
+                            @method('PUT')
+                            <label for="order_status" class="form-label small">Thay đổi trạng thái:</label>
+                            <div class="input-group">
+                                <select name="order_status" id="order_status" class="form-select">
+                                    @foreach ($allowedNextStatuses as $status)
+                                        <option value="{{ $status }}">
+                                            {{ $statusLabels[$status] ?? ucfirst($status) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-arrow-clockwise"></i> Lưu
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        {{-- Thông báo khi không có trạng thái tiếp theo --}}
+                        <div class="alert alert-info py-2 mt-3 small">
+                            <i class="bi bi-info-circle"></i> Đơn hàng ở trạng thái <strong>{{ $currentStatusLabel }}</strong>.
+                            Không thể cập nhật tiếp từ Admin.
                         </div>
                     @endif
 
-                    {{-- FORM UPDATE TRẠNG THÁI --}}
-                    <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
-                        @csrf
-                        @method('PUT')
-                        <label for="order_status" class="form-label small">Thay đổi trạng thái:</label>
-                        <div class="input-group">
-                            <select name="order_status" id="order_status" class="form-select">
-                                @foreach ($labels as $key => $label)
-                                    <option value="{{ $key }}" {{ $order->order_status == $key ? 'selected' : '' }}>
-                                        {{ $label }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-arrow-clockwise"></i> Lưu
-                            </button>
-                        </div>
-                    </form>
-
                     <hr>
 
-                    {{-- LỊCH SỬ THỜI GIAN (GỌN HƠN) --}}
+                    {{-- LỊCH SỬ THỜI GIAN --}}
                     <h6><i class="bi bi-calendar-check"></i> Mốc thời gian quan trọng</h6>
                     <ul class="list-group list-group-flush small">
                         @if ($order->created_at)
@@ -101,16 +143,16 @@
                                 Giao thành công: <span class="text-primary">{{ date('d/m/Y H:i', strtotime($order->delivered_at)) }}</span>
                             </li>
                         @endif
-                        @if ($order->cancelled_at)
-                            <li class="list-group-item d-flex justify-content-between text-danger">
-                                Đã hủy: <span>{{ date('d/m/Y H:i', strtotime($order->cancelled_at)) }}</span>
+                        @if (isset($order->returned_at) && $order->returned_at)
+                            <li class="list-group-item d-flex justify-content-between text-secondary">
+                                Đã trả hàng: <span>{{ date('d/m/Y H:i', strtotime($order->returned_at)) }}</span>
                             </li>
                         @endif
                     </ul>
                 </div>
             </div>
 
-            {{-- GHI CHÚ ĐƠN HÀNG (Nếu có, chuyển lên cao để dễ thấy hơn) --}}
+            {{-- GHI CHÚ ĐƠN HÀNG --}}
             @if ($order->notes)
                 <div class="card shadow-sm mb-4 border-secondary">
                     <div class="card-header bg-secondary text-white py-2">
@@ -121,11 +163,136 @@
                     </div>
                 </div>
             @endif
+
+            {{-- LỊCH SỬ CẬP NHẬT TRẠNG THÁI --}}
+            <div class="card shadow-sm mb-4 border-info">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-clock-history"></i> Lịch sử cập nhật trạng thái</h6>
+                </div>
+                <div class="card-body">
+                    @php
+                        $statusLabels = [
+                            'pending' => 'Chờ xác nhận',
+                            'processing' => 'Đang xử lý',
+                            'shipping' => 'Đang giao hàng',
+                            'completed' => 'Hoàn thành',
+                            'return_requested' => 'Yêu cầu hoàn hàng',
+                            'returned' => 'Đã trả hàng',
+                            'cancelled' => 'Đã hủy',
+                        ];
+                        $statusColors = [
+                            'pending' => 'dark',
+                            'processing' => 'primary',
+                            'shipping' => 'info',
+                            'completed' => 'success',
+                            'return_requested' => 'warning',
+                            'returned' => 'secondary',
+                            'cancelled' => 'danger',
+                        ];
+                    @endphp
+
+                    @if (isset($orderLogs) && $orderLogs->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Thời gian</th>
+                                        <th>Trạng thái mới</th>
+                                        <th>Người cập nhật</th>
+                                        <th>Vai trò</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($orderLogs as $log)
+                                        <tr>
+                                            <td class="small">{{ date('d/m/Y H:i', strtotime($log->created_at)) }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ $statusColors[$log->status] ?? 'light' }}">
+                                                    {{ $statusLabels[$log->status] ?? $log->status }}
+                                                </span>
+                                            </td>
+                                            <td class="small">
+                                                @if ($log->admin)
+                                                    <div>
+                                                        <strong>{{ $log->admin->name }}</strong>
+                                                        <br>
+                                                        <span class="text-muted">{{ $log->admin->email }}</span>
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary text-uppercase">{{ $log->role }}</span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @elseif (isset($statusHistory) && $statusHistory->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Thời gian</th>
+                                        <th>Trạng thái cũ</th>
+                                        <th>Trạng thái mới</th>
+                                        <th>Người cập nhật</th>
+                                        <th>Ghi chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($statusHistory as $history)
+                                        <tr>
+                                            <td class="small">{{ date('d/m/Y H:i', strtotime($history->created_at)) }}</td>
+                                            <td>
+                                                @if ($history->old_status)
+                                                    <span class="badge bg-{{ $statusColors[$history->old_status] ?? 'light' }}">
+                                                        {{ $statusLabels[$history->old_status] ?? $history->old_status }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted small">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-{{ $statusColors[$history->new_status] ?? 'light' }}">
+                                                    {{ $statusLabels[$history->new_status] ?? $history->new_status }}
+                                                </span>
+                                            </td>
+                                            <td class="small">
+                                                @if ($history->admin)
+                                                    <div>
+                                                        <strong>{{ $history->admin->name }}</strong>
+                                                        <br>
+                                                        <span class="text-muted">{{ $history->admin->email }}</span>
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted">Đã xóa</span>
+                                                @endif
+                                            </td>
+                                            <td class="small">
+                                                @if ($history->note)
+                                                    <span class="text-muted">{{ $history->note }}</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-muted small mb-0">Chưa có lịch sử cập nhật trạng thái.</p>
+                    @endif
+                </div>
+            </div>
         </div>
 
         {{-- CỘT PHẢI: THÔNG TIN KHÁCH HÀNG, VẬN CHUYỂN & THANH TOÁN --}}
         <div class="col-lg-7">
-            {{-- THÔNG TIN KHÁCH HÀNG & VẬN CHUYỂN (Gộp lại) --}}
+            {{-- THÔNG TIN KHÁCH HÀNG & VẬN CHUYỂN --}}
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">Thông tin Khách hàng & Giao nhận</h5>
@@ -146,23 +313,26 @@
                         {{-- THÔNG TIN USER (ĐẶT HÀNG) --}}
                         <div class="col-md-6 border-start">
                             <h6><i class="bi bi-person-circle"></i> Tài khoản đặt (User)</h6>
-                            @if (isset($order->user))
-                                <ul class="list-unstyled mb-2 small">
-                                    <li><strong>Tên User:</strong> {{ $order->user->name ?? 'N/A' }}</li>
-                                    <li><strong>Email:</strong> {{ $order->user->email ?? 'N/A' }}</li>
-                                    <li><strong>SĐT:</strong> {{ $order->user->phone ?? 'N/A' }}</li>
-                                    {{-- Gộp Vai trò & Trạng thái vào một dòng để gọn hơn --}}
-                                    <li>
-                                        <strong>Vai trò:</strong> <span class="badge bg-secondary me-1">{{ ucfirst($order->user->role) ?? 'N/A' }}</span>
-                                        <strong>Status:</strong> @if ($order->user->status == 'active')
-                                            <span class="badge bg-success">Hoạt động</span>
-                                        @elseif ($order->user->status == 'banned')
-                                            <span class="badge bg-danger">Bị cấm</span>
-                                        @else
-                                            <span class="badge bg-warning text-dark">Ngưng</span>
-                                        @endif
-                                    </li>
-                                </ul>
+                            @if (isset($order->user_id) && $order->user_id)
+                                @if (isset($order->user))
+                                    <ul class="list-unstyled mb-2 small">
+                                        <li><strong>Tên User:</strong> {{ $order->user->name ?? 'N/A' }}</li>
+                                        <li><strong>Email:</strong> {{ $order->user->email ?? 'N/A' }}</li>
+                                        <li><strong>SĐT:</strong> {{ $order->user->phone ?? 'N/A' }}</li>
+                                        <li>
+                                            <strong>Vai trò:</strong> <span class="badge bg-secondary me-1">{{ ucfirst($order->user->role) ?? 'N/A' }}</span>
+                                            <strong>Status:</strong> @if ($order->user->status == 'active')
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            @elseif ($order->user->status == 'banned')
+                                                <span class="badge bg-danger">Bị cấm</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark">Ngưng</span>
+                                            @endif
+                                        </li>
+                                    </ul>
+                                @else
+                                    <p class="small mb-2">Người dùng đã bị xóa (ID: {{ $order->user_id }})</p>
+                                @endif
                             @else
                                 <p class="small mb-2">Khách vãng lai</p>
                             @endif
@@ -180,7 +350,7 @@
                         {{ $order->shipping_city }}
                     </p>
 
-                    {{-- THÔNG TIN VẬN CHUYỂN (Chỉ hiện khi có mã tracking) --}}
+                    {{-- THÔNG TIN VẬN CHUYỂN --}}
                     @if ($order->tracking_code)
                         <hr class="my-2">
                         <h6><i class="bi bi-truck"></i> Thông tin Tracking</h6>
@@ -219,7 +389,6 @@
                         </div>
                         <div class="col-md-6 border-start">
                             <h6><i class="bi bi-currency-dollar"></i> Tổng kết</h6>
-                            {{-- Giữ nguyên Table để đảm bảo căn chỉnh số tiền --}}
                             <table class="table table-borderless table-sm small">
                                 <tbody>
                                     <tr>
@@ -246,30 +415,12 @@
                     </div>
                 </div>
             </div>
-
-            {{-- THÔNG TIN TRẢ HÀNG (Nếu có) --}}
-            @if ($order->return_status != 'none')
-                <div class="card shadow-sm mt-4 border-warning">
-                    <div class="card-header bg-warning text-dark py-2">
-                        <h6 class="mb-0"><i class="bi bi-arrow-return-left"></i> Xử lý Trả hàng/Hoàn tiền</h6>
-                    </div>
-                    <div class="card-body py-2 small">
-                        <p class="mb-1"><strong>Trạng thái Yêu cầu:</strong> <span class="badge bg-primary">{{ strtoupper($order->return_status) }}</span></p>
-                        <p class="mb-1"><strong>Lý do:</strong> {{ $order->return_reason ?? 'Không rõ' }}</p>
-                        @if ($order->refunded_at)
-                            <p class="text-success mb-0">Đã hoàn tiền vào: {{ date('d/m/Y H:i', strtotime($order->refunded_at)) }}</p>
-                        @endif
-                        {{-- Thêm các nút hành động ở đây... --}}
-                    </div>
-                </div>
-            @endif
-
         </div>
     </div>
 
     <hr class="my-4">
 
-    {{-- DANH SÁCH SẢN PHẨM ĐÃ ĐẶT (GIỮ NGUYÊN) --}}
+    {{-- DANH SÁCH SẢN PHẨM ĐÃ ĐẶT --}}
     <h5><i class="bi bi-cart-fill"></i> Danh sách sản phẩm đã đặt</h5>
     <table class="table table-bordered table-hover">
         <thead class="table-dark">
@@ -281,8 +432,7 @@
             </tr>
         </thead>
         <tbody>
-            {{-- Giữ nguyên logic hiển thị sản phẩm --}}
-            @if (isset($orderDetails))
+            @if (isset($orderDetails) && count($orderDetails) > 0)
                 @foreach ($orderDetails as $item)
                     <tr>
                         <td>{{ $item->product_name }}</td>
