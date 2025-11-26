@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\Wallet\WalletManagementController;
 use App\Http\Controllers\Admin\Wallet\WalletDetailController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionActionController;
+use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -132,6 +133,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/transaction/{id}/details', [WalletTransactionActionController::class, 'showTransactionDetails'])->name('transaction.details');
         Route::get('/transaction/{id}/refund-form', [WalletTransactionActionController::class, 'showRefundForm'])->name('transaction.refund-form');
         Route::post('/transaction/{id}/refund-process', [WalletTransactionActionController::class, 'processRefund'])->name('transaction.refund-process');
+
+        Route::get('/{id}/withdraw', [WalletWithdrawController::class, 'showWithdrawForm'])->name('withdraw.form');
     });
 
     // ====== ACCOUNT MANAGEMENT ======

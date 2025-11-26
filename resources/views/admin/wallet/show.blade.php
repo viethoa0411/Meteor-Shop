@@ -93,7 +93,12 @@
                     </div>
                 </div>
 
-                
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <a href="{{ route('admin.wallet.withdraw.form', $wallet->id) }}" class="btn btn-outline-success">
+                        <i class="bi bi-cash-coin me-1"></i> Rút tiền
+                    </a>
+                    
+                </div>
             </div>
         </div>
 
