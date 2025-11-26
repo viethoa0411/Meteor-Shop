@@ -361,6 +361,12 @@ class WalletTransactionActionController extends Controller
                 ->with('error', 'Đơn hàng này đã được hoàn tiền rồi.');
         }
 
+        $request->validate([
+            'refund_amount' => 'required|numeric|min:0|max:' . $transaction->amount,
+            'bank_name' => 'required|string|max:255',
+            'bank_account' => 'required|string|max:255',
+            'account_holder' => 'required|string|max:255',
+        ]);
 
         DB::beginTransaction();
         try {
