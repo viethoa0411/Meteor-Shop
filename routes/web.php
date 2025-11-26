@@ -135,6 +135,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/transaction/{id}/refund-process', [WalletTransactionActionController::class, 'processRefund'])->name('transaction.refund-process');
 
         Route::get('/{id}/withdraw', [WalletWithdrawController::class, 'showWithdrawForm'])->name('withdraw.form');
+        Route::post('/{id}/withdraw', [WalletWithdrawController::class, 'processWithdraw'])->name('withdraw.process');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
