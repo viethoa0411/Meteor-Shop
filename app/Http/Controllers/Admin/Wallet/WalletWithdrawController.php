@@ -173,6 +173,41 @@ class WalletWithdrawController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+    /**
+     * ========================================
+     * HIỂN THỊ DANH SÁCH GIAO DỊCH CHỜ CHỐT
+     * ========================================
+     * Hiển thị tất cả giao dịch đã đánh dấu nhận tiền nhưng chưa chốt:
+     * - Lọc giao dịch có trạng thái pending
+     * - Lọc giao dịch đã được đánh dấu (marked_as_received_at không null)
+     * - Hiển thị tổng số lượng và tổng số tiền
+     * - Phân trang 7 giao dịch/trang
+     */
+    public function receiveConfirmations($walletId)
+    {
+        $wallet = Wallet::with('user')->findOrFail($walletId);
+
+        if (Auth::user()->role !== 'admin' && $wallet->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền truy cập ví này.');
+        }
+
+        $baseQuery = Transaction::with(['order', 'marker'])
+            ->where('wallet_id', $walletId)
+            ->where('status', 'pending')
+            ->whereNotNull('marked_as_received_at');
+
+        $totalCount = (clone $baseQuery)->count();
+        $totalAmount = (clone $baseQuery)->sum('amount');
+
+        $transactions = $baseQuery->orderBy('marked_as_received_at')->paginate(7);
+
+        return view('admin.wallet.receive-confirmations', compact(
+            'wallet',
+            'transactions',
+            'totalCount',
+            'totalAmount'
+        ));
+    }
 
 }
 

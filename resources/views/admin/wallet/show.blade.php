@@ -100,7 +100,14 @@
                     <a href="{{ route('admin.wallet.withdraw.history', $wallet->id) }}" class="btn btn-outline-primary">
                         <i class="bi bi-journal-text me-1"></i> Lịch sử rút tiền
                     </a>
-                    
+                    <a href="{{ route('admin.wallet.receive.confirmations', $wallet->id) }}" class="btn btn-outline-warning position-relative">
+                        <i class="bi bi-cash-stack me-1"></i> Xác nhận đã nhận tiền
+                        @if (!empty($pendingMarkedCount) && $pendingMarkedCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ $pendingMarkedCount }}
+                            </span>
+                        @endif
+                    </a>
                 </div>
             </div>
         </div>
