@@ -316,4 +316,142 @@ class WalletTransactionActionController extends Controller
 
         return view('admin.wallet.refund-form', compact('transaction', 'refundRequest'));
     }
+    /**
+     * ========================================
+     * XỬ LÝ HOÀN TIỀN + VALIDATE
+     * ========================================
+     * Xử lý hoàn tiền cho đơn hàng đã hủy:
+     *
+     * Validate:
+     * - refund_amount: bắt buộc, phải là số, tối thiểu 0, tối đa bằng số tiền giao dịch
+     * - bank_name: bắt buộc, tối đa 255 ký tự
+     * - bank_account: bắt buộc, tối đa 255 ký tự
+     * - account_holder: bắt buộc, tối đa 255 ký tự
+     *
+     * Quy trình:
+     * - Kiểm tra đơn hàng đã bị hủy chưa
+     * - Kiểm tra đơn hàng đã được hoàn tiền chưa
+     * - Tạo hoặc cập nhật yêu cầu hoàn tiền
+     * - Nếu giao dịch đã completed: tạo giao dịch chi mới và trừ số dư ví
+     * - Cập nhật trạng thái giao dịch gốc thành 'cancelled'
+     * - Cập nhật trạng thái thanh toán đơn hàng thành 'refunded'
+     * - Lưu lịch sử hành động
+     */
+    public function processRefund(Request $request, $transactionId)
+    {
+        $transaction = Transaction::with(['order', 'wallet'])->findOrFail($transactionId);
+
+        if (!$transaction->order) {
+            return redirect()->back()
+                ->with('error', 'Giao dịch này không liên quan đến đơn hàng.');
+        }
+
+        if ($transaction->order->order_status !== 'cancelled') {
+            return redirect()->back()
+                ->with('error', 'Chỉ có thể hoàn tiền cho đơn hàng đã bị hủy.');
+        }
+
+        $completedRefund = Refund::where('order_id', $transaction->order->id)
+            ->where('refund_type', 'cancel')
+            ->where('status', 'completed')
+            ->first();
+
+        if ($completedRefund) {
+            return redirect()->back()
+                ->with('error', 'Đơn hàng này đã được hoàn tiền rồi.');
+        }
+
+
+        DB::beginTransaction();
+        try {
+            $existingRefund = Refund::where('order_id', $transaction->order->id)
+                ->where('refund_type', 'cancel')
+                ->whereIn('status', ['pending', 'approved'])
+                ->first();
+
+            if ($existingRefund) {
+                $refund = $existingRefund;
+                $refund->update([
+                    'refund_amount' => $request->refund_amount,
+                    'bank_name' => $request->bank_name,
+                    'bank_account' => $request->bank_account,
+                    'account_holder' => $request->account_holder,
+                    'status' => 'completed',
+                    'processed_by' => Auth::id(),
+                    'processed_at' => now(),
+                ]);
+            } else {
+                $refund = Refund::create([
+                    'order_id' => $transaction->order->id,
+                    'user_id' => $transaction->order->user_id,
+                    'refund_type' => 'cancel',
+                    'refund_amount' => $request->refund_amount,
+                    'bank_name' => $request->bank_name,
+                    'bank_account' => $request->bank_account,
+                    'account_holder' => $request->account_holder,
+                    'status' => 'completed',
+                    'processed_by' => Auth::id(),
+                    'processed_at' => now(),
+                ]);
+            }
+
+            if ($transaction->status === 'completed') {
+                $refundTransaction = Transaction::create([
+                    'order_id' => $transaction->order_id,
+                    'wallet_id' => $transaction->wallet_id,
+                    'refund_id' => $refund->id,
+                    'amount' => $request->refund_amount,
+                    'type' => 'expense',
+                    'status' => 'completed',
+                    'payment_method' => $transaction->payment_method,
+                    'transaction_code' => 'REFUND_' . $transaction->transaction_code . '_' . time(),
+                    'description' => 'Hoàn tiền cho đơn hàng #' . ($transaction->order->order_code ?? 'N/A'),
+                    'completed_at' => now(),
+                    'processed_by' => Auth::id(),
+                ]);
+
+                if (!$transaction->wallet->subtractBalance($request->refund_amount)) {
+                    throw new \Exception('Số dư ví không đủ để hoàn tiền.');
+                }
+
+                TransactionLog::create([
+                    'transaction_id' => $refundTransaction->id,
+                    'user_id' => Auth::id(),
+                    'action' => 'refund',
+                    'description' => 'Giao dịch hoàn tiền được tạo - Số tiền: ' . number_format($request->refund_amount, 0, ',', '.') . ' VNĐ',
+                    'old_data' => null,
+                    'new_data' => ['type' => 'expense', 'status' => 'completed', 'amount' => $request->refund_amount],
+                ]);
+            }
+
+            $transaction->update([
+                'refund_id' => $refund->id,
+                'status' => 'cancelled',
+                'processed_by' => Auth::id(),
+            ]);
+
+            $transaction->order->update([
+                'payment_status' => 'refunded',
+                'refunded_at' => now(),
+            ]);
+
+            TransactionLog::create([
+                'transaction_id' => $transaction->id,
+                'user_id' => Auth::id(),
+                'action' => 'refund',
+                'description' => 'Hoàn tiền thành công - Số tiền: ' . number_format($request->refund_amount, 0, ',', '.') . ' VNĐ',
+                'old_data' => ['status' => $transaction->status, 'order_status' => $transaction->order->order_status],
+                'new_data' => ['status' => 'cancelled', 'order_status' => 'cancelled', 'refund_id' => $refund->id],
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.wallet.show', $transaction->wallet_id)
+                ->with('success', 'Hoàn tiền thành công! Đơn hàng đã được hủy và thông báo đã gửi đến khách hàng.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
   }
