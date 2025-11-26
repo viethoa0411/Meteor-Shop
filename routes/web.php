@@ -20,6 +20,8 @@ use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
 
+use App\Http\Controllers\Admin\Wallet\WalletManagementController;
+
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -105,6 +107,11 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/{id}/restore', [BannerController::class, 'restore'])->name('restore');
         Route::delete('/{id}/force-delete', [BannerController::class, 'forceDelete'])->name('forceDelete');
         Route::put('/{id}/status', [BannerController::class, 'updateStatus'])->name('updateStatus');
+    });
+
+    // ====== WALLET ======
+    Route::prefix('wallet')->name('wallet.')->group(function () {
+        Route::get('/', [WalletManagementController::class, 'index'])->name('index'); 
     });
 
     // ====== ACCOUNT MANAGEMENT ======

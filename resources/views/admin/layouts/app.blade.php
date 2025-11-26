@@ -357,6 +357,10 @@
             <a href="{{ route('admin.banners.list') }}" class="{{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                 <i class="bi bi-image-fill me-2"></i> Quản lý Banner
             </a>
+            <!-- Quản lý Ví -->
+            <a href="{{ route('admin.wallet.index') }}" class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
+                <i class="bi bi-wallet2 me-2"></i> Quản lý Ví
+            </a>
             <!-- Quản lý tài khoản -->
             <div class="dropdown-menu-item {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
                 <a href="#" class="{{ request()->routeIs('admin.account.*') ? 'active' : '' }}"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản
