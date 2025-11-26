@@ -96,7 +96,27 @@ class WalletWithdrawController extends Controller
             return back()->withInput()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+    /**
+     * ========================================
+     * LỊCH SỬ RÚT TIỀN
+     * ========================================
+     * Hiển thị lịch sử rút tiền của ví với phân trang (7 bản ghi/trang)
+     */
+    public function withdrawHistory($id)
+    {
+        $wallet = Wallet::with('user')->findOrFail($id);
 
+        if (Auth::user()->role !== 'admin' && $wallet->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền truy cập ví này.');
+        }
+
+        $withdrawals = WalletWithdrawal::with(['requester', 'processor'])
+            ->where('wallet_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(7);
+
+        return view('admin.wallet.withdraw-history', compact('wallet', 'withdrawals'));
+    }
 
 }
 

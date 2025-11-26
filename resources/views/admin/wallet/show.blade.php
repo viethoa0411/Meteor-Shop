@@ -97,6 +97,9 @@
                     <a href="{{ route('admin.wallet.withdraw.form', $wallet->id) }}" class="btn btn-outline-success">
                         <i class="bi bi-cash-coin me-1"></i> Rút tiền
                     </a>
+                    <a href="{{ route('admin.wallet.withdraw.history', $wallet->id) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-journal-text me-1"></i> Lịch sử rút tiền
+                    </a>
                     
                 </div>
             </div>

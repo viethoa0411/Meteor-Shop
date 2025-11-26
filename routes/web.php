@@ -136,6 +136,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
 
         Route::get('/{id}/withdraw', [WalletWithdrawController::class, 'showWithdrawForm'])->name('withdraw.form');
         Route::post('/{id}/withdraw', [WalletWithdrawController::class, 'processWithdraw'])->name('withdraw.process');
+        Route::get('/{id}/withdraw-history', [WalletWithdrawController::class, 'withdrawHistory'])->name('withdraw.history');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
