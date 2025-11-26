@@ -71,7 +71,7 @@
                                                    class="btn btn-sm btn-info" title="Xem chi tiết">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                <a href="#" 
+                                                <a href="{{ route('admin.wallet.edit', $wallet->id) }}" 
                                                    class="btn btn-sm btn-warning" title="Chỉnh sửa">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>

@@ -58,4 +58,17 @@ class WalletManagementController extends Controller
         return redirect()->route('admin.wallet.index')
             ->with('success', 'Tạo ví thành công!');
     }
+    /**
+     * ========================================
+     * SỬA VÍ - HIỂN THỊ FORM
+     * ========================================
+     * Hiển thị form chỉnh sửa ví
+     */
+    public function edit($id)
+    {
+        $wallet = Wallet::findOrFail($id);
+        $admins = User::where('role', 'admin')->get();
+
+        return view('admin.wallet.edit', compact('wallet', 'admins'));
+    }
 }
