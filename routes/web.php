@@ -22,6 +22,7 @@ use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderCon
 
 use App\Http\Controllers\Admin\Wallet\WalletManagementController;
 use App\Http\Controllers\Admin\Wallet\WalletDetailController;
+use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -118,6 +119,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/{id}/edit', [WalletManagementController::class, 'edit'])->name('edit');
         Route::put('/{id}', [WalletManagementController::class, 'update'])->name('update');
         Route::get('/{id}', [WalletDetailController::class, 'show'])->name('show');
+
+        Route::get('/{id}/transactions', [WalletTransactionFilterController::class, 'index'])->name('transactions.filter');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
