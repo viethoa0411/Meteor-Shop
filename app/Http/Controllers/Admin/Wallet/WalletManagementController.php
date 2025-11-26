@@ -30,5 +30,11 @@ class WalletManagementController extends Controller
 
         return view('admin.wallet.index', compact('wallets'));
     }
+    // Hiển thị form thêm ví
+    public function create()
+    {
+        $admins = User::where('role', 'admin')->get();
+        return view('admin.wallet.create', compact('admins'));
+    }
   
 }

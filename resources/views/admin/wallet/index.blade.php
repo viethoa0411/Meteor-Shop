@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="bi bi-wallet2 me-2"></i>Quản lý Ví</h2>
-            <a href="#" class="btn btn-primary">
+            <a href="{{ route('admin.wallet.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Tạo ví mới
             </a>
         </div>

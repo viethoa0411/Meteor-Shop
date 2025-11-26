@@ -112,6 +112,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     // ====== WALLET ======
     Route::prefix('wallet')->name('wallet.')->group(function () {
         Route::get('/', [WalletManagementController::class, 'index'])->name('index'); 
+        Route::get('/create', [WalletManagementController::class, 'create'])->name('create');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
