@@ -140,6 +140,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/transaction/{id}/received', [WalletWithdrawController::class, 'receivedTransaction'])->name('transaction.received');
         Route::get('/{id}/receive-confirmations', [WalletWithdrawController::class, 'receiveConfirmations'])->name('receive.confirmations');
         Route::post('/transaction/{id}/settle', [WalletWithdrawController::class, 'settleReceivedTransaction'])->name('transaction.settle');
+        Route::post('/transaction/{id}/unmark', [WalletWithdrawController::class, 'unmarkReceivedTransaction'])->name('transaction.unmark');
         
     });
 

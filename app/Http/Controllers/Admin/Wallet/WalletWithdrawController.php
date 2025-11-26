@@ -259,6 +259,39 @@ class WalletWithdrawController extends Controller
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+    /**
+     * ========================================
+     * HOÀN TÁC ĐÁNH DẤU ĐÃ NHẬN TIỀN
+     * ========================================
+     * Hoàn tác đánh dấu đã nhận tiền:
+     * - Xóa thông tin đánh dấu (marked_as_received_at, marked_as_received_by)
+     * - Lưu lịch sử hành động
+     * - Giao dịch quay về trạng thái pending bình thường
+     */
+    public function unmarkReceivedTransaction($transactionId)
+    {
+        $transaction = Transaction::findOrFail($transactionId);
+
+        if ($transaction->status !== 'pending' || !$transaction->marked_as_received_at) {
+            return redirect()->back()->with('error', 'Giao dịch không hợp lệ để hoàn tác.');
+        }
+
+        $transaction->update([
+            'marked_as_received_at' => null,
+            'marked_as_received_by' => null,
+        ]);
+
+        TransactionLog::create([
+            'transaction_id' => $transaction->id,
+            'user_id' => Auth::id(),
+            'action' => 'unmark_received',
+            'description' => 'Hoàn tác đánh dấu đã nhận',
+            'old_data' => null,
+            'new_data' => null,
+        ]);
+
+        return redirect()->back()->with('success', 'Đã hoàn tác đánh dấu.');
+    }
 
 }
 

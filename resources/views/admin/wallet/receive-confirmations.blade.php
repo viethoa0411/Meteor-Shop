@@ -69,7 +69,7 @@
                                                     <i class="bi bi-check-circle me-1"></i>Chốt
                                                 </button>
                                             </form>
-                                            <form action="#"
+                                            <form action="{{ route('admin.wallet.transaction.unmark', $transaction->id) }}"
                                                   method="POST">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-outline-secondary"
