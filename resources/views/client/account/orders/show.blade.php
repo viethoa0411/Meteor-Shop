@@ -152,6 +152,49 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Action buttons --}}
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">Thao tác</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if ($order->canTrack())
+                                <a class="btn btn-outline-primary" href="{{ route('client.account.orders.tracking', $order) }}">
+                                    <i class="bi bi-truck me-1"></i> Theo dõi vận đơn
+                                </a>
+                            @endif
+
+                            @if ($order->canReturnRefund())
+                                <a class="btn btn-outline-warning" href="{{ route('client.account.orders.refund.return', $order) }}">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Trả hàng hoàn tiền
+                                </a>
+                            @endif
+
+                            @if ($order->canCancelRefund())
+                                <a class="btn btn-outline-danger" href="{{ route('client.account.orders.refund.cancel', $order) }}">
+                                    <i class="bi bi-x-circle me-1"></i> Hủy đơn và hoàn tiền
+                                </a>
+                            @endif
+
+                            @php
+                                $pendingCancelRefund = $order->refunds
+                                    ->where('refund_type', 'cancel')
+                                    ->where('status', 'pending')
+                                    ->first();
+                            @endphp
+
+                            @if ($pendingCancelRefund)
+                                <form action="{{ route('client.account.orders.refund.cancel.reset', $order) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-dark"
+                                            onclick="return confirm('Bạn muốn đặt lại đơn hàng và dừng hoàn tiền?');">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Đặt lại
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -114,7 +114,13 @@ class WalletTransactionActionController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
-    // Hiển thị trang yêu cầu hoàn tiền
+
+    /**
+     * ========================================
+     * HIỂN THỊ CHI TIẾT YÊU CẦU HOÀN TIỀN
+     * ========================================
+     * Hiển thị chi tiết yêu cầu hoàn tiền của giao dịch
+     */
     public function showRefund($transactionId)
     {
         $transaction = Transaction::with(['order', 'refund.user', 'wallet', 'logs.user'])
@@ -127,7 +133,19 @@ class WalletTransactionActionController extends Controller
 
         return view('admin.wallet.refund-detail', compact('transaction'));
     }
-    // Xác nhận hoàn tiền, xử lý hoàn tiền
+
+    /**
+     * ========================================
+     * XÁC NHẬN HOÀN TIỀN
+     * ========================================
+     * Xác nhận hoàn tiền cho khách hàng:
+     * - Tạo giao dịch chi (expense) mới với số tiền hoàn
+     * - Trừ số dư ví
+     * - Cập nhật trạng thái giao dịch gốc thành 'cancelled'
+     * - Cập nhật trạng thái yêu cầu hoàn tiền thành 'completed'
+     * - Cập nhật thời gian hoàn tiền cho đơn hàng
+     * - Lưu lịch sử hành động
+     */
     public function confirmRefund($transactionId)
     {
         $transaction = Transaction::with(['wallet', 'refund', 'order'])->findOrFail($transactionId);
@@ -207,6 +225,7 @@ class WalletTransactionActionController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+
     /**
      * ========================================
      * HIỂN THỊ TRANG CHƯA NHẬN TIỀN
@@ -232,6 +251,7 @@ class WalletTransactionActionController extends Controller
 
         return view('admin.wallet.not-received', compact('transaction'));
     }
+
     /**
      * ========================================
      * HỦY ĐƠN HÀNG TỪ TRANG CHƯA NHẬN TIỀN
@@ -286,14 +306,26 @@ class WalletTransactionActionController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
-    // Hiển thị chi tiết mã giao dịch, lịch sử hành động
+
+    /**
+     * ========================================
+     * CHI TIẾT MÃ GIAO DỊCH + LỊCH SỬ HÀNH ĐỘNG
+     * ========================================
+     * Hiển thị chi tiết giao dịch bao gồm:
+     * - Thông tin giao dịch
+     * - Thông tin đơn hàng
+     * - Thông tin ví
+     * - Lịch sử hành động (logs)
+     * - Người xử lý (processor)
+     */
     public function showTransactionDetails($transactionId)
     {
         $transaction = Transaction::with(['order', 'wallet', 'logs.user', 'processor'])->findOrFail($transactionId);
 
         return view('admin.wallet.transaction-details', compact('transaction'));
     }
-     /**
+
+    /**
      * ========================================
      * HIỂN THỊ FORM HOÀN TIỀN
      * ========================================
@@ -316,6 +348,7 @@ class WalletTransactionActionController extends Controller
 
         return view('admin.wallet.refund-form', compact('transaction', 'refundRequest'));
     }
+
     /**
      * ========================================
      * XỬ LÝ HOÀN TIỀN + VALIDATE
@@ -460,4 +493,5 @@ class WalletTransactionActionController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
-  }
+}
+

@@ -10,7 +10,18 @@ use Illuminate\Support\Facades\Auth;
 
 class WalletDetailController extends Controller
 {
-    // Hiển thị chi tiết ví
+    /**
+     * ========================================
+     * XEM CHI TIẾT VÍ
+     * ========================================
+     * Hiển thị chi tiết ví bao gồm:
+     * - Thông tin ví
+     * - Tổng thu (income) đã hoàn thành
+     * - Tổng chi (expense) đã hoàn thành
+     * - Số giao dịch đang chờ xử lý (pending)
+     * - Số giao dịch đã đánh dấu nhận tiền (marked_as_received)
+     * - Danh sách giao dịch (có lọc và phân trang)
+     */
     public function show(Request $request, $id)
     {
         $wallet = Wallet::with('user')->findOrFail($id);

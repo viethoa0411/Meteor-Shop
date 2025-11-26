@@ -47,7 +47,7 @@
                         <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Thông tin rút tiền</h5>
                     </div>
                     <div class="card-body">
-                        <form action="#" method="POST">
+                        <form action="{{ route('admin.wallet.withdraw.process', $wallet->id) }}" method="POST">
                             @csrf
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">

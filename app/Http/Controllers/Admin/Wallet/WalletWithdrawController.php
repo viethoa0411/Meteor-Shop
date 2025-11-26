@@ -14,7 +14,12 @@ use Illuminate\Support\Str;
 
 class WalletWithdrawController extends Controller
 {
-    // Hiển thị form rút tiền
+    /**
+     * ========================================
+     * RÚT TIỀN - HIỂN THỊ FORM
+     * ========================================
+     * Hiển thị form rút tiền từ ví
+     */
     public function showWithdrawForm($id)
     {
         $wallet = Wallet::with('user')->findOrFail($id);
@@ -25,7 +30,25 @@ class WalletWithdrawController extends Controller
 
         return view('admin.wallet.withdraw', compact('wallet'));
     }
-    // Xử lý rút tiền
+
+    /**
+     * ========================================
+     * RÚT TIỀN - XỬ LÝ + VALIDATE
+     * ========================================
+     * Validate:
+     * - amount: bắt buộc, phải là số, tối thiểu 1000
+     * - bank_name: bắt buộc, tối đa 255 ký tự
+     * - bank_account: bắt buộc, tối đa 255 ký tự
+     * - account_holder: bắt buộc, tối đa 255 ký tự
+     * - note: không bắt buộc, tối đa 1000 ký tự
+     *
+     * Quy trình:
+     * - Kiểm tra số dư ví có đủ không
+     * - Trừ số dư ví
+     * - Tạo bản ghi rút tiền (WalletWithdrawal)
+     * - Tạo giao dịch chi (expense) với mã WITHDRAW_
+     * - Lưu lịch sử hành động
+     */
     public function processWithdraw(Request $request, $id)
     {
         $wallet = Wallet::with('user')->findOrFail($id);
@@ -96,6 +119,7 @@ class WalletWithdrawController extends Controller
             return back()->withInput()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+
     /**
      * ========================================
      * LỊCH SỬ RÚT TIỀN
@@ -173,6 +197,7 @@ class WalletWithdrawController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+
     /**
      * ========================================
      * HIỂN THỊ DANH SÁCH GIAO DỊCH CHỜ CHỐT
@@ -208,6 +233,7 @@ class WalletWithdrawController extends Controller
             'totalAmount'
         ));
     }
+
     /**
      * ========================================
      * CHỐT GIAO DỊCH ĐÃ NHẬN TIỀN
@@ -259,6 +285,7 @@ class WalletWithdrawController extends Controller
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+
     /**
      * ========================================
      * HOÀN TÁC ĐÁNH DẤU ĐÃ NHẬN TIỀN
@@ -292,6 +319,4 @@ class WalletWithdrawController extends Controller
 
         return redirect()->back()->with('success', 'Đã hoàn tác đánh dấu.');
     }
-
 }
-

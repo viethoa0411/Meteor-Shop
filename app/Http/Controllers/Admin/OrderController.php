@@ -35,6 +35,12 @@ class OrderController extends Controller
             });
         }
 
+        // Chỉ hiển thị đơn thanh toán online sau khi admin xác nhận
+        $query->where(function ($q) {
+            $q->whereNotIn('orders.payment_method', ['bank', 'momo'])
+              ->orWhereIn('orders.payment_status', ['paid', 'refunded']);
+        });
+
         $orders = $query->orderBy('orders.created_at', 'DESC')->get();
 
         return view('admin.orders.list', compact('orders', 'status', 'keyword'));

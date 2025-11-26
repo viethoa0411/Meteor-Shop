@@ -169,4 +169,45 @@ class Order extends Model
     {
         return $this->order_status === 'completed' && in_array($this->return_status, ['none', 'rejected']);
     }
+
+    public function canReturnRefund(): bool
+    {
+        return $this->order_status === 'completed';
+    }
+
+    public function canCancelRefund(): bool
+    {
+        // Chỉ cho phép khi đơn hàng ở trạng thái pending hoặc processing
+        if (!in_array($this->order_status, ['pending', 'processing'])) {
+            return false;
+        }
+
+        // Chỉ áp dụng cho thanh toán online
+        if (!in_array($this->payment_method, ['bank', 'momo'])) {
+            return false;
+        }
+
+        // Kiểm tra xem admin đã ấn "Đã nhận" chưa (transaction status = 'completed')
+        $transaction = $this->transactions()
+            ->where('type', 'income')
+            ->where('payment_method', $this->payment_method)
+            ->first();
+
+        // Nếu có transaction và đã completed (admin đã ấn "Đã nhận"), thì không cho phép hủy
+        if ($transaction && $transaction->status === 'completed') {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany(\App\Models\Refund::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(\App\Models\Transaction::class);
+    }
 }

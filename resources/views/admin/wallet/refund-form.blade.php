@@ -188,7 +188,10 @@
                                 <a href="{{ route('admin.wallet.show', $transaction->wallet_id) }}" class="btn btn-secondary">
                                     <i class="bi bi-x-circle me-2"></i>Hủy
                                 </a>
-                                <a href="#">Xác nhận hoàn tiền</a>
+                                <button type="submit" class="btn btn-danger" 
+                                        onclick="return confirm('Bạn có chắc chắn muốn hoàn tiền cho đơn hàng này?');">
+                                    <i class="bi bi-check-circle me-2"></i>Xác nhận hoàn tiền
+                                </button>
                             </div>
                         </form>
                     </div>

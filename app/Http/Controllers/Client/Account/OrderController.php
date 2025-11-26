@@ -18,7 +18,7 @@ class OrderController extends Controller
         $userId = $request->user()->id;
         $status = $request->get('status', 'all');
 
-        $ordersQuery = Order::with(['items.product'])
+        $ordersQuery = Order::with(['items.product', 'transactions'])
             ->ownedBy($userId)
             ->status($status)
             ->latest('order_date')
@@ -49,7 +49,7 @@ class OrderController extends Controller
     {
         $this->authorizeOwnership($request->user()->id, $order);
 
-        $order->loadMissing(['items.product']);
+        $order->loadMissing(['items.product', 'transactions', 'refunds']);
 
         return view('client.account.orders.show', compact('order'));
     }
@@ -57,6 +57,8 @@ class OrderController extends Controller
     public function tracking(Request $request, Order $order)
     {
         $this->authorizeOwnership($request->user()->id, $order);
+
+        $order->loadMissing(['refunds', 'transactions']);
 
         $timeline = [
             'order_date' => $order->display_order_date,

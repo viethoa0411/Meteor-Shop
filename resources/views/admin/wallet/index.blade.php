@@ -90,7 +90,7 @@
                     <div class="text-center py-5">
                         <i class="bi bi-wallet2 text-muted" style="font-size: 4rem;"></i>
                         <p class="text-muted mt-3">Chưa có ví nào. Hãy tạo ví mới!</p>
-                        <a href="#" class="btn btn-primary">
+                        <a href="{{ route('admin.wallet.create') }}" class="btn btn-primary">
                             <i class="bi bi-plus-circle me-2"></i>Tạo ví mới
                         </a>
                     </div>

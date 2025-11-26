@@ -30,13 +30,31 @@ class WalletManagementController extends Controller
 
         return view('admin.wallet.index', compact('wallets'));
     }
-    // Hiển thị form thêm ví
+
+    /**
+     * ========================================
+     * THÊM VÍ - HIỂN THỊ FORM
+     * ========================================
+     * Hiển thị form tạo ví mới
+     */
     public function create()
     {
         $admins = User::where('role', 'admin')->get();
         return view('admin.wallet.create', compact('admins'));
     }
-  public function store(Request $request)
+
+    /**
+     * ========================================
+     * THÊM VÍ - XỬ LÝ LƯU DỮ LIỆU + VALIDATE
+     * ========================================
+     * Validate:
+     * - user_id: bắt buộc, phải tồn tại trong bảng users
+     * - bank_name: bắt buộc, tối đa 255 ký tự
+     * - bank_account: bắt buộc, tối đa 255 ký tự
+     * - account_holder: bắt buộc, tối đa 255 ký tự
+     * - balance: không bắt buộc, phải là số, tối thiểu 0
+     */
+    public function store(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -58,6 +76,7 @@ class WalletManagementController extends Controller
         return redirect()->route('admin.wallet.index')
             ->with('success', 'Tạo ví thành công!');
     }
+
     /**
      * ========================================
      * SỬA VÍ - HIỂN THỊ FORM
@@ -71,6 +90,7 @@ class WalletManagementController extends Controller
 
         return view('admin.wallet.edit', compact('wallet', 'admins'));
     }
+
     /**
      * ========================================
      * SỬA VÍ - XỬ LÝ CẬP NHẬT + VALIDATE
@@ -84,12 +104,14 @@ class WalletManagementController extends Controller
     public function update(Request $request, $id)
     {
         $wallet = Wallet::findOrFail($id);
+
         $request->validate([
             'bank_name' => 'required|string|max:255',
             'bank_account' => 'required|string|max:255',
             'account_holder' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
         ]);
+
         $wallet->update([
             'bank_name' => $request->bank_name,
             'bank_account' => $request->bank_account,
@@ -101,3 +123,4 @@ class WalletManagementController extends Controller
             ->with('success', 'Cập nhật ví thành công!');
     }
 }
+
