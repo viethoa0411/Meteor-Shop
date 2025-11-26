@@ -207,4 +207,29 @@ class WalletTransactionActionController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+    /**
+     * ========================================
+     * HIỂN THỊ TRANG CHƯA NHẬN TIỀN
+     * ========================================
+     * Hiển thị chi tiết giao dịch chưa nhận tiền (thanh toán online)
+     * Chỉ áp dụng cho:
+     * - Giao dịch có trạng thái 'pending'
+     * - Đơn hàng thanh toán qua bank hoặc momo
+     */
+    public function showNotReceived($transactionId)
+    {
+        $transaction = Transaction::with(['order', 'order.items', 'wallet'])->findOrFail($transactionId);
+
+        if ($transaction->status !== 'pending') {
+            return redirect()->back()
+                ->with('error', 'Giao dịch này đã được xử lý.');
+        }
+
+        if (!$transaction->order || !in_array($transaction->payment_method, ['bank', 'momo'])) {
+            return redirect()->back()
+                ->with('error', 'Chỉ áp dụng cho đơn hàng thanh toán online.');
+        }
+
+        return view('admin.wallet.not-received', compact('transaction'));
+    }
   }
