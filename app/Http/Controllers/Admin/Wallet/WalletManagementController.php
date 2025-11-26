@@ -36,5 +36,20 @@ class WalletManagementController extends Controller
         $admins = User::where('role', 'admin')->get();
         return view('admin.wallet.create', compact('admins'));
     }
-  
+  public function store(Request $request)
+    {
+       
+
+        Wallet::create([
+            'user_id' => $request->user_id,
+            'bank_name' => $request->bank_name,
+            'bank_account' => $request->bank_account,
+            'account_holder' => $request->account_holder,
+            'balance' => $request->balance ?? 0,
+            'status' => 'active',
+        ]);
+
+        return redirect()->route('admin.wallet.index')
+            ->with('success', 'Tạo ví thành công!');
+    }
 }

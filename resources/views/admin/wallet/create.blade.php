@@ -13,7 +13,7 @@
 
         <div class="card shadow-sm">
             <div class="card-body">
-                <form action="#" method="POST">
+                <form action="{{ route('admin.wallet.store') }}" method="POST">
                     @csrf
 
                     <div class="mb-3">

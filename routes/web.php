@@ -113,6 +113,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     Route::prefix('wallet')->name('wallet.')->group(function () {
         Route::get('/', [WalletManagementController::class, 'index'])->name('index'); 
         Route::get('/create', [WalletManagementController::class, 'create'])->name('create');
+        Route::post('/store', [WalletManagementController::class, 'store'])->name('store');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
