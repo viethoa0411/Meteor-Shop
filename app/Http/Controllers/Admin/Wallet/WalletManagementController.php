@@ -38,7 +38,13 @@ class WalletManagementController extends Controller
     }
   public function store(Request $request)
     {
-       
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'bank_name' => 'required|string|max:255',
+            'bank_account' => 'required|string|max:255',
+            'account_holder' => 'required|string|max:255',
+            'balance' => 'nullable|numeric|min:0',
+        ]);
 
         Wallet::create([
             'user_id' => $request->user_id,
