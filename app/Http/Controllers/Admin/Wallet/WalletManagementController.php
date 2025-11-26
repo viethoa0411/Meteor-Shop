@@ -71,4 +71,28 @@ class WalletManagementController extends Controller
 
         return view('admin.wallet.edit', compact('wallet', 'admins'));
     }
+    /**
+     * ========================================
+     * SỬA VÍ - XỬ LÝ CẬP NHẬT + VALIDATE
+     * ========================================
+     * Validate:
+     * - bank_name: bắt buộc, tối đa 255 ký tự
+     * - bank_account: bắt buộc, tối đa 255 ký tự
+     * - account_holder: bắt buộc, tối đa 255 ký tự
+     * - status: bắt buộc, chỉ nhận giá trị 'active' hoặc 'inactive'
+     */
+    public function update(Request $request, $id)
+    {
+        $wallet = Wallet::findOrFail($id);
+
+        $wallet->update([
+            'bank_name' => $request->bank_name,
+            'bank_account' => $request->bank_account,
+            'account_holder' => $request->account_holder,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('admin.wallet.index')
+            ->with('success', 'Cập nhật ví thành công!');
+    }
 }

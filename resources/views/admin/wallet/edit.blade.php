@@ -13,7 +13,7 @@
 
         <div class="card shadow-sm">
             <div class="card-body">
-                <form action="#" method="POST">
+                <form action="{{ route('admin.wallet.update', $wallet->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 
