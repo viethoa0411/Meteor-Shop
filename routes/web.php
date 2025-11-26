@@ -129,6 +129,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/transaction/{id}/refund/confirm', [WalletTransactionActionController::class, 'confirmRefund'])->name('transaction.refund.confirm');
         Route::get('/transaction/{id}/not-received', [WalletTransactionActionController::class, 'showNotReceived'])->name('transaction.not-received');
         Route::post('/transaction/{id}/cancel-order', [WalletTransactionActionController::class, 'cancelOrderFromTransaction'])->name('transaction.cancel-order');
+        Route::get('/transaction/{id}/details', [WalletTransactionActionController::class, 'showTransactionDetails'])->name('transaction.details');
     });
 
     // ====== ACCOUNT MANAGEMENT ======

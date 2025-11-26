@@ -24,7 +24,7 @@
             </div>
         @endif
 
-        <a href="#"
+        <a href="{{ route('admin.wallet.transaction.details', $transaction->id) }}"
            class="btn btn-sm btn-info"
            title="Hiển thị chi tiết giao dịch">
             <i class="bi bi-info-circle"></i> Chi Tiết

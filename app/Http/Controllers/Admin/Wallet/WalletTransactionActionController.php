@@ -286,4 +286,11 @@ class WalletTransactionActionController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+    // Hiển thị chi tiết mã giao dịch, lịch sử hành động
+    public function showTransactionDetails($transactionId)
+    {
+        $transaction = Transaction::with(['order', 'wallet', 'logs.user', 'processor'])->findOrFail($transactionId);
+
+        return view('admin.wallet.transaction-details', compact('transaction'));
+    }
   }
