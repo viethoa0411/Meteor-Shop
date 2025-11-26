@@ -293,4 +293,27 @@ class WalletTransactionActionController extends Controller
 
         return view('admin.wallet.transaction-details', compact('transaction'));
     }
+     /**
+     * ========================================
+     * HIỂN THỊ FORM HOÀN TIỀN
+     * ========================================
+     * Hiển thị form hoàn tiền cho giao dịch
+     * Kiểm tra xem đơn hàng có yêu cầu hoàn tiền chưa
+     */
+    public function showRefundForm($transactionId)
+    {
+        $transaction = Transaction::with(['order', 'wallet', 'order.refunds'])->findOrFail($transactionId);
+
+        if (!$transaction->order) {
+            return redirect()->back()
+                ->with('error', 'Giao dịch này không liên quan đến đơn hàng.');
+        }
+
+        $refundRequest = $transaction->order->refunds()
+            ->where('refund_type', 'cancel')
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        return view('admin.wallet.refund-form', compact('transaction', 'refundRequest'));
+    }
   }

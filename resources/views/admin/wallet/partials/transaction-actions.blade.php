@@ -1,7 +1,7 @@
 @if ($transaction->status === 'pending' && $transaction->order && in_array($transaction->payment_method, ['bank', 'momo']))
     <div class="d-flex flex-wrap gap-1">
         @if(!$transaction->marked_as_received_at)
-            <form action="#"
+            <form action="{{ route('admin.wallet.transaction.received', $transaction->id) }}"
                   method="POST" class="d-inline">
                 @csrf
                 <button type="submit" class="btn btn-sm btn-success"
@@ -10,7 +10,7 @@
                     <i class="bi bi-check-circle"></i> Đã nhận
                 </button>
             </form>
-            <a href="#"
+            <a href="{{ route('admin.wallet.transaction.not-received', $transaction->id) }}"
                class="btn btn-sm btn-warning"
                title="Chưa Nhận - Xem thông tin đơn hàng">
                 <i class="bi bi-exclamation-circle"></i> Chưa Nhận
