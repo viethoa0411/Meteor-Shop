@@ -13,14 +13,21 @@ class OrderDetail extends Model
     protected $fillable = [
         'order_id',
         'product_id',
+        'product_name',
+        'variant_id',
+        'variant_name',
+        'variant_sku',
         'quantity',
         'price',
         'subtotal',
+        'total_price',
+        'image_path',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'subtotal' => 'decimal:2',
+        'total_price' => 'decimal:2',
     ];
 
     // Relationships
