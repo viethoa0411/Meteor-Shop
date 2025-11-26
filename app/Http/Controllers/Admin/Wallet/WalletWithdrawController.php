@@ -208,6 +208,57 @@ class WalletWithdrawController extends Controller
             'totalAmount'
         ));
     }
+    /**
+     * ========================================
+     * CHỐT GIAO DỊCH ĐÃ NHẬN TIỀN
+     * ========================================
+     * Chốt giao dịch đã đánh dấu nhận tiền vào ví:
+     * - Cộng tiền vào ví (nếu là income)
+     * - Cập nhật trạng thái giao dịch thành 'completed'
+     * - Cập nhật trạng thái thanh toán đơn hàng thành 'paid'
+     * - Lưu lịch sử hành động
+     */
+    public function settleReceivedTransaction($transactionId)
+    {
+        $transaction = Transaction::with(['wallet', 'order'])->findOrFail($transactionId);
+
+        if ($transaction->status !== 'pending' || !$transaction->marked_as_received_at) {
+            return redirect()->back()->with('error', 'Giao dịch không hợp lệ để chốt.');
+        }
+
+        DB::beginTransaction();
+        try {
+            if ($transaction->type === 'income') {
+                $transaction->wallet->addBalance($transaction->amount);
+            }
+
+            $transaction->update([
+                'status' => 'completed',
+                'completed_at' => now(),
+                'processed_by' => Auth::id(),
+            ]);
+
+            TransactionLog::create([
+                'transaction_id' => $transaction->id,
+                'user_id' => Auth::id(),
+                'action' => 'settle_received',
+                'description' => 'Chốt giao dịch đã nhận - cộng tiền vào ví',
+                'old_data' => ['status' => 'pending'],
+                'new_data' => ['status' => 'completed', 'processed_by' => Auth::id()],
+            ]);
+
+            if ($transaction->order) {
+                $transaction->order->update(['payment_status' => 'paid']);
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Chốt giao dịch thành công!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
 
 }
 

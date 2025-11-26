@@ -61,7 +61,7 @@
                                         </td>
                                         <td>{{ $transaction->marked_as_received_at?->format('d/m/Y H:i') }}</td>
                                         <td class="d-flex gap-2 flex-wrap">
-                                            <form action="#"
+                                            <form action="{{ route('admin.wallet.transaction.settle', $transaction->id) }}"
                                                   method="POST">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-success"
