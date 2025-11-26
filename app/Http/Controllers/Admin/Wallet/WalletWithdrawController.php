@@ -34,7 +34,13 @@ class WalletWithdrawController extends Controller
             abort(403, 'Bạn không có quyền truy cập ví này.');
         }
 
-         
+        $request->validate([
+            'amount' => 'required|numeric|min:1000',
+            'bank_name' => 'required|string|max:255',
+            'bank_account' => 'required|string|max:255',
+            'account_holder' => 'required|string|max:255',
+            'note' => 'nullable|string|max:1000',
+        ]);
 
         if ($request->amount > $wallet->balance) {
             return back()->withInput()->with('error', 'Số dư ví không đủ để rút tiền.');
