@@ -67,7 +67,7 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="#" 
+                                                <a href="{{ route('admin.wallet.show', $wallet->id) }}" 
                                                    class="btn btn-sm btn-info" title="Xem chi tiết">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
