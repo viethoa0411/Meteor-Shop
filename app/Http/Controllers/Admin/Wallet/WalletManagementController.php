@@ -84,7 +84,12 @@ class WalletManagementController extends Controller
     public function update(Request $request, $id)
     {
         $wallet = Wallet::findOrFail($id);
-
+        $request->validate([
+            'bank_name' => 'required|string|max:255',
+            'bank_account' => 'required|string|max:255',
+            'account_holder' => 'required|string|max:255',
+            'status' => 'required|in:active,inactive',
+        ]);
         $wallet->update([
             'bank_name' => $request->bank_name,
             'bank_account' => $request->bank_account,
