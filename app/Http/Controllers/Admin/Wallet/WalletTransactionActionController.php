@@ -114,4 +114,17 @@ class WalletTransactionActionController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+    // Hiển thị trang yêu cầu hoàn tiền
+    public function showRefund($transactionId)
+    {
+        $transaction = Transaction::with(['order', 'refund.user', 'wallet', 'logs.user'])
+            ->findOrFail($transactionId);
+
+        if (!$transaction->refund) {
+            return redirect()->back()
+                ->with('error', 'Giao dịch này không có yêu cầu hoàn tiền.');
+        }
+
+        return view('admin.wallet.refund-detail', compact('transaction'));
+    }
   }

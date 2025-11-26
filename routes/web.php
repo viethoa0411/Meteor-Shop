@@ -124,6 +124,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/{id}/transactions', [WalletTransactionFilterController::class, 'index'])->name('transactions.filter');
         Route::post('/transaction/{id}/confirm', [WalletTransactionActionController::class, 'confirmTransaction'])->name('transaction.confirm');
         Route::post('/transaction/{id}/cancel', [WalletTransactionActionController::class, 'cancelTransaction'])->name('transaction.cancel');
+
+        Route::get('/transaction/{id}/refund', [WalletTransactionActionController::class, 'showRefund'])->name('transaction.refund');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
