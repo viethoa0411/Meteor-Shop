@@ -47,7 +47,7 @@
         @endif
     </div>
 @elseif ($transaction->status === 'pending')
-    <form action="#"
+    <form action="{{ route('admin.wallet.transaction.confirm', $transaction->id) }}"
           method="POST" class="d-inline">
         @csrf
         <button type="submit" class="btn btn-sm btn-success"
@@ -55,7 +55,7 @@
             <i class="bi bi-check-circle"></i> Xác nhận
         </button>
     </form>
-    <form action="#"
+    <form action="{{ route('admin.wallet.transaction.cancel', $transaction->id) }}"
           method="POST" class="d-inline">
         @csrf
         <button type="submit" class="btn btn-sm btn-danger"
@@ -70,6 +70,21 @@
             <i class="bi bi-arrow-counterclockwise"></i> Hoàn tiền
         </a>
     @endif
-
+@else
+    @if ($transaction->processor)
+        <small class="text-muted d-block">
+            <i class="bi bi-person-check"></i>
+            {{ $transaction->processor->name }}
+        </small>
+    @endif
+    @if ($transaction->logs->count() > 0)
+        <button type="button"
+                class="btn btn-sm btn-info"
+                data-bs-toggle="modal"
+                data-bs-target="#logModal{{ $transaction->id }}"
+                title="Xem lịch sử hành động">
+            <i class="bi bi-clock-history"></i>
+        </button>
+    @endif
 @endif
 

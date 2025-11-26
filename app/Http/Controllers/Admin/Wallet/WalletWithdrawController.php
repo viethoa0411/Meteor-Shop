@@ -118,5 +118,61 @@ class WalletWithdrawController extends Controller
         return view('admin.wallet.withdraw-history', compact('wallet', 'withdrawals'));
     }
 
+    /**
+     * ========================================
+     * ĐÁNH DẤU ĐÃ NHẬN TIỀN (CHƯA CHỐT)
+     * ========================================
+     * Đánh dấu giao dịch đã nhận tiền nhưng chưa chốt vào ví:
+     * - Chỉ áp dụng cho giao dịch pending
+     * - Chỉ áp dụng cho thanh toán online (bank, momo)
+     * - Lưu thông tin người đánh dấu và thời gian
+     * - Chuyển sang trang xác nhận để chốt sau
+     */
+    public function receivedTransaction($transactionId)
+    {
+        $transaction = Transaction::with(['wallet', 'order'])->findOrFail($transactionId);
+
+        if ($transaction->status !== 'pending') {
+            return redirect()->back()
+                ->with('error', 'Giao dịch này đã được xử lý.');
+        }
+
+        if (!$transaction->order || !in_array($transaction->payment_method, ['bank', 'momo'])) {
+            return redirect()->back()
+                ->with('error', 'Chỉ áp dụng cho đơn hàng thanh toán online.');
+        }
+
+        if ($transaction->marked_as_received_at) {
+            return redirect()->back()
+                ->with('error', 'Giao dịch này đã được đánh dấu chờ chốt.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $transaction->update([
+                'marked_as_received_by' => Auth::id(),
+                'marked_as_received_at' => now(),
+            ]);
+
+            TransactionLog::create([
+                'transaction_id' => $transaction->id,
+                'user_id' => Auth::id(),
+                'action' => 'mark_received',
+                'description' => 'Đánh dấu giao dịch đã nhận - chờ chốt',
+                'old_data' => null,
+                'new_data' => ['marked_as_received_by' => Auth::id()],
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.wallet.receive.confirmations', $transaction->wallet_id)
+                ->with('success', 'Đã đánh dấu giao dịch chờ chốt. Vui lòng chốt ở trang xác nhận.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
 }
 

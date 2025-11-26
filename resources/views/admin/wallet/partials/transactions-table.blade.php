@@ -67,6 +67,3 @@
     </div>
 @endif
 
-
-
-Hiển thị tất cả các mã giao dịch
