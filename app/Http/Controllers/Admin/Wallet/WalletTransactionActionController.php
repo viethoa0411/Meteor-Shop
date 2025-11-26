@@ -232,4 +232,58 @@ class WalletTransactionActionController extends Controller
 
         return view('admin.wallet.not-received', compact('transaction'));
     }
+    /**
+     * ========================================
+     * HỦY ĐƠN HÀNG TỪ TRANG CHƯA NHẬN TIỀN
+     * ========================================
+     * Hủy đơn hàng và giao dịch khi chưa nhận được tiền:
+     * - Cập nhật trạng thái giao dịch thành 'cancelled'
+     * - Cập nhật trạng thái đơn hàng thành 'cancelled'
+     * - Lưu lịch sử hành động
+     */
+    public function cancelOrderFromTransaction($transactionId)
+    {
+        $transaction = Transaction::with(['order', 'wallet'])->findOrFail($transactionId);
+
+        if ($transaction->status !== 'pending') {
+            return redirect()->back()
+                ->with('error', 'Giao dịch này đã được xử lý.');
+        }
+
+        if (!$transaction->order || !in_array($transaction->payment_method, ['bank', 'momo'])) {
+            return redirect()->back()
+                ->with('error', 'Chỉ áp dụng cho đơn hàng thanh toán online.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $transaction->update([
+                'status' => 'cancelled',
+                'processed_by' => Auth::id(),
+            ]);
+
+            $transaction->order->update([
+                'order_status' => 'cancelled',
+                'cancelled_at' => now(),
+            ]);
+
+            TransactionLog::create([
+                'transaction_id' => $transaction->id,
+                'user_id' => Auth::id(),
+                'action' => 'cancel',
+                'description' => 'Hủy đơn hàng từ trang Chưa Nhận',
+                'old_data' => ['status' => 'pending', 'order_status' => $transaction->order->order_status],
+                'new_data' => ['status' => 'cancelled', 'order_status' => 'cancelled', 'processed_by' => Auth::id()],
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.wallet.show', $transaction->wallet_id)
+                ->with('success', 'Đã hủy đơn hàng và giao dịch thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
   }

@@ -212,7 +212,14 @@
                             <li>Chuyển trạng thái giao dịch sang <strong>"Đã hủy"</strong></li>
                             <li>Chuyển trạng thái đơn hàng sang <strong>"Đã hủy"</strong></li>
                         </ul>
-                        <a href="#">Hủy đơn hàng vì chưa nhận tiền</a>
+                        <form action="{{ route('admin.wallet.transaction.cancel-order', $transaction->id) }}" 
+                              method="POST" 
+                              onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này? Hành động này không thể hoàn tác.');">
+                            @csrf
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-x-circle me-2"></i>Hủy đơn hàng
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
