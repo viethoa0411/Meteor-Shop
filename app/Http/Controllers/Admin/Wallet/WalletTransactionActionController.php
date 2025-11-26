@@ -127,4 +127,84 @@ class WalletTransactionActionController extends Controller
 
         return view('admin.wallet.refund-detail', compact('transaction'));
     }
+    // Xác nhận hoàn tiền, xử lý hoàn tiền
+    public function confirmRefund($transactionId)
+    {
+        $transaction = Transaction::with(['wallet', 'refund', 'order'])->findOrFail($transactionId);
+
+        if (!$transaction->refund) {
+            return redirect()->back()
+                ->with('error', 'Giao dịch này không có yêu cầu hoàn tiền.');
+        }
+
+        if ($transaction->refund->status !== 'pending') {
+            return redirect()->back()
+                ->with('error', 'Yêu cầu hoàn tiền này đã được xử lý.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $refundTransaction = Transaction::create([
+                'order_id' => $transaction->order_id,
+                'wallet_id' => $transaction->wallet_id,
+                'refund_id' => $transaction->refund_id,
+                'amount' => $transaction->refund->refund_amount,
+                'type' => 'expense',
+                'status' => 'completed',
+                'payment_method' => $transaction->payment_method,
+                'transaction_code' => 'REFUND_' . $transaction->transaction_code,
+                'description' => 'Hoàn tiền cho đơn hàng #' . ($transaction->order->order_code ?? 'N/A'),
+                'completed_at' => now(),
+                'processed_by' => Auth::id(),
+            ]);
+
+            $transaction->wallet->subtractBalance($transaction->refund->refund_amount);
+
+            if ($transaction->status === 'pending') {
+                $transaction->update([
+                    'status' => 'cancelled',
+                    'processed_by' => Auth::id(),
+                ]);
+            }
+
+            $transaction->refund->update([
+                'status' => 'completed',
+                'processed_by' => Auth::id(),
+                'processed_at' => now(),
+            ]);
+
+            if ($transaction->order) {
+                $transaction->order->update([
+                    'refunded_at' => now(),
+                ]);
+            }
+
+            TransactionLog::create([
+                'transaction_id' => $transaction->id,
+                'user_id' => Auth::id(),
+                'action' => 'refund',
+                'description' => 'Hoàn tiền - Tạo giao dịch chi mới',
+                'old_data' => ['status' => $transaction->status, 'type' => $transaction->type],
+                'new_data' => ['status' => 'cancelled', 'refund_transaction_id' => $refundTransaction->id],
+            ]);
+
+            TransactionLog::create([
+                'transaction_id' => $refundTransaction->id,
+                'user_id' => Auth::id(),
+                'action' => 'refund',
+                'description' => 'Giao dịch hoàn tiền được tạo',
+                'old_data' => null,
+                'new_data' => ['type' => 'expense', 'status' => 'completed', 'amount' => $refundTransaction->amount],
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.wallet.show', $transaction->wallet_id)
+                ->with('success', 'Hoàn tiền thành công! Số dư ví đã được cập nhật.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
   }

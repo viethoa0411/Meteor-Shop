@@ -258,7 +258,14 @@
                                     <li>Trạng thái giao dịch gốc sẽ thay đổi</li>
                                 </ul>
                             </div>
-                            <a href="#">Xác nhận hoàn tiền</a>
+                            <form action="{{ route('admin.wallet.transaction.refund.confirm', $transaction->id) }}" 
+                                  method="POST" 
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xác nhận hoàn tiền? Số dư ví sẽ bị trừ {{ number_format($transaction->refund->refund_amount, 0, ',', '.') }} đ')">
+                                @csrf
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="bi bi-check-circle me-2"></i>Xác nhận hoàn tiền
+                                </button>
+                            </form>
                         </div>
                     </div>
                 @endif

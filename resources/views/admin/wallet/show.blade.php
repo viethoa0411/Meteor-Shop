@@ -93,7 +93,7 @@
                     </div>
                 </div>
 
-               
+                
             </div>
         </div>
 
@@ -140,5 +140,54 @@
         </div>
     </div>
 
+    {{-- Modal hiển thị lịch sử hành động --}}
+    @foreach ($transactions as $transaction)
+        @if ($transaction->logs->count() > 0)
+            <div class="modal fade" id="logModal{{ $transaction->id }}" tabindex="-1" aria-labelledby="logModalLabel{{ $transaction->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="logModalLabel{{ $transaction->id }}">
+                                Lịch sử hành động - Mã GD: {{ $transaction->transaction_code }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Thời gian</th>
+                                            <th>Người thực hiện</th>
+                                            <th>Hành động</th>
+                                            <th>Mô tả</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($transaction->logs as $log)
+                                            <tr>
+                                                <td>{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
+                                                <td>
+                                                    <strong>{{ $log->user->name }}</strong><br>
+                                                    <small class="text-muted">{{ $log->user->email }}</small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info">{{ $log->action_label }}</span>
+                                                </td>
+                                                <td>{{ $log->description }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 @endsection
 
