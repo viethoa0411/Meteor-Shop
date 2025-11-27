@@ -5,9 +5,13 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ProductPublicController;
+use App\Http\Controllers\Admin\ProductController;
+
+// --- ĐÃ SỬA: Đổi thành ProductController mới ---
+use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
@@ -44,6 +48,14 @@ Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name
 Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 
+// ============ CLIENT ROUTES ============
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
+Route::get('/home', [HomeController::class, 'index']);
+Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
+Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category');
+Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail');
+
+
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
 
@@ -66,6 +78,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::put('/update/{id}', [CategoryController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
     });
+
 
     // ====== PRODUCTS ======
     Route::prefix('products')->name('products.')->group(function () {
@@ -172,6 +185,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
+
+
     });
 });
 

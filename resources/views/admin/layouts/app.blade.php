@@ -311,7 +311,6 @@
                 <a class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i>
                             {{ Auth::user()->name ?? 'Admin' }}
-                            <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                     <li><a href="" class="dropdown-item">Profile</a></li>

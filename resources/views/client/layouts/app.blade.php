@@ -41,7 +41,7 @@
         }
 
         .container-header {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -156,7 +156,7 @@
         .menu-toggle {
             font-size: 22px;
             cursor: pointer;
-            padding: 6px 10px;
+            padding: 6px 5px;
             transition: color 0.3s;
         }
 
@@ -336,6 +336,7 @@
             z-index: 1
         }
 
+
         /* Đã bỏ comment cho button, sử dụng style từ file 2 */
         button {
             z-index: 1;
@@ -346,7 +347,7 @@
             color: #fff;
             cursor: pointer;
             font-style: 1em;
-        }
+        } */
 
         .article-card:hover {
             transform: translateY(-10px);
@@ -493,9 +494,11 @@
             </div>
         </div>
     </header>
+
     <main class="container">
         @yield('content')
     </main>
+    
     <div class="offcanvas offcanvas-end" tabindex="-1" id="cartCanvas">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title">Giỏ hàng</h5>

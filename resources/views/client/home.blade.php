@@ -34,6 +34,7 @@
         @endif
     </div>
 
+
     {{-- Sản phẩm mới --}}
     <div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
         <h2
@@ -288,8 +289,6 @@
                 onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'">
         </div>
     </div>
-
-    {{--  --}}
 
     <script>
         let i = 0,

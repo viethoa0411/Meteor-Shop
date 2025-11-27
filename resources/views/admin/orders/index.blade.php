@@ -1,1 +1,1 @@
-//file này không có nội dung gì
+//file này không sử dụng
