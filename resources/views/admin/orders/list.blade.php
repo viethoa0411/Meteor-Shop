@@ -2,7 +2,12 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">Danh sách đơn hàng</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Danh sách đơn hàng</h2>
+        <a href="{{ route('admin.orders.analytics', ['date_range' => 'all', 'start_date' => '2025-10-01', 'end_date' => '2025-11-29', 'status' => 'all']) }}" class="btn btn-primary">
+            <i class="bi bi-bar-chart me-1"></i>Thống kê
+        </a>
+    </div>
 
     {{-- BỘ LỌC TRẠNG THÁI + TÌM KIẾM --}}
     <form method="GET" action="{{ route('admin.orders.list') }}" class="row g-2 mb-3 align-items-center">
