@@ -5,7 +5,7 @@
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0 order-view-table">
                 <thead class="table-light">
                     <tr>
                         <th width="80">Ảnh</th>
@@ -20,16 +20,18 @@
                     @foreach($order->items as $item)
                         <tr>
                             <td>
-                                @if($item->image_path)
-                                    <img src="{{ asset('storage/' . $item->image_path) }}" 
-                                         alt="{{ $item->product_name }}" 
-                                         class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                                @else
-                                    <div class="bg-light d-flex align-items-center justify-content-center" 
-                                         style="width: 60px; height: 60px;">
-                                        <i class="bi bi-image text-muted"></i>
-                                    </div>
-                                @endif
+                                @php
+                                    $product = $item->product;
+                                    $imagePath = $item->image_path
+                                        ?? ($product?->image ?? null)
+                                        ?? ($product?->images?->first()?->image);
+                                    $imageUrl = $imagePath
+                                        ? asset('storage/' . ltrim($imagePath, '/'))
+                                        : 'https://via.placeholder.com/60x60?text=No+Image';
+                                @endphp
+                                <img src="{{ $imageUrl }}" 
+                                     alt="{{ $item->product_name }}" 
+                                     class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                             </td>
                             <td>
                                 <div class="fw-bold">{{ $item->product_name }}</div>
@@ -52,36 +54,36 @@
                 </tbody>
                 <tfoot class="table-light">
                     <tr>
-                        <td colspan="5" class="text-start fw-semibold" style="padding: 1rem 1.5rem; color: #0d6efd !important;">
+                        <td colspan="5" class="text-start fw-semibold">
                             Tổng tiền hàng:
                         </td>
-                        <td class="text-end fw-semibold" style="padding: 1rem 1.5rem; color: #0d6efd !important;">
+                        <td class="text-end fw-semibold">
                             {{ number_format($order->sub_total ?? $order->total_price, 0, ',', '.') }}₫
                         </td>
                     </tr>
                     @if($order->discount_amount > 0)
                         <tr>
-                            <td colspan="5" class="text-start fw-semibold" style="padding: 0.75rem 1.5rem; color: #0d6efd !important;">
+                            <td colspan="5" class="text-start fw-semibold">
                                 Chiết khấu:
                             </td>
-                            <td class="text-end fw-semibold" style="padding: 0.75rem 1.5rem; color: #dc3545 !important;">
+                            <td class="text-end fw-semibold order-discount-value">
                                 -{{ number_format($order->discount_amount, 0, ',', '.') }}₫
                             </td>
                         </tr>
                     @endif
                     <tr>
-                        <td colspan="5" class="text-start fw-semibold" style="padding: 0.75rem 1.5rem; color: #0d6efd !important;">
+                        <td colspan="5" class="text-start fw-semibold">
                             Phí vận chuyển:
                         </td>
-                        <td class="text-end fw-semibold" style="padding: 0.75rem 1.5rem; color: #0d6efd !important;">
+                        <td class="text-end fw-semibold">
                             {{ number_format($order->shipping_fee ?? 0, 0, ',', '.') }}₫
                         </td>
                     </tr>
-                    <tr class="border-top border-2" style="background-color: #e7f3ff;">
-                        <td colspan="5" class="text-start fw-bold" style="padding: 1.25rem 1.5rem; font-size: 1.1rem; color: #0d6efd !important;">
+                    <tr class="order-total-row order-divider">
+                        <td colspan="5" class="text-start fw-bold">
                             TỔNG CỘNG:
                         </td>
-                        <td class="text-end fw-bold" style="padding: 1.25rem 1.5rem; font-size: 1.1rem; color: #0d6efd !important;">
+                        <td class="text-end fw-bold">
                             {{ number_format($order->final_total, 0, ',', '.') }}₫
                         </td>
                     </tr>

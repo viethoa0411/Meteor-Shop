@@ -147,12 +147,19 @@
                                     @foreach($order->items as $item)
                                         <tr>
                                             <td>
+                                                @php
+                                                    $product = $item->product;
+                                                    $imagePath = $item->image_path
+                                                        ?? ($product?->image ?? null)
+                                                        ?? ($product?->images?->first()?->image);
+                                                    $imageUrl = $imagePath
+                                                        ? asset('storage/' . ltrim($imagePath, '/'))
+                                                        : 'https://via.placeholder.com/40x40?text=No+Image';
+                                                @endphp
                                                 <div class="d-flex align-items-center">
-                                                    @if($item->product && $item->product->image)
-                                                        <img src="{{ asset('storage/' . $item->product->image) }}" 
-                                                             alt="{{ $item->product->name }}" 
-                                                             class="me-2" style="width: 40px; height: 40px; object-fit: cover;">
-                                                    @endif
+                                                    <img src="{{ $imageUrl }}" 
+                                                         alt="{{ $item->product->name ?? $item->product_name }}" 
+                                                         class="me-2 rounded border" style="width: 40px; height: 40px; object-fit: cover;">
                                                     <div>
                                                         <div class="fw-bold">{{ $item->product->name ?? 'N/A' }}</div>
                                                         <small class="text-muted">{{ number_format($item->price, 0, ',', '.') }}₫</small>

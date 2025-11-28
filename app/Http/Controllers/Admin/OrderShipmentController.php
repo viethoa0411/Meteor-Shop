@@ -29,7 +29,7 @@ class OrderShipmentController extends Controller
      */
     public function create($orderId)
     {
-        $order = Order::with('items')->findOrFail($orderId);
+        $order = Order::with(['items.product', 'items.product.images'])->findOrFail($orderId);
 
         if ($order->order_status === 'cancelled' || $order->order_status === 'completed') {
             return back()->with('error', 'Không thể tạo đơn vận chuyển cho đơn hàng này');

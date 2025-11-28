@@ -7,71 +7,79 @@
                 <h5 class="mb-0"><i class="bi bi-box-seam"></i> Sản phẩm trong đơn</h5>
             </div>
             <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead style="background-color: #f8f9fa;">
+                <table class="table table-hover mb-0 order-view-table">
+                    <thead>
                         <tr>
-                            <th class="fw-semibold" style="padding: 1rem 1.5rem; color: #212529 !important;">Sản phẩm</th>
-                            <th class="fw-semibold" style="padding: 1rem 1.5rem; color: #212529 !important;">Giá</th>
-                            <th class="fw-semibold" style="padding: 1rem 1.5rem; color: #212529 !important;">SL</th>
-                            <th class="text-end fw-semibold" style="padding: 1rem 1.5rem; color: #212529 !important;">Thành tiền</th>
+                            <th class="fw-semibold">Sản phẩm</th>
+                            <th class="fw-semibold">Giá</th>
+                            <th class="fw-semibold">SL</th>
+                            <th class="text-end fw-semibold">Thành tiền</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($order->items as $item)
                             <tr>
-                                <td style="color: #212529 !important;">
+                                <td>
+                                    @php
+                                        $product = $item->product;
+                                        $imagePath = $item->image_path
+                                            ?? ($product?->image ?? null)
+                                            ?? ($product?->images?->first()?->image);
+                                        $imageUrl = $imagePath
+                                            ? asset('storage/' . ltrim($imagePath, '/'))
+                                            : 'https://via.placeholder.com/60x60?text=No+Image';
+                                    @endphp
                                     <div class="d-flex align-items-center">
-                                        @if($item->image_path)
-                                            <img src="{{ asset('storage/' . $item->image_path) }}" 
-                                                 alt="{{ $item->product_name }}" 
-                                                 class="me-2" style="width: 50px; height: 50px; object-fit: cover;">
-                                        @endif
+                                        <img src="{{ $imageUrl }}"
+                                             alt="{{ $item->product_name }}"
+                                             class="me-3 rounded border"
+                                             style="width: 55px; height: 55px; object-fit: cover;">
                                         <div>
-                                            <div class="fw-bold" style="color: #212529 !important;">{{ $item->product_name }}</div>
+                                            <div class="fw-bold order-product-name">{{ $item->product_name }}</div>
                                             @if($item->variant_name)
-                                                <small style="color: #6c757d !important;">{{ $item->variant_name }}</small>
+                                                <small class="text-muted">{{ $item->variant_name }}</small>
                                             @endif
                                         </div>
                                     </div>
                                 </td>
-                                <td style="color: #212529 !important;">{{ number_format($item->price, 0, ',', '.') }}₫</td>
-                                <td style="color: #212529 !important;">{{ $item->quantity }}</td>
-                                <td class="text-end fw-bold" style="color: #212529 !important;">{{ number_format($item->subtotal, 0, ',', '.') }}₫</td>
+                                <td>{{ number_format($item->price, 0, ',', '.') }}₫</td>
+                                <td>{{ $item->quantity }}</td>
+                                <td class="text-end fw-bold">{{ number_format($item->subtotal, 0, ',', '.') }}₫</td>
                             </tr>
                         @endforeach
                     </tbody>
                     <tfoot>
-                        <tr class="border-top">
-                            <td colspan="3" class="text-start fw-semibold" style="padding: 1rem 1.5rem; background-color: #f8f9fa; color: #212529 !important;">
+                        <tr>
+                            <td colspan="3" class="text-start fw-semibold">
                                 Tổng tiền hàng:
                             </td>
-                            <td class="text-end fw-semibold" style="padding: 1rem 1.5rem; background-color: #f8f9fa; color: #212529 !important;">
+                            <td class="text-end fw-semibold">
                                 {{ number_format($order->sub_total ?? $order->total_price, 0, ',', '.') }}₫
                             </td>
                         </tr>
                         @if($order->discount_amount > 0)
                             <tr>
-                                <td colspan="3" class="text-start fw-semibold" style="padding: 0.75rem 1.5rem; background-color: #f8f9fa; color: #212529 !important;">
+                                <td colspan="3" class="text-start fw-semibold">
                                     Chiết khấu:
                                 </td>
-                                <td class="text-end fw-semibold" style="padding: 0.75rem 1.5rem; background-color: #f8f9fa; color: #dc3545 !important;">
+                                <td class="text-end fw-semibold order-discount-value">
                                     -{{ number_format($order->discount_amount, 0, ',', '.') }}₫
                                 </td>
                             </tr>
                         @endif
                         <tr>
-                            <td colspan="3" class="text-start fw-semibold" style="padding: 0.75rem 1.5rem; background-color: #f8f9fa; color: #212529 !important;">
+                            <td colspan="3" class="text-start fw-semibold">
                                 Phí vận chuyển:
                             </td>
-                            <td class="text-end fw-semibold" style="padding: 0.75rem 1.5rem; background-color: #f8f9fa; color: #212529 !important;">
+                            <td class="text-end fw-semibold">
                                 {{ number_format($order->shipping_fee ?? 0, 0, ',', '.') }}₫
                             </td>
                         </tr>
-                        <tr class="border-top border-2" style="background-color: #e7f3ff;">
-                            <td colspan="3" class="text-start fw-bold" style="padding: 1.25rem 1.5rem; font-size: 1.1rem; color: #212529 !important;">
+                        <tr class="order-total-row order-divider">
+                            <td colspan="3" class="text-start fw-bold">
                                 TỔNG CỘNG:
                             </td>
-                            <td class="text-end fw-bold" style="padding: 1.25rem 1.5rem; font-size: 1.1rem; color: #0d6efd !important;">
+                            <td class="text-end fw-bold">
                                 {{ number_format($order->final_total, 0, ',', '.') }}₫
                             </td>
                         </tr>
