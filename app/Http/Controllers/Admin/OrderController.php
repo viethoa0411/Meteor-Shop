@@ -124,6 +124,7 @@ class OrderController extends Controller
         $statusTimestamps = [
             'processing' => 'confirmed_at',
             'shipping' => 'shipped_at',
+            'returned' => 'returned_at',
         ];
 
         $updatePayload = [

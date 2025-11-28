@@ -144,7 +144,11 @@
                                 Giao thành công: <span class="text-primary">{{ date('d/m/Y H:i', strtotime($order->delivered_at)) }}</span>
                             </li>
                         @endif
-                        @if ($order->order_status == 'returned' && isset($orderLogs) && $orderLogs->count() > 0)
+                        @if ($order->returned_at)
+                            <li class="list-group-item d-flex justify-content-between text-secondary">
+                                Đã trả hàng: <span>{{ date('d/m/Y H:i', strtotime($order->returned_at)) }}</span>
+                            </li>
+                        @elseif ($order->order_status == 'returned' && isset($orderLogs) && $orderLogs->count() > 0)
                             @php
                                 $returnedLog = $orderLogs->firstWhere('status', 'returned');
                             @endphp
