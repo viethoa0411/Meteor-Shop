@@ -264,6 +264,9 @@
                             <span class="badge bg-primary fs-6 px-3 py-2">
                                 Tổng: {{ number_format($totalFilteredOrders) }} đơn
                             </span>
+                            <a href="{{ route('admin.orders.analytics') }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-graph-up-arrow me-1"></i>Thống kê chi tiết
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -386,6 +389,7 @@
                                         <a href="{{ route('admin.orders.list') }}" class="btn btn-outline-primary">
                                             <i class="bi bi-list-ul me-1"></i>Xem tất cả
                                         </a>
+                                        
                                     </div>
                                 </div>
                             </div>
