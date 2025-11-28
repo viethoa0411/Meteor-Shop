@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\OrderAnalyticsController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductPublicController;
 use App\Http\Controllers\Admin\ProductController;
@@ -95,6 +96,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'list'])->name('list');
+        Route::get('/analytics', [OrderAnalyticsController::class, 'index'])->name('analytics');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
