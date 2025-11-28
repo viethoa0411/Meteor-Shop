@@ -9,6 +9,12 @@
     </div>
 @endif
 @section('content')
+@php
+    $filteredRevenue = $filteredRevenue ?? null;
+    $filteredOrdersCount = $filteredOrdersCount ?? null;
+    $startDate = $startDate ?? null;
+    $endDate = $endDate ?? null;
+@endphp
     <div class="row g-4 mb-4 d-flex align-items-stretch">
         {{-- Cột trái 60% --}}
         <div class="col-md-7 d-flex flex-column">
@@ -33,9 +39,19 @@
                         <div class="d-flex justify-content-between align-items-center h-100">
                             <div>
                                 <i class="bi bi-cart-check text-success display-5"></i>
-                                <h6 class="text-muted mb-1">Đơn hàng tháng này</h6>
+                                        @if (!is_null($filteredOrdersCount))
+                                            <h6 class="text-muted mb-1">Tổng đơn
+                                                
+                                            </h6>
+                                        @else
+                                            <h6 class="text-muted mb-1">Đơn hàng tháng này</h6>
+                                        @endif
                             </div>
-                            <h2 class="fw-bold">{{ number_format($totalOrders) }}</h2>
+                                    @if (!is_null($filteredOrdersCount))
+                                        <h2 class="fw-bold">{{ number_format($filteredOrdersCount) }}</h2>
+                                    @else
+                                        <h2 class="fw-bold">{{ number_format($totalOrders) }}</h2>
+                                    @endif
                         </div>
                     </div>
                 </div>
@@ -51,6 +67,36 @@
         </div>
         {{-- Cột phải 40% --}}
         <div class="col-md-5 d-flex flex-column">
+            {{-- Bộ lọc doanh thu --}}
+            <div class="card shadow-sm p-4 flex-grow-1">
+                <h6 class="mb-3 fw-semibold">Lọc doanh thu theo khoảng thời gian</h6>
+                <form method="GET" action="{{ route('admin.dashboard') }}">
+                    <div class="mb-2">
+                        <label for="filterStartDate" class="form-label small">Từ ngày</label>
+                        <input type="date" name="start_date" id="filterStartDate" class="form-control form-control-sm"
+                            value="{{ old('start_date', $startDate) }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="filterEndDate" class="form-label small">Đến ngày</label>
+                        <input type="date" name="end_date" id="filterEndDate" class="form-control form-control-sm"
+                            value="{{ old('end_date', $endDate) }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Lọc</button>
+                </form>
+
+                @if (!is_null($filteredRevenue))
+                    <div class="mt-3 p-2 border rounded bg-light">
+                        <strong>Doanh thu: </strong> {{ number_format($filteredRevenue) }} ₫
+                    </div>
+                @endif
+
+                @if (!is_null($filteredOrdersCount))
+                    <div class="mt-2 p-2 border rounded bg-light">
+                        <strong>Tổng đơn: </strong> {{ $filteredOrdersCount }}
+                    </div>
+                @endif
+            </div>
+
             {{-- Mục tiêu tháng --}}
             <div class="card shadow-sm p-4 mb-4" style="border-radius:18px;">
                 <h5 class="fw-semibold mb-1">Mục tiêu tháng</h5>
@@ -86,32 +132,6 @@
                         <h6 class="fw-bold">{{ number_format($todayRevenue) }} ₫</h6>
                     </div>
                 </div>
-            </div>
-
-
-
-            {{-- Bộ lọc doanh thu --}}
-            <div class="card shadow-sm p-4 flex-grow-1">
-                <h6 class="mb-3 fw-semibold">Lọc doanh thu theo khoảng thời gian</h6>
-                <form method="GET" action="{{ route('admin.dashboard') }}">
-                    <div class="mb-2">
-                        <label for="filterStartDate" class="form-label small">Từ ngày</label>
-                        <input type="date" name="start_date" id="filterStartDate" class="form-control form-control-sm"
-                            value="{{ old('start_date', $startDate) }}">
-                    </div>
-                    <div class="mb-3">
-                        <label for="filterEndDate" class="form-label small">Đến ngày</label>
-                        <input type="date" name="end_date" id="filterEndDate" class="form-control form-control-sm"
-                            value="{{ old('end_date', $endDate) }}">
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-sm w-100">Lọc</button>
-                </form>
-
-                @if (!is_null($filteredRevenue))
-                    <div class="mt-3 p-2 border rounded bg-light">
-                        <strong>Doanh thu: </strong> {{ number_format($filteredRevenue) }} ₫
-                    </div>
-                @endif
             </div>
         </div>
     </div>
@@ -264,6 +284,7 @@
 
 
         const revenueData = @json($revenueData);
+        const revenueLabels = @json($revenueLabels ?? []);
         const ctx = document.getElementById('revenueChart').getContext('2d');
 
         let isDark = document.documentElement.classList.contains("dark");
@@ -275,7 +296,7 @@
         let chart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                labels: revenueLabels.length ? revenueLabels : ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'],
                 datasets: [{
                     label: 'Doanh thu (VNĐ)',
                     data: revenueData,

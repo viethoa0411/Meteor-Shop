@@ -15,6 +15,7 @@ class DashboardController extends Controller
     {
         $month = now()->month;
         $year = now()->year;
+        $q = trim((string) $request->get('q'));
 
         // Thống kê người dùng và đơn hàng
         $totalUsers = User::where('role', 'user')->count();
@@ -55,25 +56,81 @@ class DashboardController extends Controller
             $filteredRevenue = $query->sum('final_total');
         }
 
-        // Biểu đồ doanh thu theo năm hiện tại
-        $monthlyRevenue = Order::select(
-            DB::raw('MONTH(created_at) as month'),
-            DB::raw('SUM(final_total) as revenue')
-        )
-            ->whereYear('created_at', $year)
-            ->where('order_status', 'completed')
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+        // Tổng số đơn (tất cả trạng thái) trong khoảng (nếu có filter)
+        $filteredOrdersCount = null;
+        if ($startDate || $endDate) {
+            $countQueryAll = Order::query();
+            if ($startDate) $countQueryAll->whereDate('created_at', '>=', $startDate);
+            if ($endDate) $countQueryAll->whereDate('created_at', '<=', $endDate);
+            $filteredOrdersCount = $countQueryAll->count();
+        }
 
-        $monthlyRevenueMap = $monthlyRevenue->keyBy('month');
+        // Biểu đồ doanh thu: nếu có filter ngày thì hiển thị theo tháng trong khoảng đó,
+        // ngược lại hiển thị theo 12 tháng của năm hiện tại
+        $revenueLabels = [];
         $revenueData = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $revenueData[] = $monthlyRevenueMap[$i]->revenue ?? 0;
+
+        if ($startDate || $endDate) {
+            // chuẩn hoá range
+            $start = \Carbon\Carbon::parse($startDate ?? ($year . '-01-01'))->startOfMonth();
+            $end = \Carbon\Carbon::parse($endDate ?? ($year . '-12-31'))->endOfMonth();
+
+            $monthlyRevenue = Order::select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('SUM(final_total) as revenue')
+            )
+                ->where('order_status', 'completed')
+                ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
+                ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
+                ->groupBy('year', 'month')
+                ->orderBy('year')
+                ->orderBy('month')
+                ->get();
+
+            $monthlyMap = $monthlyRevenue->keyBy(function ($r) {
+                return $r->year . '-' . str_pad($r->month, 2, '0', STR_PAD_LEFT);
+            });
+
+            // iterate months between start and end
+            $cursor = $start->copy();
+            while ($cursor->lte($end)) {
+                $key = $cursor->format('Y-m');
+                $revenueLabels[] = $cursor->format('m/Y');
+                $revenueData[] = $monthlyMap[$key]->revenue ?? 0;
+                $cursor->addMonth();
+            }
+        } else {
+            $monthlyRevenue = Order::select(
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('SUM(final_total) as revenue')
+            )
+                ->whereYear('created_at', $year)
+                ->where('order_status', 'completed')
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get();
+
+            $monthlyRevenueMap = $monthlyRevenue->keyBy('month');
+            for ($i = 1; $i <= 12; $i++) {
+                $revenueLabels[] = 'T' . $i;
+                $revenueData[] = $monthlyRevenueMap[$i]->revenue ?? 0;
+            }
         }
 
         // Lấy 5 đơn hàng gần nhất cùng user, sản phẩm và category
         $recentOrders = Order::with('user', 'items.product.category')
+            ->when($q, function ($query) use ($q) {
+                $query->where(function ($qBuilder) use ($q) {
+                    $qBuilder->where('order_code', 'like', "%{$q}%")
+                        ->orWhereHas('user', function ($u) use ($q) {
+                            $u->where('name', 'like', "%{$q}%");
+                        })
+                        ->orWhereHas('items.product', function ($p) use ($q) {
+                            $p->where('name', 'like', "%{$q}%");
+                        });
+                });
+            })
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -109,7 +166,9 @@ class DashboardController extends Controller
             'recentOrders',
             'latestOrder',
             'recentProducts',
-            'showTargetAlert'
+            'showTargetAlert',
+            'q',
+            'filteredOrdersCount'
         ));
     }
 }

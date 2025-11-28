@@ -93,29 +93,30 @@
                     @endphp
 
                     @if (!empty($allowedNextStatuses))
+                        @php
+                            $nextStatus = $allowedNextStatuses[0]; // Lấy trạng thái duy nhất
+                            $nextStatusLabel = $statusLabels[$nextStatus] ?? ucfirst($nextStatus);
+                        @endphp
+
                         <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
                             @csrf
                             @method('PUT')
-                            <label for="order_status" class="form-label small">Thay đổi trạng thái:</label>
-                            <div class="input-group">
-                                <select name="order_status" id="order_status" class="form-select">
-                                    @foreach ($allowedNextStatuses as $status)
-                                        <option value="{{ $status }}">
-                                            {{ $statusLabels[$status] ?? ucfirst($status) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-arrow-clockwise"></i> Lưu
+
+                            <p class="h6 mb-2">Trạng thái tiếp theo:</p>
+                            <div class="d-flex align-items-center gap-3">
+                                {{-- THẺ TRẠNG THÁI TO HƠN --}}
+                                <span class="badge bg-info text-dark fs-5 py-2 px-3 fw-bold">
+                                    {{ $nextStatusLabel }}
+                                </span>
+
+                                <input type="hidden" name="order_status" value="{{ $nextStatus }}">
+
+                                {{-- NÚT CẬP NHẬT RÕ RÀNG HƠN --}}
+                                <button type="submit" class="btn btn-primary btn-md">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Cập nhật ngay
                                 </button>
                             </div>
                         </form>
-                    @else
-                        {{-- Thông báo khi không có trạng thái tiếp theo --}}
-                        <div class="alert alert-info py-2 mt-3 small">
-                            <i class="bi bi-info-circle"></i> Đơn hàng ở trạng thái <strong>{{ $currentStatusLabel }}</strong>.
-                            Không thể cập nhật tiếp từ Admin.
-                        </div>
                     @endif
 
                     <hr>
@@ -143,10 +144,19 @@
                                 Giao thành công: <span class="text-primary">{{ date('d/m/Y H:i', strtotime($order->delivered_at)) }}</span>
                             </li>
                         @endif
-                        @if (isset($order->returned_at) && $order->returned_at)
+                        @if ($order->returned_at)
                             <li class="list-group-item d-flex justify-content-between text-secondary">
                                 Đã trả hàng: <span>{{ date('d/m/Y H:i', strtotime($order->returned_at)) }}</span>
                             </li>
+                        @elseif ($order->order_status == 'returned' && isset($orderLogs) && $orderLogs->count() > 0)
+                            @php
+                                $returnedLog = $orderLogs->firstWhere('status', 'returned');
+                            @endphp
+                            @if ($returnedLog)
+                                <li class="list-group-item d-flex justify-content-between text-secondary">
+                                    Đã trả hàng: <span>{{ date('d/m/Y H:i', strtotime($returnedLog->created_at)) }}</span>
+                                </li>
+                            @endif
                         @endif
                     </ul>
                 </div>

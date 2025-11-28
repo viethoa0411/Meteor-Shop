@@ -25,131 +25,208 @@
             margin: 0;
         }
 
-        /* Tùy chỉnh chung cho Header */
-        header {
-            max-width: 100%;
-            background: #111;
-            color: #fff;
-            padding: 5px 10px;
-            /* Tùy chỉnh theo file 1 */
+        .client-header {
+            background: #fff;
+            border-bottom: 1px solid #ebebeb;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
         }
 
-        .header {
+        .client-header__inner {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .client-logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111;
+            text-transform: none;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .client-search {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+            border: 1px solid #d6d6d6;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #fff;
+            max-width: 520px;
+        }
+
+        .client-search input {
+            flex: 1;
+            border: none;
+            padding: 10px 16px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .client-search button {
+            background: #3b3b3b;
+            border: none;
+            width: 48px;
+            display: grid;
+            place-items: center;
             color: #fff;
-            padding: 10px 0;
+        }
+
+        .client-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: 0;
+        }
+
+        .client-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2b2b2b;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .client-pill:hover {
+            color: #2b5c73;
+        }
+
+        .client-pill__icon {
+            font-size: 20px;
+        }
+
+        .client-account {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2b2b2b;
+        }
+
+        .client-account__icon {
+            font-size: 22px;
+            color: #6b6b6b;
+        }
+
+        .client-account__labels {
+            display: flex;
+            flex-direction: column;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .client-account__primary {
+            font-weight: 600;
+            color: #111;
+        }
+
+        .client-account__secondary {
+            color: #818181;
+            font-size: 13px;
+        }
+
+        .client-account__secondary.dropdown-toggle::after {
+            margin-left: 6px;
+        }
+
+        .client-cart {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #111;
             position: relative;
         }
 
-        .container-header {
-            max-width: 1300px;
-            margin: 0 auto;
+        .client-cart__badge {
+            position: absolute;
+            top: -6px;
+            right: -12px;
+            background: #ff6624;
+            color: #fff;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            font-size: 11px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .container-header>* {
-            align-self: center;
-        }
-
-        /* Logo */
-        .logo a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 20px;
+            justify-content: center;
             font-weight: 600;
         }
 
-        /* Menu ngang */
-        .main-nav>ul {
+        .client-nav {
+            border-top: 1px solid #ebebeb;
+            background: #fff;
+        }
+
+        .client-nav__inner {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .client-nav ul {
             list-style: none;
             display: flex;
-            gap: 20px;
+            gap: 24px;
             margin: 0;
-            padding: 0;
-        }
-
-        .main-nav a {
-            color: #fff;
-            text-decoration: none;
-            font-style: 14px;
+            padding: 10px 0;
+            color: #2b2b2b;
             font-weight: 500;
-            transition: color 0.3s;
         }
 
-        .main-nav a:hover {
-            color: #ffb703;
-        }
-
-        /* Dropdown Menu CSS */
-        .menu-item {
+        .client-nav li {
             position: relative;
         }
 
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: #ffffff;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            min-width: 220px;
-            z-index: 1002;
-            padding: 8px 0;
-            flex-direction: column;
-        }
-
-        .dropdown-menu li a {
-            display: block;
-            padding: 10px 14px;
-            color: #333;
-            white-space: nowrap;
-        }
-
-        .dropdown-menu li a:hover {
-            background: #f5f5f5;
-            color: #007bff;
-        }
-
-        .menu-item:hover>.dropdown-menu {
-            display: block !important;
-        }
-
-        /* End Dropdown Menu CSS */
-
-
-        /* Ô tìm kiếm */
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: #222;
-            border-radius: 20px;
-            overflow: hidden;
-            width: 20%;
-            align-self: center;
-            margin: 0;
-        }
-
-        .search-box input {
-            flex: 1;
-            /* Đã sửa lỗi chính tả từ 'float: 1' thành 'flex: 1' */
-            padding: 8px 12px;
-            border: none;
-            background: transparent;
-            color: #fff;
-        }
-
-        .search-box button {
+        .client-nav a,
+        .client-nav button {
+            color: inherit;
             background: none;
             border: none;
-            color: #fff;
-            padding: 8px 10px;
+            font: inherit;
+            padding: 0;
             cursor: pointer;
         }
 
-        .search-box button:hover {
-            color: #ffb703;
+        .client-nav .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+            min-width: 220px;
+            padding: 8px 0;
+            z-index: 1002;
+        }
+
+        .client-nav .dropdown-menu li a {
+            display: block;
+            padding: 10px 18px;
+            color: #333;
+            font-weight: 400;
+            white-space: nowrap;
+        }
+
+        .client-nav .dropdown-menu li a:hover {
+            background: #f6f6f6;
+            color: #2b5c73;
+        }
+
+        .client-nav li:hover>.dropdown-menu {
+            display: block;
         }
 
         /* Icon menu dọc */
@@ -385,32 +462,92 @@
         $cate = $cate ?? ($parentCategories->isNotEmpty() ? $parentCategories : collect());
     @endphp
 
-    <header class="header">
-        <div class="container-header">
-            {{-- Logo --}}
-            <div class="logo">
-                <a href="{{ route('client.home') }}">METEOR SHOP</a>
-            </div>
+    <header class="client-header">
+        <div class="client-header__inner">
+            <a href="{{ route('client.home') }}" class="client-logo">
+                Meteor
+            </a>
 
-            {{-- Menu ngang --}}
-            <nav class="main-nav">
+            <form action="{{ route('client.product.search') }}" method="GET" class="client-search">
+                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="{{ $searchQuery ?? '' }}">
+                <button type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+
+            <div class="client-actions">
+                <div class="client-account">
+                    <i class="fa-regular fa-user client-account__icon"></i>
+                    <div class="client-account__labels">
+                        @auth
+                            <span class="client-account__primary">{{ Auth::user()->name }}</span>
+                            <div class="dropdown">
+                                <a class="client-account__secondary dropdown-toggle" href="#" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    Tài khoản của tôi
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end mt-2">
+
+                                    <li>
+                                        <form action="{{ route('client.logout') }}" method="POST">
+                                            @csrf
+                                            <button class="dropdown-item" type="submit">Đăng xuất</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        @else
+                            <a class="client-account__primary" href="{{ route('client.login') }}">Đăng nhập / Đăng ký</a>
+                            <span class="client-account__secondary">Tài khoản của tôi</span>
+                        @endauth
+                    </div>
+                </div>
+
+                <div class="client-cart">
+                    @auth
+                        <a href="{{ route('client.account.orders.index') }}" class="client-pill">
+                            <i class="bi bi-receipt-cutoff client-pill__icon"></i>
+                            <span>Đơn hàng của tôi</span>
+                        </a>
+                    @else
+                        <a href="{{ route('client.login') }}" class="client-pill">
+                            <i class="bi bi-receipt-cutoff client-pill__icon"></i>
+                            <span>Đơn hàng của tôi</span>
+                        </a>
+                    @endauth
+                </div>
+
+                <div class="client-cart">
+                    <a data-bs-toggle="offcanvas" href="#cartCanvas" role="button" class="client-pill">
+                        <i class="bi bi-cart3 client-pill__icon"></i>
+                        <span>Giỏ hàng</span>
+                    </a>
+                    @if ($cartCount > 0)
+                        <span class="client-cart__badge">{{ $cartCount }}</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <nav class="client-nav">
+            <div class="client-nav__inner">
                 <ul>
-                    {{-- Dropdown Sản phẩm (Child Categories) --}}
-                    <li class="menu-item dropdown">
-                        <a href="#" class="dropdown-toggle">Sản phẩm</a>
+                    <li>
+                        <a href="#" class="dropdown-toggle">Sản phẩm </a>
                         <ul class="dropdown-menu">
-                            @foreach ($childCategories as $child)
+                            @forelse ($childCategories as $child)
                                 <li>
                                     <a href="{{ route('client.product.category', $child->slug) }}">
                                         {{ $child->name }}
                                     </a>
                                 </li>
-                            @endforeach
+                            @empty
+                                <li><span class="d-block px-3 py-2 text-muted">Đang cập nhật</span></li>
+                            @endforelse
                         </ul>
                     </li>
-                    {{-- Dropdown Phòng (Parent Categories) --}}
-                    <li class="menu-item dropdown">
-                        <a href="#" class="dropdown-toggle">Phòng</a>
+                    <li>
+                        <a href="#" class="dropdown-toggle">Phòng </a>
                         <ul class="dropdown-menu">
                             @foreach ($parentCategories as $parent)
                                 <li>
@@ -423,82 +560,17 @@
                     </li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
-                    {{-- Lấy link Bài Viết từ File 2 --}}
                     <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
-            </nav>
-
-            <!-- Ô tìm kiếm -->
-            <form action="{{ route('client.product.search') }}" method="GET" class="search-box">
-                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..."
-                    value="{{ $searchQuery ?? '' }}">
-                <button type="submit">
-                    <i class="fa fa-search"></i>
-                </button>
-            </form>
-
-            <div class="ms-auto d-flex align-items-center gap-3" style="margin-left:0 !important;">
-                @auth
-                    <div class="position-relative">
-                        <a class="text-white fs-4" data-bs-toggle="offcanvas" href="#cartCanvas" role="button">
-                            <i class="bi bi-cart3"></i>
-                        </a>
-                        @if ($cartCount > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 12px;">
-                                {{ $cartCount }}
-                            </span>
-                        @endif
-                    </div>
-                    {{-- DROPDOWN USER --}}
-                    <div class="dropdown">
-                        <a class="text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            {{ Auth::user()->name }}
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('client.account.orders.index') }}">Đơn hàng của
-                                    tôi</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form action="{{ route('client.logout') }}" method="POST">
-                                    @csrf
-                                    <button class="dropdown-item" type="submit">Đăng xuất</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                @else
-                    <div class="d-flex align-items-center gap-3">
-                        {{-- ICON GIỎ HÀNG --}}
-                        <div class="position-relative">
-                            <a class="text-white fs-4" data-bs-toggle="offcanvas" href="#cartCanvas" role="button">
-                                <i class="bi bi-cart3"></i>
-                            </a>
-                            @if ($cartCount > 0)
-                                <span
-                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                    style="font-size: 12px;">
-                                    {{ $cartCount }}
-                                </span>
-                            @endif
-                        </div>
-                        {{-- NÚT ĐĂNG NHẬP --}}
-                        <a class="btn btn-outline-light" href="{{ route('client.login') }}">Đăng nhập</a>
-                    </div>
-                @endauth
             </div>
-        </div>
+        </nav>
     </header>
 
     <main class="container">
         @yield('content')
     </main>
-    
+
     <div class="offcanvas offcanvas-end" tabindex="-1" id="cartCanvas">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title">Giỏ hàng</h5>
@@ -554,7 +626,6 @@
                                 src="{{ asset('storage/images/meteor.jpg') }}" alt="Logo Meteor"
                                 style="max-width: 120px;">
                         </p>
-
 
                         <div class="follow">
                             <h4>Follow us</h4>
