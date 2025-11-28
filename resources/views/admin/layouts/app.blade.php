@@ -291,7 +291,6 @@
             box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.65) !important;
         }
     </style>
-    @stack('styles')
 </head>
 
 <body>
@@ -312,7 +311,6 @@
                 <a class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i>
                             {{ Auth::user()->name ?? 'Admin' }}
-                            <span class="badge bg-info ms-2">{{ Auth::user()->role ?? 'N/A' }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                     <li><a href="" class="dropdown-item">Profile</a></li>
@@ -357,6 +355,10 @@
             </a>
             <a href="{{ route('admin.banners.list') }}" class="{{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                 <i class="bi bi-image-fill me-2"></i> Quản lý Banner
+            </a>
+            <!-- Quản lý Ví -->
+            <a href="{{ route('admin.wallet.index') }}" class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
+                <i class="bi bi-wallet2 me-2"></i> Quản lý Ví
             </a>
             <!-- Quản lý tài khoản -->
             <div class="dropdown-menu-item {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
@@ -424,8 +426,6 @@
             });
         });
     </script>
-
-    @stack('scripts')
 </body>
 
 </html>

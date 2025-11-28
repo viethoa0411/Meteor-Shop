@@ -45,4 +45,13 @@ class HomeController extends Controller
 
         return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners','latestBlogs'));
     }
+
+
+    public function getVersion($id)
+    {
+        $product = Product::select('id','version')->find($id);
+        return response()->json([
+            'version' => $product->version,
+        ]);
+    }
 }

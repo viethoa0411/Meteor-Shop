@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ProductVariant;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+
 
 class ProductController extends Controller
 {
@@ -82,6 +84,8 @@ class ProductController extends Controller
             'variants.*.height' => 'nullable|numeric|min:0',
             'variants.*.stock' => 'required|integer|min:0',
             'variants.*.price' => 'nullable|numeric|min:0',
+            'variant_color.*' => 'required_with:variant_size.*',
+            'variant_size.*'  => 'required_with:variant_color.*',
 
         ]);
 
@@ -113,7 +117,6 @@ class ProductController extends Controller
             }
         }
 
-        // 🧩 Lưu biến thể kèm tồn kho riêng
         // 🧩 Lưu biến thể kèm tồn kho riêng
         if ($request->has('variants')) {
             foreach ($request->variants as $variant) {
@@ -164,12 +167,28 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096', // ảnh phụ
+        ]);
+
+         // Validate biến thể
+        $request->validate([
+            'variants.*.color_name' => 'required',
+            'variants.*.color_code' => 'required',
+            'variants.*.stock' => 'required|numeric|min:0',
+            'variants.*.length' => 'required|numeric|min:0',
+            'variants.*.width' => 'required|numeric|min:0',
+            'variants.*.height' => 'required|numeric|min:0',
+        ], [
+            'variants.*.color_name.required' => 'Vui lòng nhập màu cho biến thể.',
+            'variants.*.color_code.required' => 'Vui lòng chọn mã màu.',
+            'variants.*.stock.required' => 'Vui lòng nhập số lượng tồn kho.',
+            'variants.*.length.required' => 'Vui lòng nhập chiều dài.',
+            'variants.*.width.required' => 'Vui lòng nhập chiều rộng.',
+            'variants.*.height.required' => 'Vui lòng nhập chiều cao.',
         ]);
 
         // Xử lý ảnh đại diện
@@ -191,12 +210,69 @@ class ProductController extends Controller
 
         // Xử lý upload ảnh phụ (nếu có)
         if ($request->hasFile('images')) {
+
+            // 1. XÓA toàn bộ ảnh cũ (trong database + trong storage)
+            foreach ($product->images as $img) {
+                if ($img->image && Storage::disk('public')->exists($img->image)) {
+                    Storage::disk('public')->delete($img->image);
+                }
+                $img->delete();
+            }
+
+            // 2. THÊM ảnh mới
             foreach ($request->file('images') as $file) {
-                $path = $file->store('products', 'public');
-                $product->images()->create(['image' => $path]);
+                $product->images()->create([
+                    'image' => $file->store('products', 'public')
+                ]);
             }
         }
 
+        // ========================== 
+        // 🔥 TĂNG VERSION SẢN PHẨM     
+        // ==========================
+        $product->increment('product_version');
+        $product->refresh();
+        $version = $product->product_version; // lấy version mới
+
+        // BIến thể
+        foreach ($request->variants ?? [] as $v) {
+
+            // Sửa biến thể cũ 
+          if (!empty($v['id'])) {
+
+            $variant = $product->variants->firstWhere('id', $v['id']);
+
+                if ($variant) {
+                    $variant->update([
+                        'product_version' => $version,
+                        'color_name' => $v['color_name'],
+                        'color_code' => $v['color_code'],
+                        'length'     => $v['length'] ?? null,
+                        'width'      => $v['width'] ?? null,
+                        'height'     => $v['height'] ?? null,
+                        'stock'      => $v['stock'] ?? 0,
+                        'price'      => $v['price'] ?? $product->price,
+                    ]);
+                }
+
+                continue;
+                    }
+
+                // Tạo biến thể mới 
+                    $product->variants()->create([
+                        'product_id'      => $product->id,
+                        'product_version' => $version,   // 🔥 KHÔNG BAO GIỜ NULL
+                        'color_name'      => $v['color_name'],
+                        'color_code'      => $v['color_code'],
+                        'length'          => $v['length'] ?? null,
+                        'width'           => $v['width'] ?? null,
+                        'height'          => $v['height'] ?? null,
+                        'stock'           => $v['stock'] ?? 0,
+                        'price'           => $v['price'] ?? $product->price,
+                    ]);
+                }
+
+      
         return redirect()->route('admin.products.list')->with('success', 'Cập nhật sản phẩm thành công!');
     }
 

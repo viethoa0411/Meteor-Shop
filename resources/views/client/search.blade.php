@@ -1,5 +1,6 @@
 @extends('client.layouts.app')
 
+
 @section('title', $title ?? 'Kết quả tìm kiếm')
 
 <style>

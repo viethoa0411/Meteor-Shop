@@ -91,6 +91,75 @@
                 </style>
             </div>
         </div>
+
+        {{-- Thông báo hoàn tiền thành công --}}
+        @php
+            $completedRefund = $order->refunds->where('status', 'completed')->first();
+        @endphp
+        @if($completedRefund)
+            <div class="card border-0 shadow-sm mt-4 border-success">
+                <div class="card-body">
+                    <div class="alert alert-success mb-0">
+                        <h6 class="alert-heading fw-bold">
+                            <i class="bi bi-check-circle-fill me-2"></i>Đã hoàn tiền thành công
+                        </h6>
+                        <p class="mb-0">
+                            Quý khách có gì thắc mắc xin liên hệ đội ngũ Meteor Shop.
+                        </p>
+                        @if($completedRefund->refund_amount)
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Số tiền đã hoàn:</strong> 
+                                <span class="text-success">{{ number_format($completedRefund->refund_amount, 0, ',', '.') }} đ</span>
+                            </p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Action buttons --}}
+        @if ($order->order_status === 'completed' || $order->canCancelRefund())
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Thao tác</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if ($order->order_status === 'completed')
+                            <a class="btn btn-outline-warning" href="{{ route('client.account.orders.refund.return', $order) }}">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Trả hàng hoàn tiền
+                            </a>
+                        @endif
+
+                        @if ($order->canCancelRefund())
+                            <a class="btn btn-outline-danger" href="{{ route('client.account.orders.refund.cancel', $order) }}">
+                                <i class="bi bi-x-circle me-1"></i> Hủy đơn và hoàn tiền
+                            </a>
+                        @endif
+
+                        @php
+                            $pendingCancelRefund = $order->refunds
+                                ->where('refund_type', 'cancel')
+                                ->where('status', 'pending')
+                                ->first();
+                        @endphp
+
+                        @if ($pendingCancelRefund)
+                            <form action="{{ route('client.account.orders.refund.cancel.reset', $order) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-dark"
+                                        onclick="return confirm('Bạn muốn đặt lại đơn hàng và dừng hoàn tiền?');">
+                                    <i class="bi bi-arrow-repeat me-1"></i> Đặt lại
+                                </button>
+                            </form>
+                        @endif
+
+                        <a class="btn btn-outline-secondary" href="{{ route('client.account.orders.show', $order) }}">
+                            <i class="bi bi-eye me-1"></i> Xem chi tiết đơn hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
 

@@ -82,11 +82,6 @@
                                     <input type="number" name="price" step="0.01" class="form-control"
                                         value="{{ old('price', $product->price) }}" required>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Tồn kho <span class="text-danger">*</span></label>
-                                    <input type="number" name="stock" class="form-control"
-                                        value="{{ old('stock', $product->stock) }}" required>
-                                </div>
                             </div>
 
                             {{-- Danh mục --}}
@@ -146,22 +141,94 @@
                             </div>
 
                             {{-- Hiển thị ảnh phụ hiện tại --}}
-                            @if ($product->images->count())
-                                <div class="mt-2">
-                                    <label class="form-label d-block">Ảnh phụ hiện tại</label>
-                                    <div class="d-flex flex-wrap" id="images-list">
-                                        @foreach ($product->images as $img)
-                                            <div class="img-container" id="img-{{ $img->id }}">
-                                                <img src="{{ asset('storage/' . $img->image) }}"
-                                                    class="img-preview rounded" alt="Ảnh phụ"
-                                                    style="width:100%; max-width:250px; height:200px; object-fit:cover; border:1px solid #e9ecef; border-radius:8px; display:block;">
-                                                <button type="button" class="btn btn-sm btn-danger btn-remove-img"
-                                                    data-id="{{ $img->id }}">&times;</button>
-                                            </div>
-                                        @endforeach
+                            @if($product->images->count())
+                                <div class="mt-2 d-flex flex-wrap">
+                                    @foreach($product->images as $img)
+                                    <div class="img-container" id="img-{{ $img->id }}">
+                                    <img src="{{ asset('storage/' . $img->image) }}"
+                                                                class="img-preview rounded" alt="Ảnh phụ"
+                                                                style="width:100%; max-width:250px; height:200px; object-fit:cover; border:1px solid #e9ecef; border-radius:8px; display:block;">
+                                                            
+                                        <button type="button" class="btn btn-sm btn-danger btn-remove-img" data-id="{{ $img->id }}">
+                                            &times;
+                                        </button>
                                     </div>
+                                    @endforeach
                                 </div>
-                            @endif
+                            @endif              
+
+                            {{-- ====================== BIẾN THỂ ====================== --}}
+                            <hr>
+                            <h4>Biến thể sản phẩm</h4>
+
+                              {{-- Biến thể cũ --}}
+                            <div id="existing-variants">
+                                @foreach($product->variants as $idx => $v)
+                                    <div class="variant-item border rounded p-3 mb-2">
+
+                                        <input type="hidden" name="variants[{{ $idx }}][id]" value="{{ $v->id }}">
+
+                                        <div class="row g-3">
+
+                                            <div class="col-md-3">
+                                                <label class="form-label">Tên màu</label>
+                                                <input name="variants[{{ $idx }}][color_name]" 
+                                                        class="form-control"
+                                                        value="{{ old('variants.'.$idx.'.color_name', $v->color_name) }}">
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="form-label">Mã màu</label>
+                                                <input type="color" name="variants[{{ $idx }}][color_code]"
+                                                        class="form-control form-control-color" 
+                                                        value="{{ old('variants.'.$idx.'.color_code', $v->color_code) }}">
+
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label>Dài</label>
+                                                <input type="number" step="0.01" name="variants[{{ $idx }}][length]"
+                                                        class="form-control" 
+                                                        value="{{ old('variants.'.$idx.'.length', $v->length) }}">
+
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label>Rộng</label>
+                                                <input type="number" step="0.01" name="variants[{{ $idx }}][width]"
+                                                        class="form-control" 
+                                                        value="{{ old('variants.'.$idx.'.width', $v->width) }}">
+
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label>Cao</label>
+                                                <input type="number" step="0.01" name="variants[{{ $idx }}][height]"
+                                                        class="form-control" 
+                                                        value="{{ old('variants.'.$idx.'.height', $v->height) }}">
+
+                                            </div>
+
+                                            <div class="col-md-2 mt-3">
+                                                <label>Tồn</label>
+                                                <input type="number" 
+                                                        name="variants[{{ $idx }}][stock]" class="form-control"
+                                                       value="{{ old('variants.'.$idx.'.stock', $v->stock) }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            {{-- DIV CHỨA BIẾN THỂ MỚI --}}
+                            <div id="new-variants"></div>
+
+                            {{-- Nút thêm biến thể --}}
+                            <button type="button" id="addNewVariant" class="btn btn-primary mt-2">+ Thêm biến thể</button>
+
+                            <hr>
+
+
 
                             {{-- Nút lưu --}}
                             <div class="d-flex mt-4">
@@ -183,29 +250,60 @@
 
 @push('scripts')
     <script>
-        document.querySelectorAll('.btn-remove-img').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (confirm('Xóa ảnh này?')) {
-                    let imgId = this.dataset.id;
-                    fetch("{{ route('admin.products.images.destroy', ['product' => $product->id, 'image' => 'IMAGE_ID']) }}"
-                            .replace('IMAGE_ID', imgId), {
-                                method: 'DELETE',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Accept': 'application/json'
-                                }
-                            })
+        document.addEventListener("DOMContentLoaded", function () {
 
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                document.getElementById('img-' + imgId).remove();
-                            } else {
-                                alert('Xóa thất bại!');
-                            }
-                        });
-                }
+            let newVariantIndex = 0;
+
+            document.getElementById("addNewVariant").addEventListener("click", function () {
+
+                let html = `
+                <div class="new-variant-item border rounded p-3 mb-2">
+
+                    <div class="row g-3">
+                        
+                        <div class="col-md-3">
+                            <label class="form-label">Tên màu</label>
+                            <input name="variants[new_${newVariantIndex}][color_name]" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Mã màu</label>
+                            <input type="color" name="variants[new_${newVariantIndex}][color_code]"
+                                class="form-control form-control-color">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label>Dài</label>
+                            <input type="number" step="0.01"
+                                name="variants[new_${newVariantIndex}][length]" class="form-control">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label>Rộng</label>
+                            <input type="number" step="0.01"
+                                name="variants[new_${newVariantIndex}][width]" class="form-control">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label>Cao</label>
+                            <input type="number" step="0.01"
+                                name="variants[new_${newVariantIndex}][height]" class="form-control">
+                        </div>
+
+                        <div class="col-md-2 mt-3">
+                            <label>Tồn</label>
+                            <input type="number" 
+                                name="variants[new_${newVariantIndex}][stock]" class="form-control">
+                        </div>
+
+                    </div>
+                </div>`;
+
+                document.getElementById("new-variants").insertAdjacentHTML("beforeend", html);
+
+                newVariantIndex++;
             });
+
         });
     </script>
 @endpush

@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {{-- <link rel="stylesheet" href="{{ asset('css/app.css') }}"> --}}
-    @stack('styles')
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -42,7 +41,7 @@
         }
 
         .container-header {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -157,7 +156,7 @@
         .menu-toggle {
             font-size: 22px;
             cursor: pointer;
-            padding: 6px 10px;
+            padding: 6px 5px;
             transition: color 0.3s;
         }
 
@@ -297,6 +296,58 @@
             gap: 20px;
         }
 
+        .slide-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 600px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity .7s
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .imageSlide {
+            width: 100vw;
+            height: 90vh;
+            object-fit: cover;
+            position: absolute;
+            z-index: -1;
+            filter: brightness(0.6)
+        }
+
+        h2 {
+            color: #000;
+            font-size: 2em;
+            margin-bottom: 20px;
+            z-index: 1
+        }
+
+
+        /* Đã bỏ comment cho button, sử dụng style từ file 2 */
+        button {
+            z-index: 1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #09f;
+            color: #fff;
+            cursor: pointer;
+            font-style: 1em;
+        } */
 
         .article-card:hover {
             transform: translateY(-10px);
@@ -443,9 +494,11 @@
             </div>
         </div>
     </header>
+
     <main class="container">
         @yield('content')
     </main>
+    
     <div class="offcanvas offcanvas-end" tabindex="-1" id="cartCanvas">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title">Giỏ hàng</h5>

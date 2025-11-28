@@ -8,6 +8,7 @@ class ProductVariant extends Model
 {
     protected $fillable = [
         'product_id',
+        'product_version',
         'color_name',
         'color_code',
         'length',
@@ -22,4 +23,15 @@ class ProductVariant extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    
+    public function orderItems()
+    {
+        return $this->hasMany(OrderDetail::class, 'variant_id', 'id');
+    }
+
+    public function hasOrders()
+    {
+        return $this->orderItems()->exists();
+    }
+
 }

@@ -3,102 +3,37 @@
 @section('title', 'Trang chủ')
 @section('content')
 
-    {{-- Banner Carousel --}}
-    <section class="banner-carousel-wrapper">
+    {{-- Slide --}}
+    <div class="slide-wrapper">
         @if ($banners->count() > 0)
-            <div class="banner-carousel" id="bannerCarousel">
-                @foreach ($banners as $index => $banner)
-                    <div class="banner-slide {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}">
-                        <div class="banner-image-wrapper">
-                            @if ($banner->image_url)
-                                <img class="banner-image" 
-                                     src="{{ $banner->image_url }}" 
-                                     alt="{{ $banner->title ?? 'Banner' }}"
-                                     loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/1920x800?text=Banner';">
-                            @else
-                                <img class="banner-image" 
-                                     src="https://via.placeholder.com/1920x800?text=Banner" 
-                                     alt="Banner"
-                                     loading="{{ $index === 0 ? 'eager' : 'lazy' }}">
-                            @endif
-                            <div class="banner-overlay"></div>
-                        </div>
-                        
-                        <div class="banner-content">
-                            <div class="container">
-                                <div class="banner-content-inner">
-                                    @if ($banner->title)
-                                        <h2 class="banner-title">{{ $banner->title }}</h2>
-                                    @endif
-                                    @if ($banner->description)
-                                        <p class="banner-description">{{ $banner->description }}</p>
-                                    @endif
-                                    @if ($banner->link)
-                                        <a href="{{ $banner->link }}" class="banner-btn">
-                                            <span>Khám phá ngay</span>
-                                            
-                                        </a>
-                                    @else
-                                        <button class="banner-btn" onclick="alert('{{ $banner->title ?? 'Banner' }}')">
-                                            <span>Khám phá ngay</span>
-                                    
-                                        </button>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            {{-- Navigation Controls --}}
-            <button class="banner-nav-btn banner-prev" aria-label="Previous banner">
-                <i class="bi bi-chevron-left"></i>
-            </button>
-            <button class="banner-nav-btn banner-next" aria-label="Next banner">
-                <i class="bi bi-chevron-right"></i>
-            </button>
-
-            {{-- Indicators --}}
-            <div class="banner-indicators">
-                @foreach ($banners as $index => $banner)
-                    <button class="banner-indicator {{ $index === 0 ? 'active' : '' }}" 
-                            data-slide-to="{{ $index }}" 
-                            aria-label="Go to slide {{ $index + 1 }}"></button>
-                @endforeach
-            </div>
-
-            {{-- Progress Bar --}}
-            <div class="banner-progress">
-                <div class="banner-progress-bar"></div>
-            </div>
+            @foreach ($banners as $index => $banner)
+                <div class="slide {{ $index === 0 ? 'active' : '' }}">
+                    @if (!empty($banner->image))
+                        <img class="imageSlide" src="{{ asset('storage/' . $banner->image) }}"
+                            alt="{{ $banner->title ?? 'Banner' }}"
+                            onerror="this.src='https://via.placeholder.com/1200x800?text=Banner'">
+                    @else
+                        <img class="imageSlide" src="https://via.placeholder.com/1200x800?text=Banner" alt="Banner">
+                    @endif
+                    @if (!empty($banner->link))
+                        <a href="{{ $banner->link }}" style="text-decoration: none;">
+                            <button>Xem ngay</button>
+                        </a>
+                    @else
+                        <button onclick="alert('{{ $banner->title ?? 'Banner' }}')">Xem ngay</button>
+                    @endif
+                </div>
+            @endforeach
         @else
             {{-- Fallback nếu không có banner --}}
-            <div class="banner-carousel">
-                <div class="banner-slide active">
-                    <div class="banner-image-wrapper">
-                        <img class="banner-image" 
-                             src="https://picsum.photos/1920/800?random=1" 
-                             alt="Welcome Banner">
-                        <div class="banner-overlay"></div>
-                    </div>
-                    <div class="banner-content">
-                        <div class="container">
-                            <div class="banner-content-inner">
-                                <h2 class="banner-title">Chào mừng đến với Meteor Shop</h2>
-                                <p class="banner-description">Khám phá bộ sưu tập nội thất hiện đại và sang trọng</p>
-                                <button class="banner-btn" onclick="alert('Khám phá ngay')">
-                                    <span>Khám phá ngay</span>
-                                    <i class="bi bi-arrow-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="slide active">
+                <img class="imageSlide" src="https://picsum.photos/1200/800?random=1">
+                <h2 style="color: #fff">Chào mừng đến với Meteor Shop</h2>
+                <button onclick="alert('Khám phá ngay')">Xem ngay</button>
             </div>
         @endif
-    </section>
+    </div>
+
 
     {{-- Sản phẩm mới --}}
     <div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
@@ -355,15 +290,15 @@
         </div>
     </div>
 
-    {{--  --}}
-
-    @push('styles')
-    <link rel="stylesheet" href="{{ route('assets.css', ['file' => 'banner-carousel']) }}">
-    @endpush
-
-    @push('scripts')
-    <script src="{{ route('assets.js', ['file' => 'banner-carousel']) }}"></script>
-    @endpush
+    <script>
+        let i = 0,
+            s = document.querySelectorAll('.slide');
+        setInterval(() => {
+            s[i].classList.remove('active');
+            i = (i + 1) % s.length;
+            s[i].classList.add('active');
+        }, 4000); // 4000ms = 4 giây
+    </script>
 
 
 @endsection

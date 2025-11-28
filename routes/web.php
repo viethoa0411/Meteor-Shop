@@ -5,14 +5,13 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\OrderShipmentController;
-use App\Http\Controllers\Admin\OrderPaymentController;
-use App\Http\Controllers\Admin\OrderRefundController;
-use App\Http\Controllers\Admin\OrderReturnController;
-use App\Http\Controllers\Admin\OrderNoteController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ProductPublicController;
+use App\Http\Controllers\Admin\ProductController;
+
+// --- ĐÃ SỬA: Đổi thành ProductController mới ---
+use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
@@ -20,15 +19,17 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MonthlyTargetController;
+
+use App\Http\Controllers\Admin\Wallet\WalletDetailController;
+use App\Http\Controllers\Admin\Wallet\WalletManagementController;
+use App\Http\Controllers\Admin\Wallet\WalletTransactionActionController;
+use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
+use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
+
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
-use App\Http\Controllers\AssetController;
-
-// ============ ASSET ROUTES ============
-Route::get('/assets/css/{file}', [AssetController::class, 'css'])->name('assets.css');
-Route::get('/assets/js/{file}', [AssetController::class, 'js'])->name('assets.js');
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -46,6 +47,14 @@ Route::get('/verify-otp', [ForgotPasswordController::class, 'showVerifyOtpForm']
 Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp.post');
 Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
+// ============ CLIENT ROUTES ============
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
+Route::get('/home', [HomeController::class, 'index']);
+Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
+Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category');
+Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail');
+
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
@@ -70,6 +79,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
     });
 
+
     // ====== PRODUCTS ======
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [ProductController::class, 'list'])->name('list');
@@ -85,51 +95,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'list'])->name('list');
-        Route::post('/bulk-action', [OrderController::class, 'bulkAction'])->name('bulkAction');
-        Route::get('/export', [OrderController::class, 'export'])->name('export');
-        Route::get('/create', [OrderController::class, 'create'])->name('create');
-        Route::post('/', [OrderController::class, 'store'])->name('store');
-     
-        Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [OrderController::class, 'update'])->name('update');
-        Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
-
-        // Shipments
-        Route::prefix('{orderId}/shipments')->name('shipments.')->group(function () {
-            Route::get('/', [OrderShipmentController::class, 'index'])->name('index');
-            Route::get('/create', [OrderShipmentController::class, 'create'])->name('create');
-            Route::post('/', [OrderShipmentController::class, 'store'])->name('store');
-            Route::put('/{shipmentId}/status', [OrderShipmentController::class, 'updateStatus'])->name('updateStatus');
-        });
-
-        // Payments
-        Route::prefix('{orderId}/payments')->name('payments.')->group(function () {
-            Route::get('/', [OrderPaymentController::class, 'index'])->name('index');
-            Route::post('/', [OrderPaymentController::class, 'store'])->name('store');
-        });
-
-        // Refunds
-        Route::prefix('{orderId}/refunds')->name('refunds.')->group(function () {
-            Route::get('/', [OrderRefundController::class, 'index'])->name('index');
-            Route::get('/create', [OrderRefundController::class, 'create'])->name('create');
-            Route::post('/', [OrderRefundController::class, 'store'])->name('store');
-            Route::put('/{refundId}/status', [OrderRefundController::class, 'updateStatus'])->name('updateStatus');
-        });
-
-        // Returns
-        Route::prefix('{orderId}/returns')->name('returns.')->group(function () {
-            Route::get('/', [OrderReturnController::class, 'index'])->name('index');
-            Route::get('/{returnId}', [OrderReturnController::class, 'show'])->name('show');
-            Route::put('/{returnId}/status', [OrderReturnController::class, 'updateStatus'])->name('updateStatus');
-        });
-
-        // Notes
-        Route::prefix('{orderId}/notes')->name('notes.')->group(function () {
-            Route::post('/', [OrderNoteController::class, 'store'])->name('store');
-            Route::put('/{noteId}', [OrderNoteController::class, 'update'])->name('update');
-            Route::delete('/{noteId}', [OrderNoteController::class, 'destroy'])->name('destroy');
-        });
+        Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
 
     // ====== BLOGS ======
@@ -150,18 +117,44 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/store', [BannerController::class, 'store'])->name('store');
         Route::get('/trash', [BannerController::class, 'trash'])->name('trash');
         Route::post('/bulk-delete', [BannerController::class, 'bulkDelete'])->name('bulkDelete');
-        Route::post('/bulk-restore', [BannerController::class, 'bulkRestore'])->name('bulkRestore');
-        Route::post('/bulk-force-delete', [BannerController::class, 'bulkForceDelete'])->name('bulkForceDelete');
-        Route::post('/bulk-update-status', [BannerController::class, 'bulkUpdateStatus'])->name('bulkUpdateStatus');
         Route::post('/update-sort-order', [BannerController::class, 'updateSortOrder'])->name('updateSortOrder');
         Route::get('/{id}', [BannerController::class, 'show'])->name('show');
         Route::get('/{id}/edit', [BannerController::class, 'edit'])->name('edit');
-        Route::post('/{id}/duplicate', [BannerController::class, 'duplicate'])->name('duplicate');
         Route::put('/{id}', [BannerController::class, 'update'])->name('update');
         Route::delete('/{id}', [BannerController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/restore', [BannerController::class, 'restore'])->name('restore');
         Route::delete('/{id}/force-delete', [BannerController::class, 'forceDelete'])->name('forceDelete');
         Route::put('/{id}/status', [BannerController::class, 'updateStatus'])->name('updateStatus');
+    });
+
+    // ====== WALLET ======
+    Route::prefix('wallet')->name('wallet.')->group(function () {
+        Route::get('/', [WalletManagementController::class, 'index'])->name('index');
+        Route::get('/create', [WalletManagementController::class, 'create'])->name('create');
+        Route::post('/store', [WalletManagementController::class, 'store'])->name('store');
+        Route::get('/{id}', [WalletDetailController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [WalletManagementController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [WalletManagementController::class, 'update'])->name('update');
+
+        Route::get('/{id}/transactions', [WalletTransactionFilterController::class, 'index'])->name('transactions.filter');
+
+        Route::post('/transaction/{id}/confirm', [WalletTransactionActionController::class, 'confirmTransaction'])->name('transaction.confirm');
+        Route::post('/transaction/{id}/cancel', [WalletTransactionActionController::class, 'cancelTransaction'])->name('transaction.cancel');
+        Route::get('/transaction/{id}/refund', [WalletTransactionActionController::class, 'showRefund'])->name('transaction.refund');
+        Route::post('/transaction/{id}/refund/confirm', [WalletTransactionActionController::class, 'confirmRefund'])->name('transaction.refund.confirm');
+        Route::get('/transaction/{id}/not-received', [WalletTransactionActionController::class, 'showNotReceived'])->name('transaction.not-received');
+        Route::post('/transaction/{id}/cancel-order', [WalletTransactionActionController::class, 'cancelOrderFromTransaction'])->name('transaction.cancel-order');
+        Route::get('/transaction/{id}/details', [WalletTransactionActionController::class, 'showTransactionDetails'])->name('transaction.details');
+        Route::get('/transaction/{id}/refund-form', [WalletTransactionActionController::class, 'showRefundForm'])->name('transaction.refund-form');
+        Route::post('/transaction/{id}/refund-process', [WalletTransactionActionController::class, 'processRefund'])->name('transaction.refund-process');
+
+        Route::post('/transaction/{id}/received', [WalletWithdrawController::class, 'receivedTransaction'])->name('transaction.received');
+        Route::get('/{id}/withdraw', [WalletWithdrawController::class, 'showWithdrawForm'])->name('withdraw.form');
+        Route::post('/{id}/withdraw', [WalletWithdrawController::class, 'processWithdraw'])->name('withdraw.process');
+        Route::get('/{id}/withdraw-history', [WalletWithdrawController::class, 'withdrawHistory'])->name('withdraw.history');
+        Route::get('/{id}/receive-confirmations', [WalletWithdrawController::class, 'receiveConfirmations'])->name('receive.confirmations');
+        Route::post('/transaction/{id}/settle', [WalletWithdrawController::class, 'settleReceivedTransaction'])->name('transaction.settle');
+        Route::post('/transaction/{id}/unmark', [WalletWithdrawController::class, 'unmarkReceivedTransaction'])->name('transaction.unmark');
     });
 
     // ====== ACCOUNT MANAGEMENT ======
@@ -192,6 +185,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
+
+
     });
 });
 
@@ -223,6 +218,13 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
     Route::post('/orders/{order}/cancel', [ClientAccountOrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/reorder', [ClientAccountOrderController::class, 'reorder'])->name('orders.reorder');
     Route::post('/orders/{order}/return', [ClientAccountOrderController::class, 'returnRequest'])->name('orders.return');
+    
+    // Refund routes
+    Route::get('/orders/{order}/refund/return', [\App\Http\Controllers\Client\Account\RefundController::class, 'showReturnForm'])->name('orders.refund.return');
+    Route::post('/orders/{order}/refund/return', [\App\Http\Controllers\Client\Account\RefundController::class, 'submitReturnRefund'])->name('orders.refund.return.submit');
+    Route::get('/orders/{order}/refund/cancel', [\App\Http\Controllers\Client\Account\RefundController::class, 'showCancelRefundForm'])->name('orders.refund.cancel');
+    Route::post('/orders/{order}/refund/cancel', [\App\Http\Controllers\Client\Account\RefundController::class, 'submitCancelRefund'])->name('orders.refund.cancel.submit');
+    Route::post('/orders/{order}/refund/reset', [\App\Http\Controllers\Client\Account\RefundController::class, 'resetCancelRefund'])->name('orders.refund.cancel.reset');
 });
 
 // ============ CHECKOUT ROUTES ============

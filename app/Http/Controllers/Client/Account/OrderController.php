@@ -8,8 +8,10 @@ use App\Http\Requests\Client\Order\ReturnOrderRequest;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class OrderController extends Controller
 {
@@ -18,7 +20,7 @@ class OrderController extends Controller
         $userId = $request->user()->id;
         $status = $request->get('status', 'all');
 
-        $ordersQuery = Order::with(['items.product'])
+        $ordersQuery = Order::with(['items.product', 'transactions'])
             ->ownedBy($userId)
             ->status($status)
             ->latest('order_date')
@@ -49,7 +51,7 @@ class OrderController extends Controller
     {
         $this->authorizeOwnership($request->user()->id, $order);
 
-        $order->loadMissing(['items.product']);
+        $order->loadMissing(['items.product', 'transactions', 'refunds']);
 
         return view('client.account.orders.show', compact('order'));
     }
@@ -57,6 +59,8 @@ class OrderController extends Controller
     public function tracking(Request $request, Order $order)
     {
         $this->authorizeOwnership($request->user()->id, $order);
+
+        $order->loadMissing(['refunds', 'transactions']);
 
         $timeline = [
             'order_date' => $order->display_order_date,
@@ -77,9 +81,6 @@ class OrderController extends Controller
             return back()->with('error', 'Đơn hàng không thể hủy ở trạng thái hiện tại.');
         }
 
-        DB::beginTransaction();
-        try {
-            $oldStatus = $order->order_status;
         $order->update([
             'order_status' => 'cancelled',
             'cancel_reason' => $request->reason,
@@ -87,20 +88,7 @@ class OrderController extends Controller
             'cancelled_at' => now(),
         ]);
 
-            // 添加时间线记录
-            $order->addTimeline(
-                'status_changed',
-                'Khách hàng hủy đơn hàng',
-                "Lý do: {$request->reason}",
-                $oldStatus,
-                'cancelled'
-            );
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
-        }
+        $this->logStatusChange($order, 'cancelled', $request->user()->id);
 
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
     }
@@ -159,29 +147,15 @@ class OrderController extends Controller
             }
         }
 
-        DB::beginTransaction();
-        try {
         $order->update([
+            'order_status' => 'return_requested',
             'return_status' => 'requested',
             'return_reason' => $request->reason,
             'return_note' => $request->description,
             'return_attachments' => $attachments,
         ]);
 
-            // 添加时间线记录
-            $order->addTimeline(
-                'return_requested',
-                'Yêu cầu trả hàng',
-                "Lý do: {$request->reason}",
-                null,
-                'return_requested'
-            );
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
-        }
+        $this->logStatusChange($order, 'return_requested', $request->user()->id);
 
         return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');
     }
@@ -224,7 +198,7 @@ class OrderController extends Controller
             ->toArray();
 
         // Đảm bảo tất cả các trạng thái đều có giá trị mặc định
-        $allStatuses = ['pending', 'awaiting_payment', 'paid', 'processing', 'confirmed', 'packed', 'shipping', 'delivered', 'completed', 'cancelled', 'returned', 'refunded'];
+        $allStatuses = ['pending', 'processing', 'shipping', 'completed', 'cancelled', 'return_requested', 'returned'];
         $counts = [];
         foreach ($allStatuses as $status) {
             $counts[$status] = $baseCounts[$status] ?? 0;
@@ -239,6 +213,21 @@ class OrderController extends Controller
     protected function authorizeOwnership(int $userId, Order $order): void
     {
         abort_if($order->user_id !== $userId, 403, 'Bạn không có quyền truy cập đơn hàng này.');
+    }
+
+    protected function logStatusChange(Order $order, string $status, int $userId): void
+    {
+        if (!Schema::hasTable('order_logs')) {
+            return;
+        }
+
+        OrderLog::create([
+            'order_id' => $order->id,
+            'status' => $status,
+            'updated_by' => $userId,
+            'role' => 'customer',
+            'created_at' => now(),
+        ]);
     }
 }
 
