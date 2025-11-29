@@ -23,6 +23,15 @@ class UserSeeder extends Seeder
                 'status' => 'active',
             ]
         );
-       
+
+        User::firstOrCreate(
+            ['email' => 'vanluan2k2bg@gmail.com'],
+            [
+                'name' => 'Admin Van Luan',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+                'status' => 'active',
+            ]
+        );
     }
 }
