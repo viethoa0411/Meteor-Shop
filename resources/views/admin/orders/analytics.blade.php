@@ -377,52 +377,57 @@
                 <div class="card-body p-3 p-md-4">
                     <div class="funnel-container">
                         @php
-                            // Funnel 5 bước chuẩn theo yêu cầu
+                            // Funnel mới theo yêu cầu
                             $funnelSteps = [
                                 [
                                     'key' => 'created',
-                                    'label' => 'Đơn mới tạo',
+                                    'label' => 'Đơn đã tạo',
                                     'count' => $funnelData['steps']['created'],
                                     'color' => '#3B82F6',
                                     'icon' => 'bi-cart-plus',
                                     'rate' => null,
-                                    'drop' => null
+                                    'drop' => null,
+                                    'status' => null
                                 ],
                                 [
-                                    'key' => 'confirmed',
-                                    'label' => 'Xác nhận',
-                                    'count' => $funnelData['steps']['confirmed'],
+                                    'key' => 'pending',
+                                    'label' => 'Chờ xác nhận',
+                                    'count' => $funnelData['steps']['pending'],
+                                    'color' => '#F59E0B',
+                                    'icon' => 'bi-hourglass-split',
+                                    'rate' => $funnelData['conversion']['pending_rate'],
+                                    'drop' => $funnelData['drops']['drop_pending'],
+                                    'status' => 'pending'
+                                ],
+                                [
+                                    'key' => 'processing',
+                                    'label' => 'Đang xử lý',
+                                    'count' => $funnelData['steps']['processing'],
                                     'color' => '#06B6D4',
-                                    'icon' => 'bi-check-circle',
-                                    'rate' => $funnelData['conversion']['confirmed_rate'],
-                                    'drop' => $funnelData['drops']['drop_confirm']
-                                ],
-                                [
-                                    'key' => 'packed',
-                                    'label' => 'Đóng gói',
-                                    'count' => $funnelData['steps']['packed'],
-                                    'color' => '#10B981',
-                                    'icon' => 'bi-box-seam',
-                                    'rate' => $funnelData['conversion']['packed_rate'],
-                                    'drop' => $funnelData['drops']['drop_packed']
+                                    'icon' => 'bi-gear',
+                                    'rate' => $funnelData['conversion']['processing_rate'],
+                                    'drop' => $funnelData['drops']['drop_processing'],
+                                    'status' => 'processing'
                                 ],
                                 [
                                     'key' => 'shipping',
-                                    'label' => 'Vận chuyển',
+                                    'label' => 'Đang giao',
                                     'count' => $funnelData['steps']['shipping'],
-                                    'color' => '#F59E0B',
+                                    'color' => '#667eea',
                                     'icon' => 'bi-truck',
                                     'rate' => $funnelData['conversion']['shipping_rate'],
-                                    'drop' => $funnelData['drops']['drop_shipping']
+                                    'drop' => $funnelData['drops']['drop_shipping'],
+                                    'status' => 'shipping'
                                 ],
                                 [
-                                    'key' => 'delivered',
+                                    'key' => 'completed',
                                     'label' => 'Hoàn tất',
-                                    'count' => $funnelData['steps']['delivered'],
-                                    'color' => '#16A34A',
-                                    'icon' => 'bi-check2-circle',
-                                    'rate' => $funnelData['conversion']['delivered_rate'],
-                                    'drop' => $funnelData['drops']['drop_delivered']
+                                    'count' => $funnelData['steps']['completed'],
+                                    'color' => '#10B981',
+                                    'icon' => 'bi-check-circle',
+                                    'rate' => $funnelData['conversion']['completed_rate'],
+                                    'drop' => $funnelData['drops']['drop_completed'],
+                                    'status' => 'completed'
                                 ],
                             ];
                             // Tính maxCount từ tổng số đơn ở bước đầu (created)
@@ -431,16 +436,9 @@
                         @foreach($funnelSteps as $index => $step)
                             @php
                                 // Map step key to status for drill-down
-                                $stepToStatus = [
-                                    'created' => null, // Tất cả đơn
-                                    'confirmed' => 'processing', // Xác nhận = processing
-                                    'packed' => 'processing', // Đóng gói = processing
-                                    'shipping' => 'shipping',
-                                    'delivered' => 'completed',
-                                ];
                                 $drillDownUrl = route('admin.orders.list');
-                                if (isset($stepToStatus[$step['key']]) && $stepToStatus[$step['key']]) {
-                                    $drillDownUrl = route('admin.orders.list', ['status' => $stepToStatus[$step['key']]]);
+                                if ($step['status']) {
+                                    $drillDownUrl = route('admin.orders.list', ['status' => $step['status']]);
                                 }
                             @endphp
                             <div class="funnel-step-wrapper mb-3" data-step="{{ $step['key'] }}">
@@ -488,36 +486,36 @@
                             </div>
                         @endforeach
                         
-                        {{-- Nhánh rớt --}}
-                        @if($funnelData['cancelled'] > 0 || $funnelData['refunded'] > 0)
+                        {{-- Nhánh rớt: Đã hủy --}}
+                        @if($funnelData['cancelled'] > 0)
                             <div class="mt-4 pt-3 border-top">
-                                <h6 class="text-muted mb-3 small fw-semibold text-uppercase">Nhánh rớt</h6>
-                                @if($funnelData['cancelled'] > 0)
-                                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded" 
-                                         style="cursor: pointer; transition: all 0.2s; border-left: 4px solid #EF4444;" 
-                                         onmouseover="this.style.backgroundColor='#fef2f2'" 
-                                         onmouseout="this.style.backgroundColor='transparent'"
-                                         onclick="window.location.href='{{ route('admin.orders.list', ['status' => 'cancelled']) }}'">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i class="bi bi-x-circle text-danger"></i>
-                                            <span class="fw-semibold text-danger">Hủy</span>
-                                        </div>
-                                        <span class="badge bg-danger">{{ number_format((float)($funnelData['cancelled'] ?? 0)) }}</span>
+                                <div class="d-flex justify-content-between align-items-center mb-2 p-3 rounded" 
+                                     style="cursor: pointer; transition: all 0.2s; border-left: 4px solid #EF4444; background-color: #fef2f2;" 
+                                     onmouseover="this.style.backgroundColor='#fee2e2'; this.style.transform='translateX(4px)';" 
+                                     onmouseout="this.style.backgroundColor='#fef2f2'; this.style.transform='translateX(0)';"
+                                     onclick="window.location.href='{{ route('admin.orders.list', ['status' => 'cancelled']) }}'">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-x-circle text-danger fs-5"></i>
+                                        <span class="fw-semibold text-danger">Đã hủy</span>
                                     </div>
-                                @endif
-                                @if($funnelData['refunded'] > 0)
-                                    <div class="d-flex justify-content-between align-items-center p-2 rounded" 
-                                         style="cursor: pointer; transition: all 0.2s; border-left: 4px solid #8B5CF6;" 
-                                         onmouseover="this.style.backgroundColor='#f5f3ff'" 
-                                         onmouseout="this.style.backgroundColor='transparent'"
-                                         onclick="window.location.href='{{ route('admin.orders.list', ['status' => 'returned']) }}'">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i class="bi bi-arrow-counterclockwise text-secondary"></i>
-                                            <span class="fw-semibold text-secondary">Hoàn tiền</span>
-                                        </div>
-                                        <span class="badge bg-secondary">{{ number_format((float)($funnelData['refunded'] ?? 0)) }}</span>
+                                    <span class="badge bg-danger fs-6">{{ number_format((float)($funnelData['cancelled'] ?? 0)) }}</span>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($funnelData['refunded'] > 0)
+                            <div class="mt-2">
+                                <div class="d-flex justify-content-between align-items-center p-3 rounded" 
+                                     style="cursor: pointer; transition: all 0.2s; border-left: 4px solid #8B5CF6; background-color: #f5f3ff;" 
+                                     onmouseover="this.style.backgroundColor='#ede9fe'; this.style.transform='translateX(4px)';" 
+                                     onmouseout="this.style.backgroundColor='#f5f3ff'; this.style.transform='translateX(0)';"
+                                     onclick="window.location.href='{{ route('admin.orders.list', ['status' => 'returned']) }}'">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-arrow-counterclockwise text-secondary fs-5"></i>
+                                        <span class="fw-semibold text-secondary">Yêu cầu đổi trả / Đã đổi trả</span>
                                     </div>
-                                @endif
+                                    <span class="badge bg-secondary fs-6">{{ number_format((float)($funnelData['refunded'] ?? 0)) }}</span>
+                                </div>
                             </div>
                         @endif
                         
@@ -526,7 +524,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <strong>Tỷ lệ chuyển đổi tổng</strong>
-                                    <p class="mb-0 small opacity-75">Từ Đơn mới tạo → Hoàn tất</p>
+                                    <p class="mb-0 small opacity-75">Từ Đơn đã tạo → Hoàn tất</p>
                                 </div>
                                 <div class="text-end">
                                     <span class="display-6 fw-bold">{{ $funnelData['conversion']['final_conversion'] }}%</span>

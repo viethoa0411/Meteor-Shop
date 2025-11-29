@@ -304,21 +304,17 @@ class OrderAnalyticsController extends Controller
 
     private function getStatusData($dateFilter, $status = 'all')
     {
-        $query = Order::query();
+        // Tạo base query không filter theo status để lấy tất cả số liệu
+        $baseQuery = Order::query();
         
         // Chỉ filter theo thời gian nếu có start và end
         if ($dateFilter['start'] && $dateFilter['end']) {
-            $query = $query->whereBetween('created_at', [$dateFilter['start'], $dateFilter['end']]);
+            $baseQuery = $baseQuery->whereBetween('created_at', [$dateFilter['start'], $dateFilter['end']]);
         }
         
-        if ($status && $status !== 'all') {
-            if ($status === 'returned') {
-                $query = $query->whereIn('order_status', ['return_requested', 'returned']);
-            } else {
-                $query = $query->where('order_status', $status);
-            }
-        }
-        $data = $query->selectRaw('order_status, COUNT(*) as count')
+        // Query để lấy số lượng đơn theo từng trạng thái (không filter theo status)
+        $data = (clone $baseQuery)
+            ->selectRaw('order_status, COUNT(*) as count')
             ->groupBy('order_status')
             ->get()
             ->pluck('count', 'order_status');
@@ -337,14 +333,44 @@ class OrderAnalyticsController extends Controller
         $result = [];
         $total = $data->sum();
 
-        foreach ($statuses as $key => $label) {
-            $count = (int)($data[$key] ?? 0);
-            $result[] = [
-                'status' => $key,
-                'label' => $label,
-                'count' => $count,
-                'percentage' => $total > 0 ? round(($count / $total) * 100, 1) : 0,
-            ];
+        // Nếu filter theo status, chỉ hiển thị status đó
+        if ($status && $status !== 'all') {
+            if ($status === 'returned') {
+                // Hiển thị cả return_requested và returned
+                foreach (['return_requested', 'returned'] as $key) {
+                    if (isset($statuses[$key])) {
+                        $count = (int)($data[$key] ?? 0);
+                        $result[] = [
+                            'status' => $key,
+                            'label' => $statuses[$key],
+                            'count' => $count,
+                            'percentage' => $total > 0 ? round(($count / $total) * 100, 1) : 0,
+                        ];
+                    }
+                }
+            } else {
+                // Hiển thị chỉ status được filter
+                if (isset($statuses[$status])) {
+                    $count = (int)($data[$status] ?? 0);
+                    $result[] = [
+                        'status' => $status,
+                        'label' => $statuses[$status],
+                        'count' => $count,
+                        'percentage' => $total > 0 ? round(($count / $total) * 100, 1) : 0,
+                    ];
+                }
+            }
+        } else {
+            // Hiển thị tất cả các status
+            foreach ($statuses as $key => $label) {
+                $count = (int)($data[$key] ?? 0);
+                $result[] = [
+                    'status' => $key,
+                    'label' => $label,
+                    'count' => $count,
+                    'percentage' => $total > 0 ? round(($count / $total) * 100, 1) : 0,
+                ];
+            }
         }
 
         return $result;
@@ -352,89 +378,76 @@ class OrderAnalyticsController extends Controller
 
     private function getFunnelData($dateFilter, $status = 'all')
     {
-        // Tạo base query với filter thời gian và status
-        $createBaseQuery = function() use ($dateFilter, $status) {
+        // Tạo base query với filter thời gian (không filter theo status để lấy tất cả)
+        $createBaseQuery = function() use ($dateFilter) {
             $query = Order::query();
             
             // Chỉ filter theo thời gian nếu có start và end
             if ($dateFilter['start'] && $dateFilter['end']) {
                 $query = $query->whereBetween('created_at', [$dateFilter['start'], $dateFilter['end']]);
             }
-            
-            if ($status && $status !== 'all') {
-                // Xử lý filter status giống như Order model scopeStatus
-                if ($status === 'returned') {
-                    $query = $query->whereIn('order_status', ['return_requested', 'returned']);
-                } else {
-                    $query = $query->where('order_status', $status);
-                }
-            }
             return $query;
         };
 
         $base = $createBaseQuery();
         
-        // Funnel 5 bước chuẩn dựa trên timestamps và status
+        // Funnel mới dựa trên order_status
         // 1. Created: Tất cả đơn được tạo trong khoảng thời gian
         $createdCount = (clone $base)->count();
         
-        // 2. Confirmed: Đơn có confirmed_at không null
-        $confirmedCount = (clone $base)->whereNotNull('confirmed_at')->count();
+        // 2. Pending: Đơn ở trạng thái chờ xác nhận
+        $pendingCount = (clone $base)->where('order_status', 'pending')->count();
         
-        // 3. Packed: Đơn có packed_at không null
-        $packedCount = (clone $base)->whereNotNull('packed_at')->count();
+        // 3. Processing: Đơn ở trạng thái đang xử lý
+        $processingCount = (clone $base)->where('order_status', 'processing')->count();
         
-        // 4. Shipping: Đơn có shipped_at không null hoặc order_status = 'shipping'
-        $shippingCount = (clone $base)->where(function($q) {
-            $q->whereNotNull('shipped_at')
-              ->orWhere('order_status', 'shipping');
-        })->count();
+        // 4. Shipping: Đơn ở trạng thái đang giao hàng
+        $shippingCount = (clone $base)->where('order_status', 'shipping')->count();
         
-        // 5. Delivered: Đơn có delivered_at không null hoặc order_status = 'completed'
-        $deliveredCount = (clone $base)->where(function($q) {
-            $q->whereNotNull('delivered_at')
-              ->orWhere('order_status', 'completed');
-        })->count();
+        // 5. Completed: Đơn ở trạng thái hoàn tất
+        $completedCount = (clone $base)->where('order_status', 'completed')->count();
         
-        // Nhánh rớt
+        // 6. Cancelled: Đơn ở trạng thái đã hủy
         $cancelledCount = (clone $base)->where('order_status', 'cancelled')->count();
+        
+        // Nhánh rớt (return)
         $returnRequestedCount = (clone $base)->where('order_status', 'return_requested')->count();
         $returnedCount = (clone $base)->where('order_status', 'returned')->count();
         $refundedCount = $returnRequestedCount + $returnedCount;
 
         // Tính tỷ lệ chuyển đổi tại mỗi bước
-        $confirmedRate = $createdCount > 0 ? round(($confirmedCount / $createdCount) * 100, 1) : 0;
-        $packedRate = $confirmedCount > 0 ? round(($packedCount / $confirmedCount) * 100, 1) : 0;
-        $shippingRate = $packedCount > 0 ? round(($shippingCount / $packedCount) * 100, 1) : 0;
-        $deliveredRate = $shippingCount > 0 ? round(($deliveredCount / $shippingCount) * 100, 1) : 0;
-        $finalConversion = $createdCount > 0 ? round(($deliveredCount / $createdCount) * 100, 1) : 0;
+        $pendingRate = $createdCount > 0 ? round(($pendingCount / $createdCount) * 100, 1) : 0;
+        $processingRate = $pendingCount > 0 ? round(($processingCount / $pendingCount) * 100, 1) : 0;
+        $shippingRate = $processingCount > 0 ? round(($shippingCount / $processingCount) * 100, 1) : 0;
+        $completedRate = $shippingCount > 0 ? round(($completedCount / $shippingCount) * 100, 1) : 0;
+        $finalConversion = $createdCount > 0 ? round(($completedCount / $createdCount) * 100, 1) : 0;
 
         // Tính số lượng rớt tại từng bước
-        $dropConfirm = $createdCount - $confirmedCount;
-        $dropPacked = $confirmedCount - $packedCount;
-        $dropShipping = $packedCount - $shippingCount;
-        $dropDelivered = $shippingCount - $deliveredCount;
+        $dropPending = $createdCount - $pendingCount;
+        $dropProcessing = $pendingCount - $processingCount;
+        $dropShipping = $processingCount - $shippingCount;
+        $dropCompleted = $shippingCount - $completedCount;
 
         return [
             'steps' => [
                 'created' => $createdCount,
-                'confirmed' => $confirmedCount,
-                'packed' => $packedCount,
+                'pending' => $pendingCount,
+                'processing' => $processingCount,
                 'shipping' => $shippingCount,
-                'delivered' => $deliveredCount,
+                'completed' => $completedCount,
             ],
             'conversion' => [
-                'confirmed_rate' => $confirmedRate,
-                'packed_rate' => $packedRate,
+                'pending_rate' => $pendingRate,
+                'processing_rate' => $processingRate,
                 'shipping_rate' => $shippingRate,
-                'delivered_rate' => $deliveredRate,
+                'completed_rate' => $completedRate,
                 'final_conversion' => $finalConversion,
             ],
             'drops' => [
-                'drop_confirm' => $dropConfirm,
-                'drop_packed' => $dropPacked,
+                'drop_pending' => $dropPending,
+                'drop_processing' => $dropProcessing,
                 'drop_shipping' => $dropShipping,
-                'drop_delivered' => $dropDelivered,
+                'drop_completed' => $dropCompleted,
             ],
             'cancelled' => $cancelledCount,
             'return_requested' => $returnRequestedCount,
