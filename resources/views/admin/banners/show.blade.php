@@ -95,8 +95,8 @@
                                 <h5 class="mb-0">Hình ảnh Banner</h5>
                             </div>
                             <div class="card-body text-center">
-                                @if (!empty($banner->image))
-                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}"
+                                @if ($banner->image_url)
+                                    <img src="{{ $banner->image_url }}" alt="{{ $banner->title }}"
                                         class="img-fluid rounded shadow-sm" style="max-width: 100%;"
                                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light p-5 rounded\'><i class=\'bi bi-image text-muted\' style=\'font-size: 3rem;\'></i><p class=\'text-muted mt-2\'>Ảnh không tồn tại</p></div>';">
                                 @else
@@ -121,6 +121,13 @@
                         </button>
                     </form>
                     <div class="d-flex gap-2">
+                        <form action="{{ route('admin.banners.duplicate', $banner->id) }}" method="POST" class="d-inline"
+                            onsubmit="return confirm('Tạo bản sao banner này?');">
+                            @csrf
+                            <button type="submit" class="btn btn-info">
+                                <i class="bi bi-files"></i> Nhân đôi
+                            </button>
+                        </form>
                         <a href="{{ route('admin.banners.edit', $banner->id) }}" class="btn btn-warning">
                             <i class="bi bi-pencil"></i> Chỉnh sửa
                         </a>

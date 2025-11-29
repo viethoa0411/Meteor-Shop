@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\OrderAnalyticsController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductPublicController;
 use App\Http\Controllers\Admin\ProductController;
@@ -95,6 +96,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'list'])->name('list');
+        Route::get('/analytics', [OrderAnalyticsController::class, 'index'])->name('analytics');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
@@ -117,6 +119,9 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/store', [BannerController::class, 'store'])->name('store');
         Route::get('/trash', [BannerController::class, 'trash'])->name('trash');
         Route::post('/bulk-delete', [BannerController::class, 'bulkDelete'])->name('bulkDelete');
+        Route::post('/bulk-restore', [BannerController::class, 'bulkRestore'])->name('bulkRestore');
+        Route::post('/bulk-force-delete', [BannerController::class, 'bulkForceDelete'])->name('bulkForceDelete');
+        Route::post('/bulk-update-status', [BannerController::class, 'bulkUpdateStatus'])->name('bulkUpdateStatus');
         Route::post('/update-sort-order', [BannerController::class, 'updateSortOrder'])->name('updateSortOrder');
         Route::get('/{id}', [BannerController::class, 'show'])->name('show');
         Route::get('/{id}/edit', [BannerController::class, 'edit'])->name('edit');
@@ -125,6 +130,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/{id}/restore', [BannerController::class, 'restore'])->name('restore');
         Route::delete('/{id}/force-delete', [BannerController::class, 'forceDelete'])->name('forceDelete');
         Route::put('/{id}/status', [BannerController::class, 'updateStatus'])->name('updateStatus');
+        Route::post('/{id}/duplicate', [BannerController::class, 'duplicate'])->name('duplicate');
     });
 
     // ====== WALLET ======

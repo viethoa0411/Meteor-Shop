@@ -33,7 +33,7 @@
             <div class="card-body">
                 <form action="{{ route('admin.banners.list') }}" method="GET" class="row g-3">
                     {{-- Tìm kiếm --}}
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="input-group">
                             <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm theo tiêu đề, mô tả..."
                                 value="{{ request('keyword') }}">
@@ -44,12 +44,22 @@
                     </div>
 
                     {{-- Lọc trạng thái --}}
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <select name="status" class="form-select">
                             <option value="all">Tất cả trạng thái</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Hoạt động</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Tạm ẩn</option>
                         </select>
+                    </div>
+
+                    {{-- Lọc theo ngày --}}
+                    <div class="col-md-2">
+                        <input type="date" name="date_from" class="form-control" placeholder="Từ ngày"
+                            value="{{ request('date_from') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="date_to" class="form-control" placeholder="Đến ngày"
+                            value="{{ request('date_to') }}">
                     </div>
 
                     {{-- Nút hành động --}}
@@ -67,17 +77,30 @@
                 </form>
 
                 {{-- Hành động hàng loạt --}}
-                <form id="bulkActionForm" action="{{ route('admin.banners.bulkDelete') }}" method="POST" class="mt-3">
-                    @csrf
-                    <div class="d-flex gap-2 align-items-center">
+                <div class="mt-3">
+                    <form id="bulkActionForm" action="{{ route('admin.banners.bulkDelete') }}" method="POST" class="d-inline">
+                        @csrf
+                    </form>
+                    <form id="bulkStatusForm" action="{{ route('admin.banners.bulkUpdateStatus') }}" method="POST" class="d-inline">
+                        @csrf
+                    </form>
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
                         <button type="button" class="btn btn-sm btn-danger" id="bulkDeleteBtn" disabled>
                             <i class="bi bi-trash"></i> Xóa đã chọn
                         </button>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-success" id="bulkActiveBtn" disabled>
+                                <i class="bi bi-check-circle"></i> Kích hoạt
+                            </button>
+                            <button type="button" class="btn btn-sm btn-warning" id="bulkInactiveBtn" disabled>
+                                <i class="bi bi-x-circle"></i> Tạm ẩn
+                            </button>
+                        </div>
                         <a href="{{ route('admin.banners.trash') }}" class="btn btn-sm btn-secondary">
                             <i class="bi bi-trash3"></i> Thùng rác
                         </a>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
 
@@ -119,8 +142,8 @@
                                                 class="form-check-input banner-checkbox">
                                         </td>
                                         <td>
-                                            @if (!empty($banner->image))
-                                                <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}"
+                                            @if ($banner->image_url)
+                                                <img src="{{ $banner->image_url }}" alt="{{ $banner->title }}"
                                                     class="img-thumbnail" style="width: 60px; height: 40px; object-fit: cover;"
                                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light d-flex align-items-center justify-content-center\' style=\'width: 60px; height: 40px;\'><i class=\'bi bi-image text-muted\'></i></div>';">
                                             @else
@@ -180,6 +203,14 @@
                                                     class="btn btn-sm btn-warning" title="Sửa">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
+                                                <form action="{{ route('admin.banners.duplicate', $banner->id) }}"
+                                                    method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Tạo bản sao banner này?');">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-secondary" title="Nhân đôi">
+                                                        <i class="bi bi-files"></i>
+                                                    </button>
+                                                </form>
                                                 <form action="{{ route('admin.banners.destroy', $banner->id) }}"
                                                     method="POST" class="d-inline"
                                                     onsubmit="return confirm('Bạn có chắc chắn muốn xóa banner này?');">
@@ -201,46 +232,118 @@
 
             {{-- Phân trang --}}
             <div class="d-flex justify-content-center mt-4">
-                {{ $banners->withQueryString()->links('pagination::bootstrap-5') }}
+                {{ $banners->links('pagination::bootstrap-5') }}
             </div>
         @endif
     </div>
+
+    @push('styles')
+        <style>
+            .sortable-ghost {
+                opacity: 0.4;
+                background-color: #f0f0f0 !important;
+            }
+            .sortable-chosen {
+                cursor: grabbing !important;
+            }
+            .sortable-drag {
+                opacity: 0.8;
+            }
+            .bi-grip-vertical {
+                cursor: grab;
+            }
+            .bi-grip-vertical:active {
+                cursor: grabbing;
+            }
+        </style>
+    @endpush
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
         <script>
             // Select all checkbox
-            document.getElementById('selectAll')?.addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('.banner-checkbox');
-                checkboxes.forEach(cb => cb.checked = this.checked);
-                updateBulkDeleteBtn();
-            });
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.banner-checkbox');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    updateBulkButtons();
+                });
+            }
 
-            // Update bulk delete button
+            // Update bulk action buttons
             document.querySelectorAll('.banner-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', updateBulkDeleteBtn);
+                checkbox.addEventListener('change', function() {
+                    updateBulkButtons();
+                    updateSelectAllCheckbox();
+                });
             });
 
-            function updateBulkDeleteBtn() {
+            function updateSelectAllCheckbox() {
+                const checkboxes = document.querySelectorAll('.banner-checkbox');
+                const checked = document.querySelectorAll('.banner-checkbox:checked');
+                const selectAll = document.getElementById('selectAll');
+                
+                if (selectAll && checkboxes.length > 0) {
+                    selectAll.checked = checked.length === checkboxes.length;
+                    selectAll.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
+                }
+            }
+
+            function updateBulkButtons() {
                 const checked = document.querySelectorAll('.banner-checkbox:checked').length;
-                const btn = document.getElementById('bulkDeleteBtn');
-                if (btn) {
-                    btn.disabled = checked === 0;
+                const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+                const bulkActiveBtn = document.getElementById('bulkActiveBtn');
+                const bulkInactiveBtn = document.getElementById('bulkInactiveBtn');
+                
+                const disabled = checked === 0;
+                
+                if (bulkDeleteBtn) {
+                    bulkDeleteBtn.disabled = disabled;
                     if (checked > 0) {
-                        btn.textContent = `Xóa đã chọn (${checked})`;
+                        bulkDeleteBtn.innerHTML = `<i class="bi bi-trash"></i> Xóa đã chọn (${checked})`;
                     } else {
-                        btn.innerHTML = '<i class="bi bi-trash"></i> Xóa đã chọn';
+                        bulkDeleteBtn.innerHTML = '<i class="bi bi-trash"></i> Xóa đã chọn';
+                    }
+                }
+                
+                if (bulkActiveBtn) {
+                    bulkActiveBtn.disabled = disabled;
+                    if (checked > 0) {
+                        bulkActiveBtn.innerHTML = `<i class="bi bi-check-circle"></i> Kích hoạt (${checked})`;
+                    } else {
+                        bulkActiveBtn.innerHTML = '<i class="bi bi-check-circle"></i> Kích hoạt';
+                    }
+                }
+                
+                if (bulkInactiveBtn) {
+                    bulkInactiveBtn.disabled = disabled;
+                    if (checked > 0) {
+                        bulkInactiveBtn.innerHTML = `<i class="bi bi-x-circle"></i> Tạm ẩn (${checked})`;
+                    } else {
+                        bulkInactiveBtn.innerHTML = '<i class="bi bi-x-circle"></i> Tạm ẩn';
                     }
                 }
             }
 
+            // Initialize buttons state
+            updateBulkButtons();
+            updateSelectAllCheckbox();
+
             // Bulk delete
-            document.getElementById('bulkDeleteBtn')?.addEventListener('click', function() {
+            document.getElementById('bulkDeleteBtn')?.addEventListener('click', function(e) {
+                e.preventDefault();
                 const checked = document.querySelectorAll('.banner-checkbox:checked');
-                if (checked.length === 0) return;
+                if (checked.length === 0) {
+                    alert('Vui lòng chọn ít nhất một banner để xóa!');
+                    return;
+                }
 
                 if (confirm(`Bạn có chắc chắn muốn xóa ${checked.length} banner đã chọn?`)) {
                     const form = document.getElementById('bulkActionForm');
+                    // Clear form trước khi thêm input mới
+                    form.querySelectorAll('input[name="ids[]"]').forEach(input => input.remove());
+                    
                     checked.forEach(cb => {
                         const input = document.createElement('input');
                         input.type = 'hidden';
@@ -252,11 +355,77 @@
                 }
             });
 
+            // Bulk update status - Active
+            document.getElementById('bulkActiveBtn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                const checked = document.querySelectorAll('.banner-checkbox:checked');
+                if (checked.length === 0) {
+                    alert('Vui lòng chọn ít nhất một banner để kích hoạt!');
+                    return;
+                }
+
+                if (confirm(`Kích hoạt ${checked.length} banner đã chọn?`)) {
+                    const form = document.getElementById('bulkStatusForm');
+                    // Clear form trước khi thêm input mới
+                    form.querySelectorAll('input[name="ids[]"]').forEach(input => input.remove());
+                    form.querySelectorAll('input[name="status"]').forEach(input => input.remove());
+                    
+                    checked.forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = cb.value;
+                        form.appendChild(input);
+                    });
+                    const statusInput = document.createElement('input');
+                    statusInput.type = 'hidden';
+                    statusInput.name = 'status';
+                    statusInput.value = 'active';
+                    form.appendChild(statusInput);
+                    form.submit();
+                }
+            });
+
+            // Bulk update status - Inactive
+            document.getElementById('bulkInactiveBtn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                const checked = document.querySelectorAll('.banner-checkbox:checked');
+                if (checked.length === 0) {
+                    alert('Vui lòng chọn ít nhất một banner để tạm ẩn!');
+                    return;
+                }
+
+                if (confirm(`Tạm ẩn ${checked.length} banner đã chọn?`)) {
+                    const form = document.getElementById('bulkStatusForm');
+                    // Clear form trước khi thêm input mới
+                    form.querySelectorAll('input[name="ids[]"]').forEach(input => input.remove());
+                    form.querySelectorAll('input[name="status"]').forEach(input => input.remove());
+                    
+                    checked.forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = cb.value;
+                        form.appendChild(input);
+                    });
+                    const statusInput = document.createElement('input');
+                    statusInput.type = 'hidden';
+                    statusInput.name = 'status';
+                    statusInput.value = 'inactive';
+                    form.appendChild(statusInput);
+                    form.submit();
+                }
+            });
+
             // Status toggle
             document.querySelectorAll('.status-toggle').forEach(toggle => {
                 toggle.addEventListener('change', function() {
                     const id = this.dataset.id;
                     const status = this.checked ? 'active' : 'inactive';
+                    const originalChecked = this.checked;
+
+                    // Disable toggle while processing
+                    this.disabled = true;
 
                     fetch(`/admin/banners/${id}/status`, {
                         method: 'PUT',
@@ -266,16 +435,32 @@
                         },
                         body: JSON.stringify({ status })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
-                            location.reload();
+                            // Update label
+                            const label = this.nextElementSibling;
+                            if (label) {
+                                label.textContent = status === 'active' ? 'Hoạt động' : 'Tạm ẩn';
+                            }
+                            // Reload after short delay to show success
+                            setTimeout(() => {
+                                location.reload();
+                            }, 300);
+                        } else {
+                            throw new Error(data.message || 'Cập nhật thất bại');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Có lỗi xảy ra!');
-                        this.checked = !this.checked;
+                        alert('Có lỗi xảy ra khi cập nhật trạng thái!');
+                        this.checked = !originalChecked;
+                        this.disabled = false;
                     });
                 });
             });
@@ -283,36 +468,61 @@
             // Drag & Drop Sortable
             const sortable = document.getElementById('sortable');
             if (sortable) {
-                new Sortable(sortable, {
-                    handle: '.bi-grip-vertical',
-                    animation: 150,
-                    onEnd: function(evt) {
-                        const items = Array.from(sortable.querySelectorAll('tr[data-id]'));
-                        const banners = items.map((item, index) => ({
-                            id: item.dataset.id,
-                            sort_order: index + 1
-                        }));
+                const items = sortable.querySelectorAll('tr[data-id]');
+                if (items.length > 1) {
+                    new Sortable(sortable, {
+                        handle: '.bi-grip-vertical',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        dragClass: 'sortable-drag',
+                        onEnd: function(evt) {
+                            const items = Array.from(sortable.querySelectorAll('tr[data-id]'));
+                            const banners = items.map((item, index) => ({
+                                id: item.dataset.id,
+                                sort_order: index + 1
+                            }));
 
-                        fetch('{{ route("admin.banners.updateSortOrder") }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({ banners })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                location.reload();
+                            // Show loading state
+                            const oldIndex = evt.oldIndex;
+                            const newIndex = evt.newIndex;
+                            
+                            // Only update if position changed
+                            if (oldIndex !== newIndex) {
+                                fetch('{{ route("admin.banners.updateSortOrder") }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: JSON.stringify({ banners })
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        // Reload after short delay
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 300);
+                                    } else {
+                                        throw new Error(data.message || 'Cập nhật thất bại');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Có lỗi xảy ra khi cập nhật thứ tự!');
+                                    // Reload to restore original order
+                                    location.reload();
+                                });
                             }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Có lỗi xảy ra khi cập nhật thứ tự!');
-                        });
-                    }
-                });
+                        }
+                    });
+                }
             }
         </script>
     @endpush

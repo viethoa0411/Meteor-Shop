@@ -15,13 +15,42 @@ class DashboardController extends Controller
     {
         $month = now()->month;
         $year = now()->year;
-        $q = trim((string) $request->get('q'));
 
         // Thống kê người dùng và đơn hàng
         $totalUsers = User::where('role', 'user')->count();
         $totalOrders = Order::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->count();
+        $totalAllOrders = Order::count();
+
+        // Tính toán so sánh với tháng trước
+        $lastMonth = $month - 1;
+        $lastMonthYear = $year;
+        if ($lastMonth < 1) {
+            $lastMonth = 12;
+            $lastMonthYear = $year - 1;
+        }
+
+        // So sánh người dùng
+        $lastMonthUsers = User::where('role', 'user')
+            ->whereYear('created_at', $lastMonthYear)
+            ->whereMonth('created_at', $lastMonth)
+            ->count();
+        $thisMonthUsers = User::where('role', 'user')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->count();
+        $userGrowth = $lastMonthUsers > 0 
+            ? round((($thisMonthUsers - $lastMonthUsers) / $lastMonthUsers) * 100, 1)
+            : ($thisMonthUsers > 0 ? 100 : 0);
+
+        // So sánh đơn hàng
+        $lastMonthOrders = Order::whereYear('created_at', $lastMonthYear)
+            ->whereMonth('created_at', $lastMonth)
+            ->count();
+        $orderGrowth = $lastMonthOrders > 0 
+            ? round((($totalOrders - $lastMonthOrders) / $lastMonthOrders) * 100, 1)
+            : ($totalOrders > 0 ? 100 : 0);
 
         $todayRevenue = Order::whereDate('created_at', now()->toDateString())
             ->where('order_status', 'completed')
@@ -56,81 +85,25 @@ class DashboardController extends Controller
             $filteredRevenue = $query->sum('final_total');
         }
 
-        // Tổng số đơn (tất cả trạng thái) trong khoảng (nếu có filter)
-        $filteredOrdersCount = null;
-        if ($startDate || $endDate) {
-            $countQueryAll = Order::query();
-            if ($startDate) $countQueryAll->whereDate('created_at', '>=', $startDate);
-            if ($endDate) $countQueryAll->whereDate('created_at', '<=', $endDate);
-            $filteredOrdersCount = $countQueryAll->count();
-        }
+        // Biểu đồ doanh thu theo năm hiện tại
+        $monthlyRevenue = Order::select(
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('SUM(final_total) as revenue')
+        )
+            ->whereYear('created_at', $year)
+            ->where('order_status', 'completed')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
 
-        // Biểu đồ doanh thu: nếu có filter ngày thì hiển thị theo tháng trong khoảng đó,
-        // ngược lại hiển thị theo 12 tháng của năm hiện tại
-        $revenueLabels = [];
+        $monthlyRevenueMap = $monthlyRevenue->keyBy('month');
         $revenueData = [];
-
-        if ($startDate || $endDate) {
-            // chuẩn hoá range
-            $start = \Carbon\Carbon::parse($startDate ?? ($year . '-01-01'))->startOfMonth();
-            $end = \Carbon\Carbon::parse($endDate ?? ($year . '-12-31'))->endOfMonth();
-
-            $monthlyRevenue = Order::select(
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('SUM(final_total) as revenue')
-            )
-                ->where('order_status', 'completed')
-                ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
-                ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
-                ->groupBy('year', 'month')
-                ->orderBy('year')
-                ->orderBy('month')
-                ->get();
-
-            $monthlyMap = $monthlyRevenue->keyBy(function ($r) {
-                return $r->year . '-' . str_pad($r->month, 2, '0', STR_PAD_LEFT);
-            });
-
-            // iterate months between start and end
-            $cursor = $start->copy();
-            while ($cursor->lte($end)) {
-                $key = $cursor->format('Y-m');
-                $revenueLabels[] = $cursor->format('m/Y');
-                $revenueData[] = $monthlyMap[$key]->revenue ?? 0;
-                $cursor->addMonth();
-            }
-        } else {
-            $monthlyRevenue = Order::select(
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('SUM(final_total) as revenue')
-            )
-                ->whereYear('created_at', $year)
-                ->where('order_status', 'completed')
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
-
-            $monthlyRevenueMap = $monthlyRevenue->keyBy('month');
-            for ($i = 1; $i <= 12; $i++) {
-                $revenueLabels[] = 'T' . $i;
-                $revenueData[] = $monthlyRevenueMap[$i]->revenue ?? 0;
-            }
+        for ($i = 1; $i <= 12; $i++) {
+            $revenueData[] = $monthlyRevenueMap[$i]->revenue ?? 0;
         }
 
         // Lấy 5 đơn hàng gần nhất cùng user, sản phẩm và category
         $recentOrders = Order::with('user', 'items.product.category')
-            ->when($q, function ($query) use ($q) {
-                $query->where(function ($qBuilder) use ($q) {
-                    $qBuilder->where('order_code', 'like', "%{$q}%")
-                        ->orWhereHas('user', function ($u) use ($q) {
-                            $u->where('name', 'like', "%{$q}%");
-                        })
-                        ->orWhereHas('items.product', function ($p) use ($q) {
-                            $p->where('name', 'like', "%{$q}%");
-                        });
-                });
-            })
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -153,9 +126,168 @@ class DashboardController extends Controller
             ->latest()
             ->first();
 
+        // ========== THỐNG KÊ ĐƠN HÀNG ==========
+        // Lấy filter từ request
+        $orderFilterType = $request->input('order_filter_type', 'last_30_days'); // today, last_7_days, last_15_days, last_30_days, all, month, date_range
+        $orderFilterMonth = $request->input('order_month');
+        $orderFilterYear = $request->input('order_year');
+        $orderFilterStartDate = $request->input('order_start_date');
+        $orderFilterEndDate = $request->input('order_end_date');
+        $orderFilterStatus = $request->input('order_status', 'all');
+
+        // Query đơn hàng với filter
+        $ordersQuery = Order::with('user');
+
+        // Áp dụng filter theo loại
+        switch ($orderFilterType) {
+            case 'today':
+                // Filter hôm nay
+                $ordersQuery->whereDate('created_at', now()->toDateString());
+                break;
+                
+            case 'last_7_days':
+                // Filter 7 ngày gần nhất
+                $ordersQuery->whereDate('created_at', '>=', now()->subDays(7)->toDateString());
+                break;
+                
+            case 'last_15_days':
+                // Filter 15 ngày gần nhất
+                $ordersQuery->whereDate('created_at', '>=', now()->subDays(15)->toDateString());
+                break;
+                
+            case 'all':
+                // Hiển thị tất cả - không filter thời gian
+                break;
+                
+            case 'month':
+                // Filter theo tháng/năm
+                if ($orderFilterMonth && $orderFilterYear) {
+                    $ordersQuery->whereYear('created_at', $orderFilterYear)
+                        ->whereMonth('created_at', $orderFilterMonth);
+                } else {
+                    // Mặc định tháng hiện tại
+                    $orderFilterMonth = $orderFilterMonth ?? $month;
+                    $orderFilterYear = $orderFilterYear ?? $year;
+                    $ordersQuery->whereYear('created_at', $orderFilterYear)
+                        ->whereMonth('created_at', $orderFilterMonth);
+                }
+                break;
+                
+            case 'date_range':
+                // Filter theo khoảng thời gian
+                if ($orderFilterStartDate) {
+                    $ordersQuery->whereDate('created_at', '>=', $orderFilterStartDate);
+                }
+                if ($orderFilterEndDate) {
+                    $ordersQuery->whereDate('created_at', '<=', $orderFilterEndDate);
+                }
+                break;
+                
+            case 'last_30_days':
+            default:
+                // Mặc định: 30 ngày gần nhất
+                $ordersQuery->whereDate('created_at', '>=', now()->subDays(30)->toDateString());
+                break;
+        }
+
+        // Filter theo trạng thái
+        if ($orderFilterStatus && $orderFilterStatus !== 'all') {
+            $ordersQuery->where('order_status', $orderFilterStatus);
+        }
+
+        // Phân trang đơn hàng
+        $perPage = 15;
+        $filteredOrders = $ordersQuery->orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        // Thống kê đơn hàng theo trạng thái (dùng cùng filter với danh sách)
+        $statsQuery = Order::select('order_status', DB::raw('count(*) as count'));
+        
+        // Áp dụng cùng filter thời gian
+        switch ($orderFilterType) {
+            case 'today':
+                $statsQuery->whereDate('created_at', now()->toDateString());
+                break;
+            case 'last_7_days':
+                $statsQuery->whereDate('created_at', '>=', now()->subDays(7)->toDateString());
+                break;
+            case 'last_15_days':
+                $statsQuery->whereDate('created_at', '>=', now()->subDays(15)->toDateString());
+                break;
+            case 'all':
+                break;
+            case 'month':
+                if ($orderFilterMonth && $orderFilterYear) {
+                    $statsQuery->whereYear('created_at', $orderFilterYear)
+                        ->whereMonth('created_at', $orderFilterMonth);
+                } else {
+                    $statsQuery->whereYear('created_at', $orderFilterYear ?? $year)
+                        ->whereMonth('created_at', $orderFilterMonth ?? $month);
+                }
+                break;
+            case 'date_range':
+                if ($orderFilterStartDate) {
+                    $statsQuery->whereDate('created_at', '>=', $orderFilterStartDate);
+                }
+                if ($orderFilterEndDate) {
+                    $statsQuery->whereDate('created_at', '<=', $orderFilterEndDate);
+                }
+                break;
+            case 'last_30_days':
+            default:
+                $statsQuery->whereDate('created_at', '>=', now()->subDays(30)->toDateString());
+                break;
+        }
+        
+        $orderStatsByStatus = $statsQuery->groupBy('order_status')
+            ->get()
+            ->pluck('count', 'order_status');
+        
+        // Đảm bảo tất cả trạng thái đều có trong thống kê (mặc định 0)
+        $allStatuses = ['pending', 'processing', 'shipping', 'completed', 'cancelled'];
+        foreach ($allStatuses as $status) {
+            if (!isset($orderStatsByStatus[$status])) {
+                $orderStatsByStatus[$status] = 0;
+            }
+        }
+
+        // Dữ liệu biểu đồ tăng trưởng đơn hàng (7 ngày gần nhất)
+        // Biểu đồ luôn hiển thị 7 ngày gần nhất, không phụ thuộc vào filter tháng/ngày
+        $growthChartData = [];
+        $growthChartLabels = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $dateStr = $date->format('d/m');
+            $growthChartLabels[] = $dateStr;
+
+            $countQuery = Order::whereDate('created_at', $date->toDateString());
+            
+            // Chỉ áp dụng filter trạng thái nếu có
+            if ($orderFilterStatus && $orderFilterStatus !== 'all') {
+                $countQuery->where('order_status', $orderFilterStatus);
+            }
+            
+            $growthChartData[] = $countQuery->count();
+        }
+
+        // Tính tăng trưởng so với ngày trước
+        $todayOrders = $growthChartData[6] ?? 0;
+        $yesterdayOrders = $growthChartData[5] ?? 0;
+        $orderGrowthRate = $yesterdayOrders > 0 
+            ? round((($todayOrders - $yesterdayOrders) / $yesterdayOrders) * 100, 1)
+            : ($todayOrders > 0 ? 100 : 0);
+
+        // Tổng số đơn hàng theo filter
+        $totalFilteredOrders = $ordersQuery->count();
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalOrders',
+            'totalAllOrders',
+            'userGrowth',
+            'orderGrowth',
+            'thisMonthUsers',
             'todayRevenue',
             'currentMonthRevenue',
             'monthlyTarget',
@@ -167,8 +299,19 @@ class DashboardController extends Controller
             'latestOrder',
             'recentProducts',
             'showTargetAlert',
-            'q',
-            'filteredOrdersCount'
+            // Thống kê đơn hàng
+            'filteredOrders',
+            'orderFilterType',
+            'orderFilterMonth',
+            'orderFilterYear',
+            'orderFilterStartDate',
+            'orderFilterEndDate',
+            'orderFilterStatus',
+            'orderStatsByStatus',
+            'growthChartData',
+            'growthChartLabels',
+            'orderGrowthRate',
+            'totalFilteredOrders'
         ));
     }
 }
