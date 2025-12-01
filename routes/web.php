@@ -31,6 +31,7 @@ use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
+use App\Http\Controllers\Client\Contact\ContactController as ClientContactController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -216,6 +217,9 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update-qty', [CartController::class, 'updateQty'])->name('cart.updateQty');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/contact/list', [ClientContactController::class, 'list'])->name('client.contact.list');
+Route::post('/contact/store', [ClientContactController::class, 'store'])->name('client.contact.store');
+
 
 Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
     Route::get('/orders', [ClientAccountOrderController::class, 'index'])->name('orders.index');
