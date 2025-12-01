@@ -59,5 +59,28 @@ class ContactController extends Controller
         $contact = Contact::findOrFail($id);
         return view('admin.contact.edit', compact('contact'));
     }
+     /**
+ * Cập nhật liên hệ
+ */
+public function update(Request $request, $id)
+{
+    $contact = Contact::findOrFail($id);
 
+    // Chỉ validate trường status
+    $validated = $request->validate([
+        'status' => 'required|in:pending,processed',
+    ]);
+
+    // Nếu trạng thái không thay đổi thì không cho cập nhật
+    if ($validated['status'] === $contact->status) {
+        return back()->with('error', 'Trạng thái chưa thay đổi, không thể cập nhật!');
+    }
+
+    try {
+        $contact->update(['status' => $validated['status']]);
+        return redirect()->route('admin.contacts.index')->with('success', 'Cập nhật trạng thái thành công!');
+    } catch (\Exception $e) {
+        return back()->withInput()->with('error', 'Lỗi cập nhật: ' . $e->getMessage());
+    }
+}
 }

@@ -46,7 +46,7 @@
                             <div class="alert alert-danger">{{ session('error') }}</div>
                         @endif
 
-                        <form action="#" method="POST">
+                        <form action="{{ route('admin.contacts.update', $contact->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
