@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\Wallet\WalletManagementController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionActionController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
 use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
+use App\Http\Controllers\Admin\Contact\ContactController;
 
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
@@ -132,6 +133,10 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::delete('/{id}/force-delete', [BannerController::class, 'forceDelete'])->name('forceDelete');
         Route::put('/{id}/status', [BannerController::class, 'updateStatus'])->name('updateStatus');
         Route::post('/{id}/duplicate', [BannerController::class, 'duplicate'])->name('duplicate');
+    });
+
+    Route::prefix('contacts')->name('contacts.')->group(function () {
+          Route::get('/', [ContactController::class, 'index'])->name('index');
     });
 
     // ====== WALLET ======

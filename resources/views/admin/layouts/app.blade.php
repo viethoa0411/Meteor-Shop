@@ -350,6 +350,9 @@
             <a href="{{ route('admin.orders.list') }}" class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                 <i class="bi bi-cart-fill me-2"></i> Đơn hàng
             </a>
+            <a href="{{ route('admin.contacts.index') }}">
+              <i class="bi bi-envelope me-2"></i> Liên hệ
+            </a>
             <a href="{{ route('admin.blogs.list') }}" class="{{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
                 <i class="bi bi-list-ul me-2"></i> Danh sách bài viết
             </a>
