@@ -44,12 +44,31 @@
                     </a>
                 </div>
 
+
+                {{-- Ô tìm kiếm --}}
+                <form action="{{ route('admin.contacts.index') }}" method="GET"
+                    class="d-flex align-items-center flex-grow-1 mx-md-4" style="max-width: 500px;">
+                    <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+
+                    <div class="input-group w-100">
+                        <input type="text" name="keyword" class="form-control"
+                            placeholder="VD: tên, email hoặc số điện thoại..." value="{{ request('keyword') }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                        @if (request('keyword'))
+                            <a href="{{ route('admin.contacts.index', ['status' => request('status', 'all')]) }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        @endif
+                    </div>
+                </form>
                 
             </div>
         </div>
     </div>
 
-    
+
     @if ($contacts->isEmpty())
         <p class="text-center">Chưa có liên hệ nào.</p>
     @else

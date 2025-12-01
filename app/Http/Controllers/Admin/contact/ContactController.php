@@ -24,6 +24,16 @@ class ContactController extends Controller
                 $query->where('status', 'pending');
             }
         }
+        
+        // Tìm kiếm theo tên, email, sdt
+        if ($request->has('keyword') && $request->keyword != '') {
+            $keyword = $request->keyword;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('email', 'like', "%{$keyword}%")
+                    ->orWhere('phone', 'like', "%{$keyword}%");
+            });
+        }
 
         // Sắp xếp theo ID giảm dần và phân trang
         $contacts = $query->orderBy('id', 'desc')->paginate(10);
