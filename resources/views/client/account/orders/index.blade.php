@@ -127,7 +127,7 @@
                     <h2 class="fw-bold mb-1">Đơn hàng của tôi</h2>
                     <p class="text-muted mb-0">Theo dõi và quản lý toàn bộ đơn hàng một cách dễ dàng.</p>
                 </div>
-                
+
             </div>
         </div>
 
@@ -277,7 +277,7 @@
                             @endif
                             <div class="flex-grow-1">
                                 @if ($productSlug)
-                                    <a href="{{ route('client.product.detail', $productSlug) }}" 
+                                    <a href="{{ route('client.product.detail', $productSlug) }}"
                                        class="text-decoration-none text-dark fw-semibold d-inline-block"
                                        style="transition: color 0.2s;">
                                         {{ $productName }}
@@ -326,7 +326,7 @@
                                     @endif
                                     <div class="flex-grow-1">
                                         @if ($productSlug)
-                                            <a href="{{ route('client.product.detail', $productSlug) }}" 
+                                            <a href="{{ route('client.product.detail', $productSlug) }}"
                                                class="text-decoration-none text-dark fw-semibold d-inline-block"
                                                style="transition: color 0.2s;">
                                                 {{ $productName }}
@@ -365,17 +365,33 @@
 
                 <hr class="my-3">
 
-                <div class="d-flex flex-wrap gap-2">
+                {{-- BẮT ĐẦU PHẦN ĐÃ SỬA: CÁC NÚT HÀNH ĐỘNG --}}
+                {{-- Đã thêm align-items-start để căn chỉnh các nút lên trên cùng --}}
+                <div class="d-flex flex-wrap gap-2 align-items-start">
+                    {{-- Nút cơ bản: Xem chi tiết --}}
                     <a class="btn btn-outline-secondary" href="{{ route('client.account.orders.show', $order) }}">
                         <i class="bi bi-eye me-1"></i> Xem chi tiết
                     </a>
 
+                    {{-- Nút: Đã nhận hàng --}}
+                    @if ($order->canReceive())
+                        <form action="{{ route('client.account.orders.markReceived', $order) }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-success"
+                                    onclick="return confirm('Bạn đã nhận được hàng? Xác nhận này sẽ cập nhật trạng thái đơn hàng sang \"Giao hàng thành công\".');">
+                                <i class="bi bi-check-circle me-1"></i> Đã nhận hàng
+                            </button>
+                        </form>
+                    @endif
+
+                    {{-- Nút: Theo dõi vận đơn --}}
                     @if ($order->canTrack())
                         <a class="btn btn-outline-primary" href="{{ route('client.account.orders.tracking', $order) }}">
                             <i class="bi bi-truck me-1"></i> Theo dõi vận đơn
                         </a>
                     @endif
 
+                    {{-- Nút: Hủy đơn --}}
                     @if ($order->canCancel())
                         <button class="btn btn-outline-danger btn-cancel-order" data-order-id="{{ $order->id }}"
                             data-order-code="{{ $order->order_code }}"
@@ -384,6 +400,7 @@
                         </button>
                     @endif
 
+                    {{-- Nút: Mua lại --}}
                     @if ($order->canReorder())
                         <form action="{{ route('client.account.orders.reorder', $order) }}" method="POST">
                             @csrf
@@ -393,20 +410,47 @@
                         </form>
                     @endif
 
+                    {{-- Nút: Đánh giá --}}
                     @if ($order->canReview())
                         <button class="btn btn-outline-success" type="button">
                             <i class="bi bi-star me-1"></i> Đánh giá
                         </button>
                     @endif
 
+                    {{-- Logic Yêu cầu đổi trả (Sử dụng flex-column và min-height để tránh lệch nút) --}}
                     @if ($order->canReturn())
-                        <button class="btn btn-outline-warning btn-return-order" data-order-id="{{ $order->id }}"
-                            data-order-code="{{ $order->order_code }}"
-                            data-action="{{ route('client.account.orders.return', $order) }}">
-                            <i class="bi bi-arrow-counterclockwise me-1"></i> Yêu cầu đổi trả
-                        </button>
+                        @php
+                            $daysRemaining = $order->getReturnDaysRemaining();
+                        @endphp
+                        {{-- Bọc nút và thông báo ngày còn lại trong d-flex flex-column --}}
+                        <div class="d-flex flex-column">
+                            <button class="btn btn-outline-warning btn-return-order" data-order-id="{{ $order->id }}"
+                                data-order-code="{{ $order->order_code }}"
+                                data-action="{{ route('client.account.orders.return', $order) }}">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Yêu cầu đổi trả
+                            </button>
+                            @if ($daysRemaining !== null && $daysRemaining > 0)
+                                {{-- Thẻ small với thông tin ngày còn lại --}}
+                                <small class="text-muted text-center mt-1" style="min-height: 18px;">
+                                    (Còn {{ $daysRemaining }} ngày)
+                                </small>
+                            @else
+                                {{-- Thẻ small rỗng với min-height để giữ khoảng trống, giúp nút không bị đẩy lên --}}
+                                <small style="min-height: 18px;"></small>
+                            @endif
+                        </div>
+                    @elseif ($order->order_status === 'completed' && $order->isReturnExpired() && in_array($order->return_status, ['none', 'rejected']))
+                        {{-- Thông báo hết hạn đổi trả, dùng d-flex align-items-center để căn giữa theo chiều dọc --}}
+                        {{-- Lưu ý: Với align-items-start ở container cha, khối này sẽ căn trên cùng --}}
+                        <div class="d-flex align-items-start">
+                            <div class="alert alert-warning small mb-0 py-2">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Đã quá thời hạn 7 ngày để yêu cầu đổi trả
+                            </div>
+                        </div>
                     @endif
                 </div>
+                {{-- KẾT THÚC PHẦN ĐÃ SỬA --}}
             </div>
         @empty
             <div class="order-card">
@@ -426,6 +470,7 @@
         @endif
     </div>
 
+    {{-- MODAL HỦY ĐƠN --}}
     <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form method="POST" class="modal-content" id="cancelOrderForm">
@@ -459,6 +504,7 @@
         </div>
     </div>
 
+    {{-- MODAL YÊU CẦU ĐỔI TRẢ --}}
     <div class="modal fade" id="returnOrderModal" tabindex="-1" aria-labelledby="returnOrderModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -470,7 +516,7 @@
                 </div>
                 <div class="modal-body">
                     <p class="text-muted">Nhập thông tin cho đơn <span class="fw-semibold"
-                            id="returnOrderCode"></span></p>
+                                id="returnOrderCode"></span></p>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Lý do đổi trả</label>
@@ -501,12 +547,15 @@
         </div>
     </div>
 
+    {{-- SCRIPT --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cancelModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
             const returnModal = new bootstrap.Modal(document.getElementById('returnOrderModal'));
             const cancelForm = document.getElementById('cancelOrderForm');
             const returnForm = document.getElementById('returnOrderForm');
+
+            // Xử lý nút Hủy đơn
             document.querySelectorAll('.btn-cancel-order').forEach(btn => {
                 btn.addEventListener('click', () => {
                     cancelForm.action = btn.dataset.action;
@@ -515,6 +564,7 @@
                 });
             });
 
+            // Xử lý nút Yêu cầu đổi trả
             document.querySelectorAll('.btn-return-order').forEach(btn => {
                 btn.addEventListener('click', () => {
                     returnForm.action = btn.dataset.action;
@@ -523,18 +573,22 @@
                 });
             });
 
+            // Xử lý nút xem thêm sản phẩm
             document.querySelectorAll('.btn-toggle-products').forEach(btn => {
                 const targetSelector = btn.getAttribute('data-bs-target');
                 const target = document.querySelector(targetSelector);
 
                 if (!target) return;
 
+                // Thiết lập văn bản ban đầu
                 btn.textContent = btn.dataset.closeText;
 
+                // Cập nhật văn bản khi mở
                 target.addEventListener('show.bs.collapse', () => {
                     btn.textContent = btn.dataset.openText;
                 });
 
+                // Cập nhật văn bản khi đóng
                 target.addEventListener('hide.bs.collapse', () => {
                     btn.textContent = btn.dataset.closeText;
                 });
@@ -542,4 +596,3 @@
         });
     </script>
 @endsection
-

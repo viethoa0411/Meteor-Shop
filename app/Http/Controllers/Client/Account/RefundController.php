@@ -26,6 +26,17 @@ class RefundController extends Controller
             return back()->with('error', 'Chỉ có thể yêu cầu trả hàng hoàn tiền khi đơn hàng đã giao thành công.');
         }
 
+        // Kiểm tra đã nhận hàng chưa
+        if (!$order->delivered_at) {
+            return back()->with('error', 'Đơn hàng chưa được xác nhận đã nhận hàng.');
+        }
+
+        // Kiểm tra trong vòng 7 ngày
+        if ($order->isReturnExpired()) {
+            $daysSinceDelivery = now()->diffInDays($order->delivered_at);
+            return back()->with('error', "Đơn hàng đã quá hạn để yêu cầu trả hàng hoàn tiền. Thời gian cho phép là 7 ngày kể từ khi nhận hàng (đã qua {$daysSinceDelivery} ngày).");
+        }
+
         // Kiểm tra xem đã có yêu cầu hoàn tiền chưa
         $existingRefund = Refund::where('order_id', $order->id)
             ->where('refund_type', 'return')
@@ -121,7 +132,7 @@ class RefundController extends Controller
                     ->where('type', 'income')
                     ->where('status', 'completed')
                     ->first();
-                
+
                 if ($transaction) {
                     $transaction->update(['refund_id' => $refund->id]);
                 }
@@ -196,7 +207,7 @@ class RefundController extends Controller
                 ->where('type', 'income')
                 ->whereIn('status', ['pending', 'completed'])
                 ->first();
-            
+
             if ($transaction) {
                 $transaction->update(['refund_id' => $refund->id]);
             }
