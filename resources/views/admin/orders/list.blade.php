@@ -4,9 +4,14 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Danh sách đơn hàng</h2>
-        <a href="{{ route('admin.orders.analytics', ['date_range' => 'all', 'start_date' => '2025-10-01', 'end_date' => '2025-11-29', 'status' => 'all']) }}" class="btn btn-primary">
-            <i class="bi bi-bar-chart me-1"></i>Thống kê
-        </a>
+        <div>
+            <a href="{{ route('admin.orders.returns.index') }}" class="btn btn-warning me-2">
+                <i class="bi bi-arrow-repeat me-1"></i>Quản lý trả hàng
+            </a>
+            <a href="{{ route('admin.orders.analytics', ['date_range' => 'all', 'start_date' => '2025-10-01', 'end_date' => '2025-11-29', 'status' => 'all']) }}" class="btn btn-primary">
+                <i class="bi bi-bar-chart me-1"></i>Thống kê
+            </a>
+        </div>
     </div>
 
     {{-- BỘ LỌC TRẠNG THÁI + TÌM KIẾM --}}

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderAnalyticsController;
+use App\Http\Controllers\Admin\OrderReturnController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductPublicController;
 use App\Http\Controllers\Admin\ProductController;
@@ -97,6 +98,15 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'list'])->name('list');
         Route::get('/analytics', [OrderAnalyticsController::class, 'index'])->name('analytics');
+
+        // Returns management - Phải đặt trước route /{id} để tránh xung đột
+        Route::get('/returns', [OrderReturnController::class, 'index'])->name('returns.index');
+        Route::get('/{orderId}/returns', [OrderReturnController::class, 'show'])->name('returns.show');
+        Route::post('/{orderId}/returns/approve', [OrderReturnController::class, 'approve'])->name('returns.approve');
+        Route::post('/{orderId}/returns/reject', [OrderReturnController::class, 'reject'])->name('returns.reject');
+        Route::post('/{orderId}/returns/update-status', [OrderReturnController::class, 'updateStatus'])->name('returns.updateStatus');
+
+        // Order detail routes
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
@@ -224,7 +234,8 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
     Route::post('/orders/{order}/cancel', [ClientAccountOrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/reorder', [ClientAccountOrderController::class, 'reorder'])->name('orders.reorder');
     Route::post('/orders/{order}/return', [ClientAccountOrderController::class, 'returnRequest'])->name('orders.return');
-    
+    Route::post('/orders/{order}/mark-received', [ClientAccountOrderController::class, 'markAsReceived'])->name('orders.markReceived');
+
     // Refund routes
     Route::get('/orders/{order}/refund/return', [\App\Http\Controllers\Client\Account\RefundController::class, 'showReturnForm'])->name('orders.refund.return');
     Route::post('/orders/{order}/refund/return', [\App\Http\Controllers\Client\Account\RefundController::class, 'submitReturnRefund'])->name('orders.refund.return.submit');
