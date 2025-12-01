@@ -135,8 +135,10 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/{id}/duplicate', [BannerController::class, 'duplicate'])->name('duplicate');
     });
 
+    // Tư Vấn Thiết Kế 
     Route::prefix('contacts')->name('contacts.')->group(function () {
           Route::get('/', [ContactController::class, 'index'])->name('index');
+          Route::get('/show/{id}', [ContactController::class, 'show'])->name('show');
     });
 
     // ====== WALLET ======

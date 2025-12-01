@@ -110,8 +110,8 @@
                             </td>
                             <td data-label="Hành động">
                                 <div class="d-flex gap-1 justify-content-center">
-                                    <a href="#" class="btn btn-sm btn-info">
-                                        <i class="bi bi-eye"></i> Xem
+                                    <a href="{{ route('admin.contacts.show', $contact->id) }}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Xem Chi Tiết 
                                     </a>
                                     <a href="#" class="btn btn-sm btn-warning">
                                         <i class="bi bi-pencil-square"></i> Sửa

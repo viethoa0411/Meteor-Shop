@@ -24,7 +24,7 @@ class ContactController extends Controller
                 $query->where('status', 'pending');
             }
         }
-        
+
         // Tìm kiếm theo tên, email, sdt
         if ($request->has('keyword') && $request->keyword != '') {
             $keyword = $request->keyword;
@@ -42,6 +42,14 @@ class ContactController extends Controller
         $contacts->appends($request->only(['keyword', 'status']));
 
         return view('admin.contact.list', compact('contacts'));
+    }
+    /**
+     * Hiển thị chi tiết liên hệ
+     */
+    public function show($id)
+    {
+        $contact = Contact::findOrFail($id);
+        return view('admin.contact.show', compact('contact'));
     }
 
 }
