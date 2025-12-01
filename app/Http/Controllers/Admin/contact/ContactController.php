@@ -51,5 +51,13 @@ class ContactController extends Controller
         $contact = Contact::findOrFail($id);
         return view('admin.contact.show', compact('contact'));
     }
+    /**
+     * Hiển thị form chỉnh sửa liên hệ
+     */
+    public function edit($id)
+    {
+        $contact = Contact::findOrFail($id);
+        return view('admin.contact.edit', compact('contact'));
+    }
 
 }

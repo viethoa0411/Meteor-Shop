@@ -139,6 +139,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     Route::prefix('contacts')->name('contacts.')->group(function () {
           Route::get('/', [ContactController::class, 'index'])->name('index');
           Route::get('/show/{id}', [ContactController::class, 'show'])->name('show');
+          Route::get('/edit/{id}', [ContactController::class, 'edit'])->name('edit');
     });
 
     // ====== WALLET ======
