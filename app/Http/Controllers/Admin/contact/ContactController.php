@@ -15,6 +15,15 @@ class ContactController extends Controller
     {
         $query = Contact::query();
 
+        // Lọc theo trạng thái
+        $status = $request->get('status', 'all');
+        if ($status !== 'all') {
+            if ($status === 'processed') {
+                $query->where('status', 'processed');
+            } elseif ($status === 'pending') {
+                $query->where('status', 'pending');
+            }
+        }
 
         // Sắp xếp theo ID giảm dần và phân trang
         $contacts = $query->orderBy('id', 'desc')->paginate(10);

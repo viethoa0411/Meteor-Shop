@@ -24,7 +24,32 @@
         </div>
     </div>
 
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                
+                {{-- Bộ lọc trạng thái --}}
+                <div class="d-flex gap-1 align-items-center">
+                    <a href="{{ route('admin.contacts.index', ['status' => 'all'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'all') == 'all' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-list-ul"></i> Tất cả
+                    </a>
+                    <a href="{{ route('admin.contacts.index', ['status' => 'processed'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'all') == 'processed' ? 'btn-success' : 'btn-outline-success' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-check-circle-fill"></i> Đã Xử lý
+                    </a>
+                    <a href="{{ route('admin.contacts.index', ['status' => 'pending'] + request()->except('status')) }}"
+                       class="btn {{ request('status', 'all') == 'pending' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm px-2 py-1" style="font-size: 0.85rem;">
+                        <i class="bi bi-clock-history"></i> Chưa Xử lý
+                    </a>
+                </div>
 
+                
+            </div>
+        </div>
+    </div>
+
+    
     @if ($contacts->isEmpty())
         <p class="text-center">Chưa có liên hệ nào.</p>
     @else
