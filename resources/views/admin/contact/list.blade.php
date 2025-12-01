@@ -123,6 +123,10 @@
                 </tbody>
             </table>
         </div>
+        {{-- Phân trang --}}
+        <div class="d-flex justify-content-center mt-4">
+            {{ $contacts->links('pagination::bootstrap-5') }}
+        </div>
     @endif
 @endsection
 
