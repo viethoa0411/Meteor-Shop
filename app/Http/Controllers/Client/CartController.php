@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -14,28 +15,57 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
 
-        // Lấy thông tin đầy đủ từ database, bao gồm ảnh
+        $productIds = collect($cart)->pluck('product_id')->filter()->unique()->values();
+        $products = Product::whereIn('id', $productIds)->with('category')->get()->keyBy('id');
+
         foreach ($cart as $id => &$item) {
-            $product = Product::find($item['product_id']);
+            $product = $products->get($item['product_id']);
             if ($product) {
-                // Lấy ảnh từ public/storage/products
                 $item['image'] = $product->image;
+                $item['category'] = $product->category;
             } else {
                 $item['image'] = null;
+                $item['category'] = null;
             }
 
-            // Nếu chưa có color hoặc size trong session, set mặc định
             $item['color'] = $item['color'] ?? null;
             $item['size'] = $item['size'] ?? null;
         }
 
-        $total = $this->getTotal(); // phương thức tính tổng tiền
-        return view('client.cart', compact('cart', 'total'));
+        $suggestedProducts = collect();
+        if ($productIds->isNotEmpty()) {
+            $categories = $products->pluck('category_id')->filter()->unique();
+
+            if ($categories->isNotEmpty()) {
+                $suggestedProducts = Product::whereIn('category_id', $categories)
+                    ->whereNotIn('id', $productIds)
+                    ->latest()
+                    ->take(8)
+                    ->get();
+            }
+        }
+
+        $total = $this->getTotal();
+
+        return view('client.cart', [
+            'cart' => $cart,
+            'total' => $total,
+            'suggestedProducts' => $suggestedProducts,
+        ]);
     }
 
 
     public function add(Request $request)
     {
+        if (! Auth::check()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.',
+                'requires_auth' => true,
+                'redirect' => route('client.login')
+            ], 401);
+        }
+
         $productId = $request->product_id;
         $quantity = (int)($request->quantity ?? 1);
         $color = $request->color;
@@ -115,6 +145,15 @@ class CartController extends Controller
 
     public function updateQty(Request $request)
     {
+        if (! Auth::check()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập để cập nhật giỏ hàng.',
+                'requires_auth' => true,
+                'redirect' => route('client.login')
+            ], 401);
+        }
+
         $id = $request->id; // Đây là key trong session cart
         $type = $request->type;
 
@@ -169,6 +208,15 @@ class CartController extends Controller
 
     public function remove(Request $request)
     {
+        if (! Auth::check()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập để cập nhật giỏ hàng.',
+                'requires_auth' => true,
+                'redirect' => route('client.login')
+            ], 401);
+        }
+
         $id = $request->id;
         $cart = session()->get('cart', []);
 

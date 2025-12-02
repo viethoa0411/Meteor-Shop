@@ -8,10 +8,8 @@ use App\Http\Requests\Client\Order\ReturnOrderRequest;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
-use App\Models\OrderLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class OrderController extends Controller
 {
@@ -20,7 +18,7 @@ class OrderController extends Controller
         $userId = $request->user()->id;
         $status = $request->get('status', 'all');
 
-        $ordersQuery = Order::with(['items.product', 'transactions'])
+        $ordersQuery = Order::with(['items.product'])
             ->ownedBy($userId)
             ->status($status)
             ->latest('order_date')
@@ -51,7 +49,7 @@ class OrderController extends Controller
     {
         $this->authorizeOwnership($request->user()->id, $order);
 
-        $order->loadMissing(['items.product', 'transactions', 'refunds']);
+        $order->loadMissing(['items.product']);
 
         return view('client.account.orders.show', compact('order'));
     }
@@ -59,8 +57,6 @@ class OrderController extends Controller
     public function tracking(Request $request, Order $order)
     {
         $this->authorizeOwnership($request->user()->id, $order);
-
-        $order->loadMissing(['refunds', 'transactions']);
 
         $timeline = [
             'order_date' => $order->display_order_date,
@@ -87,8 +83,6 @@ class OrderController extends Controller
             'notes' => $request->notes,
             'cancelled_at' => now(),
         ]);
-
-        $this->logStatusChange($order, 'cancelled', $request->user()->id);
 
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
     }
@@ -148,14 +142,11 @@ class OrderController extends Controller
         }
 
         $order->update([
-            'order_status' => 'return_requested',
             'return_status' => 'requested',
             'return_reason' => $request->reason,
             'return_note' => $request->description,
             'return_attachments' => $attachments,
         ]);
-
-        $this->logStatusChange($order, 'return_requested', $request->user()->id);
 
         return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');
     }
@@ -213,21 +204,6 @@ class OrderController extends Controller
     protected function authorizeOwnership(int $userId, Order $order): void
     {
         abort_if($order->user_id !== $userId, 403, 'Bạn không có quyền truy cập đơn hàng này.');
-    }
-
-    protected function logStatusChange(Order $order, string $status, int $userId): void
-    {
-        if (!Schema::hasTable('order_logs')) {
-            return;
-        }
-
-        OrderLog::create([
-            'order_id' => $order->id,
-            'status' => $status,
-            'updated_by' => $userId,
-            'role' => 'customer',
-            'created_at' => now(),
-        ]);
     }
 }
 

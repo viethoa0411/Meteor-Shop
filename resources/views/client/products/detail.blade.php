@@ -212,10 +212,17 @@
                         Mua ngay
                     </button>
 
-                    <button id="add-to-cart" type="button"
-                        style="border: 2px solid #000; background-color: #000; color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                        <i class="bi bi-cart"></i> Thêm vào giỏ
-                    </button>
+                    @auth
+                        <button id="add-to-cart" type="button"
+                            style="border: 2px solid #000; background-color: #000; color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                            <i class="bi bi-cart"></i> Thêm vào giỏ
+                        </button>
+                    @else
+                        <a href="{{ route('client.login') }}"
+                            style="border: 2px solid #000; background-color: #000; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                            <i class="bi bi-cart"></i> Thêm vào giỏ
+                        </a>
+                    @endauth
                 </div>
             </div>
         </div>
@@ -484,50 +491,52 @@
                     @endauth
                 });
 
-            addBtn?.addEventListener('click', (event) => {
-                event.preventDefault();
-                const quantity = parseInt(qtyInput.value, 10) || 1;
-                const colorBtn = document.querySelector('.color-btn.active');
-                const sizeBtn = document.querySelector('.size-btn.active');
+            @auth
+                addBtn?.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const quantity = parseInt(qtyInput.value, 10) || 1;
+                    const colorBtn = document.querySelector('.color-btn.active');
+                    const sizeBtn = document.querySelector('.size-btn.active');
 
-                @if ($product->variants->count() > 0)
-                    if (!colorBtn || !sizeBtn) {
-                        alert('Vui lòng chọn màu và kích cỡ');
-                        return;
-                    }
-                    const selectedVariant = updateSelectedVariant();
-                    if (!selectedVariant || !selectedVariant.id) {
-                        alert('Không tìm thấy biến thể hợp lệ.');
-                        return;
-                    }
-                @endif
-
-                const payload = {
-                    product_id: {{ $product->id }},
-                    quantity: quantity,
-                    color: colorBtn ? colorBtn.dataset.color : null,
-                    size: sizeBtn ? sizeBtn.dataset.size : null,
-                    variant_id: selectedVariantId
-                };
-
-                fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            alert('Đã thêm vào giỏ hàng!');
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Không thể thêm vào giỏ hàng.');
+                    @if ($product->variants->count() > 0)
+                        if (!colorBtn || !sizeBtn) {
+                            alert('Vui lòng chọn màu và kích cỡ');
+                            return;
                         }
-                    });
-            });
+                        const selectedVariant = updateSelectedVariant();
+                        if (!selectedVariant || !selectedVariant.id) {
+                            alert('Không tìm thấy biến thể hợp lệ.');
+                            return;
+                        }
+                    @endif
+
+                    const payload = {
+                        product_id: {{ $product->id }},
+                        quantity: quantity,
+                        color: colorBtn ? colorBtn.dataset.color : null,
+                        size: sizeBtn ? sizeBtn.dataset.size : null,
+                        variant_id: selectedVariantId
+                    };
+
+                    fetch("{{ route('cart.add') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                alert('Đã thêm vào giỏ hàng!');
+                                window.location.reload();
+                            } else {
+                                alert(data.message || 'Không thể thêm vào giỏ hàng.');
+                            }
+                        });
+                });
+            @endauth
             });
         </script>
         <style>

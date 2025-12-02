@@ -25,6 +25,10 @@
             margin: 0;
         }
 
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
         .client-header {
             background: #fff;
             border-bottom: 1px solid #ebebeb;
@@ -290,7 +294,7 @@
             background-color: #111;
             margin: 0 auto;
             color: #fff;
-            padding: 10px 15px;
+            padding: 0px 70px;
         }
 
         /* Các style khác */
@@ -424,9 +428,9 @@
             color: #fff;
             cursor: pointer;
             font-style: 1em;
-        } */
+        }
 
-        .article-card:hover {
+        */ .article-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 8ox 20px rgba(0, 0, 0, 0.15);
         }
@@ -469,13 +473,41 @@
             </a>
 
             <form action="{{ route('client.product.search') }}" method="GET" class="client-search">
-                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="{{ $searchQuery ?? '' }}">
+                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..."
+                    value="{{ $searchQuery ?? '' }}">
                 <button type="submit">
                     <i class="fa fa-search"></i>
                 </button>
             </form>
 
             <div class="client-actions">
+                <div class="client-cart">
+                    @auth
+                        <a href="{{ route('client.account.orders.index') }}" class="client-pill">
+                            <i class="bi bi-heart client-pill__icon"></i>
+                        </a>
+                    @else
+                        <a href="{{ route('client.login') }}" class="client-pill">
+                            <i class="bi bi-heart client-pill__icon"></i>
+                        </a>
+                    @endauth
+                </div>
+
+                <div class="client-cart">
+                    @auth
+                        <a data-bs-toggle="offcanvas" href="#cartCanvas" role="button" class="client-pill">
+                            <i class="bi bi-cart3 client-pill__icon"></i>
+                        </a>
+                        @if ($cartCount > 0)
+                            <span class="client-cart__badge">{{ $cartCount }}</span>
+                        @endif
+                    @else
+                        <a href="{{ route('client.login') }}" class="client-pill">
+                            <i class="bi bi-cart3 client-pill__icon"></i>
+                        </a>
+                    @endauth
+                </div>
+
                 <div class="client-account">
                     <i class="fa-regular fa-user client-account__icon"></i>
                     <div class="client-account__labels">
@@ -487,44 +519,28 @@
                                     Tài khoản của tôi
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end mt-2">
-
+                                    <li>
+                                        <form action="{{ route('client.logout') }}" method="POST">
+                                            @csrf
+                                            <button class="dropdown-item" type="submit"><a
+                                                    href="{{ route('client.account.orders.index') }}">Đơn hàng của
+                                                    tôi</a></button>
+                                        </form>
+                                    </li>
                                     <li>
                                         <form action="{{ route('client.logout') }}" method="POST">
                                             @csrf
                                             <button class="dropdown-item" type="submit">Đăng xuất</button>
                                         </form>
                                     </li>
+
                                 </ul>
+
                             </div>
                         @else
-                            <a class="client-account__primary" href="{{ route('client.login') }}">Đăng nhập / Đăng ký</a>
-                            <span class="client-account__secondary">Tài khoản của tôi</span>
+                            <a class="client-account__primary" href="{{ route('client.login') }}">Đăng nhập</a>
                         @endauth
                     </div>
-                </div>
-
-                <div class="client-cart">
-                    @auth
-                        <a href="{{ route('client.account.orders.index') }}" class="client-pill">
-                            <i class="bi bi-receipt-cutoff client-pill__icon"></i>
-                            <span>Đơn hàng của tôi</span>
-                        </a>
-                    @else
-                        <a href="{{ route('client.login') }}" class="client-pill">
-                            <i class="bi bi-receipt-cutoff client-pill__icon"></i>
-                            <span>Đơn hàng của tôi</span>
-                        </a>
-                    @endauth
-                </div>
-
-                <div class="client-cart">
-                    <a data-bs-toggle="offcanvas" href="#cartCanvas" role="button" class="client-pill">
-                        <i class="bi bi-cart3 client-pill__icon"></i>
-                        <span>Giỏ hàng</span>
-                    </a>
-                    @if ($cartCount > 0)
-                        <span class="client-cart__badge">{{ $cartCount }}</span>
-                    @endif
                 </div>
             </div>
         </div>
@@ -679,7 +695,7 @@
                     <div id="text-2944331817" class="text">
                         <p>Hãy để lại email của bạn để nhận được những ý tưởng trang trí mới và những thông tin, ưu đãi
                             từ Meteor</p>
-                        <p>Email: meteor</p>
+                        <p>Email: meteor@gmail.com</p>
                         <p>Hotline: <strong>0397766836</strong></p>
                         <style>
                             #text-2944331817 {
@@ -704,20 +720,6 @@
                                 <input type="hidden" name="_wpcf7_posted_data_hash" value="">
                                 <input type="hidden" name="_wpcf7_recaptcha_response"
                                     value="0cAFcWeA7swwLl_8VvpFI06BH3gsjO68Ua_z5VNFU3hy53nMAl1Ib7MeCY5iXtu94dRupk7wiA0keDJ5HgJdgtgo0EYcDooyKZ63qDfxkzaFXYp5nkEMhcr5_ue_kmeQU92aHNxsy1mWUxkQSKxN8OWCh6dzQdp-KzwjpGSFz4OPB-SOb1hbW1z8pZO8-hDZet1qfO2B5uU3s3GdEUfy1YJxrd7si21y0xUlVXLGtRiCG0t8dNFC_5oplJUw-1SX90fY-210RRm1Ee7D2dBieO58yWy-vKauhvB0yohn7yrNyo9CIvSYVz-QUfGqHLrgkOtkGddun16vrAHo8Z_ElyFdzntv7DI6ZDLfUi_mPDOnaataHiFt2X4nDFOq97xzSs9xEZxMR6SB5R9WTqJtC8lLASyMMnBeUsZBH-PB0yjNhs6B4kD2RMULDnqLynhTXu5sprEQIi3oh-hij4WC9plTBrZgcT5pcoRABIzY5xI6IGrLQfVwqY5tqcpPr0COV8-bFAlVDRQa9NO7AaXdPYQCCeM4aLO9CQvgA4oV4SsCs7gbTRZofv0P1hswqLW-dN1WYbDYRn0OPu3-A1A2RTbPNWikLvekFLE23T5y62gi5akjQVwaIdh5W9dOAcP6Se3m65nJCIk5AJ_fUhmc8HmBG4ieMc9ezZSLa0lG7_WqkTJ4AHm28pSwdK9SYiUdG4xQwZcxHHBW05E3Jex1l4im_aN5gAmzXxOrbckL8vXAzrYDQ7L2jNxTHuzTncUOIs1i8soQ_wUrerU40dgDRKcz-5qMYD6HwW-h8feMooaH2QXYRmbn2FByIMFCr7Bw8jvgyKCDlCJRz7">
-                            </div>
-                            <div class="flex-row form-flat medium-flex-wrap">
-                                <div class="flex-col flex-grow">
-                                    <span class="wpcf7-form-control-wrap your-email"><input type="email"
-                                            name="your-email" value="" size="40"
-                                            class="wpcf7-form-control wpcf7-text wpcf7-email wpcf7-validates-as-required wpcf7-validates-as-email"
-                                            aria-required="true" aria-invalid="false"
-                                            placeholder="Nhập email của bạn"></span>
-                                </div>
-                                <div class="flex-col ml-half">
-                                    <input type="submit" value="Đăng ký"
-                                        class="wpcf7-form-control has-spinner wpcf7-submit button"><span
-                                        class="wpcf7-spinner"></span>
-                                </div>
                             </div>
                             <div class="wpcf7-response-output" aria-hidden="true"></div>
                         </form>

@@ -257,39 +257,6 @@
         </div>
 
     </div>
-
-    {{--  --}}
-
-
-
-    {{-- bai content 2 --}}
-    <div
-        style="display:flex;width:100%;height:60vh;gap:24px;padding:0;           
-                    box-sizing:border-box;background-color: rgb(4, 52, 110)">
-        <div
-            style="width:50%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;text-align:center;">
-            <h2 style="font-size:24px;font-weight:600;margin:12px 0; color:#fff">Phong cách hiện đại</h2>
-            <p
-                style="color:#cecece;font-size:14px;line-height:1.6
-                        ;margin-bottom:20px;margin:50px">
-                Khám phá bộ sưu tập nội thất mới nhất mang đậm hơi thở đương đại.
-                Ra đời vào năm 2024, là một trong những thương hiệu tiên phong
-                trong ngành nội thất, với nguồn cảm hứng văn hóa Việt và gu thẩm mỹ
-                tinh tế. Qua 26 năm hoạt động, Nhà Xinh luôn chú trọng đổi mới để
-                duy trì vị thế là thương hiệu nội thất hàng đầu tại Việt Nam.
-            </p>
-            <button
-                style="background:#393939;color:#fff;border:none;
-                            padding:10px 24px; border-radius:6px;cursor:pointer;transition:.3s;"
-                onmouseover="this.style.background='#444'" onmouseout="this.style.background='#222'">Xem ngay</button>
-        </div>
-        <div style="width:50%;height:100%;overflow:hidden;;">
-            <img src="https://picsum.photos/1000/800?random=9"
-                style="width:100%;height:100%;object-fit:cover;transition:1s;"
-                onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'">
-        </div>
-    </div>
-
     <script>
         let i = 0,
             s = document.querySelectorAll('.slide');

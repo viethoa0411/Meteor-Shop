@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Auth;
 
 class Order extends Model
 {
@@ -71,13 +73,40 @@ class Order extends Model
     ];
 
     public const STATUS_META = [
-        'pending' => ['label' => 'Chờ xác nhận', 'badge' => 'warning', 'icon' => 'bi-hourglass-split'],
-        'processing' => ['label' => 'Chuẩn bị hàng', 'badge' => 'info', 'icon' => 'bi-box'],
-        'shipping' => ['label' => 'Đang giao', 'badge' => 'primary', 'icon' => 'bi-truck'],
-        'completed' => ['label' => 'Đã giao', 'badge' => 'success', 'icon' => 'bi-check-circle'],
-        'cancelled' => ['label' => 'Đã hủy', 'badge' => 'danger', 'icon' => 'bi-x-circle'],
-        'return_requested' => ['label' => 'Yêu cầu đổi trả', 'badge' => 'secondary', 'icon' => 'bi-arrow-repeat'],
-        'returned' => ['label' => 'Đã đổi trả', 'badge' => 'secondary', 'icon' => 'bi-arrow-counterclockwise'],
+        'pending' => ['label' => 'Chờ xử lý', 'badge' => 'warning', 'icon' => 'bi-hourglass-split', 'color' => '#ffc107'],
+        'awaiting_payment' => ['label' => 'Chờ thanh toán', 'badge' => 'warning', 'icon' => 'bi-credit-card', 'color' => '#ff9800'],
+        'paid' => ['label' => 'Đã thanh toán', 'badge' => 'success', 'icon' => 'bi-check-circle', 'color' => '#28a745'],
+        'processing' => ['label' => 'Đang xử lý', 'badge' => 'info', 'icon' => 'bi-gear', 'color' => '#17a2b8'],
+        'confirmed' => ['label' => 'Đã xác nhận', 'badge' => 'info', 'icon' => 'bi-check-circle', 'color' => '#17a2b8'],
+        'packed' => ['label' => 'Đã đóng gói', 'badge' => 'info', 'icon' => 'bi-box', 'color' => '#17a2b8'],
+        'shipping' => ['label' => 'Đang giao hàng', 'badge' => 'primary', 'icon' => 'bi-truck', 'color' => '#007bff'],
+        'delivered' => ['label' => 'Giao thành công', 'badge' => 'success', 'icon' => 'bi-check-circle', 'color' => '#28a745'],
+        'completed' => ['label' => 'Hoàn thành', 'badge' => 'success', 'icon' => 'bi-check-circle-fill', 'color' => '#28a745'],
+        'cancelled' => ['label' => 'Đã hủy', 'badge' => 'danger', 'icon' => 'bi-x-circle', 'color' => '#dc3545'],
+        'return_requested' => ['label' => 'Yêu cầu trả hàng', 'badge' => 'warning', 'icon' => 'bi-arrow-return-left', 'color' => '#ffc107'],
+        'returned' => ['label' => 'Trả hàng', 'badge' => 'secondary', 'icon' => 'bi-arrow-counterclockwise', 'color' => '#6c757d'],
+        'refunded' => ['label' => 'Đã hoàn tiền', 'badge' => 'warning', 'icon' => 'bi-arrow-counterclockwise', 'color' => '#ffc107'],
+        'partial_refund' => ['label' => 'Hoàn tiền một phần', 'badge' => 'info', 'icon' => 'bi-currency-dollar', 'color' => '#17a2b8'],
+    ];
+
+    /**
+     * 状态转换规则
+     */
+    public const STATUS_TRANSITIONS = [
+        'pending' => ['awaiting_payment', 'paid', 'processing', 'cancelled'],
+        'awaiting_payment' => ['paid', 'cancelled'],
+        'paid' => ['processing', 'cancelled'],
+        'processing' => ['packed', 'cancelled'],
+        'confirmed' => ['packed', 'cancelled'],
+        'packed' => ['shipping', 'cancelled'],
+        'shipping' => ['delivered', 'return_requested', 'cancelled'],
+        'delivered' => ['completed', 'return_requested'],
+        'completed' => ['return_requested'],
+        'return_requested' => ['returned', 'cancelled'],
+        'returned' => ['refunded', 'partial_refund'],
+        'cancelled' => [],
+        'refunded' => [],
+        'partial_refund' => [],
     ];
 
     public const PAYMENT_LABELS = [
@@ -95,6 +124,46 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderDetail::class, 'order_id')->orderBy('id');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
+
+    public function shipments(): HasMany
+    {
+        return $this->hasMany(OrderShipment::class);
+    }
+
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(OrderRefund::class);
+    }
+
+    public function returns(): HasMany
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(OrderNote::class)->orderBy('is_pinned', 'desc')->orderBy('created_at', 'desc');
+    }
+
+    public function timelines(): HasMany
+    {
+        return $this->hasMany(OrderTimeline::class)->orderBy('created_at', 'desc');
+    }
+
+    public function latestPayment(): HasOne
+    {
+        return $this->hasOne(OrderPayment::class)->latestOfMany();
+    }
+
+    public function latestShipment(): HasOne
+    {
+        return $this->hasOne(OrderShipment::class)->latestOfMany();
     }
 
     public function scopeOwnedBy($query, int $userId)
@@ -170,44 +239,89 @@ class Order extends Model
         return $this->order_status === 'completed' && in_array($this->return_status, ['none', 'rejected']);
     }
 
-    public function canReturnRefund(): bool
+    /**
+     * Get fulfillment status (packed, shipped, delivered)
+     */
+    public function getFulfillmentStatusAttribute(): string
     {
-        return $this->order_status === 'completed';
+        if ($this->delivered_at) {
+            return 'delivered';
+        }
+        if ($this->shipped_at) {
+            return 'shipped';
+        }
+        if ($this->packed_at) {
+            return 'packed';
+        }
+        if ($this->confirmed_at) {
+            return 'confirmed';
+        }
+        return 'pending';
     }
 
-    public function canCancelRefund(): bool
+    /**
+     * Check if order can be confirmed
+     */
+    public function canConfirm(): bool
     {
-        // Chỉ cho phép khi đơn hàng ở trạng thái pending hoặc processing
-        if (!in_array($this->order_status, ['pending', 'processing'])) {
-            return false;
-        }
-
-        // Chỉ áp dụng cho thanh toán online
-        if (!in_array($this->payment_method, ['bank', 'momo'])) {
-            return false;
-        }
-
-        // Kiểm tra xem admin đã ấn "Đã nhận" chưa (transaction status = 'completed')
-        $transaction = $this->transactions()
-            ->where('type', 'income')
-            ->where('payment_method', $this->payment_method)
-            ->first();
-
-        // Nếu có transaction và đã completed (admin đã ấn "Đã nhận"), thì không cho phép hủy
-        if ($transaction && $transaction->status === 'completed') {
-            return false;
-        }
-
-        return true;
+        return in_array($this->order_status, ['pending', 'awaiting_payment', 'paid']);
     }
 
-    public function refunds()
+    /**
+     * Check if order can be packed
+     */
+    public function canPack(): bool
     {
-        return $this->hasMany(\App\Models\Refund::class);
+        return in_array($this->order_status, ['processing', 'confirmed', 'paid']);
     }
 
-    public function transactions()
+    /**
+     * Check if order can be shipped
+     */
+    public function canShip(): bool
     {
-        return $this->hasMany(\App\Models\Transaction::class);
+        return $this->order_status === 'packed';
+    }
+
+    /**
+     * Check if order can be cancelled
+     */
+    public function canCancelOrder(): bool
+    {
+        return in_array($this->order_status, ['pending', 'awaiting_payment', 'paid', 'processing', 'confirmed', 'packed']);
+    }
+
+    /**
+     * Check if status transition is valid
+     */
+    public function canTransitionTo(string $newStatus): bool
+    {
+        $allowedTransitions = self::STATUS_TRANSITIONS[$this->order_status] ?? [];
+        return in_array($newStatus, $allowedTransitions);
+    }
+
+    /**
+     * Get allowed next statuses
+     */
+    public function getAllowedNextStatuses(): array
+    {
+        return self::STATUS_TRANSITIONS[$this->order_status] ?? [];
+    }
+
+    /**
+     * Add timeline event
+     */
+    public function addTimeline(string $eventType, string $title, ?string $description = null, ?string $oldValue = null, ?string $newValue = null, ?array $metadata = null): OrderTimeline
+    {
+        return $this->timelines()->create([
+            'event_type' => $eventType,
+            'title' => $title,
+            'description' => $description,
+            'old_value' => $oldValue,
+            'new_value' => $newValue,
+            'metadata' => $metadata,
+            'user_id' => Auth::check() ? Auth::id() : null,
+            'user_type' => Auth::check() && Auth::user() ? Auth::user()->role : 'system',
+        ]);
     }
 }

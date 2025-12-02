@@ -7,8 +7,6 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Wallet;
-use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,19 +16,9 @@ use Carbon\Carbon;
 class CheckoutController extends Controller
 {
     /**
-     * ========================================
-     * CLIENT: TRANG CHECKOUT - THANH TOÁN
-     * ========================================
      * Trang checkout - Thanh toán
      * URL: /checkout?product_id=xxx&variant_id=xxx&qty=1&type=buy_now (mua ngay)
      * URL: /checkout?type=cart (từ giỏ hàng)
-     *
-     * Chức năng:
-     * - Kiểm tra đăng nhập
-     * - Xử lý checkout từ giỏ hàng (nhiều sản phẩm)
-     * - Xử lý checkout mua ngay (1 sản phẩm)
-     * - Kiểm tra tồn kho
-     * - Lưu thông tin vào session
      */
     public function index(Request $request)
     {
@@ -52,11 +40,20 @@ class CheckoutController extends Controller
                     ->with('error', 'Giỏ hàng của bạn đang trống');
             }
 
+            $selectedKeys = collect($request->input('selected', []))
+                ->filter(fn ($value) => $value !== null && $value !== '')
+                ->map(fn ($value) => (string) $value)
+                ->values();
+
             // Kiểm tra tồn kho cho tất cả sản phẩm trong giỏ
             $cartItems = [];
             $subtotal = 0;
 
             foreach ($cart as $key => $item) {
+                if ($selectedKeys->isNotEmpty() && ! $selectedKeys->contains((string) $key)) {
+                    continue;
+                }
+
                 $product = Product::find($item['product_id']);
                 if (!$product) {
                     continue; // Bỏ qua sản phẩm không tồn tại
@@ -99,11 +96,17 @@ class CheckoutController extends Controller
                 ];
             }
 
+            if (empty($cartItems)) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Vui lòng chọn ít nhất một sản phẩm để đặt hàng.');
+            }
+
             // Lưu thông tin vào session
             $checkoutData = [
                 'type' => 'cart',
                 'items' => $cartItems,
                 'subtotal' => $subtotal,
+                'selected_keys' => $cartItems ? array_column($cartItems, 'key') : [],
                 'created_at' => now(),
             ];
 
@@ -169,23 +172,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * ========================================
-     * CLIENT: CHỌN ĐỊA CHỈ NGƯỜI NHẬN + VALIDATE
-     * ========================================
      * Xử lý form checkout - chuyển đến trang xác nhận
-     *
-     * Validate:
-     * - customer_name: bắt buộc, tối đa 255 ký tự, chỉ chứa chữ cái và khoảng trắng
-     * - customer_phone: bắt buộc, phải có 10-11 chữ số
-     * - customer_email: bắt buộc, phải là email hợp lệ
-     * - shipping_city: bắt buộc (tỉnh/thành phố)
-     * - shipping_district: bắt buộc (quận/huyện)
-     * - shipping_ward: bắt buộc (phường/xã)
-     * - shipping_address: bắt buộc, tối đa 500 ký tự
-     * - shipping_method: bắt buộc (standard, express, fast)
-     * - payment_method: bắt buộc (cash, bank, momo, paypal)
-     * - notes: không bắt buộc, tối đa 1000 ký tự
-     * - quantity: không bắt buộc, tối thiểu 1
      */
     public function process(Request $request)
     {
@@ -196,8 +183,8 @@ class CheckoutController extends Controller
         }
 
         $request->validate([
-            'customer_name' => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
-            'customer_phone' => 'required|string|regex:/^[0-9]{10,11}$/',
+            'customer_name' => 'required|string|max:255',
+            'customer_phone' => 'required|string|max:20',
             'customer_email' => 'required|email|max:255',
             'shipping_city' => 'required|string|max:255',
             'shipping_district' => 'required|string|max:255',
@@ -207,17 +194,6 @@ class CheckoutController extends Controller
             'payment_method' => 'required|string|in:cash,bank,momo,paypal',
             'notes' => 'nullable|string|max:1000',
             'quantity' => 'nullable|integer|min:1',
-        ], [
-            'customer_name.required' => 'Vui lòng nhập họ tên',
-            'customer_name.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng',
-            'customer_phone.required' => 'Vui lòng nhập số điện thoại',
-            'customer_phone.regex' => 'Số điện thoại phải có 10-11 chữ số',
-            'customer_email.required' => 'Vui lòng nhập email',
-            'customer_email.email' => 'Email không hợp lệ',
-            'shipping_city.required' => 'Vui lòng chọn tỉnh/thành phố',
-            'shipping_district.required' => 'Vui lòng chọn quận/huyện',
-            'shipping_ward.required' => 'Vui lòng chọn phường/xã',
-            'shipping_address.required' => 'Vui lòng nhập địa chỉ chi tiết',
         ]);
 
         // Lấy checkout session
@@ -283,16 +259,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * ========================================
-     * CLIENT: TRANG XÁC NHẬN ĐơN HÀNG + THANH TOÁN ONLINE
-     * ========================================
      * Trang xác nhận đơn hàng
-     *
-     * Chức năng:
-     * - Hiển thị thông tin đơn hàng để xác nhận
-     * - Nếu thanh toán qua bank: tạo QR code VietQR
-     * - Lấy thông tin ví admin để hiển thị
-     * - Lưu QR code URL vào session
      */
     public function confirm()
     {
@@ -303,45 +270,15 @@ class CheckoutController extends Controller
         }
 
         $checkoutSession = session('checkout_session');
-
+        
         if (!$checkoutSession) {
             return redirect()->route('client.home')
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
         }
 
-        // Tạo QR code nếu thanh toán bằng chuyển khoản
-        $qrCodeUrl = null;
-        $walletInfo = null;
-
-        if (isset($checkoutSession['payment_method']) && $checkoutSession['payment_method'] === 'bank') {
-            // Lấy thông tin ví admin (ví đầu tiên có status active)
-            $wallet = Wallet::where('status', 'active')->first();
-
-            if ($wallet) {
-                $walletInfo = $wallet;
-                $amount = $checkoutSession['final_total'];
-                $orderCode = 'ORDER' . strtoupper(Str::random(8));
-
-                // Tạo QR code sử dụng API VietQR
-                // Format: https://img.vietqr.io/image/{BANK_ID}-{ACCOUNT_NUMBER}-{TEMPLATE}.png?amount={AMOUNT}&addInfo={INFO}&accountName={ACCOUNT_NAME}
-                $bankId = $this->getBankId($wallet->bank_name);
-                $accountNumber = $wallet->bank_account;
-                $template = 'compact2'; // hoặc 'compact', 'qr_only', 'print'
-                $addInfo = urlencode("Thanh toan don hang " . $orderCode);
-                $accountName = urlencode($wallet->account_holder);
-
-                $qrCodeUrl = "https://img.vietqr.io/image/{$bankId}-{$accountNumber}-{$template}.png?amount={$amount}&addInfo={$addInfo}&accountName={$accountName}";
-
-                // Lưu QR code URL vào session
-                $checkoutSession['qr_code_url'] = $qrCodeUrl;
-                $checkoutSession['temp_order_code'] = $orderCode;
-                session(['checkout_session' => $checkoutSession]);
-            }
-        }
-
         // Nếu là checkout từ cart
         if ($checkoutSession['type'] === 'cart') {
-            return view('client.checkout.confirm-cart', compact('checkoutSession', 'qrCodeUrl', 'walletInfo'));
+            return view('client.checkout.confirm-cart', compact('checkoutSession'));
         }
 
         // Lấy lại sản phẩm và variant cho buy_now
@@ -351,71 +288,11 @@ class CheckoutController extends Controller
             $variant = ProductVariant::find($checkoutSession['variant_id']);
         }
 
-        return view('client.checkout.confirm', compact('checkoutSession', 'product', 'variant', 'qrCodeUrl', 'walletInfo'));
+        return view('client.checkout.confirm', compact('checkoutSession', 'product', 'variant'));
     }
 
     /**
-     * Lấy Bank ID cho VietQR API
-     */
-    private function getBankId($bankName)
-    {
-        $bankMapping = [
-            'Vietcombank' => 'VCB',
-            'Techcombank' => 'TCB',
-            'BIDV' => 'BIDV',
-            'VietinBank' => 'CTG',
-            'Agribank' => 'AGR',
-            'ACB' => 'ACB',
-            'MB Bank' => 'MB',
-            'VPBank' => 'VPB',
-            'TPBank' => 'TPB',
-            'Sacombank' => 'STB',
-            'HDBank' => 'HDB',
-            'VIB' => 'VIB',
-            'SHB' => 'SHB',
-            'Eximbank' => 'EIB',
-            'MSB' => 'MSB',
-            'OCB' => 'OCB',
-            'SeABank' => 'SEAB',
-            'VietCapitalBank' => 'VCCB',
-            'SCB' => 'SCB',
-            'VietBank' => 'VietBank',
-            'PVcomBank' => 'PVCB',
-            'Oceanbank' => 'Oceanbank',
-            'NCB' => 'NCB',
-            'BacABank' => 'BAB',
-            'LienVietPostBank' => 'LPB',
-            'KienLongBank' => 'KLB',
-            'VietABank' => 'VAB',
-            'NamABank' => 'NAB',
-            'PGBank' => 'PGB',
-            'GPBank' => 'GPB',
-            'ABBank' => 'ABB',
-            'BaoVietBank' => 'BVB',
-            'Cake' => 'CAKE',
-            'Ubank' => 'Ubank',
-            'Timo' => 'Timo',
-            'ViettelMoney' => 'VTLMONEY',
-            'VNPTMoney' => 'VNPTMONEY',
-        ];
-
-        return $bankMapping[$bankName] ?? 'VCB'; // Mặc định là Vietcombank
-    }
-
-    /**
-     * ========================================
-     * CLIENT: TẠO ĐƠN HÀNG + HIỂN THỊ TẤT CẢ MÃ GIAO DỊCH
-     * ========================================
      * Xử lý tạo đơn hàng
-     *
-     * Chức năng:
-     * - Tạo đơn hàng mới
-     * - Tạo chi tiết đơn hàng (OrderDetail)
-     * - Cập nhật tồn kho sản phẩm
-     * - Nếu thanh toán qua bank: tạo giao dịch (Transaction) với trạng thái pending
-     * - Xóa giỏ hàng (nếu checkout từ cart)
-     * - Xóa checkout session
-     * - Chuyển đến trang thành công
      */
     public function createOrder()
     {
@@ -426,7 +303,7 @@ class CheckoutController extends Controller
         }
 
         $checkoutSession = session('checkout_session');
-
+        
         if (!$checkoutSession) {
             return redirect()->route('client.home')
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
@@ -567,30 +444,6 @@ class CheckoutController extends Controller
                     $variant->decrement('stock', $checkoutSession['quantity']);
                 } else {
                     $product->decrement('stock', $checkoutSession['quantity']);
-                }
-            }
-
-            // Tạo transaction nếu thanh toán qua chuyển khoản
-            if ($checkoutSession['payment_method'] === 'bank') {
-                // Lấy ví admin đầu tiên (hoặc ví mặc định)
-                $wallet = Wallet::where('status', 'active')->first();
-
-                if ($wallet) {
-                    // Tạo transaction với trạng thái pending
-                    $transaction = Transaction::create([
-                        'order_id' => $order->id,
-                        'wallet_id' => $wallet->id,
-                        'amount' => $checkoutSession['final_total'],
-                        'type' => 'income',
-                        'status' => 'pending', // Sẽ được cập nhật thành 'completed' khi admin xác nhận
-                        'payment_method' => 'bank',
-                        'transaction_code' => $checkoutSession['temp_order_code'] ?? $orderCode,
-                        'qr_code_url' => $checkoutSession['qr_code_url'] ?? null,
-                        'description' => "Thanh toán đơn hàng {$orderCode} - {$checkoutSession['customer_name']}",
-                    ]);
-
-                    // Đơn hàng sẽ ở trạng thái "Chờ thanh toán"
-                    // Admin sẽ xác nhận thủ công sau khi kiểm tra chuyển khoản
                 }
             }
 

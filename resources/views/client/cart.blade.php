@@ -1,13 +1,16 @@
 @extends('client.layouts.app')
 
 @section('content')
-    <div class="container">
+    <div class="container pb-5">
         <div class="text-center mb-4">
             <h2>Giỏ hàng</h2>
         </div>
         @if (count($cart) > 0)
-            <table class="table table-bordered">
+            <table class="table table-bordered align-middle">
                 <tr>
+                    <th style="width:40px;">
+                        <input type="checkbox" id="select-all" checked>
+                    </th>
                     <th>Ảnh</th>
                     <th>Tên</th>
                     <th class="text-end">Giá</th>
@@ -18,6 +21,10 @@
 
                 @foreach ($cart as $id => $item)
                     <tr id="row-{{ $id }}">
+                        <td class="text-center">
+                            <input type="checkbox" class="cart-item-checkbox" data-id="{{ $id }}"
+                                data-subtotal="{{ $item['price'] * $item['quantity'] }}" checked>
+                        </td>
                         <td>
                             <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/70x70?text=No+Image' }}"
                                 width="70" alt="{{ $item['name'] }}">
@@ -61,14 +68,46 @@
                     </tr>
                 @endforeach
             </table>
-            <div class="text-end mt-3">
-                <h4>Tổng tiền: <span id="total">{{ number_format($total) ?? 0 }}đ</span></h4>
-                <a href="{{ route('client.checkout.index', ['type' => 'cart']) }}" class="btn btn-dark mt-2">Đặt hàng</a>
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mt-3">
+                <div class="fw-semibold fs-5">
+                    Tổng tiền đã chọn:
+                    <span id="selected-total">{{ number_format($total) ?? 0 }}đ</span>
+                </div>
+                <button id="checkout-selected" class="btn btn-dark mt-2 mt-md-0">
+                    Đặt hàng
+                </button>
             </div>
         @else
             <div class="text-center mt-4">
                 <p>Hiện tại giỏ hàng của bạn trống.</p>
                 <a href="{{ route('client.home') }}" class="btn btn-primary mt-3">Quay lại trang chủ</a>
+            </div>
+        @endif
+
+        @if (! empty($suggestedProducts) && $suggestedProducts->count())
+            <div class="mt-5 mb-4">
+                <h4 class="mb-3 fw-semibold">Sản phẩm bạn có thể thích</h4>
+                <div class="row g-3">
+                    @foreach ($suggestedProducts as $product)
+                        <div class="col-6 col-md-3">
+                            <div class="card h-100">
+                                <a href="{{ route('client.product.detail', $product->slug) }}" class="text-decoration-none text-dark">
+                                    <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x300?text=No+Image' }}"
+                                        class="card-img-top" alt="{{ $product->name }}" style="object-fit:cover; aspect-ratio:1/1;">
+                                    <div class="card-body">
+                                        <h6 class="card-title" style="min-height: 40px;">{{ $product->name }}</h6>
+                                        <p class="mb-0 text-danger fw-semibold">
+                                            {{ number_format($product->price, 0, ',', '.') }} đ
+                                        </p>
+                                        @if ($product->category)
+                                            <small class="text-muted">{{ $product->category->name }}</small>
+                                        @endif
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         @endif
     </div>
@@ -77,6 +116,54 @@
 
 <script>
     $(document).ready(function() {
+        const checkoutUrl = "{{ route('client.checkout.index') }}";
+
+        const formatCurrency = (value) => Number(value).toLocaleString('vi-VN') + "đ";
+
+        const updateSelectedTotal = () => {
+            let total = 0;
+            $('.cart-item-checkbox:checked').each(function() {
+                total += Number($(this).attr('data-subtotal')) || 0;
+            });
+            $('#selected-total').text(formatCurrency(total));
+        };
+
+        const syncSelectAll = () => {
+            const totalCheckboxes = $('.cart-item-checkbox').length;
+            const checked = $('.cart-item-checkbox:checked').length;
+            $('#select-all').prop('checked', totalCheckboxes > 0 && checked === totalCheckboxes);
+        };
+
+        updateSelectedTotal();
+        syncSelectAll();
+
+        $('#select-all').on('change', function() {
+            const checked = $(this).is(':checked');
+            $('.cart-item-checkbox').prop('checked', checked);
+            updateSelectedTotal();
+        });
+
+        $(document).on('change', '.cart-item-checkbox', function() {
+            syncSelectAll();
+            updateSelectedTotal();
+        });
+
+        $('#checkout-selected').on('click', function(e) {
+            e.preventDefault();
+            const selectedIds = $('.cart-item-checkbox:checked').map(function() {
+                return $(this).data('id');
+            }).get();
+
+            if (selectedIds.length === 0) {
+                alert('Vui lòng chọn ít nhất một sản phẩm để đặt hàng.');
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('type', 'cart');
+            selectedIds.forEach(id => params.append('selected[]', id));
+            window.location.href = checkoutUrl + '?' + params.toString();
+        });
 
         // Update số lượng
         $(document).on('click', '.updateQty', function() {
@@ -102,8 +189,10 @@
                     // Cập nhật giao diện nếu thành công
                     $("#qty-" + id).text(data.quantity)
                         .attr('data-max', data.max_stock ?? '');
-                    $("#subtotal-" + id).text(Number(data.subtotal).toLocaleString() + "đ");
-                    $("#total").text(Number(data.total).toLocaleString() + "đ");
+                    $("#subtotal-" + id).text(Number(data.subtotal).toLocaleString('vi-VN') + "đ");
+                    $(".cart-item-checkbox[data-id='" + id + "']").attr('data-subtotal', data.subtotal);
+                    updateSelectedTotal();
+                    syncSelectAll();
                     if (typeof data.max_stock !== 'undefined') {
                         if (data.max_stock) {
                             $("#stock-note-" + id).text('Tối đa: ' + data.max_stock);
@@ -130,11 +219,13 @@
             }, function(data) {
                 if (data.status === 'success') {
                     $("#row-" + id).remove();
-                    $("#total").text(Number(data.total).toLocaleString() + "đ");
+                    updateSelectedTotal();
+                    syncSelectAll();
 
                     if (data.total == 0) {
                         $("table").remove();
                         $(".container").append("<p>Giỏ hàng của bạn trống.</p>");
+                        $('#selected-total').text("0đ");
                     }
                 }
             });
