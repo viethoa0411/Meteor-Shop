@@ -19,7 +19,7 @@ class OrderController extends Controller
     private const STATUS_TRANSITIONS = [
         'pending' => ['processing'],
         'processing' => ['shipping', 'returned'],
-        'shipping' => ['returned'],
+        'shipping' => [], // Không cho admin cập nhật từ shipping, user sẽ cập nhật sang completed
         'return_requested' => ['returned'],
         'returned' => [],
         'completed' => [],
@@ -104,7 +104,10 @@ class OrderController extends Controller
                 ->get();
         }
 
-        return view('admin.orders.detail', compact('order', 'orderDetails', 'statusHistory', 'orderLogs'));
+        // Kiểm tra xem có yêu cầu trả hàng không
+        $hasReturnRequest = $order->return_status && $order->return_status !== 'none' && $order->return_status !== 'rejected';
+
+        return view('admin.orders.detail', compact('order', 'orderDetails', 'statusHistory', 'orderLogs', 'hasReturnRequest'));
     }
 
     public function updateStatus(Request $request, $id)
@@ -122,7 +125,18 @@ class OrderController extends Controller
             return back()->with('error', 'Trạng thái này do khách hàng thao tác, không thể sửa từ Admin.');
         }
 
-        // 2. Kiểm tra rule chuyển trạng thái hợp lệ
+        // 2. Không cho phép cập nhật trực tiếp sang "returned" khi có return request
+        // Trừ khi return_status đã là 'refunded' (đã nhận hàng và hoàn tiền)
+        if ($newStatus === 'returned' && $currentStatus === 'return_requested') {
+            // Kiểm tra return_status
+            $returnStatus = $order->return_status ?? 'none';
+            if ($returnStatus !== 'refunded') {
+                return back()->with('error', 'Không thể cập nhật trực tiếp sang "Đã trả hàng". Vui lòng duyệt yêu cầu trả hàng và hoàn tiền tại trang quản lý return.');
+            }
+            // Nếu return_status = 'refunded' thì cho phép cập nhật sang 'returned'
+        }
+
+        // 3. Kiểm tra rule chuyển trạng thái hợp lệ
         $validTransitions = self::STATUS_TRANSITIONS[$currentStatus] ?? [];
 
         if (!in_array($newStatus, $validTransitions, true)) {

@@ -47,7 +47,7 @@
                             'shipping' => 'Đang giao hàng',
                             'completed' => 'Hoàn thành',
                             'cancelled' => 'Đã hủy',
-                            'return_requested' => 'Yêu cầu hoàn hàng',
+                            'return_requested' => 'Yêu cầu trả hàng',
                             'returned' => 'Đã trả hàng',
                         ];
                         $currentStatusColor = $colors[$order->order_status] ?? 'light';
@@ -68,7 +68,7 @@
                         $validTransitions = [
                             'pending' => ['processing'],
                             'processing' => ['shipping', 'returned'],
-                            'shipping' => ['returned'],
+                            'shipping' => [], // Không cho admin cập nhật từ shipping, user sẽ cập nhật sang completed
                             'return_requested' => ['returned'],
                             'returned' => [],
                             'completed' => [],
@@ -92,31 +92,114 @@
                         });
                     @endphp
 
-                    @if (!empty($allowedNextStatuses))
+                    {{-- THÔNG BÁO VỀ YÊU CẦU TRẢ HÀNG --}}
+                    @if (isset($hasReturnRequest) && $hasReturnRequest)
+                        <div class="alert alert-warning mt-3">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Đơn hàng này có yêu cầu trả hàng!</strong>
+                            <br>
+                            <a href="{{ route('admin.orders.returns.show', $order->id) }}" class="btn btn-sm btn-warning mt-2">
+                                <i class="bi bi-arrow-repeat"></i> Xem và quản lý yêu cầu trả hàng
+                            </a>
+                        </div>
+                    @endif
+
+                    {{-- Hiển thị thông báo khi đang giao hàng --}}
+                    @if ($order->order_status === 'shipping')
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-truck"></i>
+                            <strong>Đơn hàng đang giao hàng.</strong> Vui lòng đợi khách hàng xác nhận đã nhận hàng. Khách hàng sẽ cập nhật trạng thái sang "Giao hàng thành công" khi đã nhận hàng.
+                        </div>
+                    @elseif (!empty($allowedNextStatuses))
                         @php
                             $nextStatus = $allowedNextStatuses[0]; // Lấy trạng thái duy nhất
                             $nextStatusLabel = $statusLabels[$nextStatus] ?? ucfirst($nextStatus);
                         @endphp
 
-                        <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
-                            @csrf
-                            @method('PUT')
+                        {{-- Cho phép cập nhật sang returned nếu return_status là refunded --}}
+                        @if ($nextStatus === 'returned' && isset($hasReturnRequest) && $hasReturnRequest)
+                            @if ($order->return_status === 'refunded')
+                                {{-- Nếu đã refunded thì cho phép cập nhật sang returned --}}
+                                <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
+                                    @csrf
+                                    @method('PUT')
 
-                            <p class="h6 mb-2">Trạng thái tiếp theo:</p>
-                            <div class="d-flex align-items-center gap-3">
-                                {{-- THẺ TRẠNG THÁI TO HƠN --}}
-                                <span class="badge bg-info text-dark fs-5 py-2 px-3 fw-bold">
-                                    {{ $nextStatusLabel }}
+                                    <p class="h6 mb-2">Trạng thái tiếp theo:</p>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="badge bg-info text-dark fs-5 py-2 px-3 fw-bold">
+                                            {{ $nextStatusLabel }}
+                                        </span>
+
+                                        <input type="hidden" name="order_status" value="{{ $nextStatus }}">
+
+                                        <button type="submit" class="btn btn-primary btn-md">
+                                            <i class="bi bi-arrow-clockwise me-1"></i> Cập nhật ngay
+                                        </button>
+                                    </div>
+                                </form>
+                            @else
+                                {{-- Nếu chưa refunded thì không cho phép --}}
+                                <div class="alert alert-info mt-3">
+                                    <i class="bi bi-info-circle"></i>
+                                    Vui lòng duyệt yêu cầu trả hàng và hoàn tiền trước khi cập nhật trạng thái này.
+                                </div>
+                            @endif
+                        @else
+                            <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
+                                @csrf
+                                @method('PUT')
+
+                                <p class="h6 mb-2">Trạng thái tiếp theo:</p>
+                                <div class="d-flex align-items-center gap-3">
+                                    {{-- THẺ TRẠNG THÁI TO HƠN --}}
+                                    <span class="badge bg-info text-dark fs-5 py-2 px-3 fw-bold">
+                                        {{ $nextStatusLabel }}
+                                    </span>
+
+                                    <input type="hidden" name="order_status" value="{{ $nextStatus }}">
+
+                                    {{-- NÚT CẬP NHẬT RÕ RÀNG HƠN --}}
+                                    <button type="submit" class="btn btn-primary btn-md">
+                                        <i class="bi bi-arrow-clockwise me-1"></i> Cập nhật ngay
+                                    </button>
+                                </div>
+                            </form>
+                        @endif
+                    @endif
+
+                    {{-- THÔNG TIN TRẢ HÀNG --}}
+                    @if ($order->return_status && $order->return_status !== 'none' && $order->return_status !== 'rejected')
+                        <hr>
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-arrow-repeat"></i> Thông tin yêu cầu trả hàng</h6>
+                            <p class="mb-1"><strong>Trạng thái:</strong>
+                                @php
+                                    $returnStatusLabels = [
+                                        'requested' => 'Đã yêu cầu',
+                                        'approved' => 'Đã duyệt hoàn hàng',
+                                        'rejected' => 'Đã từ chối',
+                                        'refunded' => 'Đã nhận hàng và hoàn tiền',
+                                        'completed' => 'Hoàn hàng thành công',
+                                    ];
+                                    $returnStatusColors = [
+                                        'requested' => 'warning',
+                                        'approved' => 'success',
+                                        'rejected' => 'danger',
+                                        'refunded' => 'primary',
+                                        'completed' => 'success',
+                                    ];
+                                @endphp
+                                <span class="badge bg-{{ $returnStatusColors[$order->return_status] ?? 'secondary' }}">
+                                    {{ $returnStatusLabels[$order->return_status] ?? $order->return_status }}
                                 </span>
-
-                                <input type="hidden" name="order_status" value="{{ $nextStatus }}">
-
-                                {{-- NÚT CẬP NHẬT RÕ RÀNG HƠN --}}
-                                <button type="submit" class="btn btn-primary btn-md">
-                                    <i class="bi bi-arrow-clockwise me-1"></i> Cập nhật ngay
-                                </button>
-                            </div>
-                        </form>
+                            </p>
+                            @if ($order->return_reason)
+                                <p class="mb-1"><strong>Lý do:</strong> {{ $order->return_reason }}</p>
+                            @endif
+                            <a href="{{ route('admin.orders.returns.show', $order->id) }}" class="btn btn-sm btn-warning mt-2">
+                                <i class="bi bi-eye"></i> Xem chi tiết và quản lý
+                            </a>
+                        </div>
                     @endif
 
                     <hr>
@@ -186,7 +269,7 @@
                             'processing' => 'Đang xử lý',
                             'shipping' => 'Đang giao hàng',
                             'completed' => 'Hoàn thành',
-                            'return_requested' => 'Yêu cầu hoàn hàng',
+                            'return_requested' => 'Yêu cầu trả hàng',
                             'returned' => 'Đã trả hàng',
                             'cancelled' => 'Đã hủy',
                         ];

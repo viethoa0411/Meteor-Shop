@@ -141,11 +141,6 @@ class Order extends Model
         return $this->hasMany(OrderRefund::class);
     }
 
-    public function returns(): HasMany
-    {
-        return $this->hasMany(OrderReturn::class);
-    }
-
     public function notes(): HasMany
     {
         return $this->hasMany(OrderNote::class)->orderBy('is_pinned', 'desc')->orderBy('created_at', 'desc');
@@ -224,6 +219,11 @@ class Order extends Model
         return in_array($this->order_status, ['shipping', 'processing']);
     }
 
+    public function canReceive(): bool
+    {
+        return $this->order_status === 'shipping';
+    }
+
     public function canReorder(): bool
     {
         return in_array($this->order_status, ['completed', 'cancelled']);
@@ -236,7 +236,56 @@ class Order extends Model
 
     public function canReturn(): bool
     {
-        return $this->order_status === 'completed' && in_array($this->return_status, ['none', 'rejected']);
+        // Kiểm tra trạng thái đơn hàng
+        if ($this->order_status !== 'completed') {
+            return false;
+        }
+
+        // Kiểm tra return_status
+        if (!in_array($this->return_status, ['none', 'rejected'])) {
+            return false;
+        }
+
+        // Kiểm tra đã nhận hàng chưa (delivered_at phải có giá trị)
+        if (!$this->delivered_at) {
+            return false;
+        }
+
+        // Kiểm tra trong vòng 7 ngày kể từ khi nhận hàng
+        $daysSinceDelivery = now()->diffInDays($this->delivered_at);
+        if ($daysSinceDelivery > 7) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Kiểm tra xem đơn hàng có quá hạn để hoàn hàng không (quá 7 ngày)
+     */
+    public function isReturnExpired(): bool
+    {
+        if ($this->order_status !== 'completed' || !$this->delivered_at) {
+            return false;
+        }
+
+        $daysSinceDelivery = now()->diffInDays($this->delivered_at);
+        return $daysSinceDelivery > 7;
+    }
+
+    /**
+     * Lấy số ngày còn lại để có thể hoàn hàng
+     */
+    public function getReturnDaysRemaining(): ?int
+    {
+        if ($this->order_status !== 'completed' || !$this->delivered_at) {
+            return null;
+        }
+
+        $daysSinceDelivery = now()->diffInDays($this->delivered_at);
+        $remaining = 7 - $daysSinceDelivery;
+
+        return $remaining > 0 ? $remaining : 0;
     }
 
     /**
@@ -244,6 +293,7 @@ class Order extends Model
      */
     public function getFulfillmentStatusAttribute(): string
     {
+
         if ($this->delivered_at) {
             return 'delivered';
         }
@@ -257,6 +307,24 @@ class Order extends Model
             return 'confirmed';
         }
         return 'pending';
+
+        // Kiểm tra trạng thái đơn hàng
+        if ($this->order_status !== 'completed') {
+            return false;
+        }
+
+        // Kiểm tra đã nhận hàng chưa (delivered_at phải có giá trị)
+        if (!$this->delivered_at) {
+            return false;
+        }
+
+        // Kiểm tra trong vòng 7 ngày kể từ khi nhận hàng
+        $daysSinceDelivery = now()->diffInDays($this->delivered_at);
+        if ($daysSinceDelivery > 7) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -323,5 +391,10 @@ class Order extends Model
             'user_id' => Auth::check() ? Auth::id() : null,
             'user_type' => Auth::check() && Auth::user() ? Auth::user()->role : 'system',
         ]);
+    }
+
+    public function returns()
+    {
+        return $this->hasMany(OrderReturn::class, 'order_id');
     }
 }
