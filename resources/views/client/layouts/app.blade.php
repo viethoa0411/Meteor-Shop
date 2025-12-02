@@ -1544,9 +1544,13 @@
                 try {
                     let response;
 
+                    // Get CSRF token
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
                     if (imageFile) {
                         // Send with FormData for image upload
                         const formData = new FormData();
+                        formData.append('_token', csrfToken);
                         formData.append('image', imageFile);
                         if (message.trim()) {
                             formData.append('message', message);
@@ -1557,7 +1561,8 @@
                         response = await fetch('/chat/send', {
                             method: 'POST',
                             headers: {
-                                'Accept': 'application/json'
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
                             },
                             body: formData
                         });
@@ -1567,7 +1572,8 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Accept': 'application/json'
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
                             },
                             body: JSON.stringify({
                                 message: message,

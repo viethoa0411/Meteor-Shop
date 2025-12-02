@@ -75,6 +75,7 @@ class ChatController extends Controller
             ], 500);
         }
     }
+
     /**
      * Gửi tin nhắn từ client
      */
@@ -182,6 +183,7 @@ class ChatController extends Controller
             ], 500);
         }
     }
+
     /**
      * Lấy tin nhắn mới (polling)
      */
@@ -216,7 +218,8 @@ class ChatController extends Controller
             }),
         ]);
     }
-       /**
+
+    /**
      * Cập nhật thông tin khách
      */
     public function updateGuestInfo(Request $request)
@@ -237,6 +240,7 @@ class ChatController extends Controller
 
         return response()->json(['success' => true]);
     }
+
     /**
      * Lấy hoặc tạo session chat
      */
@@ -297,6 +301,7 @@ class ChatController extends Controller
 
         return $session;
     }
+
     /**
      * Thêm tin nhắn chào mừng
      */

@@ -56,121 +56,8 @@ class ChatboxController extends Controller
 
         return view('admin.chatbox.index', compact('sessions', 'settings', 'stats'));
     }
+
     /**
-     * Trang cài đặt chatbox
-     */
-    public function settings()
-    {
-        $settings = ChatSetting::getSettings();
-        return view('admin.chatbox.settings', compact('settings'));
-    }
-     /**
-     * Cập nhật cài đặt chatbox
-     */
-    public function updateSettings(Request $request)
-    {
-        $request->validate([
-            'chatbox_title' => 'required|string|max:100',
-            'welcome_message' => 'required|string|max:500',
-            'offline_message' => 'required|string|max:500',
-            'primary_color' => 'required|string|max:20',
-        ]);
-
-        $settings = ChatSetting::getSettings();
-        
-        $settings->update([
-            'is_enabled' => $request->boolean('is_enabled'),
-            'chatbox_title' => $request->chatbox_title,
-            'chatbox_subtitle' => $request->chatbox_subtitle,
-            'welcome_message' => $request->welcome_message,
-            'offline_message' => $request->offline_message,
-            'primary_color' => $request->primary_color,
-            'secondary_color' => $request->secondary_color ?? $request->primary_color,
-            'show_on_mobile' => $request->boolean('show_on_mobile'),
-            'play_sound' => $request->boolean('play_sound'),
-            'position_bottom' => $request->position_bottom ?? 24,
-            'position_right' => $request->position_right ?? 24,
-        ]);
-
-        return back()->with('success', 'Đã cập nhật cài đặt chatbox');
-    }
-    /**
-     * Cập nhật quick replies
-     */
-    public function updateQuickReplies(Request $request)
-    {
-        $settings = ChatSetting::getSettings();
-
-        $quickReplies = [];
-        if ($request->has('quick_replies')) {
-            foreach ($request->quick_replies as $qr) {
-                if (!empty($qr['text']) && !empty($qr['message'])) {
-                    $quickReplies[] = [
-                        'icon' => $qr['icon'] ?? 'bi-chat',
-                        'text' => $qr['text'],
-                        'message' => $qr['message'],
-                    ];
-                }
-            }
-        }
-
-        $settings->update(['quick_replies' => $quickReplies]);
-
-        return back()->with('success', 'Đã cập nhật câu trả lời nhanh');
-    }
-       /**
-     * Cập nhật auto replies
-     */
-    public function updateAutoReplies(Request $request)
-    {
-        $settings = ChatSetting::getSettings();
-
-        $autoReplies = [];
-        if ($request->has('auto_replies')) {
-            foreach ($request->auto_replies as $ar) {
-                if (!empty($ar['keywords']) && !empty($ar['reply'])) {
-                    $keywords = array_map('trim', explode(',', $ar['keywords']));
-                    $autoReplies[] = [
-                        'keywords' => $keywords,
-                        'reply' => $ar['reply'],
-                    ];
-                }
-            }
-        }
-
-        $settings->update(['auto_replies' => $autoReplies]);
-
-        return back()->with('success', 'Đã cập nhật tự động trả lời');
-    }
-    /**
-     * Bật/tắt chatbox nhanh
-     */
-    public function toggle(Request $request)
-    {
-        $settings = ChatSetting::getSettings();
-        $settings->update(['is_enabled' => !$settings->is_enabled]);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'is_enabled' => $settings->is_enabled,
-            ]);
-        }
-
-        return back()->with('success', $settings->is_enabled ? 'Đã bật chatbox' : 'Đã tắt chatbox');
-    }
-       /**
-     * API: Lấy số tin nhắn chưa đọc
-     */
-    public function getUnreadCount()
-    {
-        $count = ChatSession::where('unread_count', '>', 0)->count();
-
-        return response()->json([
-            'count' => $count,
-        ]);
-    }
-       /**
      * Xem chi tiết conversation và trả lời
      */
     public function show($id)
@@ -189,6 +76,7 @@ class ChatboxController extends Controller
 
         return view('admin.chatbox.show', compact('session', 'settings'));
     }
+
     /**
      * Gửi tin nhắn từ admin
      */
@@ -243,7 +131,116 @@ class ChatboxController extends Controller
 
         return back()->with('success', 'Đã gửi tin nhắn');
     }
-       /**
+
+    /**
+     * Trang cài đặt chatbox
+     */
+    public function settings()
+    {
+        $settings = ChatSetting::getSettings();
+        return view('admin.chatbox.settings', compact('settings'));
+    }
+
+    /**
+     * Cập nhật cài đặt chatbox
+     */
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'chatbox_title' => 'required|string|max:100',
+            'welcome_message' => 'required|string|max:500',
+            'offline_message' => 'required|string|max:500',
+            'primary_color' => 'required|string|max:20',
+        ]);
+
+        $settings = ChatSetting::getSettings();
+        
+        $settings->update([
+            'is_enabled' => $request->boolean('is_enabled'),
+            'chatbox_title' => $request->chatbox_title,
+            'chatbox_subtitle' => $request->chatbox_subtitle,
+            'welcome_message' => $request->welcome_message,
+            'offline_message' => $request->offline_message,
+            'primary_color' => $request->primary_color,
+            'secondary_color' => $request->secondary_color ?? $request->primary_color,
+            'show_on_mobile' => $request->boolean('show_on_mobile'),
+            'play_sound' => $request->boolean('play_sound'),
+            'position_bottom' => $request->position_bottom ?? 24,
+            'position_right' => $request->position_right ?? 24,
+        ]);
+
+        return back()->with('success', 'Đã cập nhật cài đặt chatbox');
+    }
+
+    /**
+     * Cập nhật quick replies
+     */
+    public function updateQuickReplies(Request $request)
+    {
+        $settings = ChatSetting::getSettings();
+
+        $quickReplies = [];
+        if ($request->has('quick_replies')) {
+            foreach ($request->quick_replies as $qr) {
+                if (!empty($qr['text']) && !empty($qr['message'])) {
+                    $quickReplies[] = [
+                        'icon' => $qr['icon'] ?? 'bi-chat',
+                        'text' => $qr['text'],
+                        'message' => $qr['message'],
+                    ];
+                }
+            }
+        }
+
+        $settings->update(['quick_replies' => $quickReplies]);
+
+        return back()->with('success', 'Đã cập nhật câu trả lời nhanh');
+    }
+
+    /**
+     * Cập nhật auto replies
+     */
+    public function updateAutoReplies(Request $request)
+    {
+        $settings = ChatSetting::getSettings();
+
+        $autoReplies = [];
+        if ($request->has('auto_replies')) {
+            foreach ($request->auto_replies as $ar) {
+                if (!empty($ar['keywords']) && !empty($ar['reply'])) {
+                    $keywords = array_map('trim', explode(',', $ar['keywords']));
+                    $autoReplies[] = [
+                        'keywords' => $keywords,
+                        'reply' => $ar['reply'],
+                    ];
+                }
+            }
+        }
+
+        $settings->update(['auto_replies' => $autoReplies]);
+
+        return back()->with('success', 'Đã cập nhật tự động trả lời');
+    }
+
+    /**
+     * Bật/tắt chatbox nhanh
+     */
+    public function toggle(Request $request)
+    {
+        $settings = ChatSetting::getSettings();
+        $settings->update(['is_enabled' => !$settings->is_enabled]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_enabled' => $settings->is_enabled,
+            ]);
+        }
+
+        return back()->with('success', $settings->is_enabled ? 'Đã bật chatbox' : 'Đã tắt chatbox');
+    }
+
+    /**
      * Đóng conversation
      */
     public function closeSession($id)
@@ -253,6 +250,7 @@ class ChatboxController extends Controller
 
         return back()->with('success', 'Đã đóng cuộc hội thoại');
     }
+
     /**
      * Xóa conversation
      */
@@ -263,6 +261,7 @@ class ChatboxController extends Controller
 
         return redirect()->route('admin.chatbox.index')->with('success', 'Đã xóa cuộc hội thoại');
     }
+
     /**
      * Lấy tin nhắn mới (AJAX polling)
      */
@@ -279,6 +278,18 @@ class ChatboxController extends Controller
         return response()->json([
             'messages' => $messages,
             'unread_count' => $session->unread_count,
+        ]);
+    }
+
+    /**
+     * API: Lấy số tin nhắn chưa đọc
+     */
+    public function getUnreadCount()
+    {
+        $count = ChatSession::where('unread_count', '>', 0)->count();
+
+        return response()->json([
+            'count' => $count,
         ]);
     }
 }

@@ -5,9 +5,14 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\OrderAnalyticsController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\ProductPublicController;
+use App\Http\Controllers\Admin\ProductController;
+
+// --- ĐÃ SỬA: Đổi thành ProductController mới ---
+use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
@@ -21,14 +26,15 @@ use App\Http\Controllers\Admin\Wallet\WalletManagementController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionActionController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
 use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
+use App\Http\Controllers\Admin\Contact\ContactController;
+use App\Http\Controllers\Admin\ChatboxController;
+use App\Http\Controllers\Client\ChatController;
 
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
-
-use App\Http\Controllers\Client\ChatController;
-use App\Http\Controllers\Admin\ChatboxController;
+use App\Http\Controllers\Client\Contact\ContactController as ClientContactController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -46,6 +52,14 @@ Route::get('/verify-otp', [ForgotPasswordController::class, 'showVerifyOtpForm']
 Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp.post');
 Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
+// ============ CLIENT ROUTES ============
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
+Route::get('/home', [HomeController::class, 'index']);
+Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
+Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category');
+Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail');
+
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
@@ -70,6 +84,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
     });
 
+
     // ====== PRODUCTS ======
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [ProductController::class, 'list'])->name('list');
@@ -85,6 +100,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'list'])->name('list');
+        Route::get('/analytics', [OrderAnalyticsController::class, 'index'])->name('analytics');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
@@ -107,6 +123,9 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/store', [BannerController::class, 'store'])->name('store');
         Route::get('/trash', [BannerController::class, 'trash'])->name('trash');
         Route::post('/bulk-delete', [BannerController::class, 'bulkDelete'])->name('bulkDelete');
+        Route::post('/bulk-restore', [BannerController::class, 'bulkRestore'])->name('bulkRestore');
+        Route::post('/bulk-force-delete', [BannerController::class, 'bulkForceDelete'])->name('bulkForceDelete');
+        Route::post('/bulk-update-status', [BannerController::class, 'bulkUpdateStatus'])->name('bulkUpdateStatus');
         Route::post('/update-sort-order', [BannerController::class, 'updateSortOrder'])->name('updateSortOrder');
         Route::get('/{id}', [BannerController::class, 'show'])->name('show');
         Route::get('/{id}/edit', [BannerController::class, 'edit'])->name('edit');
@@ -115,6 +134,15 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/{id}/restore', [BannerController::class, 'restore'])->name('restore');
         Route::delete('/{id}/force-delete', [BannerController::class, 'forceDelete'])->name('forceDelete');
         Route::put('/{id}/status', [BannerController::class, 'updateStatus'])->name('updateStatus');
+        Route::post('/{id}/duplicate', [BannerController::class, 'duplicate'])->name('duplicate');
+    });
+
+    // Tư Vấn Thiết Kế 
+    Route::prefix('contacts')->name('contacts.')->group(function () {
+          Route::get('/', [ContactController::class, 'index'])->name('index');
+          Route::get('/show/{id}', [ContactController::class, 'show'])->name('show');
+          Route::get('/edit/{id}', [ContactController::class, 'edit'])->name('edit');
+          Route::put('/update/{id}', [ContactController::class, 'update'])->name('update');
     });
 
     // ====== WALLET ======
@@ -175,8 +203,11 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
-        Route::prefix('chatbox')->name('chatbox.')->group(function () {
-        Route::get('/', [ChatboxController::class, 'index'])->name('index'); // Trình quản lý chatbox
+    });
+
+    // ====== CHATBOX MANAGEMENT ======
+    Route::prefix('chatbox')->name('chatbox.')->group(function () {
+        Route::get('/', [ChatboxController::class, 'index'])->name('index');
         Route::get('/settings', [ChatboxController::class, 'settings'])->name('settings');
         Route::post('/settings', [ChatboxController::class, 'updateSettings'])->name('settings.update');
         Route::post('/quick-replies', [ChatboxController::class, 'updateQuickReplies'])->name('quick-replies.update');
@@ -188,8 +219,6 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/{id}/close', [ChatboxController::class, 'closeSession'])->name('close');
         Route::delete('/{id}', [ChatboxController::class, 'deleteSession'])->name('delete');
         Route::get('/{id}/messages', [ChatboxController::class, 'getNewMessages'])->name('messages');
-    });
-
     });
 });
 
@@ -213,15 +242,15 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update-qty', [CartController::class, 'updateQty'])->name('cart.updateQty');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/contact/list', [ClientContactController::class, 'list'])->name('client.contact.list');
+Route::post('/contact/store', [ClientContactController::class, 'store'])->name('client.contact.store');
 
-
-// ============ CHAT ROUTES ============
+// ============ CHATBOX CLIENT API ============
 Route::prefix('chat')->name('chat.')->group(function () {
-    Route::get('/settings', [ChatController::class, 'getSettings'])->name('settings');  
+    Route::get('/settings', [ChatController::class, 'getSettings'])->name('settings');
     Route::post('/send', [ChatController::class, 'sendMessage'])->name('send');
     Route::get('/messages', [ChatController::class, 'getMessages'])->name('messages');
-
-
+    Route::post('/guest-info', [ChatController::class, 'updateGuestInfo'])->name('guest-info');
 });
 
 
