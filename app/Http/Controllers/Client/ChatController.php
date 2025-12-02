@@ -182,6 +182,40 @@ class ChatController extends Controller
             ], 500);
         }
     }
+    /**
+     * Lấy tin nhắn mới (polling)
+     */
+    public function getMessages(Request $request)
+    {
+        $session = $this->getOrCreateSession($request);
+        $lastId = $request->input('last_id', 0);
+        
+        $messages = $session->messages()
+            ->where('id', '>', $lastId)
+            ->where('sender_type', '!=', 'client')
+            ->get();
+
+        // Đánh dấu đã đọc
+        if ($messages->isNotEmpty()) {
+            $session->markAsReadByClient();
+        }
+
+        return response()->json([
+            'messages' => $messages->map(function($msg) {
+                return [
+                    'id' => $msg->id,
+                    'message' => $msg->message,
+                    'sender_type' => $msg->sender_type,
+                    'sender_name' => $msg->sender_name,
+                    'message_type' => $msg->message_type,
+                    'attachment_url' => $msg->attachment_url,
+                    'attachment_name' => $msg->attachment_name,
+                    'time' => $msg->formatted_time,
+                    'created_at' => $msg->created_at->toISOString(),
+                ];
+            }),
+        ]);
+    }
 
 }
 

@@ -203,6 +203,7 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 Route::prefix('chat')->name('chat.')->group(function () {
     Route::get('/settings', [ChatController::class, 'getSettings'])->name('settings');  
     Route::post('/send', [ChatController::class, 'sendMessage'])->name('send');
+    Route::get('/messages', [ChatController::class, 'getMessages'])->name('messages');
 
 
 });
