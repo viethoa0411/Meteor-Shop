@@ -179,6 +179,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/', [ChatboxController::class, 'index'])->name('index'); // Trình quản lý chatbox
         Route::get('/settings', [ChatboxController::class, 'settings'])->name('settings');
         Route::post('/settings', [ChatboxController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/quick-replies', [ChatboxController::class, 'updateQuickReplies'])->name('quick-replies.update');
     });
 
     });

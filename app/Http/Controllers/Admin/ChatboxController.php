@@ -94,5 +94,29 @@ class ChatboxController extends Controller
 
         return back()->with('success', 'Đã cập nhật cài đặt chatbox');
     }
+    /**
+     * Cập nhật quick replies
+     */
+    public function updateQuickReplies(Request $request)
+    {
+        $settings = ChatSetting::getSettings();
+
+        $quickReplies = [];
+        if ($request->has('quick_replies')) {
+            foreach ($request->quick_replies as $qr) {
+                if (!empty($qr['text']) && !empty($qr['message'])) {
+                    $quickReplies[] = [
+                        'icon' => $qr['icon'] ?? 'bi-chat',
+                        'text' => $qr['text'],
+                        'message' => $qr['message'],
+                    ];
+                }
+            }
+        }
+
+        $settings->update(['quick_replies' => $quickReplies]);
+
+        return back()->with('success', 'Đã cập nhật câu trả lời nhanh');
+    }
 }
 
