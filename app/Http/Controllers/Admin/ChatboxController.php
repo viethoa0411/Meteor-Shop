@@ -170,5 +170,24 @@ class ChatboxController extends Controller
             'count' => $count,
         ]);
     }
+       /**
+     * Xem chi tiết conversation và trả lời
+     */
+    public function show($id)
+    {
+        $session = ChatSession::with(['user', 'messages.sender', 'assignedAdmin'])->findOrFail($id);
+        
+        // Đánh dấu đã đọc
+        $session->markAsRead();
+        
+        // Gán admin nếu chưa có
+        if (!$session->assigned_admin_id) {
+            $session->update(['assigned_admin_id' => Auth::id()]);
+        }
+
+        $settings = ChatSetting::getSettings();
+
+        return view('admin.chatbox.show', compact('session', 'settings'));
+    }
 }
 
