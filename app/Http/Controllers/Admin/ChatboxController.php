@@ -253,5 +253,15 @@ class ChatboxController extends Controller
 
         return back()->with('success', 'Đã đóng cuộc hội thoại');
     }
+    /**
+     * Xóa conversation
+     */
+    public function deleteSession($id)
+    {
+        $session = ChatSession::findOrFail($id);
+        $session->delete();
+
+        return redirect()->route('admin.chatbox.index')->with('success', 'Đã xóa cuộc hội thoại');
+    }
 }
 

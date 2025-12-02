@@ -186,6 +186,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/{id}', [ChatboxController::class, 'show'])->name('show');
         Route::post('/{id}/send', [ChatboxController::class, 'sendMessage'])->name('send');
         Route::post('/{id}/close', [ChatboxController::class, 'closeSession'])->name('close');
+        Route::delete('/{id}', [ChatboxController::class, 'deleteSession'])->name('delete');
     });
 
     });
