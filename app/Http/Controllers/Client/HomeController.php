@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Blog;
 use App\Models\Product;
+use App\Models\Wishlist;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,13 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $wishlistIds = [];
+        if (auth()->check()) {
+            $wishlistIds = Wishlist::where('user_id', auth()->id())
+                ->pluck('product_id')
+                ->toArray();
+        }
+
         // lấy 4 sp mới nhât(theo ngày tạo)
         $newProducts = Product::query()
             ->select(['id', 'name',  'slug', 'price', 'image', 'status', 'created_at'])
@@ -43,7 +51,7 @@ class HomeController extends Controller
             ->take(2)
             ->get();
 
-        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners','latestBlogs'));
+        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners', 'latestBlogs', 'wishlistIds'));
     }
 
 

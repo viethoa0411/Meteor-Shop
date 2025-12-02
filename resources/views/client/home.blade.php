@@ -52,21 +52,85 @@
         @else
             <div class="grid-products">
                 @foreach ($newProducts as $p)
-                    <a href="{{ route('client.product.detail', $p->slug) }}" class="product-card">
-                        <div class="product-img">
-                            <img src="{{ $p->image ? asset('storage/' . $p->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}"
-                                alt="{{ $p->name }}">
-                        </div>
-                        <div class="product-name">{{ $p->name }}</div>
-                        <div class="product-price">
-                            {{ number_format($p->price, 0, ',', '.') }} đ
-                        </div>
-                    </a>
+                    @php
+                        $liked = auth()->check() && in_array($p->id, $wishlistIds ?? []);
+                    @endphp
+                    <div class="product-card position-relative">
+                        <button type="button"
+                            class="wishlist-toggle-home"
+                            data-product-id="{{ $p->id }}"
+                            style="position:absolute; top:8px; right:8px; z-index:2; border-radius:999px; border:none; background:rgba(255,255,255,0.9); padding:4px 8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                            <i class="bi {{ $liked ? 'bi-heart-fill text-danger' : 'bi-heart' }}"></i>
+                        </button>
+                        <a href="{{ route('client.product.detail', $p->slug) }}" class="product-card-link">
+                            <div class="product-img">
+                                <img src="{{ $p->image ? asset('storage/' . $p->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}"
+                                    alt="{{ $p->name }}">
+                            </div>
+                            <div class="product-name">{{ $p->name }}</div>
+                            <div class="product-price">
+                                {{ number_format($p->price, 0, ',', '.') }} đ
+                            </div>
+                        </a>
+                    </div>
                 @endforeach
             </div>
         @endif
     </div>
     {{-- end  --}}
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.wishlist-toggle-home').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const productId = this.dataset.productId;
+                        const icon = this.querySelector('i');
+
+                        fetch("{{ route('client.wishlist.toggle') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    product_id: productId
+                                })
+                            })
+                            .then(async res => {
+                                if (res.status === 401) {
+                                    window.location.href = '{{ route('client.login') }}';
+                                    return null;
+                                }
+                                return res.json();
+                            })
+                            .then(data => {
+                                if (!data) return;
+                                if (data.status === 'success') {
+                                    if (data.liked) {
+                                        icon.classList.remove('bi-heart');
+                                        icon.classList.add('bi-heart-fill', 'text-danger');
+                                    } else {
+                                        icon.classList.remove('bi-heart-fill', 'text-danger');
+                                        icon.classList.add('bi-heart');
+                                    }
+
+                                    window.location.reload();
+                                } else {
+                                    alert(data.message || 'Không thể cập nhật danh sách yêu thích.');
+                                }
+                            })
+                            .catch(() => {
+                                alert('Có lỗi xảy ra, vui lòng thử lại.');
+                            });
+                    });
+                });
+            });
+        </script>
+    @endpush
 
     {{-- danh mục theo đồ --}}
     <div style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
