@@ -562,7 +562,7 @@
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
                     <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
-                    <li><a href="{{ route('client.contact.list') }}">Tư vấn thiết kế</a></li>
+                    <li><a href="#">Tư vấn thiết kế</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </div>

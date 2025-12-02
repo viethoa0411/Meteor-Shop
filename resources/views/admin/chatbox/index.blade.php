@@ -11,7 +11,7 @@
             <a href="{{ route('admin.chatbox.settings') }}" class="btn btn-outline-primary">
                 <i class="bi bi-gear me-1"></i> Cài đặt
             </a>
-            <form action="{{ route('admin.chatbox.settings.update') }}" method="POST" class="d-inline">
+            <form action="{{ route('admin.chatbox.toggle') }}" method="POST" class="d-inline">
                 @csrf
                 <button type="submit" class="btn {{ $settings->is_enabled ? 'btn-success' : 'btn-secondary' }}">
                     <i class="bi bi-{{ $settings->is_enabled ? 'toggle-on' : 'toggle-off' }} me-1"></i>
@@ -139,7 +139,7 @@
         </div>
         <div class="card-body p-0">
             @forelse($sessions as $session)
-                <a href="#" 
+                <a href="{{ route('admin.chatbox.show', $session->id) }}" 
                    class="d-block border-bottom p-3 text-decoration-none chat-item {{ $session->unread_count > 0 ? 'bg-light' : '' }}">
                     <div class="d-flex align-items-start">
                         <div class="flex-shrink-0">

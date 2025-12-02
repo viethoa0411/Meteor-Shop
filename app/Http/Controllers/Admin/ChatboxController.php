@@ -189,5 +189,59 @@ class ChatboxController extends Controller
 
         return view('admin.chatbox.show', compact('session', 'settings'));
     }
+    /**
+     * Gửi tin nhắn từ admin
+     */
+    public function sendMessage(Request $request, $id)
+    {
+        $request->validate([
+            'message' => 'required_without:image|nullable|string|max:2000',
+            'image' => 'required_without:message|nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+        ]);
+
+        $session = ChatSession::findOrFail($id);
+
+        // Xử lý upload hình ảnh
+        $attachmentUrl = null;
+        $attachmentName = null;
+        $messageType = 'text';
+        $messageText = $request->message ?? '';
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $fileName = 'chat_admin_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/chat'), $fileName);
+            $attachmentUrl = '/uploads/chat/' . $fileName;
+            $attachmentName = $image->getClientOriginalName();
+            $messageType = 'image';
+            $messageText = $messageText ?: '[Hình ảnh]';
+        }
+
+        $message = ChatMessage::create([
+            'chat_session_id' => $session->id,
+            'sender_type' => 'admin',
+            'sender_id' => Auth::id(),
+            'message' => $messageText,
+            'message_type' => $messageType,
+            'attachment_url' => $attachmentUrl,
+            'attachment_name' => $attachmentName,
+        ]);
+
+        // Cập nhật session
+        $session->update([
+            'last_message' => $messageType === 'image' ? '📷 Hình ảnh' : $messageText,
+            'last_message_at' => now(),
+            'client_unread_count' => $session->client_unread_count + 1,
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message->load('sender'),
+            ]);
+        }
+
+        return back()->with('success', 'Đã gửi tin nhắn');
+    }
 }
 
