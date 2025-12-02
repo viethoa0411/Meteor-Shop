@@ -237,6 +237,65 @@ class ChatController extends Controller
 
         return response()->json(['success' => true]);
     }
+    /**
+     * Lấy hoặc tạo session chat
+     */
+    private function getOrCreateSession(Request $request)
+    {
+        $user = Auth::user();
+        $sessionToken = $request->input('session_token') ?? $request->cookie('chat_session_token');
 
+        // Nếu đã đăng nhập, tìm session theo user_id
+        if ($user) {
+            $session = ChatSession::where('user_id', $user->id)
+                ->where('status', '!=', 'closed')
+                ->latest('last_message_at')
+                ->first();
+
+            if (!$session) {
+                $session = ChatSession::create([
+                    'user_id' => $user->id,
+                    'guest_token' => Str::random(32),
+                    'guest_name' => $user->name,
+                    'guest_email' => $user->email,
+                    'status' => 'active',
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'last_message_at' => now(),
+                ]);
+
+                // Thêm tin nhắn chào mừng
+                $this->addWelcomeMessage($session);
+            }
+
+            return $session;
+        }
+
+        // Nếu là khách, tìm theo token
+        if ($sessionToken) {
+            $session = ChatSession::where('guest_token', $sessionToken)
+                ->where('status', '!=', 'closed')
+                ->first();
+
+            if ($session) {
+                return $session;
+            }
+        }
+
+        // Tạo session mới cho khách
+        $newToken = Str::random(32);
+        $session = ChatSession::create([
+            'guest_token' => $newToken,
+            'status' => 'active',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'last_message_at' => now(),
+        ]);
+
+        // Thêm tin nhắn chào mừng
+        $this->addWelcomeMessage($session);
+
+        return $session;
+    }
 }
 
