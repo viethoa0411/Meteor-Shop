@@ -8,7 +8,7 @@
             <p class="text-muted mb-0">Trả lời tin nhắn và hỗ trợ khách hàng</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="#" class="btn btn-outline-primary">
+            <a href="{{ route('admin.chatbox.settings') }}" class="btn btn-outline-primary">
                 <i class="bi bi-gear me-1"></i> Cài đặt
             </a>
             <form action="#" method="POST" class="d-inline">

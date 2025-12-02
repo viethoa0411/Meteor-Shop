@@ -56,5 +56,13 @@ class ChatboxController extends Controller
 
         return view('admin.chatbox.index', compact('sessions', 'settings', 'stats'));
     }
+    /**
+     * Trang cài đặt chatbox
+     */
+    public function settings()
+    {
+        $settings = ChatSetting::getSettings();
+        return view('admin.chatbox.settings', compact('settings'));
+    }
 }
 
