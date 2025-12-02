@@ -243,5 +243,15 @@ class ChatboxController extends Controller
 
         return back()->with('success', 'Đã gửi tin nhắn');
     }
+       /**
+     * Đóng conversation
+     */
+    public function closeSession($id)
+    {
+        $session = ChatSession::findOrFail($id);
+        $session->update(['status' => 'closed']);
+
+        return back()->with('success', 'Đã đóng cuộc hội thoại');
+    }
 }
 

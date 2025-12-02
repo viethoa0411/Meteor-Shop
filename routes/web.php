@@ -185,6 +185,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/unread-count', [ChatboxController::class, 'getUnreadCount'])->name('unread-count');
         Route::get('/{id}', [ChatboxController::class, 'show'])->name('show');
         Route::post('/{id}/send', [ChatboxController::class, 'sendMessage'])->name('send');
+        Route::post('/{id}/close', [ChatboxController::class, 'closeSession'])->name('close');
     });
 
     });
