@@ -159,5 +159,16 @@ class ChatboxController extends Controller
 
         return back()->with('success', $settings->is_enabled ? 'Đã bật chatbox' : 'Đã tắt chatbox');
     }
+       /**
+     * API: Lấy số tin nhắn chưa đọc
+     */
+    public function getUnreadCount()
+    {
+        $count = ChatSession::where('unread_count', '>', 0)->count();
+
+        return response()->json([
+            'count' => $count,
+        ]);
+    }
 }
 
