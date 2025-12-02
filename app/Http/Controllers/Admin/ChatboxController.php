@@ -263,5 +263,23 @@ class ChatboxController extends Controller
 
         return redirect()->route('admin.chatbox.index')->with('success', 'Đã xóa cuộc hội thoại');
     }
+    /**
+     * Lấy tin nhắn mới (AJAX polling)
+     */
+    public function getNewMessages(Request $request, $id)
+    {
+        $lastId = $request->input('last_id', 0);
+        $session = ChatSession::findOrFail($id);
+
+        $messages = $session->messages()
+            ->where('id', '>', $lastId)
+            ->with('sender')
+            ->get();
+
+        return response()->json([
+            'messages' => $messages,
+            'unread_count' => $session->unread_count,
+        ]);
+    }
 }
 
