@@ -64,5 +64,35 @@ class ChatboxController extends Controller
         $settings = ChatSetting::getSettings();
         return view('admin.chatbox.settings', compact('settings'));
     }
+     /**
+     * Cập nhật cài đặt chatbox
+     */
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'chatbox_title' => 'required|string|max:100',
+            'welcome_message' => 'required|string|max:500',
+            'offline_message' => 'required|string|max:500',
+            'primary_color' => 'required|string|max:20',
+        ]);
+
+        $settings = ChatSetting::getSettings();
+        
+        $settings->update([
+            'is_enabled' => $request->boolean('is_enabled'),
+            'chatbox_title' => $request->chatbox_title,
+            'chatbox_subtitle' => $request->chatbox_subtitle,
+            'welcome_message' => $request->welcome_message,
+            'offline_message' => $request->offline_message,
+            'primary_color' => $request->primary_color,
+            'secondary_color' => $request->secondary_color ?? $request->primary_color,
+            'show_on_mobile' => $request->boolean('show_on_mobile'),
+            'play_sound' => $request->boolean('play_sound'),
+            'position_bottom' => $request->position_bottom ?? 24,
+            'position_right' => $request->position_right ?? 24,
+        ]);
+
+        return back()->with('success', 'Đã cập nhật cài đặt chatbox');
+    }
 }
 
