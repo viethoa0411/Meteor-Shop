@@ -104,6 +104,7 @@
                 </div>
 
                 {{-- Giá --}}
+                
                 <p style="font-size:24px; font-weight:600; color:#d41; margin-bottom:10px;">
                     {{ number_format($product->price, 0, ',', '.') }} đ
                 </p>
@@ -206,20 +207,34 @@
 
 
                 {{-- Nút hành động --}}
+
                 <div style="display:flex; flex-wrap:wrap; gap:16px;">
+                    <button type="button"
+                        id="wishlist-toggle"
+                        class="product-action-btn"
+                        data-product-id="{{ $product->id }}"
+                        data-liked="{{ $isInWishlist ? 'true' : 'false' }}"
+                        style="border: 2px solid #000; color:#000; background:#fff; padding:10px 20px; border-radius:6px; font-weight:500; cursor:pointer;">
+                        <i class="bi {{ $isInWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' }} me-1"></i>
+                        <span>{{ $isInWishlist ? 'Đã thích' : 'Yêu thích' }}</span>
+                    </button>
+
                     <button id="buy-now-btn" type="button"
-                        style="color:#fff; background:#111; border:none; padding:10px 20px; border-radius:6px; font-weight:500; cursor:pointer;">
+                        class="product-action-btn"
+                        style="border: 2px solid #000; color:#000; background:#fff; padding:10px 20px; border-radius:6px; font-weight:500; cursor:pointer;">
                         Mua ngay
                     </button>
 
                     @auth
                         <button id="add-to-cart" type="button"
-                            style="border: 2px solid #000; background-color: #000; color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                            class="product-action-btn"
+                            style="border: 2px solid #000; color:#000; background:#fff; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
                             <i class="bi bi-cart"></i> Thêm vào giỏ
                         </button>
                     @else
                         <a href="{{ route('client.login') }}"
-                            style="border: 2px solid #000; background-color: #000; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                            class="product-action-btn"
+                            style="border: 2px solid #000; color:#000; background:#fff; padding: 10px 20px; border-radius: 6px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
                             <i class="bi bi-cart"></i> Thêm vào giỏ
                         </a>
                     @endauth
@@ -292,6 +307,55 @@
         {{-- Hiệu ứng hover --}}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                const wishlistBtn = document.getElementById('wishlist-toggle');
+
+                wishlistBtn?.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    const label = this.querySelector('span');
+
+                    fetch("{{ route('client.wishlist.toggle') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                product_id: productId
+                            })
+                        })
+                        .then(async res => {
+                            if (res.status === 401) {
+                                window.location.href = '{{ route('client.login') }}';
+                                return null;
+                            }
+                            return res.json();
+                        })
+                        .then(data => {
+                            if (!data) return;
+                            if (data.status === 'success') {
+                                const icon = wishlistBtn.querySelector('i');
+                                if (data.liked) {
+                                    icon.classList.remove('bi-heart');
+                                    icon.classList.add('bi-heart-fill', 'text-danger');
+                                    wishlistBtn.setAttribute('data-liked', 'true');
+                                    if (label) label.textContent = 'Đã thích';
+                                } else {
+                                    icon.classList.remove('bi-heart-fill', 'text-danger');
+                                    icon.classList.add('bi-heart');
+                                    wishlistBtn.setAttribute('data-liked', 'false');
+                                    if (label) label.textContent = 'Yêu thích';
+                                }
+
+                                window.location.reload();
+                            } else {
+                                alert(data.message || 'Không thể cập nhật danh sách yêu thích.');
+                            }
+                        })
+                        .catch(() => {
+                            alert('Có lỗi xảy ra, vui lòng thử lại.');
+                        });
+                });
+
                 // ----- Hiệu ứng hover thẻ sản phẩm liên quan -----
                 document.querySelectorAll('.product-card').forEach(card => {
                     card.addEventListener('mouseenter', () => {
@@ -544,6 +608,15 @@
                 border: 1px solid #111 !important;
                 background: #111 !important;
                 color: #fff !important;
+            }
+
+            .product-action-btn {
+                transition: transform 0.15s ease, box-shadow 0.15s ease;
+            }
+
+            .product-action-btn:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
             }
 
             input[type=number]::-webkit-inner-spin-button,

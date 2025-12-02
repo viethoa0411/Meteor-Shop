@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Wishlist;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class ProductClientController extends Controller
@@ -28,7 +30,14 @@ class ProductClientController extends Controller
             ->take(4)
             ->get();
 
-        return view('client.products.detail', compact('product', 'relatedProducts', 'cate'));
+        $isInWishlist = false;
+        if (Auth::check()) {
+            $isInWishlist = Wishlist::where('user_id', Auth::id())
+                ->where('product_id', $product->id)
+                ->exists();
+        }
+
+        return view('client.products.detail', compact('product', 'relatedProducts', 'cate', 'isInWishlist'));
     }
 
     /**

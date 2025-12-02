@@ -31,6 +31,7 @@ use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
+use App\Http\Controllers\Client\WishlistController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -216,6 +217,12 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update-qty', [CartController::class, 'updateQty'])->name('cart.updateQty');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+
+// Wishlist
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('client.wishlist.index');
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('client.wishlist.toggle');
+});
 
 Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
     Route::get('/orders', [ClientAccountOrderController::class, 'index'])->name('orders.index');

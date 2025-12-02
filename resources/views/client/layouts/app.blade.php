@@ -5,6 +5,17 @@
     foreach ($cart as $item) {
         $cartCount += $item['quantity'];
     }
+
+    $wishlistItems = collect();
+    $wishlistCount = 0;
+
+    if (auth()->check()) {
+        $wishlistItems = \App\Models\Wishlist::with('product')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
+        $wishlistCount = $wishlistItems->count();
+    }
 @endphp
 
 <!DOCTYPE html>
@@ -206,7 +217,7 @@
         .client-nav .dropdown-menu {
             display: none;
             position: absolute;
-            top: calc(100% + 12px);
+            top: 100%;
             left: 0;
             background: #fff;
             border-radius: 8px;
@@ -483,9 +494,12 @@
             <div class="client-actions">
                 <div class="client-cart">
                     @auth
-                        <a href="{{ route('client.account.orders.index') }}" class="client-pill">
+                        <a data-bs-toggle="offcanvas" href="#wishlistCanvas" role="button" class="client-pill">
                             <i class="bi bi-heart client-pill__icon"></i>
                         </a>
+                        <span class="client-cart__badge {{ $wishlistCount > 0 ? '' : 'd-none' }}" data-wishlist-badge>
+                            {{ $wishlistCount }}
+                        </span>
                     @else
                         <a href="{{ route('client.login') }}" class="client-pill">
                             <i class="bi bi-heart client-pill__icon"></i>
@@ -586,6 +600,44 @@
     <main class="container">
         @yield('content')
     </main>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="wishlistCanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Danh sách yêu thích</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column" style="height: 100%;">
+            @if (auth()->check())
+                @if ($wishlistItems->count())
+                    <ul class="list-group mb-3">
+                        @foreach ($wishlistItems as $wishlist)
+                            @php $product = $wishlist->product; @endphp
+                            @if ($product)
+                                <li class="list-group-item d-flex align-items-center position-relative">
+                                    <a href="{{ route('client.product.detail', $product->slug) }}"
+                                        class="d-flex flex-column text-decoration-none text-dark flex-grow-1 pe-4">
+                                        <strong>{{ $product->name }}</strong>
+                                        <small class="text-muted">{{ number_format($product->price, 0, ',', '.') }}₫</small>
+                                    </a>
+                                    <button class="btn-close position-absolute top-0 end-0 m-2 remove-wishlist-item"
+                                        data-product-id="{{ $product->id }}"></button>
+                                </li>
+                            @endif
+                        @endforeach
+                    </ul>
+                    <div class="mt-auto d-flex flex-column gap-2">
+                        <a href="{{ route('client.wishlist.index') }}" class="btn btn-outline-dark w-100">Xem danh sách chi tiết</a>
+                    </div>
+                @else
+                    <p>Danh sách yêu thích trống.</p>
+                    <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100 mt-2">Khám phá sản phẩm</a>
+                @endif
+            @else
+                <p>Vui lòng đăng nhập để xem danh sách yêu thích.</p>
+                <a href="{{ route('client.login') }}" class="btn btn-primary w-100 mt-2">Đăng nhập</a>
+            @endif
+        </div>
+    </div>
 
     <div class="offcanvas offcanvas-end" tabindex="-1" id="cartCanvas">
         <div class="offcanvas-header">
@@ -759,6 +811,124 @@
                         .then(data => {
                             if (data.status === 'success') {
                                 // Reload lại toàn bộ trang
+                                window.location.reload();
+                            } else {
+                                alert(data.message || 'Có lỗi xảy ra!');
+                            }
+                        })
+                        .catch(err => console.error(err));
+                });
+            });
+
+            // ----- Xóa sản phẩm khỏi wishlist và reload -----
+            const removeWishlistListeners = () => {
+                document.querySelectorAll('.remove-wishlist-item').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const productId = this.dataset.productId;
+
+                        fetch("{{ route('client.wishlist.toggle') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    product_id: productId
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    window.location.reload();
+                                } else {
+                                    alert(data.message || 'Có lỗi xảy ra!');
+                                }
+                            })
+                            .catch(err => console.error(err));
+                    });
+                });
+            };
+
+            removeWishlistListeners();
+
+            window.addEventListener('wishlist-updated', function(event) {
+                const { liked, productId, productName, productPrice, productSlug } = event.detail;
+                const wishlistCountEl = document.querySelector('.client-cart .client-cart__badge');
+
+                if (!liked) {
+                    document.querySelectorAll(`.remove-wishlist-item[data-product-id="${productId}"]`).forEach(btn => {
+                        const li = btn.closest('li');
+                        if (li) {
+                            const listGroup = li.parentElement;
+                            li.remove();
+
+                            if (listGroup && !listGroup.querySelector('li')) {
+                                listGroup.remove();
+                                const wishlistBody = document.querySelector('#wishlistCanvas .offcanvas-body');
+                                if (wishlistBody) {
+                                    const emptyMsg = document.createElement('p');
+                                    emptyMsg.textContent = 'Danh sách yêu thích trống.';
+                                    wishlistBody.prepend(emptyMsg);
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    let listGroup = document.querySelector('#wishlistCanvas .list-group');
+                    const wishlistBody = document.querySelector('#wishlistCanvas .offcanvas-body');
+
+                    if (!listGroup && wishlistBody) {
+                        wishlistBody.querySelectorAll('p, .btn').forEach(el => {
+                            if (!el.closest('.list-group')) {
+                                el.remove();
+                            }
+                        });
+                        listGroup = document.createElement('ul');
+                        listGroup.className = 'list-group mb-3';
+                        wishlistBody.insertBefore(listGroup, wishlistBody.firstChild);
+                    }
+
+                    if (listGroup) {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex align-items-center position-relative';
+                        li.innerHTML = `
+                            <a href="${productSlug}" class="d-flex flex-column text-decoration-none text-dark flex-grow-1 pe-4">
+                                <strong>${productName}</strong>
+                                <small class="text-muted">${productPrice}</small>
+                            </a>
+                            <button class="btn-close position-absolute top-0 end-0 m-2 remove-wishlist-item" data-product-id="${productId}"></button>
+                        `;
+                        listGroup.prepend(li);
+                        removeWishlistListeners();
+                    }
+                }
+
+                const badge = document.querySelector('[data-wishlist-badge]');
+                if (badge) {
+                    const current = parseInt(badge.textContent || 0, 10);
+                    const next = liked ? current + 1 : Math.max(0, current - 1);
+                    badge.textContent = next;
+                    if (next <= 0) {
+                        badge.classList.add('d-none');
+                    } else {
+                        badge.classList.remove('d-none');
+                    }
+                }
+            });
+        });
+    </script>
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                product_id: productId
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
                                 window.location.reload();
                             } else {
                                 alert(data.message || 'Có lỗi xảy ra!');
