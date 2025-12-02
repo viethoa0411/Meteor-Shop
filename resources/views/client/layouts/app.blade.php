@@ -917,29 +917,7 @@
             });
         });
     </script>
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                product_id: productId
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                window.location.reload();
-                            } else {
-                                alert(data.message || 'Có lỗi xảy ra!');
-                            }
-                        })
-                        .catch(err => console.error(err));
-                });
-            });
-
-        });
-    </script>
+                        
 
 
     @stack('scripts')

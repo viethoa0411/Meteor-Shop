@@ -70,13 +70,13 @@
             display: block;
         }
 
-        .dropdown-menu-item > a .bi-chevron-right {
+        .dropdown-menu-item>a .bi-chevron-right {
             transition: transform 0.3s;
         }
 
-        .dropdown-menu-item.active > a .bi-chevron-right {
+        .dropdown-menu-item.active>a .bi-chevron-right {
             transform: rotate(90deg);
-            }
+        }
 
         /* Header */
         .navbar {
@@ -204,7 +204,7 @@
             color: #ffffff !important;
         }
 
-        body.dark .table-bordered > :not(caption) > * > * {
+        body.dark .table-bordered> :not(caption)>*>* {
             border-color: #2f2f2f;
         }
 
@@ -215,11 +215,11 @@
 
         body.dark table.table tbody tr:nth-of-type(odd),
         body.dark table.table tbody tr:nth-of-type(odd) td,
-        body.dark .table-striped > tbody > tr:nth-of-type(odd) {
+        body.dark .table-striped>tbody>tr:nth-of-type(odd) {
             background-color: #1c1c1c !important;
         }
 
-        body.dark .table-striped > tbody > tr:nth-of-type(odd) > * {
+        body.dark .table-striped>tbody>tr:nth-of-type(odd)>* {
             background-color: #1c1c1c !important;
         }
 
@@ -297,7 +297,7 @@
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg px-3 shadow-sm">
-                <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Meteor-Shop</a>
+        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Meteor-Shop</a>
 
         <div class="ms-auto d-flex align-items-center">
 
@@ -307,29 +307,29 @@
             </button>
 
             <!-- Tài khoản -->
-                    <div class="dropdown">
+            <div class="dropdown">
                 <a class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i>
-                            {{ Auth::user()->name ?? 'Admin' }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                    <i class="bi bi-person-circle"></i>
+                    {{ Auth::user()->name ?? 'Admin' }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
                     <li><a href="" class="dropdown-item">Profile</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
                         <form action="{{ route('logout') }}" method="POST">
-                                        @csrf
+                            @csrf
                             <button class="dropdown-item">
-                                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                                        </button>
-                                    </form>
-                            </li>
-                        </ul>
-                    </div>
-
+                                <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
-        </nav>
+
+        </div>
+    </nav>
 
     <!-- Admin Layout -->
     <div class="admin-container">
@@ -338,41 +338,55 @@
         <aside class="sidebar">
             <h5 class="navbar navbar-expand-lg px-3 shadow-sm">Quản trị</h5>
 
-            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('admin.dashboard') }}"
+                class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-house-door-fill me-2"></i> Dashboard
             </a>
-            <a href="{{ route('admin.categories.list') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.categories.list') }}"
+                class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                 <i class="bi bi-folder-plus me-2"></i> Danh mục
             </a>
-            <a href="{{ route('admin.products.list') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.products.list') }}"
+                class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam me-2"></i> Sản phẩm
             </a>
-            <a href="{{ route('admin.orders.list') }}" class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.orders.list') }}"
+                class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                 <i class="bi bi-cart-fill me-2"></i> Đơn hàng
             </a>
             <a href="{{ route('admin.contacts.index') }}">
-              <i class="bi bi-envelope me-2"></i> Liên hệ
+                <i class="bi bi-envelope me-2"></i> Liên hệ
             </a>
-            <a href="{{ route('admin.blogs.list') }}" class="{{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.wishlist.index') }}"
+                class="{{ request()->routeIs('admin.wishlist.*') ? 'active' : '' }}">
+                <i class="bi bi-heart-fill me-2"></i> Sản phẩm yêu thích
+            </a>
+            <a href="{{ route('admin.blogs.list') }}"
+                class="{{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
                 <i class="bi bi-list-ul me-2"></i> Danh sách bài viết
             </a>
-            <a href="{{ route('admin.banners.list') }}" class="{{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.banners.list') }}"
+                class="{{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                 <i class="bi bi-image-fill me-2"></i> Quản lý Banner
             </a>
             <!-- Quản lý Ví -->
-            <a href="{{ route('admin.wallet.index') }}" class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.wallet.index') }}"
+                class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
                 <i class="bi bi-wallet2 me-2"></i> Quản lý Ví
             </a>
             <!-- Quản lý tài khoản -->
             <div class="dropdown-menu-item {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
-                <a href="#" class="{{ request()->routeIs('admin.account.*') ? 'active' : '' }}"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản
+                <a href="#" class="{{ request()->routeIs('admin.account.*') ? 'active' : '' }}"><i
+                        class="bi bi-people-fill me-2"></i> Quản lý tài khoản
                     <i class="bi bi-chevron-right float-end"></i>
                 </a>
                 <div class="submenu">
-                    <a href="{{ route('admin.account.admin.list') }}" class="{{ request()->routeIs('admin.account.admin.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.account.admin.list') }}"
+                        class="{{ request()->routeIs('admin.account.admin.*') ? 'active' : '' }}">
                         <i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin
                     </a>
-                    <a href="{{ route('admin.account.users.list') }}" class="{{ request()->routeIs('admin.account.users.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.account.users.list') }}"
+                        class="{{ request()->routeIs('admin.account.users.*') ? 'active' : '' }}">
                         <i class="bi bi-people-fill me-2"></i> Quản lý User
                     </a>
                 </div>
@@ -408,7 +422,11 @@
             themeIcon.classList.toggle("bi-moon-fill", !isDark);
             themeIcon.classList.toggle("bi-sun-fill", isDark);
             localStorage.setItem("theme", isDark ? "dark" : "light");
-            window.dispatchEvent(new CustomEvent("theme-changed", { detail: { isDark } }));
+            window.dispatchEvent(new CustomEvent("theme-changed", {
+                detail: {
+                    isDark
+                }
+            }));
         };
 
         setTheme(localStorage.getItem("theme") === "dark");

@@ -17,6 +17,7 @@ use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Client\ProductClientController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
+use App\Http\Controllers\Admin\AdminWishListController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -28,16 +29,13 @@ use App\Http\Controllers\Admin\Wallet\WalletTransactionActionController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
 use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
 use App\Http\Controllers\Admin\Contact\ContactController;
-
+use App\Http\Controllers\Admin\WishListController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
-<<<<<<< HEAD
-use App\Http\Controllers\Client\WishlistController;
-=======
 use App\Http\Controllers\Client\Contact\ContactController as ClientContactController;
->>>>>>> origin/thiet_Ke
+use App\Http\Controllers\Client\WishlistController as ClientWishlistController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -151,10 +149,10 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
 
     // Tư Vấn Thiết Kế 
     Route::prefix('contacts')->name('contacts.')->group(function () {
-          Route::get('/', [ContactController::class, 'index'])->name('index');
-          Route::get('/show/{id}', [ContactController::class, 'show'])->name('show');
-          Route::get('/edit/{id}', [ContactController::class, 'edit'])->name('edit');
-          Route::put('/update/{id}', [ContactController::class, 'update'])->name('update');
+        Route::get('/', [ContactController::class, 'index'])->name('index');
+        Route::get('/show/{id}', [ContactController::class, 'show'])->name('show');
+        Route::get('/edit/{id}', [ContactController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [ContactController::class, 'update'])->name('update');
     });
 
     // ====== WALLET ======
@@ -187,6 +185,11 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/transaction/{id}/unmark', [WalletWithdrawController::class, 'unmarkReceivedTransaction'])->name('transaction.unmark');
     });
 
+    Route::prefix('wishlist')->name('wishlist.')->group(function () {
+        Route::get('/', [AdminWishListController::class, 'index'])->name('index');
+        Route::get('/{id}', [AdminWishListController::class, 'show'])->name('show');
+    });
+
     // ====== ACCOUNT MANAGEMENT ======
     Route::prefix('account')->name('account.')->group(function () {
 
@@ -215,8 +218,6 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
-
-
     });
 });
 
@@ -246,8 +247,8 @@ Route::post('/contact/store', [ClientContactController::class, 'store'])->name('
 
 // Wishlist
 Route::middleware('auth')->group(function () {
-    Route::get('/wishlist', [WishlistController::class, 'index'])->name('client.wishlist.index');
-    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('client.wishlist.toggle');
+    Route::get('/wishlist', [ClientWishlistController::class, 'index'])->name('client.wishlist.index');
+    Route::post('/wishlist/toggle', [ClientWishlistController::class, 'toggle'])->name('client.wishlist.toggle');
 });
 
 Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
