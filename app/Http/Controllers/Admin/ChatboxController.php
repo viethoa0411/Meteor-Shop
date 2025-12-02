@@ -118,5 +118,30 @@ class ChatboxController extends Controller
 
         return back()->with('success', 'Đã cập nhật câu trả lời nhanh');
     }
+       /**
+     * Cập nhật auto replies
+     */
+    public function updateAutoReplies(Request $request)
+    {
+        $settings = ChatSetting::getSettings();
+
+        $autoReplies = [];
+        if ($request->has('auto_replies')) {
+            foreach ($request->auto_replies as $ar) {
+                if (!empty($ar['keywords']) && !empty($ar['reply'])) {
+                    $keywords = array_map('trim', explode(',', $ar['keywords']));
+                    $autoReplies[] = [
+                        'keywords' => $keywords,
+                        'reply' => $ar['reply'],
+                    ];
+                }
+            }
+        }
+
+        $settings->update(['auto_replies' => $autoReplies]);
+
+        return back()->with('success', 'Đã cập nhật tự động trả lời');
+    }
+
 }
 
