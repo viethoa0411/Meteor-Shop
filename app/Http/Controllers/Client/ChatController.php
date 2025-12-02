@@ -297,5 +297,25 @@ class ChatController extends Controller
 
         return $session;
     }
+    /**
+     * Thêm tin nhắn chào mừng
+     */
+    private function addWelcomeMessage(ChatSession $session)
+    {
+        $settings = ChatSetting::getSettings();
+
+        $message = ChatMessage::create([
+            'chat_session_id' => $session->id,
+            'sender_type' => 'bot',
+            'message' => $settings->welcome_message,
+            'message_type' => 'text',
+        ]);
+
+        // Cập nhật last_message
+        $session->update([
+            'last_message' => $settings->welcome_message,
+            'last_message_at' => now(),
+        ]);
+    }
 }
 
