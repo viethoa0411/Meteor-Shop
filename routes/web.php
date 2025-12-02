@@ -28,6 +28,7 @@ use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
 
 use App\Http\Controllers\Client\ChatController;
+use App\Http\Controllers\Admin\ChatboxController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -174,6 +175,10 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
+        Route::prefix('chatbox')->name('chatbox.')->group(function () {
+        Route::get('/', [ChatboxController::class, 'index'])->name('index'); // Trình quản lý chatbox
+    });
+
     });
 });
 

@@ -351,6 +351,15 @@
             <a href="{{ route('admin.orders.list') }}" class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                 <i class="bi bi-cart-fill me-2"></i> Đơn hàng
             </a>
+            <a href="{{ route('admin.chatbox.index') }}" class="{{ request()->routeIs('admin.chatbox.*') ? 'active' : '' }}">
+                <i class="bi bi-chat-dots-fill me-2"></i> Chatbox
+                @php
+                    $unreadChatCount = \App\Models\ChatSession::where('unread_count', '>', 0)->count();
+                @endphp
+                @if($unreadChatCount > 0)
+                    <span class="badge bg-danger ms-1">{{ $unreadChatCount }}</span>
+                @endif
+            </a>
             <a href="{{ route('admin.blogs.list') }}" class="{{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
                 <i class="bi bi-list-ul me-2"></i> Danh sách bài viết
             </a>
