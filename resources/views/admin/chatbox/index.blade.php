@@ -11,7 +11,7 @@
             <a href="{{ route('admin.chatbox.settings') }}" class="btn btn-outline-primary">
                 <i class="bi bi-gear me-1"></i> Cài đặt
             </a>
-            <form action="#" method="POST" class="d-inline">
+            <form action="{{ route('admin.chatbox.settings.update') }}" method="POST" class="d-inline">
                 @csrf
                 <button type="submit" class="btn {{ $settings->is_enabled ? 'btn-success' : 'btn-secondary' }}">
                     <i class="bi bi-{{ $settings->is_enabled ? 'toggle-on' : 'toggle-off' }} me-1"></i>

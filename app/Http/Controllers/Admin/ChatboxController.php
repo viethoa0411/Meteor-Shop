@@ -142,6 +142,22 @@ class ChatboxController extends Controller
 
         return back()->with('success', 'Đã cập nhật tự động trả lời');
     }
+    /**
+     * Bật/tắt chatbox nhanh
+     */
+    public function toggle(Request $request)
+    {
+        $settings = ChatSetting::getSettings();
+        $settings->update(['is_enabled' => !$settings->is_enabled]);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_enabled' => $settings->is_enabled,
+            ]);
+        }
+
+        return back()->with('success', $settings->is_enabled ? 'Đã bật chatbox' : 'Đã tắt chatbox');
+    }
 }
 

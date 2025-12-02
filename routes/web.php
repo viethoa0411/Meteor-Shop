@@ -181,6 +181,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/settings', [ChatboxController::class, 'updateSettings'])->name('settings.update');
         Route::post('/quick-replies', [ChatboxController::class, 'updateQuickReplies'])->name('quick-replies.update');
         Route::post('/auto-replies', [ChatboxController::class, 'updateAutoReplies'])->name('auto-replies.update');
+        Route::post('/toggle', [ChatboxController::class, 'toggle'])->name('toggle');
     });
 
     });
