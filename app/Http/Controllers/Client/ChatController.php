@@ -216,6 +216,27 @@ class ChatController extends Controller
             }),
         ]);
     }
+       /**
+     * Cập nhật thông tin khách
+     */
+    public function updateGuestInfo(Request $request)
+    {
+        $request->validate([
+            'name' => 'nullable|string|max:100',
+            'email' => 'nullable|email|max:100',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $session = $this->getOrCreateSession($request);
+
+        $session->update([
+            'guest_name' => $request->name,
+            'guest_email' => $request->email,
+            'guest_phone' => $request->phone,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
 
 }
 
