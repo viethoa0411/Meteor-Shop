@@ -202,6 +202,7 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 // ============ CHAT ROUTES ============
 Route::prefix('chat')->name('chat.')->group(function () {
     Route::get('/settings', [ChatController::class, 'getSettings'])->name('settings');  
+    Route::post('/send', [ChatController::class, 'sendMessage'])->name('send');
 
 
 });
