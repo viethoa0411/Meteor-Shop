@@ -81,6 +81,22 @@ class DepositController extends Controller
         
         return view('client.wallet.deposit-success', compact('deposit', 'settings'));
     }
- 
+
+    /**
+     * Hủy yêu cầu nạp tiền (chỉ khi đang pending)
+     */
+    public function cancel($id)
+    {
+        $deposit = DepositRequest::where('user_id', Auth::id())
+            ->where('status', 'pending')
+            ->findOrFail($id);
+        
+        $deposit->update(['status' => 'cancelled']);
+        
+        return redirect()->route('client.account.wallet.index')
+            ->with('success', 'Đã hủy yêu cầu nạp tiền');
+    }
+
+    
 }
 

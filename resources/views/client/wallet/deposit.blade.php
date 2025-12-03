@@ -58,7 +58,7 @@
                             <div class="fw-semibold">{{ $pending->formatted_amount }}</div>
                             <small class="text-muted">{{ $pending->created_at->format('d/m/Y H:i') }}</small>
                         </div>
-                        <form action="#" method="POST" class="d-inline">
+                        <form action="{{ route('client.account.wallet.deposit.cancel', $pending->id) }}" method="POST" class="d-inline">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hủy yêu cầu này?')">Hủy</button>
                         </form>

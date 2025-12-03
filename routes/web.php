@@ -250,7 +250,8 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
         // Deposit routes
         Route::get('/deposit', [ClientDepositController::class, 'index'])->name('deposit');
         Route::post('/deposit', [ClientDepositController::class, 'store'])->name('deposit.store');
-        Route::get('/deposit/{id}/success', [ClientDepositController::class, 'success'])->name('deposit.success'); 
+        Route::get('/deposit/{id}/success', [ClientDepositController::class, 'success'])->name('deposit.success');
+        Route::post('/deposit/{id}/cancel', [ClientDepositController::class, 'cancel'])->name('deposit.cancel');
  
     });
 });
