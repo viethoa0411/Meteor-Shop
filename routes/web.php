@@ -21,18 +21,20 @@ use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MonthlyTargetController;
 
-use App\Http\Controllers\Admin\Wallet\WalletDetailController;
-use App\Http\Controllers\Admin\Wallet\WalletManagementController;
-use App\Http\Controllers\Admin\Wallet\WalletTransactionActionController;
-use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
-use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
+
 use App\Http\Controllers\Admin\Contact\ContactController;
+use App\Http\Controllers\Admin\ChatboxController;
+use App\Http\Controllers\Client\ChatController;
 
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
 use App\Http\Controllers\Client\Contact\ContactController as ClientContactController;
+
+// Wallet Controllers
+ 
+use App\Http\Controllers\Client\Wallet\WalletController as ClientWalletController; 
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -143,36 +145,6 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
           Route::put('/update/{id}', [ContactController::class, 'update'])->name('update');
     });
 
-    // ====== WALLET ======
-    Route::prefix('wallet')->name('wallet.')->group(function () {
-        Route::get('/', [WalletManagementController::class, 'index'])->name('index');
-        Route::get('/create', [WalletManagementController::class, 'create'])->name('create');
-        Route::post('/store', [WalletManagementController::class, 'store'])->name('store');
-        Route::get('/{id}', [WalletDetailController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [WalletManagementController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [WalletManagementController::class, 'update'])->name('update');
-
-        Route::get('/{id}/transactions', [WalletTransactionFilterController::class, 'index'])->name('transactions.filter');
-
-        Route::post('/transaction/{id}/confirm', [WalletTransactionActionController::class, 'confirmTransaction'])->name('transaction.confirm');
-        Route::post('/transaction/{id}/cancel', [WalletTransactionActionController::class, 'cancelTransaction'])->name('transaction.cancel');
-        Route::get('/transaction/{id}/refund', [WalletTransactionActionController::class, 'showRefund'])->name('transaction.refund');
-        Route::post('/transaction/{id}/refund/confirm', [WalletTransactionActionController::class, 'confirmRefund'])->name('transaction.refund.confirm');
-        Route::get('/transaction/{id}/not-received', [WalletTransactionActionController::class, 'showNotReceived'])->name('transaction.not-received');
-        Route::post('/transaction/{id}/cancel-order', [WalletTransactionActionController::class, 'cancelOrderFromTransaction'])->name('transaction.cancel-order');
-        Route::get('/transaction/{id}/details', [WalletTransactionActionController::class, 'showTransactionDetails'])->name('transaction.details');
-        Route::get('/transaction/{id}/refund-form', [WalletTransactionActionController::class, 'showRefundForm'])->name('transaction.refund-form');
-        Route::post('/transaction/{id}/refund-process', [WalletTransactionActionController::class, 'processRefund'])->name('transaction.refund-process');
-
-        Route::post('/transaction/{id}/received', [WalletWithdrawController::class, 'receivedTransaction'])->name('transaction.received');
-        Route::get('/{id}/withdraw', [WalletWithdrawController::class, 'showWithdrawForm'])->name('withdraw.form');
-        Route::post('/{id}/withdraw', [WalletWithdrawController::class, 'processWithdraw'])->name('withdraw.process');
-        Route::get('/{id}/withdraw-history', [WalletWithdrawController::class, 'withdrawHistory'])->name('withdraw.history');
-        Route::get('/{id}/receive-confirmations', [WalletWithdrawController::class, 'receiveConfirmations'])->name('receive.confirmations');
-        Route::post('/transaction/{id}/settle', [WalletWithdrawController::class, 'settleReceivedTransaction'])->name('transaction.settle');
-        Route::post('/transaction/{id}/unmark', [WalletWithdrawController::class, 'unmarkReceivedTransaction'])->name('transaction.unmark');
-    });
-
     // ====== ACCOUNT MANAGEMENT ======
     Route::prefix('account')->name('account.')->group(function () {
 
@@ -201,9 +173,25 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::put('/{id}', [AccountUserController::class, 'update'])->name('update');
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
-
-
     });
+
+    // ====== CHATBOX MANAGEMENT ======
+    Route::prefix('chatbox')->name('chatbox.')->group(function () {
+        Route::get('/', [ChatboxController::class, 'index'])->name('index');
+        Route::get('/settings', [ChatboxController::class, 'settings'])->name('settings');
+        Route::post('/settings', [ChatboxController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/quick-replies', [ChatboxController::class, 'updateQuickReplies'])->name('quick-replies.update');
+        Route::post('/auto-replies', [ChatboxController::class, 'updateAutoReplies'])->name('auto-replies.update');
+        Route::post('/toggle', [ChatboxController::class, 'toggle'])->name('toggle');
+        Route::get('/unread-count', [ChatboxController::class, 'getUnreadCount'])->name('unread-count');
+        Route::get('/{id}', [ChatboxController::class, 'show'])->name('show');
+        Route::post('/{id}/send', [ChatboxController::class, 'sendMessage'])->name('send');
+        Route::post('/{id}/close', [ChatboxController::class, 'closeSession'])->name('close');
+        Route::delete('/{id}', [ChatboxController::class, 'deleteSession'])->name('delete');
+        Route::get('/{id}/messages', [ChatboxController::class, 'getNewMessages'])->name('messages');
+    });
+
+     
 });
 
 // ============ CLIENT ROUTES ============
@@ -229,6 +217,14 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 Route::get('/contact/list', [ClientContactController::class, 'list'])->name('client.contact.list');
 Route::post('/contact/store', [ClientContactController::class, 'store'])->name('client.contact.store');
 
+// ============ CHATBOX CLIENT API ============
+Route::prefix('chat')->name('chat.')->group(function () {
+    Route::get('/settings', [ChatController::class, 'getSettings'])->name('settings');
+    Route::post('/send', [ChatController::class, 'sendMessage'])->name('send');
+    Route::get('/messages', [ChatController::class, 'getMessages'])->name('messages');
+    Route::post('/guest-info', [ChatController::class, 'updateGuestInfo'])->name('guest-info');
+});
+
 
 Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
     Route::get('/orders', [ClientAccountOrderController::class, 'index'])->name('orders.index');
@@ -237,13 +233,18 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
     Route::post('/orders/{order}/cancel', [ClientAccountOrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/reorder', [ClientAccountOrderController::class, 'reorder'])->name('orders.reorder');
     Route::post('/orders/{order}/return', [ClientAccountOrderController::class, 'returnRequest'])->name('orders.return');
-    
+
     // Refund routes
     Route::get('/orders/{order}/refund/return', [\App\Http\Controllers\Client\Account\RefundController::class, 'showReturnForm'])->name('orders.refund.return');
     Route::post('/orders/{order}/refund/return', [\App\Http\Controllers\Client\Account\RefundController::class, 'submitReturnRefund'])->name('orders.refund.return.submit');
     Route::get('/orders/{order}/refund/cancel', [\App\Http\Controllers\Client\Account\RefundController::class, 'showCancelRefundForm'])->name('orders.refund.cancel');
     Route::post('/orders/{order}/refund/cancel', [\App\Http\Controllers\Client\Account\RefundController::class, 'submitCancelRefund'])->name('orders.refund.cancel.submit');
     Route::post('/orders/{order}/refund/reset', [\App\Http\Controllers\Client\Account\RefundController::class, 'resetCancelRefund'])->name('orders.refund.cancel.reset');
+
+    // ====== CLIENT WALLET ======
+    Route::prefix('wallet')->name('wallet.')->group(function () {
+        Route::get('/', [ClientWalletController::class, 'index'])->name('index'); 
+    });
 });
 
 // ============ CHECKOUT ROUTES ============

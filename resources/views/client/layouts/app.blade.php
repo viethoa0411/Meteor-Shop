@@ -12,6 +12,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Meteor Shop')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -487,11 +488,23 @@
                                     Tài khoản của tôi
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end mt-2">
-
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('client.account.wallet.index') }}">
+                                            <i class="bi bi-wallet2 me-2"></i>Ví của tôi
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('client.account.orders.index') }}">
+                                            <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form action="{{ route('client.logout') }}" method="POST">
                                             @csrf
-                                            <button class="dropdown-item" type="submit">Đăng xuất</button>
+                                            <button class="dropdown-item" type="submit">
+                                                <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                            </button>
                                         </form>
                                     </li>
                                 </ul>
@@ -561,7 +574,7 @@
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="#">Thiết kế nội thất</a></li>
                     <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
-                    <li><a href="{{ route('client.contact.list') }}">Tư vấn thiết kế</a></li>
+                    <li><a href="#">Tư vấn thiết kế</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </div>
@@ -775,6 +788,933 @@
 
     <!-- Bootstrap JS Bundle to enable dropdown -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chatbox Widget - Dynamic -->
+    <div class="chatbox-wrapper" id="chatboxWrapper" style="display: none;">
+        <!-- Chat Icon Button -->
+        <div class="chatbox-toggle" id="chatboxToggle">
+            <i class="bi bi-chat-dots-fill chatbox-toggle__icon"></i>
+            <span class="chatbox-toggle__badge" id="chatBadge" style="display: none;">0</span>
+        </div>
+
+        <!-- Chat Popup -->
+        <div class="chatbox-popup" id="chatboxPopup">
+            <div class="chatbox-popup__header" id="chatboxHeader">
+                <div class="chatbox-popup__header-info">
+                    <div class="chatbox-popup__avatar">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <div class="chatbox-popup__header-text">
+                        <h4 id="chatboxTitle">Hỗ trợ trực tuyến</h4>
+                        <span class="chatbox-popup__status" id="chatboxStatus">
+                            <span class="chatbox-popup__status-dot"></span>
+                            <span id="chatboxStatusText">Trực tuyến</span>
+                        </span>
+                    </div>
+                </div>
+                <button class="chatbox-popup__close" id="chatboxClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="chatbox-popup__messages" id="chatMessages">
+                <!-- Messages will be loaded dynamically -->
+                <div class="chatbox-loading" id="chatLoading">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span>Đang tải...</span>
+                </div>
+            </div>
+
+            <div class="chatbox-popup__quick-replies" id="chatQuickReplies">
+                <!-- Quick replies will be loaded dynamically -->
+            </div>
+
+            <div class="chatbox-popup__input">
+                <input type="file" id="chatImageInput" accept="image/*" style="display: none;">
+                <button class="chatbox-popup__attach" id="chatAttach" title="Gửi hình ảnh">
+                    <i class="bi bi-image"></i>
+                </button>
+                <input type="text" id="chatInput" placeholder="Nhập tin nhắn..." autocomplete="off">
+                <button class="chatbox-popup__send" id="chatSend">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+            <!-- Image Preview -->
+            <div class="chatbox-popup__preview" id="chatImagePreview" style="display: none;">
+                <div class="chatbox-popup__preview-inner">
+                    <img src="" alt="Preview" id="chatPreviewImg">
+                    <button class="chatbox-popup__preview-remove" id="chatPreviewRemove">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Chatbox Wrapper */
+        .chatbox-wrapper {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Chat Toggle Button */
+        .chatbox-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .chatbox-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .chatbox-toggle__icon {
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .chatbox-toggle__badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+        }
+
+        /* Chat Popup */
+        .chatbox-popup {
+            position: absolute;
+            bottom: 75px;
+            right: 0;
+            width: 380px;
+            max-height: 520px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: chatboxSlideUp 0.3s ease;
+        }
+
+        .chatbox-popup.active {
+            display: flex;
+        }
+
+        @keyframes chatboxSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chat Header */
+        .chatbox-popup__header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chatbox-popup__header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chatbox-popup__avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .chatbox-popup__header-text h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chatbox-popup__status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .chatbox-popup__status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2ecc71;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chatbox-popup__close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .chatbox-popup__close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Chat Messages */
+        .chatbox-popup__messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            max-height: 280px;
+        }
+
+        .chatbox-message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .chatbox-message--sent {
+            flex-direction: row-reverse;
+        }
+
+        .chatbox-message__avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .chatbox-message--sent .chatbox-message__avatar {
+            background: #3498db;
+        }
+
+        .chatbox-message__content {
+            max-width: 70%;
+            background: #fff;
+            padding: 10px 14px;
+            border-radius: 16px;
+            border-top-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .chatbox-message--sent .chatbox-message__content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 16px;
+            border-top-right-radius: 4px;
+        }
+
+        .chatbox-message__content p {
+            margin: 0 0 6px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .chatbox-message__content p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .chatbox-message__time {
+            font-size: 11px;
+            color: #999;
+            display: block;
+            margin-top: 6px;
+        }
+
+        .chatbox-message--sent .chatbox-message__time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Quick Replies */
+        .chatbox-popup__quick-replies {
+            padding: 12px 16px;
+            background: #fff;
+            border-top: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chatbox-quick-reply {
+            background: #f0f2f5;
+            border: 1px solid #e4e6eb;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chatbox-quick-reply:hover {
+            background: #667eea;
+            color: #fff;
+            border-color: #667eea;
+        }
+
+        /* Chat Input */
+        .chatbox-popup__input {
+            padding: 12px 16px;
+            background: #fff;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chatbox-popup__input input {
+            flex: 1;
+            border: 1px solid #e4e6eb;
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chatbox-popup__input input:focus {
+            border-color: #667eea;
+        }
+
+        .chatbox-popup__send {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .chatbox-popup__send:hover {
+            transform: scale(1.05);
+        }
+
+        /* Attach button */
+        .chatbox-popup__attach {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #f0f2f5;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+
+        .chatbox-popup__attach:hover {
+            background: #667eea;
+            color: #fff;
+        }
+
+        /* Image Preview */
+        .chatbox-popup__preview {
+            padding: 10px 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+
+        .chatbox-popup__preview-inner {
+            position: relative;
+            display: inline-block;
+        }
+
+        .chatbox-popup__preview img {
+            max-width: 150px;
+            max-height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .chatbox-popup__preview-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #dc3545;
+            border: 2px solid #fff;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Image in message */
+        .chatbox-message__image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chatbox-message__image:hover {
+            transform: scale(1.02);
+        }
+
+        /* Image modal */
+        .chatbox-image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10002;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .chatbox-image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .chatbox-image-modal__close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Bot message style */
+        .chatbox-message--bot .chatbox-message__avatar {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+        }
+
+        .chatbox-message--bot .chatbox-message__content {
+            background: #e8f5e9;
+            border-left: 3px solid #00b894;
+        }
+
+        /* Loading */
+        .chatbox-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            color: #666;
+        }
+
+        /* Typing indicator */
+        .chatbox-typing {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+        }
+
+        .chatbox-typing__dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .chatbox-typing__dots span {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out;
+        }
+
+        .chatbox-typing__dots span:nth-child(1) { animation-delay: -0.32s; }
+        .chatbox-typing__dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .chatbox-wrapper {
+                bottom: 16px;
+                right: 16px;
+            }
+
+            .chatbox-popup {
+                width: calc(100vw - 32px);
+                right: 0;
+                bottom: 70px;
+            }
+
+            .chatbox-toggle {
+                width: 54px;
+                height: 54px;
+            }
+
+            .chatbox-toggle__icon {
+                font-size: 24px;
+            }
+        }
+
+        .chatbox-wrapper.chatbox-hidden {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chatbox elements
+            const chatboxWrapper = document.getElementById('chatboxWrapper');
+            const chatboxToggle = document.getElementById('chatboxToggle');
+            const chatboxPopup = document.getElementById('chatboxPopup');
+            const chatboxClose = document.getElementById('chatboxClose');
+            const chatInput = document.getElementById('chatInput');
+            const chatSend = document.getElementById('chatSend');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatQuickReplies = document.getElementById('chatQuickReplies');
+            const chatBadge = document.getElementById('chatBadge');
+            const chatLoading = document.getElementById('chatLoading');
+            const chatboxTitle = document.getElementById('chatboxTitle');
+            const chatboxStatusText = document.getElementById('chatboxStatusText');
+            const chatboxHeader = document.getElementById('chatboxHeader');
+            const chatAttach = document.getElementById('chatAttach');
+            const chatImageInput = document.getElementById('chatImageInput');
+            const chatImagePreview = document.getElementById('chatImagePreview');
+            const chatPreviewImg = document.getElementById('chatPreviewImg');
+            const chatPreviewRemove = document.getElementById('chatPreviewRemove');
+
+            // State
+            let chatSettings = null;
+            let sessionToken = localStorage.getItem('chat_session_token') || '';
+            let lastMessageId = 0;
+            let pollingInterval = null;
+            let isEnabled = false;
+            let selectedImage = null;
+
+            // Initialize chatbox
+            initChatbox();
+
+            // Image upload handlers
+            chatAttach.addEventListener('click', () => chatImageInput.click());
+
+            chatImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Hình ảnh không được vượt quá 5MB');
+                        return;
+                    }
+                    selectedImage = file;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        chatPreviewImg.src = e.target.result;
+                        chatImagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            chatPreviewRemove.addEventListener('click', function() {
+                selectedImage = null;
+                chatImageInput.value = '';
+                chatImagePreview.style.display = 'none';
+            });
+
+            async function initChatbox() {
+                try {
+                    const response = await fetch('/chat/settings' + (sessionToken ? '?session_token=' + sessionToken : ''));
+                    const data = await response.json();
+
+                    if (!data.enabled) {
+                        chatboxWrapper.style.display = 'none';
+                        return;
+                    }
+
+                    isEnabled = true;
+                    chatSettings = data.settings;
+                    sessionToken = data.session_token;
+                    localStorage.setItem('chat_session_token', sessionToken);
+
+                    // Apply settings
+                    applySettings(data.settings);
+
+                    // Load messages
+                    if (data.messages && data.messages.length > 0) {
+                        chatLoading.style.display = 'none';
+                        data.messages.forEach(msg => {
+                            appendMessage(msg);
+                            lastMessageId = Math.max(lastMessageId, msg.id);
+                        });
+                    } else {
+                        chatLoading.style.display = 'none';
+                    }
+
+                    // Update unread badge
+                    updateBadge(data.unread_count || 0);
+
+                    // Show chatbox
+                    chatboxWrapper.style.display = 'block';
+
+                    // Start polling for new messages
+                    startPolling();
+
+                } catch (error) {
+                    console.error('Failed to initialize chatbox:', error);
+                    chatboxWrapper.style.display = 'none';
+                }
+            }
+
+            function applySettings(settings) {
+                // Title
+                chatboxTitle.textContent = settings.title || 'Hỗ trợ trực tuyến';
+
+                // Status
+                chatboxStatusText.textContent = settings.is_working_hours ? 'Trực tuyến' : 'Ngoài giờ làm việc';
+
+                // Colors
+                if (settings.primary_color) {
+                    const gradient = `linear-gradient(135deg, ${settings.primary_color} 0%, ${settings.secondary_color || settings.primary_color} 100%)`;
+                    chatboxHeader.style.background = gradient;
+                    document.querySelector('.chatbox-toggle').style.background = gradient;
+                }
+
+                // Quick replies
+                if (settings.quick_replies && settings.quick_replies.length > 0) {
+                    chatQuickReplies.innerHTML = settings.quick_replies.map(qr => `
+                        <button class="chatbox-quick-reply" data-message="${qr.message || qr.text}">
+                            <i class="bi ${qr.icon || 'bi-chat'}"></i> ${qr.text}
+                        </button>
+                    `).join('');
+
+                    // Bind quick reply events
+                    document.querySelectorAll('.chatbox-quick-reply').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            sendMessage(this.dataset.message);
+                        });
+                    });
+                } else {
+                    chatQuickReplies.style.display = 'none';
+                }
+
+                // Mobile visibility
+                if (!settings.show_on_mobile && window.innerWidth <= 768) {
+                    chatboxWrapper.classList.add('chatbox-hidden');
+                }
+            }
+
+            function appendMessage(msg) {
+                const isClient = msg.sender_type === 'client';
+                const isBot = msg.sender_type === 'bot';
+                const typeClass = isClient ? 'chatbox-message--sent' : (isBot ? 'chatbox-message--received chatbox-message--bot' : 'chatbox-message--received');
+                const icon = isClient ? 'bi-person-fill' : (isBot ? 'bi-robot' : 'bi-headset');
+
+                // Check if message has image
+                let contentHtml = '';
+                if (msg.message_type === 'image' && msg.attachment_url) {
+                    contentHtml = `<img src="${msg.attachment_url}" class="chatbox-message__image" onclick="openImageModal('${msg.attachment_url}')" alt="Image">`;
+                    if (msg.message && msg.message !== '[Hình ảnh]') {
+                        contentHtml += `<p>${escapeHtml(msg.message)}</p>`;
+                    }
+                } else {
+                    contentHtml = `<p>${escapeHtml(msg.message)}</p>`;
+                }
+
+                const html = `
+                    <div class="chatbox-message ${typeClass}" data-id="${msg.id}">
+                        <div class="chatbox-message__avatar">
+                            <i class="bi ${icon}"></i>
+                        </div>
+                        <div class="chatbox-message__content">
+                            ${msg.sender_name && !isClient ? `<small class="text-muted d-block mb-1">${msg.sender_name}</small>` : ''}
+                            ${contentHtml}
+                            <span class="chatbox-message__time">${msg.time || 'Vừa xong'}</span>
+                        </div>
+                    </div>
+                `;
+                chatMessages.insertAdjacentHTML('beforeend', html);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Image modal function (global)
+            window.openImageModal = function(imageUrl) {
+                const modal = document.createElement('div');
+                modal.className = 'chatbox-image-modal';
+                modal.innerHTML = `
+                    <button class="chatbox-image-modal__close" onclick="this.parentElement.remove()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <img src="${imageUrl}" alt="Full image">
+                `;
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) modal.remove();
+                });
+                document.body.appendChild(modal);
+            };
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            async function sendMessage(message, imageFile = null) {
+                if (!message.trim() && !imageFile) return;
+                if (!isEnabled) return;
+
+                chatInput.value = '';
+                chatInput.disabled = true;
+                chatSend.disabled = true;
+
+                // Clear image preview
+                if (selectedImage) {
+                    chatImagePreview.style.display = 'none';
+                    chatImageInput.value = '';
+                }
+
+                // Show sent message immediately
+                const tempMsg = {
+                    id: 'temp-' + Date.now(),
+                    message: imageFile ? '📷 Đang gửi hình ảnh...' : message,
+                    sender_type: 'client',
+                    time: 'Đang gửi...'
+                };
+                appendMessage(tempMsg);
+
+                try {
+                    let response;
+
+                    if (imageFile) {
+                        // Send with FormData for image upload
+                        const formData = new FormData();
+                        formData.append('image', imageFile);
+                        if (message.trim()) {
+                            formData.append('message', message);
+                        }
+                        formData.append('session_token', sessionToken);
+                        formData.append('page_url', window.location.href);
+
+                        response = await fetch('/chat/send', {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        });
+                    } else {
+                        // Send as JSON for text only
+                        response = await fetch('/chat/send', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                message: message,
+                                session_token: sessionToken,
+                                page_url: window.location.href
+                            })
+                        });
+                    }
+
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update session token
+                        if (data.session_token) {
+                            sessionToken = data.session_token;
+                            localStorage.setItem('chat_session_token', sessionToken);
+                        }
+
+                        // Remove temp message and add real messages
+                        const tempEl = document.querySelector(`[data-id="${tempMsg.id}"]`);
+                        if (tempEl) tempEl.remove();
+
+                        data.messages.forEach(msg => {
+                            appendMessage(msg);
+                            lastMessageId = Math.max(lastMessageId, msg.id);
+                        });
+
+                        // Clear selected image
+                        selectedImage = null;
+
+                        // Play sound if enabled
+                        if (chatSettings?.play_sound && data.messages.length > 1) {
+                            playNotificationSound();
+                        }
+                    } else if (data.error) {
+                        console.error('Server error:', data.error);
+                        const tempEl = document.querySelector(`[data-id="${tempMsg.id}"]`);
+                        if (tempEl) {
+                            tempEl.querySelector('.chatbox-message__time').textContent = 'Lỗi: ' + data.error;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to send message:', error);
+                    console.error('Error details:', error.message);
+                    // Update temp message to show error
+                    const tempEl = document.querySelector(`[data-id="${tempMsg.id}"]`);
+                    if (tempEl) {
+                        tempEl.querySelector('.chatbox-message__time').textContent = 'Lỗi gửi tin';
+                    }
+                }
+
+                chatInput.disabled = false;
+                chatSend.disabled = false;
+                chatInput.focus();
+            }
+
+            async function pollNewMessages() {
+                if (!isEnabled || !sessionToken) return;
+
+                try {
+                    const response = await fetch(`/chat/messages?session_token=${sessionToken}&last_id=${lastMessageId}`);
+                    const data = await response.json();
+
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            appendMessage(msg);
+                            lastMessageId = Math.max(lastMessageId, msg.id);
+                        });
+
+                        // Update badge if popup is closed
+                        if (!chatboxPopup.classList.contains('active')) {
+                            const currentBadge = parseInt(chatBadge.textContent) || 0;
+                            updateBadge(currentBadge + data.messages.length);
+                        }
+
+                        // Play sound
+                        if (chatSettings?.play_sound) {
+                            playNotificationSound();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }
+
+            function startPolling() {
+                if (pollingInterval) clearInterval(pollingInterval);
+                pollingInterval = setInterval(pollNewMessages, 5000);
+            }
+
+            function updateBadge(count) {
+                if (count > 0) {
+                    chatBadge.textContent = count > 99 ? '99+' : count;
+                    chatBadge.style.display = 'flex';
+                } else {
+                    chatBadge.style.display = 'none';
+                }
+            }
+
+            function playNotificationSound() {
+                try {
+                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQAA');
+                    audio.volume = 0.3;
+                    audio.play().catch(() => {});
+                } catch (e) {}
+            }
+
+            // Event listeners
+            chatboxToggle.addEventListener('click', function() {
+                chatboxPopup.classList.toggle('active');
+                if (chatboxPopup.classList.contains('active')) {
+                    updateBadge(0);
+                    chatInput.focus();
+                }
+            });
+
+            chatboxClose.addEventListener('click', function() {
+                chatboxPopup.classList.remove('active');
+            });
+
+            chatSend.addEventListener('click', function() {
+                sendMessage(chatInput.value, selectedImage);
+            });
+
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !selectedImage) {
+                    sendMessage(chatInput.value);
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
