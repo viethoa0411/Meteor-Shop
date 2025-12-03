@@ -7,7 +7,9 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderAnalyticsController;
+
 use App\Http\Controllers\Admin\OrderReturnController;
+
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductPublicController;
 use App\Http\Controllers\Admin\ProductController;
@@ -29,13 +31,21 @@ use App\Http\Controllers\Admin\Wallet\WalletTransactionActionController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
 use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
 use App\Http\Controllers\Admin\Contact\ContactController;
+
 use App\Http\Controllers\Admin\WishListController;
+
+use App\Http\Controllers\Admin\ChatboxController;
+use App\Http\Controllers\Client\ChatController;
+
+
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
 use App\Http\Controllers\Client\Contact\ContactController as ClientContactController;
+
 use App\Http\Controllers\Client\WishlistController as ClientWishlistController;
+
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -103,6 +113,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/', [OrderController::class, 'list'])->name('list');
         Route::get('/analytics', [OrderAnalyticsController::class, 'index'])->name('analytics');
 
+
         // Returns management - Phải đặt trước route /{id} để tránh xung đột
         Route::get('/returns', [OrderReturnController::class, 'index'])->name('returns.index');
         Route::get('/{orderId}/returns', [OrderReturnController::class, 'show'])->name('returns.show');
@@ -111,6 +122,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/{orderId}/returns/update-status', [OrderReturnController::class, 'updateStatus'])->name('returns.updateStatus');
 
         // Order detail routes
+
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
@@ -149,6 +161,12 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
 
     // Tư Vấn Thiết Kế 
     Route::prefix('contacts')->name('contacts.')->group(function () {
+
+        Route::get('/', [ContactController::class, 'index'])->name('index');
+        Route::get('/show/{id}', [ContactController::class, 'show'])->name('show');
+        Route::get('/edit/{id}', [ContactController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [ContactController::class, 'update'])->name('update');
+
         Route::get('/', [ContactController::class, 'index'])->name('index');
         Route::get('/show/{id}', [ContactController::class, 'show'])->name('show');
         Route::get('/edit/{id}', [ContactController::class, 'edit'])->name('edit');
@@ -219,6 +237,22 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
             Route::get('/{id}', [AccountUserController::class, 'show'])->name('show');
         });
     });
+
+    // ====== CHATBOX MANAGEMENT ======
+    Route::prefix('chatbox')->name('chatbox.')->group(function () {
+        Route::get('/', [ChatboxController::class, 'index'])->name('index');
+        Route::get('/settings', [ChatboxController::class, 'settings'])->name('settings');
+        Route::post('/settings', [ChatboxController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/quick-replies', [ChatboxController::class, 'updateQuickReplies'])->name('quick-replies.update');
+        Route::post('/auto-replies', [ChatboxController::class, 'updateAutoReplies'])->name('auto-replies.update');
+        Route::post('/toggle', [ChatboxController::class, 'toggle'])->name('toggle');
+        Route::get('/unread-count', [ChatboxController::class, 'getUnreadCount'])->name('unread-count');
+        Route::get('/{id}', [ChatboxController::class, 'show'])->name('show');
+        Route::post('/{id}/send', [ChatboxController::class, 'sendMessage'])->name('send');
+        Route::post('/{id}/close', [ChatboxController::class, 'closeSession'])->name('close');
+        Route::delete('/{id}', [ChatboxController::class, 'deleteSession'])->name('delete');
+        Route::get('/{id}/messages', [ChatboxController::class, 'getNewMessages'])->name('messages');
+    });
 });
 
 // ============ CLIENT ROUTES ============
@@ -244,11 +278,21 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 Route::get('/contact/list', [ClientContactController::class, 'list'])->name('client.contact.list');
 Route::post('/contact/store', [ClientContactController::class, 'store'])->name('client.contact.store');
 
+
 Route::get('/wishlist', [ClientWishlistController::class, 'index'])
     ->name('client.wishlist.index');
 
 Route::post('/wishlist/toggle', [ClientWishlistController::class, 'toggle'])
     ->name('client.wishlist.toggle');
+
+// ============ CHATBOX CLIENT API ============
+Route::prefix('chat')->name('chat.')->group(function () {
+    Route::get('/settings', [ChatController::class, 'getSettings'])->name('settings');
+    Route::post('/send', [ChatController::class, 'sendMessage'])->name('send');
+    Route::get('/messages', [ChatController::class, 'getMessages'])->name('messages');
+    Route::post('/guest-info', [ChatController::class, 'updateGuestInfo'])->name('guest-info');
+});
+
 
 
 Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {

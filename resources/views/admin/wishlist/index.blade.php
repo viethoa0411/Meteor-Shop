@@ -34,13 +34,14 @@
         @else
             <div class="card shadow-sm">
                 <div class="card-body">
+
                     <div class="table-responsive">
                         <table class="table table-striped table-hover align-middle text-center mb-0">
                             <thead>
                                 <tr>
                                     <th>STT</th>
                                     <th>Hình ảnh</th>
-                                    <th>Tên</th>
+                                    <th class="text-center">Tên</th>
                                     <th>Số Lượng Yêu thích</th>
                                     <th>Hành động</th>
                                 </tr>
@@ -48,25 +49,32 @@
                             <tbody>
                                 @foreach ($products as $index => $product)
                                     <tr>
-                                        <td>{{ $products->firstItem() + $index }}</td>
-                                        <td>
-                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/80x80?text=No+Image' }}"
-                                                alt="{{ $product->name }}"
-                                                style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;">
+                                        <td class="align-middle">
+                                            {{ $products->firstItem() + $index }}
                                         </td>
-                                        <td class="text-start">
-                                            <a href="{{ route('admin.products.show', $product->id) }}" 
+
+                                        <td class="align-middle">
+                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/80x80?text=No+Image' }}"
+                                                 alt="{{ $product->name }}"
+                                                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;">
+                                        </td>
+
+                                        {{-- Cột tên – căn giữa đẹp --}}
+                                        <td class="align-middle text-center">
+                                            <a href="{{ route('admin.products.show', $product->id) }}"
                                                class="text-dark text-decoration-none fw-semibold">
                                                 {{ $product->name }}
                                             </a>
                                         </td>
-                                        <td>
+
+                                        <td class="align-middle">
                                             <span class="badge bg-danger">
                                                 <i class="bi bi-heart-fill"></i> {{ $product->favorite_count ?? 0 }}
                                             </span>
                                         </td>
-                                        <td>
-                                            <a href="{{ route('admin.wishlist.show', $product->id) }}" 
+
+                                        <td class="align-middle">
+                                            <a href="{{ route('admin.wishlist.show', $product->id) }}"
                                                class="btn btn-sm btn-primary">
                                                 <i class="bi bi-eye"></i> Xem chi tiết
                                             </a>
@@ -81,6 +89,7 @@
                     <div class="mt-4">
                         {{ $products->links() }}
                     </div>
+
                 </div>
             </div>
         @endif
