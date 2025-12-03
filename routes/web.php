@@ -244,12 +244,12 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 Route::get('/contact/list', [ClientContactController::class, 'list'])->name('client.contact.list');
 Route::post('/contact/store', [ClientContactController::class, 'store'])->name('client.contact.store');
 
+Route::get('/wishlist', [ClientWishlistController::class, 'index'])
+    ->name('client.wishlist.index');
 
-// Wishlist
-Route::middleware('auth')->group(function () {
-    Route::get('/wishlist', [ClientWishlistController::class, 'index'])->name('client.wishlist.index');
-    Route::post('/wishlist/toggle', [ClientWishlistController::class, 'toggle'])->name('client.wishlist.toggle');
-});
+Route::post('/wishlist/toggle', [ClientWishlistController::class, 'toggle'])
+    ->name('client.wishlist.toggle');
+
 
 Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
     Route::get('/orders', [ClientAccountOrderController::class, 'index'])->name('orders.index');
