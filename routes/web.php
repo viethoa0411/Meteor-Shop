@@ -255,7 +255,8 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
         Route::post('/deposit/{id}/cancel', [ClientDepositController::class, 'cancel'])->name('deposit.cancel');
 
         // Withdraw routes
-        Route::get('/withdraw', [ClientWithdrawController::class, 'index'])->name('withdraw'); 
+        Route::get('/withdraw', [ClientWithdrawController::class, 'index'])->name('withdraw');
+        Route::post('/withdraw', [ClientWithdrawController::class, 'store'])->name('withdraw.store'); 
     });
 });
 

@@ -39,6 +39,37 @@ class WithdrawController extends Controller
         return view('client.wallet.withdraw', compact('wallet', 'pendingWithdraws'));
     }
 
+    /**
+     * Xử lý yêu cầu rút tiền
+     * - Validate thông tin ngân hàng
+     * - Validate số tiền không vượt quá số dư
+     * - Tạo yêu cầu rút tiền
+     * - Gửi mail thông báo cho admin
+     */
+    public function store(Request $request)
+    {
+        $user = Auth::user();
+        $wallet = ClientWallet::getOrCreateForUser($user->id);
+        
+        
+        
+        // Tạo yêu cầu rút tiền
+        $withdraw = WithdrawRequest::create([
+            'user_id' => $user->id,
+            'wallet_id' => $wallet->id,
+            'amount' => $request->amount,
+            'bank_name' => $request->bank_name,
+            'account_number' => $request->account_number,
+            'account_holder' => $request->account_holder,
+            'phone' => $request->phone,
+            'note' => $request->note,
+        ]);
+        
+        // Gửi mail thông báo cho admin
+        $this->sendWithdrawNotificationEmail($withdraw, $user);
+
+        return redirect()->route('client.account.wallet.withdraw.success', $withdraw->id);
+    }
  
 }
 

@@ -72,7 +72,7 @@
                 </div>
                 @endif
 
-                <form action="#" method="POST">
+                <form action="{{ route('client.account.wallet.withdraw.store') }}" method="POST">
                     @csrf
                     <div class="row">
                         <div class="col-md-6 mb-3">
