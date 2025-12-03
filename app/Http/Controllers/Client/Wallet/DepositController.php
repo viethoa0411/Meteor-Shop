@@ -69,6 +69,18 @@ class DepositController extends Controller
         return redirect()->route('client.account.wallet.deposit.success', $deposit->id);
     }
 
+    /**
+     * Trang thông báo thành công
+     * - Hiển thị thông báo chờ xác nhận
+     * - Hiển thị số điện thoại liên hệ
+     */
+    public function success($id)
+    {
+        $deposit = DepositRequest::where('user_id', Auth::id())->findOrFail($id);
+        $settings = WalletSetting::getSettings();
+        
+        return view('client.wallet.deposit-success', compact('deposit', 'settings'));
+    }
  
 }
 
