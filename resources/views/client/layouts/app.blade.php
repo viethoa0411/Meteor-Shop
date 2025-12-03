@@ -36,6 +36,17 @@
             margin: 0;
         }
 
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            /* chặn kéo ngang */
+            zoom: reset !important;
+        }
+
         ::-webkit-scrollbar {
             display: none;
         }
@@ -617,7 +628,8 @@
                                     <a href="{{ route('client.product.detail', $product->slug) }}"
                                         class="d-flex flex-column text-decoration-none text-dark flex-grow-1 pe-4">
                                         <strong>{{ $product->name }}</strong>
-                                        <small class="text-muted">{{ number_format($product->price, 0, ',', '.') }}₫</small>
+                                        <small
+                                            class="text-muted">{{ number_format($product->price, 0, ',', '.') }}₫</small>
                                     </a>
                                     <button class="btn-close position-absolute top-0 end-0 m-2 remove-wishlist-item"
                                         data-product-id="{{ $product->id }}"></button>
@@ -626,11 +638,13 @@
                         @endforeach
                     </ul>
                     <div class="mt-auto d-flex flex-column gap-2">
-                        <a href="{{ route('client.wishlist.index') }}" class="btn btn-outline-dark w-100">Xem danh sách chi tiết</a>
+                        <a href="{{ route('client.wishlist.index') }}" class="btn btn-outline-dark w-100">Xem danh
+                            sách chi tiết</a>
                     </div>
                 @else
                     <p>Danh sách yêu thích trống.</p>
-                    <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100 mt-2">Khám phá sản phẩm</a>
+                    <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100 mt-2">Khám phá sản
+                        phẩm</a>
                 @endif
             @else
                 <p>Vui lòng đăng nhập để xem danh sách yêu thích.</p>
@@ -852,27 +866,35 @@
             removeWishlistListeners();
 
             window.addEventListener('wishlist-updated', function(event) {
-                const { liked, productId, productName, productPrice, productSlug } = event.detail;
+                const {
+                    liked,
+                    productId,
+                    productName,
+                    productPrice,
+                    productSlug
+                } = event.detail;
                 const wishlistCountEl = document.querySelector('.client-cart .client-cart__badge');
 
                 if (!liked) {
-                    document.querySelectorAll(`.remove-wishlist-item[data-product-id="${productId}"]`).forEach(btn => {
-                        const li = btn.closest('li');
-                        if (li) {
-                            const listGroup = li.parentElement;
-                            li.remove();
+                    document.querySelectorAll(`.remove-wishlist-item[data-product-id="${productId}"]`)
+                        .forEach(btn => {
+                            const li = btn.closest('li');
+                            if (li) {
+                                const listGroup = li.parentElement;
+                                li.remove();
 
-                            if (listGroup && !listGroup.querySelector('li')) {
-                                listGroup.remove();
-                                const wishlistBody = document.querySelector('#wishlistCanvas .offcanvas-body');
-                                if (wishlistBody) {
-                                    const emptyMsg = document.createElement('p');
-                                    emptyMsg.textContent = 'Danh sách yêu thích trống.';
-                                    wishlistBody.prepend(emptyMsg);
+                                if (listGroup && !listGroup.querySelector('li')) {
+                                    listGroup.remove();
+                                    const wishlistBody = document.querySelector(
+                                        '#wishlistCanvas .offcanvas-body');
+                                    if (wishlistBody) {
+                                        const emptyMsg = document.createElement('p');
+                                        emptyMsg.textContent = 'Danh sách yêu thích trống.';
+                                        wishlistBody.prepend(emptyMsg);
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
                 } else {
                     let listGroup = document.querySelector('#wishlistCanvas .list-group');
                     const wishlistBody = document.querySelector('#wishlistCanvas .offcanvas-body');
@@ -917,7 +939,22 @@
             });
         });
     </script>
-                        
+
+    <script>
+        document.addEventListener('wheel', function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, {
+            passive: false
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '=')) || e.key === 'Meta') {
+                e.preventDefault();
+            }
+        });
+    </script>
 
 
     @stack('scripts')
