@@ -170,4 +170,18 @@ class PromotionController extends Controller
         return redirect()->route('admin.promotions.list')->with('success', 'Cập nhật mã khuyến mãi thành công');
     }
 
+    public function destroy($id)
+    {
+        $promotion = Promotion::find($id);
+        if (!$promotion) {
+            return redirect()->route('admin.promotions.list')->with('error', 'Mã khuyến mãi không tồn tại');
+        }
+
+        $promotion->categories()->detach();
+        $promotion->products()->detach();
+        $promotion->delete();
+
+        return redirect()->route('admin.promotions.list')->with('success', 'Đã xoá mã khuyến mãi');
+    }
 }
+
