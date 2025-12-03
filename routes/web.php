@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\Wallet\WalletManagementController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionActionController;
 use App\Http\Controllers\Admin\Wallet\WalletTransactionFilterController;
 use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
+use App\Http\Controllers\Admin\CommentController;
 
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
@@ -48,14 +49,6 @@ Route::get('/verify-otp', [ForgotPasswordController::class, 'showVerifyOtpForm']
 Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp.post');
 Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
-
-// ============ CLIENT ROUTES ============
-Route::get('/', [HomeController::class, 'index'])->name('client.home');
-Route::get('/home', [HomeController::class, 'index']);
-Route::get('/search', [ProductPublicController::class, 'search'])->name('client.product.search');
-Route::get('/category/{slug}', [ClientProductController::class, 'productsByCategory'])->name('client.product.category');
-Route::get('/products/{slug}', [ClientProductController::class, 'showDetail'])->name('client.product.detail');
-
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function () {
@@ -91,6 +84,30 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/show/{id}', [ProductController::class, 'show'])->name('show');
         Route::delete('/delete/{id}', [ProductController::class, 'destroy'])->name('destroy');
         Route::delete('{product}/images/{image}', [ProductController::class, 'destroyImage'])->name('images.destroy');
+    });
+
+    // ====== COMMENTS / REVIEWS ======
+    Route::prefix('comments')->name('comments.')->group(function () {
+        Route::get('/', [CommentController::class, 'index'])->name('index');
+        Route::get('/pending', [CommentController::class, 'pending'])->name('pending');
+        Route::get('/reported', [CommentController::class, 'reported'])->name('reported');
+        Route::get('/settings', [CommentController::class, 'settings'])->name('settings');
+        Route::post('/settings', [CommentController::class, 'saveSettings'])->name('settings.save');
+        Route::get('/export', [CommentController::class, 'export'])->name('export');
+        Route::get('/{id}/quick-view', [CommentController::class, 'quickView'])->name('quickView');
+        Route::get('/{id}', [CommentController::class, 'show'])->name('show');
+        Route::post('/{id}/approve', [CommentController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [CommentController::class, 'reject'])->name('reject');
+        Route::post('/{id}/hide', [CommentController::class, 'hide'])->name('hide');
+        Route::post('/{id}/show', [CommentController::class, 'showComment'])->name('showComment');
+        Route::post('/{id}/reply', [CommentController::class, 'reply'])->name('reply');
+        Route::delete('/{review}/reply/{reply}', [CommentController::class, 'deleteReply'])->name('reply.destroy');
+        Route::delete('/{review}/replies/bulk', [CommentController::class, 'bulkDeleteReplies'])->name('reply.bulkDestroy');
+        Route::post('/bulk-approve', [CommentController::class, 'bulkApprove'])->name('bulkApprove');
+        Route::post('/bulk-reject', [CommentController::class, 'bulkReject'])->name('bulkReject');
+        Route::post('/bulk-hide', [CommentController::class, 'bulkHide'])->name('bulkHide');
+        Route::post('/bulk-delete', [CommentController::class, 'bulkDelete'])->name('bulkDelete');
+        Route::delete('/{id}', [CommentController::class, 'destroy'])->name('destroy');
     });
 
     // ====== ORDERS ======
@@ -209,6 +226,12 @@ Route::get('/home', [HomeController::class, 'index']);
 Route::get('/search', [ProductClientController::class, 'search'])->name('client.product.search');
 Route::get('/category/{slug}', [ProductClientController::class, 'productsByCategory'])->name('client.product.category');
 Route::get('/products/{slug}', [ProductClientController::class, 'showDetail'])->name('client.product.detail');
+Route::post('/products/variant/get', [ProductClientController::class, 'getVariant'])->name('client.product.variant.get');
+Route::get('/products/{slug}/reviews', [ProductClientController::class, 'getReviews'])->name('client.product.reviews');
+Route::get('/products/{slug}/reviews/check-updates', [ProductClientController::class, 'checkUpdates'])->name('client.product.reviews.check-updates');
+Route::post('/products/{slug}/review', [ProductClientController::class, 'storeReview'])->name('client.product.review.store')->middleware('auth');
+Route::post('/reviews/{review}/helpful', [ProductClientController::class, 'markHelpful'])->name('client.review.helpful')->middleware('auth');
+Route::post('/reviews/{review}/report', [ProductClientController::class, 'reportReview'])->name('client.review.report')->middleware('auth');
 Route::get('/products', [HomeController::class, 'index'])->name('client.products.index');
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
@@ -231,6 +254,10 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
     Route::get('/orders/{order}/refund/cancel', [\App\Http\Controllers\Client\Account\RefundController::class, 'showCancelRefundForm'])->name('orders.refund.cancel');
     Route::post('/orders/{order}/refund/cancel', [\App\Http\Controllers\Client\Account\RefundController::class, 'submitCancelRefund'])->name('orders.refund.cancel.submit');
     Route::post('/orders/{order}/refund/reset', [\App\Http\Controllers\Client\Account\RefundController::class, 'resetCancelRefund'])->name('orders.refund.cancel.reset');
+
+    // Review reports
+    Route::get('/review-reports', [\App\Http\Controllers\Client\Account\ReviewReportController::class, 'index'])
+        ->name('review-reports.index');
 });
 
 // ============ CHECKOUT ROUTES ============

@@ -9,8 +9,11 @@ class Product extends Model
     protected $fillable = [
         'name',
         'slug',
+        'sku',
         'description',
+        'short_description',
         'price',
+        'sale_price',
         'stock',
         'image',
         'length',
@@ -19,7 +22,9 @@ class Product extends Model
         'color_code',
         'category_id',
         'brand_id',
-        'status'
+        'status',
+        'rating_avg',
+        'total_sold',
     ];
 
     // Quan hệ
@@ -40,5 +45,40 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Tính giá hiển thị (ưu tiên sale_price nếu có)
+     */
+    public function getDisplayPriceAttribute()
+    {
+        return $this->sale_price ?? $this->price;
+    }
+
+    /**
+     * Tính % giảm giá
+     */
+    public function getDiscountPercentAttribute()
+    {
+        if (!$this->sale_price || $this->sale_price >= $this->price) {
+            return 0;
+        }
+        return round((($this->price - $this->sale_price) / $this->price) * 100);
+    }
+
+    /**
+     * Kiểm tra còn hàng
+     */
+    public function getInStockAttribute()
+    {
+        if ($this->variants->count() > 0) {
+            return $this->variants->sum('stock') > 0;
+        }
+        return ($this->stock ?? 0) > 0;
     }
 }
