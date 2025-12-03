@@ -51,7 +51,21 @@ class WithdrawController extends Controller
         $user = Auth::user();
         $wallet = ClientWallet::getOrCreateForUser($user->id);
         
-        
+        $request->validate([
+            'account_holder' => 'required|string|max:255',
+            'bank_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:50',
+            'amount' => 'required|numeric|min:10000|max:' . $wallet->balance,
+            'phone' => 'required|string|max:20',
+        ], [
+            'account_holder.required' => 'Vui lòng nhập tên chủ tài khoản',
+            'bank_name.required' => 'Vui lòng chọn ngân hàng',
+            'account_number.required' => 'Vui lòng nhập số tài khoản',
+            'amount.required' => 'Vui lòng nhập số tiền rút',
+            'amount.min' => 'Số tiền rút tối thiểu là 10,000đ',
+            'amount.max' => 'Số tiền rút không được vượt quá số dư trong ví',
+            'phone.required' => 'Vui lòng nhập số điện thoại liên hệ',
+        ]);
         
         // Tạo yêu cầu rút tiền
         $withdraw = WithdrawRequest::create([
