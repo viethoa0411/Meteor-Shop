@@ -15,13 +15,6 @@
                     @else
                         <img class="imageSlide" src="https://via.placeholder.com/1200x800?text=Banner" alt="Banner">
                     @endif
-                    @if (!empty($banner->link))
-                        <a href="{{ $banner->link }}" style="text-decoration: none;">
-                            <button>Xem ngay</button>
-                        </a>
-                    @else
-                        <button onclick="alert('{{ $banner->title ?? 'Banner' }}')">Xem ngay</button>
-                    @endif
                 </div>
             @endforeach
         @else
