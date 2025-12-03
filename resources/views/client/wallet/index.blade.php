@@ -107,7 +107,7 @@
             <div class="transaction-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0 fw-bold">Giao dịch gần đây</h5>
-                    <a href="#" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('client.account.wallet.history') }}" class="btn btn-sm btn-outline-primary">
                         Xem tất cả <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                 </div>

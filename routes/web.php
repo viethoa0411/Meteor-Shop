@@ -243,7 +243,8 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
 
     // ====== CLIENT WALLET ======
     Route::prefix('wallet')->name('wallet.')->group(function () {
-        Route::get('/', [ClientWalletController::class, 'index'])->name('index'); 
+        Route::get('/', [ClientWalletController::class, 'index'])->name('index');
+        Route::get('/history', [ClientWalletController::class, 'history'])->name('history'); 
     });
 });
 
