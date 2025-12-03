@@ -16,7 +16,8 @@
                 {{-- Người dùng --}}
                 <div class="col-6">
                     <a href="{{ route('admin.account.users.list') }}" class="text-decoration-none">
-                        <div class="stat-card card p-4 shadow-sm border-start border-warning border-4 h-100 position-relative overflow-hidden">
+                        <div
+                            class="stat-card card p-4 shadow-sm border-start border-warning border-4 h-100 position-relative overflow-hidden">
                             <div class="stat-card-bg"></div>
                             <div class="d-flex justify-content-between align-items-center h-100 position-relative">
                                 <div class="stat-info">
@@ -26,13 +27,15 @@
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-0 small fw-normal">Tổng người dùng</h6>
-                                            <p class="text-muted mb-0 small">Tháng này: +{{ number_format($thisMonthUsers) }}</p>
+                                            <p class="text-muted mb-0 small">Tháng này:
+                                                +{{ number_format($thisMonthUsers) }}</p>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center mt-2">
                                         <h2 class="fw-bold mb-0 stat-number">{{ number_format($totalUsers) }}</h2>
-                                        @if($userGrowth != 0)
-                                            <span class="badge ms-2 stat-badge {{ $userGrowth > 0 ? 'bg-success' : 'bg-danger' }}">
+                                        @if ($userGrowth != 0)
+                                            <span
+                                                class="badge ms-2 stat-badge {{ $userGrowth > 0 ? 'bg-success' : 'bg-danger' }}">
                                                 <i class="bi bi-arrow-{{ $userGrowth > 0 ? 'up' : 'down' }}-short"></i>
                                                 {{ abs($userGrowth) }}%
                                             </span>
@@ -50,7 +53,8 @@
                 {{-- Tổng số đơn hàng --}}
                 <div class="col-6">
                     <a href="{{ route('admin.orders.list') }}" class="text-decoration-none">
-                        <div class="stat-card card p-4 shadow-sm border-start border-success border-4 h-100 position-relative overflow-hidden">
+                        <div
+                            class="stat-card card p-4 shadow-sm border-start border-success border-4 h-100 position-relative overflow-hidden">
                             <div class="stat-card-bg"></div>
                             <div class="d-flex justify-content-between align-items-center h-100 position-relative">
                                 <div class="stat-info">
@@ -60,13 +64,15 @@
                                         </div>
                                         <div>
                                             <h6 class="text-muted mb-0 small fw-normal">Tổng đơn hàng</h6>
-                                            <p class="text-muted mb-0 small">Tháng này: {{ number_format($totalOrders) }}</p>
+                                            <p class="text-muted mb-0 small">Tháng này: {{ number_format($totalOrders) }}
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center mt-2">
                                         <h2 class="fw-bold mb-0 stat-number">{{ number_format($totalAllOrders) }}</h2>
-                                        @if($orderGrowth != 0)
-                                            <span class="badge ms-2 stat-badge {{ $orderGrowth > 0 ? 'bg-success' : 'bg-danger' }}">
+                                        @if ($orderGrowth != 0)
+                                            <span
+                                                class="badge ms-2 stat-badge {{ $orderGrowth > 0 ? 'bg-success' : 'bg-danger' }}">
                                                 <i class="bi bi-arrow-{{ $orderGrowth > 0 ? 'up' : 'down' }}-short"></i>
                                                 {{ abs($orderGrowth) }}%
                                             </span>
@@ -92,59 +98,22 @@
         </div>
         {{-- Cột phải 40% --}}
         <div class="col-md-5 d-flex flex-column">
-            {{-- Mục tiêu tháng --}}
-            <div class="card shadow-sm p-4 mb-4" style="border-radius:18px;">
-                <h5 class="fw-semibold mb-1">Mục tiêu tháng</h5>
-                <p class="text-muted" style="font-size:14px;">Mục tiêu bạn đặt ra mỗi tháng</p>
-
-                <div class="half-gauge-wrapper">
-                    <svg class="half-gauge" width="250" height="140">
-                        <path class="half-gauge-bg" d="M20 120 A100 100 0 0 1 230 120" />
-                        <path class="half-gauge-value" d="M20 120 A100 100 0 0 1 230 120" />
-                    </svg>
-
-                    <div class="half-gauge-text">
-                        <h2 class="fw-bold mb-1" id="halfPercent">0%</h2>
-                    </div>
-                </div>
-
-                <p class="mt-3 text-muted text-center">
-                    Hôm nay bạn đã kiếm được {{ number_format($todayRevenue) }} ₫<br>
-                    Tiếp tục làm tốt nhé!
-                </p>
-
-                <div class="d-flex justify-content-between text-center pt-3 border-top">
-                    <div class="flex-fill">
-                        <p class="text-muted mb-1">Mục tiêu</p>
-                        <h6 class="fw-bold">{{ number_format($monthlyTarget) }} ₫</h6>
-                    </div>
-                    <div class="flex-fill">
-                        <p class="text-muted mb-1">Doanh thu</p>
-                        <h6 class="fw-bold">{{ number_format($currentMonthRevenue) }} ₫</h6>
-                    </div>
-                    <div class="flex-fill">
-                        <p class="text-muted mb-1">Hôm nay</p>
-                        <h6 class="fw-bold">{{ number_format($todayRevenue) }} ₫</h6>
-                    </div>
-                </div>
-            </div>
-
-
-
-            {{-- Bộ lọc doanh thu --}}
-            <div class="card shadow-sm p-4 flex-grow-1">
+            <div class="card shadow-sm p-4 mb-4">
                 <h6 class="mb-3 fw-semibold">Lọc doanh thu theo khoảng thời gian</h6>
+
                 <form method="GET" action="{{ route('admin.dashboard') }}">
                     <div class="mb-2">
                         <label for="filterStartDate" class="form-label small">Từ ngày</label>
                         <input type="date" name="start_date" id="filterStartDate" class="form-control form-control-sm"
                             value="{{ old('start_date', $startDate) }}">
                     </div>
+
                     <div class="mb-3">
                         <label for="filterEndDate" class="form-label small">Đến ngày</label>
                         <input type="date" name="end_date" id="filterEndDate" class="form-control form-control-sm"
                             value="{{ old('end_date', $endDate) }}">
                     </div>
+
                     <button type="submit" class="btn btn-primary btn-sm w-100">Lọc</button>
                 </form>
 
@@ -154,62 +123,9 @@
                     </div>
                 @endif
             </div>
-        </div>
-    </div>
-    <div class="row mt-4 g-4">
-        {{-- Bảng Đơn hàng gần nhất --}}
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white">
-                    <h5 class="fw-semibold mb-0">Đơn hàng gần nhất</h5>
-                </div>
 
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Mã đơn</th>
-                                <th>Người đặt</th>
-                                <th>Ngày đặt</th>
-                                <th>Tổng tiền</th>
-                                <th>Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($recentOrders as $order)
-                                <tr>
-                                    <td>{{ $order->order_code }}</td>
-                                    <td>{{ $order->user->name ?? 'Người dùng không xác định' }}</td>
-                                    <td>{{ $order->created_at->format('d/m/Y') }}</td>
-                                    <td>{{ number_format($order->final_total) }} ₫</td>
-                                    <td>
-                                        @php
-                                            $status = [
-                                                'pending' => 'warning',
-                                                'processing' => 'info',
-                                                'completed' => 'success',
-                                                'cancelled' => 'danger',
-                                            ];
-                                        @endphp
-                                        <span class="badge bg-{{ $status[$order->order_status] ?? 'secondary' }}">
-                                            {{ ucfirst($order->order_status) }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">Không có đơn hàng nào.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        {{-- Bảng Sản phẩm gần nhất --}}
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
+            {{-- sp bán gần nhất --}}
+            <div class="card shadow-sm flex-grow-1">
                 <div class="card-header bg-white">
                     <h5 class="fw-semibold mb-0">Sản phẩm bán gần đây nhất</h5>
                 </div>
@@ -230,8 +146,6 @@
                                         @if (!empty($item['image']))
                                             <img src="{{ asset('storage/' . $item['image']) }}"
                                                 alt="{{ $item['product_name'] }}" style="width:50px; height:auto;">
-                                        @else
-                                            -
                                         @endif
                                         {{ $item['product_name'] }}
                                     </td>
@@ -240,7 +154,9 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted">Không có sản phẩm nào.</td>
+                                    <td colspan="3" class="text-center text-muted">
+                                        Không có sản phẩm nào.
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -278,20 +194,21 @@
                             <h6 class="fw-semibold mb-0">
                                 <i class="bi bi-funnel-fill me-2 text-primary"></i>Bộ lọc
                             </h6>
-                            <button type="button" class="btn btn-sm btn-link text-decoration-none d-md-none" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none d-md-none"
+                                data-bs-toggle="collapse" data-bs-target="#filterCollapse">
                                 <i class="bi bi-chevron-down"></i>
                             </button>
                         </div>
-                        
+
                         <form method="GET" action="{{ route('admin.dashboard') }}" id="orderFilterForm">
                             {{-- Giữ lại filter doanh thu nếu có --}}
-                            @if($startDate)
+                            @if ($startDate)
                                 <input type="hidden" name="start_date" value="{{ $startDate }}">
                             @endif
-                            @if($endDate)
+                            @if ($endDate)
                                 <input type="hidden" name="end_date" value="{{ $endDate }}">
                             @endif
-                            
+
                             <div class="collapse d-md-block" id="filterCollapse">
                                 {{-- Loại filter --}}
                                 <div class="row g-3 mb-3">
@@ -299,28 +216,44 @@
                                         <label for="order_filter_type" class="form-label small fw-semibold">
                                             <i class="bi bi-filter-circle me-1 text-primary"></i>Loại lọc
                                         </label>
-                                        <select name="order_filter_type" id="order_filter_type" class="form-select" onchange="toggleFilterOptions()">
-                                            <option value="today" {{ ($orderFilterType ?? '') == 'today' ? 'selected' : '' }}>Hôm nay</option>
-                                            <option value="last_7_days" {{ ($orderFilterType ?? '') == 'last_7_days' ? 'selected' : '' }}>7 ngày gần nhất</option>
-                                            <option value="last_15_days" {{ ($orderFilterType ?? '') == 'last_15_days' ? 'selected' : '' }}>15 ngày gần nhất</option>
-                                            <option value="last_30_days" {{ ($orderFilterType ?? 'last_30_days') == 'last_30_days' ? 'selected' : '' }}>30 ngày gần nhất</option>
-                                            <option value="all" {{ ($orderFilterType ?? '') == 'all' ? 'selected' : '' }}>Tất cả</option>
-                                            <option value="month" {{ ($orderFilterType ?? '') == 'month' ? 'selected' : '' }}>Theo tháng</option>
-                                            <option value="date_range" {{ ($orderFilterType ?? '') == 'date_range' ? 'selected' : '' }}>Khoảng thời gian</option>
+                                        <select name="order_filter_type" id="order_filter_type" class="form-select"
+                                            onchange="toggleFilterOptions()">
+                                            <option value="today"
+                                                {{ ($orderFilterType ?? '') == 'today' ? 'selected' : '' }}>Hôm nay
+                                            </option>
+                                            <option value="last_7_days"
+                                                {{ ($orderFilterType ?? '') == 'last_7_days' ? 'selected' : '' }}>7 ngày
+                                                gần nhất</option>
+                                            <option value="last_15_days"
+                                                {{ ($orderFilterType ?? '') == 'last_15_days' ? 'selected' : '' }}>15 ngày
+                                                gần nhất</option>
+                                            <option value="last_30_days"
+                                                {{ ($orderFilterType ?? 'last_30_days') == 'last_30_days' ? 'selected' : '' }}>
+                                                30 ngày gần nhất</option>
+                                            <option value="all"
+                                                {{ ($orderFilterType ?? '') == 'all' ? 'selected' : '' }}>Tất cả</option>
+                                            <option value="month"
+                                                {{ ($orderFilterType ?? '') == 'month' ? 'selected' : '' }}>Theo tháng
+                                            </option>
+                                            <option value="date_range"
+                                                {{ ($orderFilterType ?? '') == 'date_range' ? 'selected' : '' }}>Khoảng
+                                                thời gian</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 {{-- Filter theo tháng --}}
-                                <div class="row g-3 mb-3" id="filter_month_group" style="display: {{ ($orderFilterType ?? 'last_30_days') == 'month' ? 'flex' : 'none' }};">
+                                <div class="row g-3 mb-3" id="filter_month_group"
+                                    style="display: {{ ($orderFilterType ?? 'last_30_days') == 'month' ? 'flex' : 'none' }};">
                                     <div class="col-12 col-sm-6 col-md-6">
                                         <label for="order_month" class="form-label small fw-semibold">
                                             <i class="bi bi-calendar-month me-1 text-primary"></i>Tháng
                                         </label>
                                         <select name="order_month" id="order_month" class="form-select">
                                             <option value="">-- Chọn tháng --</option>
-                                            @for($m = 1; $m <= 12; $m++)
-                                                <option value="{{ $m }}" {{ ($orderFilterMonth ?? '') == $m ? 'selected' : '' }}>
+                                            @for ($m = 1; $m <= 12; $m++)
+                                                <option value="{{ $m }}"
+                                                    {{ ($orderFilterMonth ?? '') == $m ? 'selected' : '' }}>
                                                     Tháng {{ $m }}
                                                 </option>
                                             @endfor
@@ -333,8 +266,9 @@
                                         </label>
                                         <select name="order_year" id="order_year" class="form-select">
                                             <option value="">-- Chọn năm --</option>
-                                            @for($y = now()->year; $y >= now()->year - 5; $y--)
-                                                <option value="{{ $y }}" {{ ($orderFilterYear ?? '') == $y ? 'selected' : '' }}>
+                                            @for ($y = now()->year; $y >= now()->year - 5; $y--)
+                                                <option value="{{ $y }}"
+                                                    {{ ($orderFilterYear ?? '') == $y ? 'selected' : '' }}>
                                                     {{ $y }}
                                                 </option>
                                             @endfor
@@ -343,23 +277,22 @@
                                 </div>
 
                                 {{-- Filter theo khoảng thời gian --}}
-                                <div class="row g-3 mb-3" id="filter_date_range_group" style="display: {{ ($orderFilterType ?? '') == 'date_range' ? 'flex' : 'none' }};">
+                                <div class="row g-3 mb-3" id="filter_date_range_group"
+                                    style="display: {{ ($orderFilterType ?? '') == 'date_range' ? 'flex' : 'none' }};">
                                     <div class="col-12 col-sm-6">
                                         <label for="order_start_date" class="form-label small fw-semibold">
                                             <i class="bi bi-calendar-event me-1 text-primary"></i>Từ ngày
                                         </label>
-                                        <input type="date" name="order_start_date" id="order_start_date" 
-                                            class="form-control" 
-                                            value="{{ $orderFilterStartDate ?? '' }}">
+                                        <input type="date" name="order_start_date" id="order_start_date"
+                                            class="form-control" value="{{ $orderFilterStartDate ?? '' }}">
                                     </div>
 
                                     <div class="col-12 col-sm-6">
                                         <label for="order_end_date" class="form-label small fw-semibold">
                                             <i class="bi bi-calendar-event-fill me-1 text-primary"></i>Đến ngày
                                         </label>
-                                        <input type="date" name="order_end_date" id="order_end_date" 
-                                            class="form-control" 
-                                            value="{{ $orderFilterEndDate ?? '' }}">
+                                        <input type="date" name="order_end_date" id="order_end_date"
+                                            class="form-control" value="{{ $orderFilterEndDate ?? '' }}">
                                     </div>
                                 </div>
 
@@ -370,12 +303,24 @@
                                             <i class="bi bi-funnel me-1 text-primary"></i>Trạng thái đơn hàng
                                         </label>
                                         <select name="order_status" id="order_status" class="form-select">
-                                            <option value="all" {{ ($orderFilterStatus ?? 'all') == 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
-                                            <option value="pending" {{ ($orderFilterStatus ?? '') == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
-                                            <option value="processing" {{ ($orderFilterStatus ?? '') == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
-                                            <option value="shipping" {{ ($orderFilterStatus ?? '') == 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
-                                            <option value="completed" {{ ($orderFilterStatus ?? '') == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
-                                            <option value="cancelled" {{ ($orderFilterStatus ?? '') == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                                            <option value="all"
+                                                {{ ($orderFilterStatus ?? 'all') == 'all' ? 'selected' : '' }}>Tất cả trạng
+                                                thái</option>
+                                            <option value="pending"
+                                                {{ ($orderFilterStatus ?? '') == 'pending' ? 'selected' : '' }}>Chờ xử lý
+                                            </option>
+                                            <option value="processing"
+                                                {{ ($orderFilterStatus ?? '') == 'processing' ? 'selected' : '' }}>Đang xử
+                                                lý</option>
+                                            <option value="shipping"
+                                                {{ ($orderFilterStatus ?? '') == 'shipping' ? 'selected' : '' }}>Đang giao
+                                                hàng</option>
+                                            <option value="completed"
+                                                {{ ($orderFilterStatus ?? '') == 'completed' ? 'selected' : '' }}>Hoàn
+                                                thành</option>
+                                            <option value="cancelled"
+                                                {{ ($orderFilterStatus ?? '') == 'cancelled' ? 'selected' : '' }}>Đã hủy
+                                            </option>
                                         </select>
                                     </div>
 
@@ -383,13 +328,14 @@
                                         <button type="submit" class="btn btn-primary">
                                             <i class="bi bi-search me-1"></i>Áp dụng bộ lọc
                                         </button>
-                                        <button type="button" class="btn btn-outline-secondary" onclick="resetOrderFilter()">
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            onclick="resetOrderFilter()">
                                             <i class="bi bi-arrow-counterclockwise me-1"></i>Đặt lại
                                         </button>
                                         <a href="{{ route('admin.orders.list') }}" class="btn btn-outline-primary">
                                             <i class="bi bi-list-ul me-1"></i>Xem tất cả
                                         </a>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -403,23 +349,31 @@
                                 'pending' => ['label' => 'Chờ xử lý', 'color' => 'warning', 'icon' => 'clock'],
                                 'processing' => ['label' => 'Đang xử lý', 'color' => 'info', 'icon' => 'gear'],
                                 'shipping' => ['label' => 'Đang giao hàng', 'color' => 'primary', 'icon' => 'truck'],
-                                'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'check-circle'],
+                                'completed' => [
+                                    'label' => 'Hoàn thành',
+                                    'color' => 'success',
+                                    'icon' => 'check-circle',
+                                ],
                                 'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'x-circle'],
                             ];
                         @endphp
-                        @foreach($statusConfig as $status => $config)
+                        @foreach ($statusConfig as $status => $config)
                             <div class="col-6 col-md-3 col-lg">
-                                <div class="stat-mini-card p-3 p-md-3 rounded border border-{{ $config['color'] }} border-2 bg-{{ $config['color'] }} bg-opacity-10 h-100">
+                                <div
+                                    class="stat-mini-card p-3 p-md-3 rounded border border-{{ $config['color'] }} border-2 bg-{{ $config['color'] }} bg-opacity-10 h-100">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div class="flex-grow-1">
                                             <p class="text-muted small mb-1 fw-medium">{{ $config['label'] }}</p>
-                                            <h4 class="fw-bold mb-0 stat-mini-number">{{ $orderStatsByStatus[$status] ?? 0 }}</h4>
+                                            <h4 class="fw-bold mb-0 stat-mini-number">
+                                                {{ $orderStatsByStatus[$status] ?? 0 }}</h4>
                                         </div>
-                                        <div class="stat-mini-icon bg-{{ $config['color'] }} bg-opacity-25 rounded-circle p-2 flex-shrink-0">
-                                            @if($status == 'shipping')
+                                        <div
+                                            class="stat-mini-icon bg-{{ $config['color'] }} bg-opacity-25 rounded-circle p-2 flex-shrink-0">
+                                            @if ($status == 'shipping')
                                                 <i class="bi bi-car-front-fill text-primary fs-5"></i>
                                             @else
-                                                <i class="bi bi-{{ $config['icon'] }}-fill text-{{ $config['color'] }} fs-5"></i>
+                                                <i
+                                                    class="bi bi-{{ $config['icon'] }}-fill text-{{ $config['color'] }} fs-5"></i>
                                             @endif
                                         </div>
                                     </div>
@@ -431,17 +385,21 @@
                     {{-- Biểu đồ tăng trưởng --}}
                     <div class="row g-4 mb-4">
                         <div class="col-12 col-lg-8">
-                            <div class="card border-0 bg-gradient-primary text-white shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px !important;">
+                            <div class="card border-0 bg-gradient-primary text-white shadow-sm"
+                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px !important;">
                                 <div class="card-body p-3 p-md-4">
-                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 gap-2">
+                                    <div
+                                        class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 gap-2">
                                         <div>
                                             <h6 class="text-white-50 mb-1 small">Tăng trưởng đơn hàng</h6>
                                             <h3 class="fw-bold mb-0 text-white fs-4 fs-md-3">7 ngày gần nhất</h3>
                                         </div>
                                         <div class="text-start text-sm-end">
-                                            @if($orderGrowthRate != 0)
-                                                <span class="badge bg-{{ $orderGrowthRate > 0 ? 'success' : 'danger' }} fs-6 px-3 py-2">
-                                                    <i class="bi bi-arrow-{{ $orderGrowthRate > 0 ? 'up' : 'down' }}-short"></i>
+                                            @if ($orderGrowthRate != 0)
+                                                <span
+                                                    class="badge bg-{{ $orderGrowthRate > 0 ? 'success' : 'danger' }} fs-6 px-3 py-2">
+                                                    <i
+                                                        class="bi bi-arrow-{{ $orderGrowthRate > 0 ? 'up' : 'down' }}-short"></i>
                                                     {{ abs($orderGrowthRate) }}%
                                                 </span>
                                             @endif
@@ -461,33 +419,40 @@
                                         <i class="bi bi-graph-up-arrow me-2 text-primary"></i>Tổng quan
                                     </h6>
                                     <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
                                             <div class="d-flex align-items-center">
                                                 <i class="bi bi-calendar-day text-primary me-2"></i>
                                                 <span class="text-muted small">Hôm nay</span>
                                             </div>
                                             <span class="fw-bold text-primary">{{ $growthChartData[6] ?? 0 }} đơn</span>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
                                             <div class="d-flex align-items-center">
                                                 <i class="bi bi-calendar-minus text-info me-2"></i>
                                                 <span class="text-muted small">Hôm qua</span>
                                             </div>
                                             <span class="fw-bold text-info">{{ $growthChartData[5] ?? 0 }} đơn</span>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
                                             <div class="d-flex align-items-center">
                                                 <i class="bi bi-calendar-week text-success me-2"></i>
                                                 <span class="text-muted small">7 ngày qua</span>
                                             </div>
-                                            <span class="fw-bold text-success">{{ array_sum($growthChartData) }} đơn</span>
+                                            <span class="fw-bold text-success">{{ array_sum($growthChartData) }}
+                                                đơn</span>
                                         </div>
-                                        <div class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
                                             <div class="d-flex align-items-center">
                                                 <i class="bi bi-bar-chart text-warning me-2"></i>
                                                 <span class="text-muted small">Trung bình/ngày</span>
                                             </div>
-                                            <span class="fw-bold text-warning">{{ round(array_sum($growthChartData) / 7, 1) }} đơn</span>
+                                            <span
+                                                class="fw-bold text-warning">{{ round(array_sum($growthChartData) / 7, 1) }}
+                                                đơn</span>
                                         </div>
                                     </div>
                                 </div>
@@ -522,7 +487,8 @@
                                                 </div>
                                                 <div>
                                                     <div class="fw-medium">{{ $order->user->name ?? 'N/A' }}</div>
-                                                    <small class="text-muted">{{ Str::limit($order->user->email ?? '', 25) }}</small>
+                                                    <small
+                                                        class="text-muted">{{ Str::limit($order->user->email ?? '', 25) }}</small>
                                                 </div>
                                             </div>
                                         </td>
@@ -531,7 +497,9 @@
                                             <small class="text-muted">{{ $order->created_at->format('H:i') }}</small>
                                         </td>
                                         <td>
-                                            <span class="fw-bold text-success fs-6">{{ number_format($order->final_total) }} ₫</span>
+                                            <span
+                                                class="fw-bold text-success fs-6">{{ number_format($order->final_total) }}
+                                                ₫</span>
                                         </td>
                                         <td>
                                             @php
@@ -550,13 +518,14 @@
                                                     'cancelled' => 'Đã hủy',
                                                 ];
                                             @endphp
-                                            <span class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
+                                            <span
+                                                class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
                                                 {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('admin.orders.show', $order->id) }}" 
-                                               class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ route('admin.orders.show', $order->id) }}"
+                                                class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-eye me-1"></i>Chi tiết
                                             </a>
                                         </td>
@@ -598,31 +567,36 @@
                                         <div>
                                             <h6 class="fw-bold text-primary mb-1">{{ $order->order_code }}</h6>
                                             <small class="text-muted">
-                                                <i class="bi bi-calendar3 me-1"></i>{{ $order->created_at->format('d/m/Y H:i') }}
+                                                <i
+                                                    class="bi bi-calendar3 me-1"></i>{{ $order->created_at->format('d/m/Y H:i') }}
                                             </small>
                                         </div>
-                                        <span class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
+                                        <span
+                                            class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
                                             {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
                                         </span>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <div class="d-flex align-items-center mb-2">
                                             <i class="bi bi-person-circle text-muted me-2"></i>
                                             <div>
                                                 <div class="fw-medium small">{{ $order->user->name ?? 'N/A' }}</div>
-                                                <small class="text-muted">{{ Str::limit($order->user->email ?? '', 30) }}</small>
+                                                <small
+                                                    class="text-muted">{{ Str::limit($order->user->email ?? '', 30) }}</small>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
                                         <div>
                                             <small class="text-muted d-block">Tổng tiền</small>
-                                            <span class="fw-bold text-success fs-5">{{ number_format($order->final_total) }} ₫</span>
+                                            <span
+                                                class="fw-bold text-success fs-5">{{ number_format($order->final_total) }}
+                                                ₫</span>
                                         </div>
-                                        <a href="{{ route('admin.orders.show', $order->id) }}" 
-                                           class="btn btn-sm btn-primary">
+                                        <a href="{{ route('admin.orders.show', $order->id) }}"
+                                            class="btn btn-sm btn-primary">
                                             <i class="bi bi-eye me-1"></i>Chi tiết
                                         </a>
                                     </div>
@@ -639,13 +613,15 @@
                     </div>
 
                     {{-- Phân trang sticky --}}
-                    @if($filteredOrders->hasPages())
+                    @if ($filteredOrders->hasPages())
                         <div class="sticky-pagination-wrapper">
                             <div class="sticky-pagination">
-                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-3 bg-white border-top shadow-sm">
+                                <div
+                                    class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-3 bg-white border-top shadow-sm">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-muted small">
-                                            Hiển thị {{ $filteredOrders->firstItem() ?? 0 }} - {{ $filteredOrders->lastItem() ?? 0 }} 
+                                            Hiển thị {{ $filteredOrders->firstItem() ?? 0 }} -
+                                            {{ $filteredOrders->lastItem() ?? 0 }}
                                             trong tổng số {{ $filteredOrders->total() }} đơn hàng
                                         </span>
                                     </div>
@@ -737,9 +713,12 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
             }
+
             50% {
                 opacity: 0.7;
             }
@@ -765,6 +744,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -967,6 +947,7 @@
                 opacity: 0;
                 transform: translateX(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -978,11 +959,25 @@
             animation: slideInRight 0.5s ease-out;
         }
 
-        .stat-mini-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-mini-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-mini-card:nth-child(3) { animation-delay: 0.3s; }
-        .stat-mini-card:nth-child(4) { animation-delay: 0.4s; }
-        .stat-mini-card:nth-child(5) { animation-delay: 0.5s; }
+        .stat-mini-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-mini-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-mini-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-mini-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .stat-mini-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
 
         /* Responsive Improvements */
         @media (max-width: 768px) {
@@ -1266,7 +1261,7 @@
             chart.options.scales.y.ticks.color = textColor();
             chart.data.datasets[0].backgroundColor = bgColor();
             chart.update();
-            
+
             // Update order growth chart
             if (orderGrowthChart) {
                 orderGrowthChart.options.scales.x.ticks.color = textColor();
@@ -1386,11 +1381,11 @@
             const filterType = document.getElementById('order_filter_type').value;
             const monthGroup = document.getElementById('filter_month_group');
             const dateRangeGroup = document.getElementById('filter_date_range_group');
-            
+
             // Hide all groups first
             monthGroup.style.display = 'none';
             dateRangeGroup.style.display = 'none';
-            
+
             // Show relevant group
             if (filterType === 'month') {
                 monthGroup.style.display = 'flex';
@@ -1412,10 +1407,10 @@
             document.getElementById('order_start_date').value = '';
             document.getElementById('order_end_date').value = '';
             document.getElementById('order_status').value = 'all';
-            
+
             // Toggle filter options
             toggleFilterOptions();
-            
+
             // Xóa các hidden input filter doanh thu
             const form = document.getElementById('orderFilterForm');
             const hiddenInputs = form.querySelectorAll('input[type="hidden"]');
