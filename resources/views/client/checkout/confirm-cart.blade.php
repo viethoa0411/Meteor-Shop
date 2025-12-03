@@ -32,10 +32,10 @@
                         <p class="mb-1"><strong>Họ tên:</strong> {{ $checkoutSession['customer_name'] }}</p>
                         <p class="mb-1"><strong>Số điện thoại:</strong> {{ $checkoutSession['customer_phone'] }}</p>
                         <p class="mb-1"><strong>Email:</strong> {{ $checkoutSession['customer_email'] }}</p>
-                        <p class="mb-0"><strong>Địa chỉ:</strong>
-                            {{ $checkoutSession['shipping_address'] }},
-                            {{ $checkoutSession['shipping_ward'] }},
-                            {{ $checkoutSession['shipping_district'] }},
+                        <p class="mb-0"><strong>Địa chỉ:</strong> 
+                            {{ $checkoutSession['shipping_address'] }}, 
+                            {{ $checkoutSession['shipping_ward'] }}, 
+                            {{ $checkoutSession['shipping_district'] }}, 
                             {{ $checkoutSession['shipping_city'] }}
                         </p>
                     </div>
@@ -50,7 +50,7 @@
                         @foreach ($checkoutSession['items'] as $item)
                             <div class="d-flex mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
                                 <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/120' }}"
-                                    alt="{{ $item['name'] }}"
+                                    alt="{{ $item['name'] }}" 
                                     style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
                                 <div class="ms-3 flex-grow-1">
                                     <h6 class="mb-2">{{ $item['name'] }}</h6>
@@ -69,7 +69,7 @@
                                         <strong>Số lượng:</strong> {{ $item['quantity'] }}
                                     </p>
                                     <p class="mb-0">
-                                        <strong>Đơn giá:</strong>
+                                        <strong>Đơn giá:</strong> 
                                         <span class="text-danger">{{ number_format($item['price'], 0, ',', '.') }} đ</span>
                                     </p>
                                 </div>
@@ -90,7 +90,7 @@
                     </div>
                     <div class="card-body">
                         <p class="mb-2">
-                            <strong>Vận chuyển:</strong>
+                            <strong>Vận chuyển:</strong> 
                             @if ($checkoutSession['shipping_method'] == 'standard')
                                 Giao hàng tiêu chuẩn
                             @elseif ($checkoutSession['shipping_method'] == 'express')
@@ -100,7 +100,7 @@
                             @endif
                         </p>
                         <p class="mb-0">
-                            <strong>Thanh toán:</strong>
+                            <strong>Thanh toán:</strong> 
                             @if ($checkoutSession['payment_method'] == 'cash')
                                 Thanh toán khi nhận hàng (COD)
                             @elseif ($checkoutSession['payment_method'] == 'bank')

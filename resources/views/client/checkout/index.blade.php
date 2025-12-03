@@ -209,12 +209,12 @@
                                         <label class="form-label small mb-1">Số lượng:</label>
                                         <div class="input-group input-group-sm" style="max-width: 120px;">
                                             <button type="button" class="btn btn-outline-secondary" id="qty-minus">−</button>
-                                            <input type="number"
-                                                id="quantity-input"
-                                                name="quantity"
-                                                class="form-control text-center"
-                                                value="{{ $qty }}"
-                                                min="1"
+                                            <input type="number" 
+                                                id="quantity-input" 
+                                                name="quantity" 
+                                                class="form-control text-center" 
+                                                value="{{ $qty }}" 
+                                                min="1" 
                                                 max="{{ $stock }}"
                                                 data-price="{{ $price }}"
                                                 data-stock="{{ $stock }}">
@@ -292,7 +292,7 @@
                     provinces = await response.json();
                     const citySelect = document.getElementById('shipping_city');
                     if (!citySelect) return;
-
+                    
                     provinces.forEach(province => {
                         const option = document.createElement('option');
                         option.value = province.name;
@@ -323,7 +323,7 @@
                     districts = data.districts || [];
                     const districtSelect = document.getElementById('shipping_district');
                     if (!districtSelect) return;
-
+                    
                     districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
                     districts.forEach(district => {
                         const option = document.createElement('option');
@@ -359,7 +359,7 @@
                     wards = data.wards || [];
                     const wardSelect = document.getElementById('shipping_ward');
                     if (!wardSelect) return;
-
+                    
                     wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
                     wards.forEach(ward => {
                         const option = document.createElement('option');
@@ -401,18 +401,18 @@
                 const quantityHidden = document.getElementById('quantity-hidden');
                 const qtyMinus = document.getElementById('qty-minus');
                 const qtyPlus = document.getElementById('qty-plus');
-
+                
                 // Kiểm tra các element có tồn tại không
                 if (!quantityInput || !quantityHidden || !qtyMinus || !qtyPlus) {
                     console.error('Không tìm thấy các element cần thiết');
                     return;
                 }
-
+                
                 const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
-
+                
                 const price = parseFloat(quantityInput.getAttribute('data-price')) || 0;
                 const maxStock = parseInt(quantityInput.getAttribute('data-stock')) || 1;
-
+                
                 const shippingFees = {
                     'standard': 30000,
                     'express': 50000,
@@ -430,18 +430,18 @@
 
                     // Tính lại subtotal
                     const subtotal = price * newQty;
-
+                    
                     // Cập nhật hiển thị
                     const productSubtotalEl = document.getElementById('product-subtotal');
                     const subtotalDisplayEl = document.getElementById('subtotal-display');
-
+                    
                     if (productSubtotalEl) {
                         productSubtotalEl.textContent = subtotal.toLocaleString('vi-VN') + ' đ';
                     }
                     if (subtotalDisplayEl) {
                         subtotalDisplayEl.textContent = subtotal.toLocaleString('vi-VN') + ' đ';
                     }
-
+                    
                     // Cập nhật phí vận chuyển và tổng
                     updateShippingFee(subtotal);
                 }
@@ -452,7 +452,7 @@
                     if (!selected) return;
 
                     let fee = shippingFees[selected.value] || 0;
-
+                    
                     // Miễn phí ship cho đơn trên 500k
                     if (subtotal >= 500000) {
                         fee = 0;
@@ -461,10 +461,10 @@
                     const total = Math.max(0, subtotal - currentDiscount + fee);
                     const shippingFeeEl = document.getElementById('shipping-fee');
                     const totalAmountEl = document.getElementById('total-amount');
-
+                    
                     if (shippingFeeEl) {
-                        shippingFeeEl.textContent = fee === 0
-                            ? 'Miễn phí'
+                        shippingFeeEl.textContent = fee === 0 
+                            ? 'Miễn phí' 
                             : fee.toLocaleString('vi-VN') + ' đ';
                     }
                     if (totalAmountEl) {

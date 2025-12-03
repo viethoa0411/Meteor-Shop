@@ -285,6 +285,7 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('client.chec
 Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('client.checkout.process');
 Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('client.checkout.confirm');
 Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
+Route::post('/checkout/apply-promotion', [CheckoutController::class, 'applyPromotion'])->name('client.checkout.applyPromotion');
 Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
 
 Route::fallback(function () {
