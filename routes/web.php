@@ -248,7 +248,8 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
         Route::get('/history', [ClientWalletController::class, 'history'])->name('history');
 
         // Deposit routes
-        Route::get('/deposit', [ClientDepositController::class, 'index'])->name('deposit'); 
+        Route::get('/deposit', [ClientDepositController::class, 'index'])->name('deposit');
+        Route::post('/deposit', [ClientDepositController::class, 'store'])->name('deposit.store'); 
  
     });
 });

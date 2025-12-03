@@ -67,7 +67,7 @@
                 </div>
                 @endif
 
-                <form action="#" method="POST">
+                <form action="{{ route('client.account.wallet.deposit.store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Số tiền muốn nạp <span class="text-danger">*</span></label>

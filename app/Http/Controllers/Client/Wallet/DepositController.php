@@ -35,6 +35,33 @@ class DepositController extends Controller
         return view('client.wallet.deposit', compact('wallet', 'settings', 'pendingDeposits'));
     }
 
-    
+    /**
+     * Xử lý yêu cầu nạp tiền
+     * - Validate số tiền
+     * - Tạo yêu cầu nạp tiền
+     * - Gửi mail thông báo cho admin
+     */
+    public function store(Request $request)
+    {
+        
+
+        $user = Auth::user();
+        $wallet = ClientWallet::getOrCreateForUser($user->id);
+        
+        // Tạo yêu cầu nạp tiền
+        $deposit = DepositRequest::create([
+            'user_id' => $user->id,
+            'wallet_id' => $wallet->id,
+            'amount' => $request->amount,
+            'note' => $request->note,
+        ]);
+
+        // Gửi mail thông báo cho admin
+        $this->sendDepositNotificationEmail($deposit, $user);
+
+        return redirect()->route('client.account.wallet.deposit.success', $deposit->id);
+    }
+
+ 
 }
 
