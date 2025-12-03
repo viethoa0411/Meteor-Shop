@@ -34,7 +34,8 @@ use App\Http\Controllers\Client\Contact\ContactController as ClientContactContro
 
 // Wallet Controllers
  
-use App\Http\Controllers\Client\Wallet\WalletController as ClientWalletController; 
+use App\Http\Controllers\Client\Wallet\WalletController as ClientWalletController;
+use App\Http\Controllers\Client\Wallet\DepositController as ClientDepositController; 
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -244,7 +245,11 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
     // ====== CLIENT WALLET ======
     Route::prefix('wallet')->name('wallet.')->group(function () {
         Route::get('/', [ClientWalletController::class, 'index'])->name('index');
-        Route::get('/history', [ClientWalletController::class, 'history'])->name('history'); 
+        Route::get('/history', [ClientWalletController::class, 'history'])->name('history');
+
+        // Deposit routes
+        Route::get('/deposit', [ClientDepositController::class, 'index'])->name('deposit'); 
+ 
     });
 });
 
