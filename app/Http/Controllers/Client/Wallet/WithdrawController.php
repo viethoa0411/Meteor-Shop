@@ -84,6 +84,20 @@ class WithdrawController extends Controller
 
         return redirect()->route('client.account.wallet.withdraw.success', $withdraw->id);
     }
- 
+
+    /**
+     * Trang thông báo thành công
+     */
+    public function success($id)
+    {
+        $withdraw = WithdrawRequest::where('user_id', Auth::id())->findOrFail($id);
+        $settings = WalletSetting::getSettings();
+        
+        return view('client.wallet.withdraw-success', compact('withdraw', 'settings'));
+    }
+
+     
+
+     
 }
 
