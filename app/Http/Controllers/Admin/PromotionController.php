@@ -4,16 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Promotion;
-use App\Models\Category; // Cần thiết cho chức năng áp dụng theo danh mục
-use App\Models\Product; // Cần thiết cho chức năng áp dụng theo sản phẩm
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class PromotionController extends Controller
 {
-    /**
-     * Hiển thị danh sách các mã khuyến mãi (Promotion).
-     * (Không thay đổi)
-     */
     public function list(Request $request)
     {
         $query = Promotion::query();
@@ -35,103 +31,143 @@ class PromotionController extends Controller
         return view('admin.promotions.list', compact('promotions'));
     }
 
-    // ----------------------------------------------------------------------
-    // PHƯƠNG THỨC THÊM MỚI (CREATE)
-    // ----------------------------------------------------------------------
-
-    /**
-     * Hiển thị form tạo mã khuyến mãi mới.
-     */
     public function create()
     {
-        // Lấy danh sách danh mục và sản phẩm để hiển thị trong form áp dụng
         $categories = Category::orderBy('name')->get();
         $products = Product::orderBy('name')->get();
-
         return view('admin.promotions.create', compact('categories', 'products'));
     }
 
-    /**
-     * Lưu dữ liệu mã khuyến mãi mới vào database.
-     */
     public function store(Request $request)
     {
-        // 1. Validation (Kiểm tra dữ liệu)
         $validated = $request->validate([
             'code' => 'required|string|max:100|unique:promotions,code',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'discount_type' => 'required|in:percent,fixed', // Kiểu giảm giá
+            'discount_type' => 'required|in:percent,fixed',
             'discount_value' => 'required|numeric|min:0.01',
-
-            // Các trường đã bổ sung theo yêu cầu
-            'max_discount' => 'nullable|numeric|min:0', // Giới hạn tiền giảm tối đa
-            'min_amount' => 'nullable|numeric|min:0',   // Giá trị đơn hàng tối thiểu
-            'min_orders' => 'nullable|integer|min:0',   // Số lần mua tối thiểu (2-N+)
-
+            'max_discount' => 'nullable|numeric|min:0',
+            'min_amount' => 'nullable|numeric|min:0',
+            'min_orders' => 'nullable|integer|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-
-            'limit_global' => 'nullable|integer|min:0',     // Tổng lượt dùng tối đa
-            'limit_per_user' => 'nullable|integer|min:0', // Lượt dùng trên mỗi user
-
+            'usage_limit' => 'nullable|integer|min:0',
+            'limit_per_user' => 'nullable|integer|min:0',
+            'limit_global' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
-            'scope' => 'required|in:all,category,product', // Phạm vi áp dụng
-
-            'category_ids' => 'nullable|array',
+            'scope' => 'required|in:all,category,product',
+            'category_ids' => 'array',
             'category_ids.*' => 'integer|exists:categories,id',
-
-            'product_ids' => 'nullable|array',
+            'product_ids' => 'array',
             'product_ids.*' => 'integer|exists:products,id',
         ]);
 
-        // Kiểm tra logic: Bắt buộc nhập Giới hạn tiền giảm nếu chọn giảm theo %
         if ($validated['discount_type'] === 'percent' && empty($validated['max_discount'])) {
             return back()->withErrors(['max_discount' => 'Vui lòng nhập giới hạn tiền giảm tối đa khi chọn giảm theo %'])->withInput();
         }
 
-        // 2. Tạo đối tượng Promotion
         $promotion = Promotion::create([
             'code' => $validated['code'],
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
-            'type' => $validated['discount_type'], // Lưu ý: Cột trong DB là 'type'
-            'value' => $validated['discount_value'],
-
-            'max_discount_amount' => $validated['max_discount'] ?? null, // Lưu ý: Cột trong DB là 'max_discount_amount'
-            'min_order_amount' => $validated['min_amount'] ?? 0,
-            'min_order_count' => $validated['min_orders'] ?? 0,
-
+            'discount_type' => $validated['discount_type'],
+            'discount_value' => $validated['discount_value'],
+            'max_discount' => $validated['max_discount'] ?? null,
+            'min_amount' => $validated['min_amount'] ?? 0,
+            'min_orders' => $validated['min_orders'] ?? 0,
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
-
-            'usage_limit' => $validated['limit_global'] ?? null, // Lưu ý: Cột trong DB là 'usage_limit'
-            'usage_limit_per_customer' => $validated['limit_per_user'] ?? null,
-
-            'used_count' => 0, // Khởi tạo số lần dùng là 0
+            'usage_limit' => $validated['usage_limit'] ?? null,
+            'limit_per_user' => $validated['limit_per_user'] ?? null,
+            'limit_global' => $validated['limit_global'] ?? null,
+            'used_count' => 0,
             'status' => $validated['status'],
+            'scope' => $validated['scope'],
         ]);
 
-        // 3. Xử lý mối quan hệ (scope: category/product)
         if ($validated['scope'] === 'category') {
-            // Sử dụng sync để lưu các category_ids vào bảng promotion_category
             $promotion->categories()->sync($validated['category_ids'] ?? []);
-            // Đảm bảo không còn liên kết sản phẩm cũ nếu có
-            $promotion->products()->detach();
         } elseif ($validated['scope'] === 'product') {
-            // Sử dụng sync để lưu các product_ids vào bảng promotion_product
             $promotion->products()->sync($validated['product_ids'] ?? []);
-            // Đảm bảo không còn liên kết danh mục cũ nếu có
-            $promotion->categories()->detach();
         } else {
-            // Nếu là 'all', detach tất cả các liên kết
             $promotion->categories()->detach();
             $promotion->products()->detach();
         }
 
-        // 4. Chuyển hướng
         return redirect()->route('admin.promotions.list')->with('success', 'Tạo mã khuyến mãi thành công');
     }
 
-    // Các phương thức: edit(), update(), destroy() đã được loại bỏ.
+    public function edit($id)
+    {
+        $promotion = Promotion::findOrFail($id);
+        $categories = Category::orderBy('name')->get();
+        $products = Product::orderBy('name')->get();
+        $selectedCategoryIds = $promotion->categories()->pluck('categories.id')->toArray();
+        $selectedProductIds = $promotion->products()->pluck('products.id')->toArray();
+
+        return view('admin.promotions.edit', compact('promotion', 'categories', 'products', 'selectedCategoryIds', 'selectedProductIds'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $promotion = Promotion::findOrFail($id);
+
+        $validated = $request->validate([
+            'code' => 'required|string|max:100|unique:promotions,code,' . $promotion->id,
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'discount_type' => 'required|in:percent,fixed',
+            'discount_value' => 'required|numeric|min:0.01',
+            'max_discount' => 'nullable|numeric|min:0',
+            'min_amount' => 'nullable|numeric|min:0',
+            'min_orders' => 'nullable|integer|min:0',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'usage_limit' => 'nullable|integer|min:0',
+            'limit_per_user' => 'nullable|integer|min:0',
+            'limit_global' => 'nullable|integer|min:0',
+            'status' => 'required|in:active,inactive',
+            'scope' => 'required|in:all,category,product',
+            'category_ids' => 'array',
+            'category_ids.*' => 'integer|exists:categories,id',
+            'product_ids' => 'array',
+            'product_ids.*' => 'integer|exists:products,id',
+        ]);
+
+        if ($validated['discount_type'] === 'percent' && empty($validated['max_discount'])) {
+            return back()->withErrors(['max_discount' => 'Vui lòng nhập giới hạn tiền giảm tối đa khi chọn giảm theo %'])->withInput();
+        }
+
+        $promotion->update([
+            'code' => $validated['code'],
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'discount_type' => $validated['discount_type'],
+            'discount_value' => $validated['discount_value'],
+            'max_discount' => $validated['max_discount'] ?? null,
+            'min_amount' => $validated['min_amount'] ?? 0,
+            'min_orders' => $validated['min_orders'] ?? 0,
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+            'usage_limit' => $validated['usage_limit'] ?? null,
+            'limit_per_user' => $validated['limit_per_user'] ?? null,
+            'limit_global' => $validated['limit_global'] ?? null,
+            'status' => $validated['status'],
+            'scope' => $validated['scope'],
+        ]);
+
+        if ($validated['scope'] === 'category') {
+            $promotion->categories()->sync($validated['category_ids'] ?? []);
+            $promotion->products()->detach();
+        } elseif ($validated['scope'] === 'product') {
+            $promotion->products()->sync($validated['product_ids'] ?? []);
+            $promotion->categories()->detach();
+        } else {
+            $promotion->categories()->detach();
+            $promotion->products()->detach();
+        }
+
+        return redirect()->route('admin.promotions.list')->with('success', 'Cập nhật mã khuyến mãi thành công');
+    }
+
 }
