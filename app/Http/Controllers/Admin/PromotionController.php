@@ -51,7 +51,6 @@ class PromotionController extends Controller
             'min_orders' => 'nullable|integer|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'usage_limit' => 'nullable|integer|min:0',
             'limit_per_user' => 'nullable|integer|min:0',
             'limit_global' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
@@ -77,7 +76,6 @@ class PromotionController extends Controller
             'min_orders' => $validated['min_orders'] ?? 0,
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
-            'usage_limit' => $validated['usage_limit'] ?? null,
             'limit_per_user' => $validated['limit_per_user'] ?? null,
             'limit_global' => $validated['limit_global'] ?? null,
             'used_count' => 0,
@@ -123,7 +121,6 @@ class PromotionController extends Controller
             'min_orders' => 'nullable|integer|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'usage_limit' => 'nullable|integer|min:0',
             'limit_per_user' => 'nullable|integer|min:0',
             'limit_global' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
@@ -149,7 +146,6 @@ class PromotionController extends Controller
             'min_orders' => $validated['min_orders'] ?? 0,
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
-            'usage_limit' => $validated['usage_limit'] ?? null,
             'limit_per_user' => $validated['limit_per_user'] ?? null,
             'limit_global' => $validated['limit_global'] ?? null,
             'status' => $validated['status'],
@@ -184,4 +180,3 @@ class PromotionController extends Controller
         return redirect()->route('admin.promotions.list')->with('success', 'Đã xoá mã khuyến mãi');
     }
 }
-

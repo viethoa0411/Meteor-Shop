@@ -32,9 +32,7 @@ class PromotionService
         if (!is_null($promotion->limit_global) && $promotion->used_count >= $promotion->limit_global) {
             return ['ok' => false, 'error' => 'Mã khuyến mãi đã đạt giới hạn toàn hệ thống'];
         }
-        if (!is_null($promotion->usage_limit) && $promotion->used_count >= $promotion->usage_limit) {
-            return ['ok' => false, 'error' => 'Mã khuyến mãi đã đạt giới hạn tổng'];
-        }
+        // Bỏ kiểm tra usage_limit (legacy)
 
         if ($user) {
             $usage = UserPromotionUsage::where('user_id', $user->id)->where('promotion_id', $promotion->id)->first();
@@ -128,4 +126,3 @@ class PromotionService
         });
     }
 }
-

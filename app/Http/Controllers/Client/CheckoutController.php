@@ -334,6 +334,7 @@ class CheckoutController extends Controller
                 'sub_total' => $checkoutSession['subtotal'],
                 'total_price' => $checkoutSession['subtotal'],
                 'discount_amount' => $checkoutSession['discount_amount'] ?? 0,
+                'promotion_id' => $checkoutSession['promotion']['promotion_id'] ?? null,
                 'final_total' => $checkoutSession['final_total'],
                 'order_status' => 'pending',
                 'payment_status' => 'pending',
@@ -447,6 +448,16 @@ class CheckoutController extends Controller
                     $variant->decrement('stock', $checkoutSession['quantity']);
                 } else {
                     $product->decrement('stock', $checkoutSession['quantity']);
+                }
+            }
+
+            // Tăng lượt dùng mã khuyến mãi nếu có
+            if (!empty($checkoutSession['promotion']['promotion_id'])) {
+                try {
+                    $service = new \App\Services\PromotionService();
+                    $service->incrementUsage(Auth::id(), $checkoutSession['promotion']['promotion_id']);
+                } catch (\Throwable $e) {
+                    // Không dừng tạo đơn nếu tăng lượt dùng thất bại
                 }
             }
 

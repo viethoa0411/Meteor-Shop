@@ -53,12 +53,12 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Giá trị giảm *</label>
-                        <input type="number" step="0.01" name="discount_value" class="form-control" value="{{ old('discount_value', $promotion->discount_value) }}" required>
+                        <label class="form-label">Giá trị giảm % hoặc số tiền</label>
+                        <input type="number" step="0" name="discount_value" class="form-control" value="{{ old('discount_value', $promotion->discount_value) }}" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Giới hạn giảm tối đa (nếu %) </label>
-                        <input type="number" step="0.01" name="max_discount" class="form-control" value="{{ old('max_discount', $promotion->max_discount) }}">
+                        <input type="number" step="0." name="max_discount" class="form-control" value="{{ old('max_discount', $promotion->max_discount) }}">
                     </div>
                 </div>
 
@@ -81,10 +81,6 @@
                     <div class="col-md-4">
                         <label class="form-label">Giới hạn tổng hệ thống</label>
                         <input type="number" name="limit_global" class="form-control" value="{{ old('limit_global', $promotion->limit_global) }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Giới hạn tổng (legacy)</label>
-                        <input type="number" name="usage_limit" class="form-control" value="{{ old('usage_limit', $promotion->usage_limit) }}">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Phạm vi áp dụng *</label>
@@ -144,4 +140,3 @@
     </div>
  </div>
 @endsection
-
