@@ -96,7 +96,20 @@ class WithdrawController extends Controller
         return view('client.wallet.withdraw-success', compact('withdraw', 'settings'));
     }
 
-     
+    /**
+     * Hủy yêu cầu rút tiền (chỉ khi đang pending)
+     */
+    public function cancel($id)
+    {
+        $withdraw = WithdrawRequest::where('user_id', Auth::id())
+            ->where('status', 'pending')
+            ->findOrFail($id);
+        
+        $withdraw->update(['status' => 'cancelled']);
+        
+        return redirect()->route('client.account.wallet.index')
+            ->with('success', 'Đã hủy yêu cầu rút tiền');
+    }
 
      
 }

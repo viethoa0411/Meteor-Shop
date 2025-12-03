@@ -257,7 +257,8 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
         // Withdraw routes
         Route::get('/withdraw', [ClientWithdrawController::class, 'index'])->name('withdraw');
         Route::post('/withdraw', [ClientWithdrawController::class, 'store'])->name('withdraw.store');
-        Route::get('/withdraw/{id}/success', [ClientWithdrawController::class, 'success'])->name('withdraw.success'); 
+        Route::get('/withdraw/{id}/success', [ClientWithdrawController::class, 'success'])->name('withdraw.success');
+        Route::post('/withdraw/{id}/cancel', [ClientWithdrawController::class, 'cancel'])->name('withdraw.cancel');
     });
 });
 
