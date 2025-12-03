@@ -96,7 +96,7 @@
                     <a href="{{ route('client.account.wallet.deposit') }}" class="wallet-btn wallet-btn-deposit">
                         <i class="bi bi-plus-circle me-2"></i>Nạp tiền
                     </a>
-                    <a href="#" class="wallet-btn wallet-btn-withdraw">
+                    <a href="{{ route('client.account.wallet.withdraw') }}" class="wallet-btn wallet-btn-withdraw">
                         <i class="bi bi-arrow-up-circle me-2"></i>Rút tiền
                     </a>
                 </div>

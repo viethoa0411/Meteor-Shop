@@ -35,7 +35,8 @@ use App\Http\Controllers\Client\Contact\ContactController as ClientContactContro
 // Wallet Controllers
  
 use App\Http\Controllers\Client\Wallet\WalletController as ClientWalletController;
-use App\Http\Controllers\Client\Wallet\DepositController as ClientDepositController; 
+use App\Http\Controllers\Client\Wallet\DepositController as ClientDepositController;
+use App\Http\Controllers\Client\Wallet\WithdrawController as ClientWithdrawController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -252,7 +253,9 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
         Route::post('/deposit', [ClientDepositController::class, 'store'])->name('deposit.store');
         Route::get('/deposit/{id}/success', [ClientDepositController::class, 'success'])->name('deposit.success');
         Route::post('/deposit/{id}/cancel', [ClientDepositController::class, 'cancel'])->name('deposit.cancel');
- 
+
+        // Withdraw routes
+        Route::get('/withdraw', [ClientWithdrawController::class, 'index'])->name('withdraw'); 
     });
 });
 
