@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Models\Promotion;
+use App\Services\PromotionService;
 
 class CheckoutController extends Controller
 {
@@ -34,7 +36,7 @@ class CheckoutController extends Controller
         // Xử lý checkout từ giỏ hàng
         if ($type === 'cart') {
             $cart = session()->get('cart', []);
-            
+
             if (empty($cart)) {
                 return redirect()->route('cart.index')
                     ->with('error', 'Giỏ hàng của bạn đang trống');
@@ -137,7 +139,7 @@ class CheckoutController extends Controller
             $variant = ProductVariant::where('id', $variantId)
                 ->where('product_id', $productId)
                 ->first();
-            
+
             if ($variant) {
                 // Ưu tiên giá của variant, nếu không có thì dùng giá sản phẩm
                 $price = $variant->price ?? $product->price;
@@ -207,11 +209,11 @@ class CheckoutController extends Controller
         // Cập nhật số lượng cho buy_now (nếu có)
         if ($checkoutSession['type'] === 'buy_now' && $request->has('quantity')) {
             $newQuantity = max(1, (int) $request->quantity);
-            
+
             // Kiểm tra lại tồn kho với số lượng mới
             $product = Product::findOrFail($checkoutSession['product_id']);
             $stock = $product->stock ?? 0;
-            
+
             if (!empty($checkoutSession['variant_id'])) {
                 $variant = ProductVariant::where('id', $checkoutSession['variant_id'])
                     ->where('product_id', $product->id)
@@ -251,7 +253,8 @@ class CheckoutController extends Controller
         $checkoutSession['payment_method'] = $request->payment_method;
         $checkoutSession['shipping_fee'] = $shippingFee;
         $checkoutSession['notes'] = $request->notes;
-        $checkoutSession['final_total'] = $checkoutSession['subtotal'] + $shippingFee;
+        $discountAmount = isset($checkoutSession['discount_amount']) ? (float) $checkoutSession['discount_amount'] : 0;
+        $checkoutSession['final_total'] = max(0, $checkoutSession['subtotal'] - $discountAmount + $shippingFee);
 
         session(['checkout_session' => $checkoutSession]);
 
@@ -270,7 +273,7 @@ class CheckoutController extends Controller
         }
 
         $checkoutSession = session('checkout_session');
-        
+
         if (!$checkoutSession) {
             return redirect()->route('client.home')
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
@@ -303,7 +306,7 @@ class CheckoutController extends Controller
         }
 
         $checkoutSession = session('checkout_session');
-        
+
         if (!$checkoutSession) {
             return redirect()->route('client.home')
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
@@ -330,7 +333,7 @@ class CheckoutController extends Controller
                 'payment_method' => $checkoutSession['payment_method'],
                 'sub_total' => $checkoutSession['subtotal'],
                 'total_price' => $checkoutSession['subtotal'],
-                'discount_amount' => 0,
+                'discount_amount' => $checkoutSession['discount_amount'] ?? 0,
                 'final_total' => $checkoutSession['final_total'],
                 'order_status' => 'pending',
                 'payment_status' => 'pending',
@@ -345,7 +348,7 @@ class CheckoutController extends Controller
                     $product = Product::findOrFail($item['product_id']);
                     $stock = $product->stock ?? 0;
                     $variant = null;
-                    
+
                     if (!empty($item['variant_id'])) {
                         $variant = ProductVariant::where('id', $item['variant_id'])
                             ->where('product_id', $product->id)
@@ -363,7 +366,7 @@ class CheckoutController extends Controller
 
                     // Lấy product với images để lưu snapshot
                     $productForSnapshot = Product::with('images')->findOrFail($product->id);
-                    
+
                     // Tạo order detail
                     OrderDetail::create([
                         'order_id' => $order->id,
@@ -371,8 +374,8 @@ class CheckoutController extends Controller
                         'product_name' => $item['name'],
                         'variant_id' => $variant ? $variant->id : null,
                         'variant_name' => $variant ? (
-                            ($variant->color_name ?? '') . 
-                            ($variant->length && $variant->width && $variant->height 
+                            ($variant->color_name ?? '') .
+                            ($variant->length && $variant->width && $variant->height
                                 ? ' - ' . $variant->length . 'x' . $variant->width . 'x' . $variant->height . ' cm'
                                 : '')
                         ) : null,
@@ -400,7 +403,7 @@ class CheckoutController extends Controller
                 $product = Product::findOrFail($checkoutSession['product_id']);
                 $stock = $product->stock ?? 0;
                 $variant = null;
-                
+
                 if (!empty($checkoutSession['variant_id'])) {
                     $variant = ProductVariant::where('id', $checkoutSession['variant_id'])
                         ->where('product_id', $product->id)
@@ -418,7 +421,7 @@ class CheckoutController extends Controller
 
                 // Lấy lại product với images để lưu snapshot
                 $productForSnapshot = Product::with('images')->findOrFail($product->id);
-                
+
                 // Tạo order detail với snapshot đầy đủ
                 OrderDetail::create([
                     'order_id' => $order->id,
@@ -426,8 +429,8 @@ class CheckoutController extends Controller
                     'product_name' => $productForSnapshot->name,
                     'variant_id' => $variant ? $variant->id : null,
                     'variant_name' => $variant ? (
-                        ($variant->color_name ?? '') . 
-                        ($variant->length && $variant->width && $variant->height 
+                        ($variant->color_name ?? '') .
+                        ($variant->length && $variant->width && $variant->height
                             ? ' - ' . $variant->length . 'x' . $variant->width . 'x' . $variant->height . ' cm'
                             : '')
                     ) : null,
@@ -460,6 +463,55 @@ class CheckoutController extends Controller
             return redirect()->back()
                 ->with('error', 'Có lỗi xảy ra khi tạo đơn hàng: ' . $e->getMessage());
         }
+    }
+
+    public function applyPromotion(\Illuminate\Http\Request $request)
+    {
+        if (!Auth::check()) {
+            return response()->json(['ok' => false, 'error' => 'Vui lòng đăng nhập'], 401);
+        }
+
+        $request->validate(['code' => 'required|string']);
+        $checkoutSession = session('checkout_session');
+        if (!$checkoutSession) {
+            return response()->json(['ok' => false, 'error' => 'Phiên đặt hàng đã hết hạn'], 400);
+        }
+
+        $items = [];
+        if ($checkoutSession['type'] === 'cart' && isset($checkoutSession['items'])) {
+            $items = $checkoutSession['items'];
+        } else {
+            $product = Product::find($checkoutSession['product_id']);
+            if (!$product) {
+                return response()->json(['ok' => false, 'error' => 'Sản phẩm không hợp lệ'], 400);
+            }
+            $items = [[
+                'product_id' => $product->id,
+                'product' => $product,
+                'subtotal' => $checkoutSession['subtotal'],
+            ]];
+        }
+
+        $service = new PromotionService();
+        $result = $service->validateAndCalculate(Auth::user(), $request->code, $items, $checkoutSession['subtotal']);
+
+        if (!$result['ok']) {
+            return response()->json(['ok' => false, 'error' => $result['error']], 400);
+        }
+
+        $promotionData = [
+            'code' => $result['code'],
+            'promotion_id' => $result['promotion_id'],
+            'discount_amount' => $result['discount'],
+        ];
+
+        $checkoutSession['promotion'] = $promotionData;
+        $checkoutSession['discount_amount'] = $promotionData['discount_amount'];
+        $shippingFee = $checkoutSession['shipping_fee'] ?? 0;
+        $checkoutSession['final_total'] = max(0, $checkoutSession['subtotal'] - $promotionData['discount_amount'] + $shippingFee);
+        session(['checkout_session' => $checkoutSession]);
+
+        return response()->json(['ok' => true, 'promotion' => $promotionData, 'final_total' => $checkoutSession['final_total']]);
     }
 
     /**
@@ -516,4 +568,3 @@ class CheckoutController extends Controller
         return $baseFee;
     }
 }
-
