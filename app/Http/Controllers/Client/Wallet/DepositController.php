@@ -43,7 +43,14 @@ class DepositController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $request->validate([
+            'amount' => 'required|numeric|min:10000|max:999999999999', // Tối thiểu 10,000đ, tối đa 999 tỷ
+        ], [
+            'amount.required' => 'Vui lòng nhập số tiền nạp',
+            'amount.numeric' => 'Số tiền phải là số',
+            'amount.min' => 'Số tiền nạp tối thiểu là 10,000đ',
+            'amount.max' => 'Số tiền nạp tối đa là 999,999,999,999đ',
+        ]);
 
         $user = Auth::user();
         $wallet = ClientWallet::getOrCreateForUser($user->id);
