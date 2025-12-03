@@ -339,7 +339,7 @@
             {{-- Nội dung --}}
             <div class="blog-detail-content-block">
                 <div class="blog-detail-content">
-                    {!! $blog->content !!}
+                    {!! \App\Helpers\TextHelper::sanitizeHtml($blog->content) !!}
                 </div>
             </div>
         </div>
