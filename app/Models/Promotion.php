@@ -20,12 +20,16 @@ class Promotion extends Model
         'usage_limit',
         'used_count',
         'status',
+        'apply_for_returning_customers',
+        'min_orders_for_applying',
     ];
 
     protected $casts = [
         'discount_value' => 'decimal:2',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'apply_for_returning_customers' => 'boolean',
+        'min_orders_for_applying' => 'integer',
     ];
 
     // Scopes
@@ -43,6 +47,17 @@ class Promotion extends Model
                         $q->whereNull('usage_limit')
                           ->orWhereRaw('used_count < usage_limit');
                     });
+    }
+
+    /**
+     * Lấy promotion áp dụng cho khách quay lại (đơn hàng thứ 2 trở lên).
+     */
+    public function scopeForReturningCustomers($query, int $orderCount)
+    {
+        return $query->available()
+            ->where('apply_for_returning_customers', true)
+            ->where('min_orders_for_applying', '<=', $orderCount)
+            ->orderByDesc('discount_value');
     }
 
     // Accessors

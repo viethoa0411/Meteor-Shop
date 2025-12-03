@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $table = 'orders';
-
-    // nếu dùng guarded/fillable tùy project
     protected $guarded = [];
 
     public function user()
@@ -16,8 +14,9 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function items()
+    public function details()
     {
-        return $this->hasMany(OrderItem::class, 'order_id');
+        return $this->hasMany(OrderDetail::class, 'order_id');
     }
 }
+

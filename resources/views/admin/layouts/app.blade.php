@@ -164,6 +164,7 @@
             <a href="#" class="active"><i class="bi bi-house-door-fill me-2"></i> Dashboard</a>
             <a href="{{ route('admin.categories.list') }}"><i class="bi bi-folder-plus me-2"></i> Danh mục</a>
             <a href="{{ route('admin.products.list') }}"><i class="bi bi-box-seam me-2"></i> Sản phẩm</a>
+            <a href="{{ route('admin.promotions.index') }}"><i class="bi bi-percent me-2"></i> Mã khuyến mãi</a>
             <a href="{{ route('admin.orders.index')}}"><i class="bi bi-cart-fill me-2"></i> Đơn hàng</a>
             <div class="dropdown-menu-item">
                 <a href="#"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản <i class="bi bi-chevron-right float-end"></i></a>
