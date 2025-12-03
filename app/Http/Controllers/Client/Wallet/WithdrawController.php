@@ -111,6 +111,91 @@ class WithdrawController extends Controller
             ->with('success', 'Đã hủy yêu cầu rút tiền');
     }
 
-     
+    /**
+     * Gửi email thông báo yêu cầu rút tiền cho admin
+     */
+    private function sendWithdrawNotificationEmail($withdraw, $user)
+    {
+        try {
+            $adminEmail = env('MAIL_FROM_ADDRESS', 'admin@meteorshop.com');
+            $formattedAmount = number_format($withdraw->amount, 0, ',', '.') . 'đ';
+
+            $emailContent = "
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                    <div style='background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; text-align: center;'>
+                        <h1 style='margin: 0;'>💸 Yêu cầu rút tiền mới</h1>
+                    </div>
+                    <div style='padding: 30px; background: #f9f9f9;'>
+                        <div style='background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>
+                            <h2 style='color: #333; border-bottom: 2px solid #f5576c; padding-bottom: 10px;'>
+                                Thông tin yêu cầu
+                            </h2>
+                            <table style='width: 100%; border-collapse: collapse;'>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Mã yêu cầu:</td>
+                                    <td style='padding: 10px 0; font-weight: bold; color: #333;'>{$withdraw->request_code}</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Khách hàng:</td>
+                                    <td style='padding: 10px 0; font-weight: bold; color: #333;'>{$user->name}</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Email:</td>
+                                    <td style='padding: 10px 0; color: #333;'>{$user->email}</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Số điện thoại:</td>
+                                    <td style='padding: 10px 0; color: #333;'>{$withdraw->phone}</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Số tiền rút:</td>
+                                    <td style='padding: 10px 0; font-weight: bold; font-size: 18px; color: #dc3545;'>{$formattedAmount}</td>
+                                </tr>
+                            </table>
+
+                            <h3 style='color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-top: 20px;'>
+                                Thông tin ngân hàng
+                            </h3>
+                            <table style='width: 100%; border-collapse: collapse;'>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Ngân hàng:</td>
+                                    <td style='padding: 10px 0; font-weight: bold; color: #333;'>{$withdraw->bank_name}</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Số tài khoản:</td>
+                                    <td style='padding: 10px 0; font-weight: bold; color: #333;'>{$withdraw->account_number}</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Chủ tài khoản:</td>
+                                    <td style='padding: 10px 0; font-weight: bold; color: #333;'>{$withdraw->account_holder}</td>
+                                </tr>
+                                <tr>
+                                    <td style='padding: 10px 0; color: #666;'>Ghi chú:</td>
+                                    <td style='padding: 10px 0; color: #333;'>" . ($withdraw->note ?? 'Không có') . "</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div style='text-align: center; margin-top: 20px;'>
+                            <a href='" . route('admin.wallet.withdraw.detail', $withdraw->id) . "'
+                               style='display: inline-block; background: #f5576c; color: white; padding: 12px 30px;
+                                      text-decoration: none; border-radius: 5px; font-weight: bold;'>
+                                Xem chi tiết & Xử lý
+                            </a>
+                        </div>
+                    </div>
+                    <div style='text-align: center; padding: 15px; color: #666; font-size: 12px;'>
+                        <p>Email này được gửi tự động từ hệ thống Meteor Shop</p>
+                    </div>
+                </div>
+            ";
+
+            Mail::html($emailContent, function ($message) use ($adminEmail, $withdraw) {
+                $message->to($adminEmail)
+                    ->subject("💸 Yêu cầu rút tiền mới #{$withdraw->request_code} - Meteor Shop");
+            });
+        } catch (\Exception $e) {
+            Log::error('Lỗi gửi email thông báo rút tiền: ' . $e->getMessage());
+        }
+    }
 }
 
