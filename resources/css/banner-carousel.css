@@ -1,0 +1,333 @@
+/* Banner Carousel Styles */
+.banner-carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    min-height: 500px;
+    max-height: 800px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    background: #000;
+}
+
+.banner-carousel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.banner-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+}
+
+.banner-slide.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.banner-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+    z-index: 1;
+}
+
+.banner-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    padding: 40px 20px;
+}
+
+.banner-content .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-content-inner {
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    animation: fadeInUp 0.8s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.banner-title {
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.2;
+    text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.6);
+    letter-spacing: -0.5px;
+}
+
+.banner-description {
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+    line-height: 1.7;
+    text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
+    max-width: 700px;
+}
+
+.banner-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: #fff;
+    color: #111;
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
+}
+
+.banner-btn:hover {
+    background: #09f;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.banner-btn i {
+    transition: transform 0.3s ease;
+}
+
+.banner-btn:hover i {
+    transform: translateX(5px);
+}
+
+/* Navigation Buttons */
+.banner-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.banner-carousel-wrapper:hover .banner-nav-btn {
+    opacity: 1;
+    visibility: visible;
+}
+
+.banner-prev {
+    left: 20px;
+}
+
+.banner-next {
+    right: 20px;
+}
+
+.banner-nav-btn:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.banner-nav-btn i {
+    font-size: 24px;
+    color: #111;
+}
+
+/* Indicators */
+.banner-indicators {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.banner-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.banner-indicator.active {
+    background: #fff;
+    border-color: #fff;
+    width: 30px;
+    border-radius: 6px;
+}
+
+.banner-indicator:hover {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Progress Bar */
+.banner-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    z-index: 10;
+}
+
+.banner-progress-bar {
+    height: 100%;
+    background: #fff;
+    width: 0%;
+    transition: width 5s linear;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .banner-carousel-wrapper {
+        height: 50vh;
+        min-height: 400px;
+    }
+
+    .banner-content-inner {
+        gap: 15px;
+        max-width: 90%;
+    }
+
+    .banner-title {
+        font-size: clamp(1.75rem, 6vw, 2.5rem);
+        line-height: 1.3;
+    }
+
+    .banner-description {
+        font-size: clamp(0.9rem, 3vw, 1.05rem);
+        line-height: 1.6;
+    }
+
+    .banner-btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .banner-nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .banner-nav-btn i {
+        font-size: 20px;
+    }
+
+    .banner-prev {
+        left: 10px;
+    }
+
+    .banner-next {
+        right: 10px;
+    }
+
+    .banner-indicators {
+        bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .banner-carousel-wrapper {
+        height: 40vh;
+        min-height: 300px;
+    }
+
+    .banner-content {
+        padding: 20px 15px;
+    }
+
+    .banner-content-inner {
+        gap: 12px;
+        max-width: 95%;
+    }
+
+    .banner-title {
+        font-size: clamp(1.5rem, 7vw, 2rem);
+        line-height: 1.3;
+    }
+
+    .banner-description {
+        font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+        line-height: 1.5;
+    }
+
+    .banner-btn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+}
+
