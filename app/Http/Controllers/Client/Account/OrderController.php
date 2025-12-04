@@ -185,6 +185,7 @@ class OrderController extends Controller
         $order->update([
             'order_status' => 'completed',
             'delivered_at' => $order->delivered_at ?: now(),
+            'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
         ]);
 
         $this->logStatusChange($order, 'completed', $request->user()->id);

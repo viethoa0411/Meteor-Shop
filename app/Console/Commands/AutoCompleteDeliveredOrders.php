@@ -26,6 +26,7 @@ class AutoCompleteDeliveredOrders extends Command
             $oldStatus = $order->order_status;
             $order->update([
                 'order_status' => 'completed',
+                'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
                 'updated_at' => now(),
             ]);
 
@@ -54,4 +55,3 @@ class AutoCompleteDeliveredOrders extends Command
         return Command::SUCCESS;
     }
 }
-

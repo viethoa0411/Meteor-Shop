@@ -324,6 +324,9 @@ class OrderReturnController extends Controller
                 $updateData['returned_at'] = now();
             } elseif ($newReturnStatus === 'rejected' && $order->order_status === 'return_requested') {
                 $updateData['order_status'] = 'completed';
+                if (($order->payment_method ?? null) === 'cash') {
+                    $updateData['payment_status'] = 'paid';
+                }
             }
 
             if ($request->admin_note) {
