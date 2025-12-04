@@ -33,7 +33,9 @@ use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderCon
 use App\Http\Controllers\Client\Contact\ContactController as ClientContactController;
 
 // Wallet Controllers
-use App\Http\Controllers\Admin\Wallet\WalletController as AdminWalletController; 
+use App\Http\Controllers\Admin\Wallet\WalletController as AdminWalletController;
+use App\Http\Controllers\Admin\Wallet\WithdrawController as AdminWithdrawController;
+use App\Http\Controllers\Admin\Wallet\SettingsController as AdminWalletSettingsController;
 use App\Http\Controllers\Client\Wallet\WalletController as ClientWalletController;
 use App\Http\Controllers\Client\Wallet\DepositController as ClientDepositController;
 use App\Http\Controllers\Client\Wallet\WithdrawController as ClientWithdrawController;
@@ -195,7 +197,22 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
 
     // ====== WALLET MANAGEMENT ======
     Route::prefix('wallet')->name('wallet.')->group(function () {
-        Route::get('/', [AdminWalletController::class, 'index'])->name('index'); 
+        Route::get('/', [AdminWalletController::class, 'index'])->name('index');
+
+        // Deposit routes
+        Route::get('/deposit/{id}', [AdminWalletController::class, 'depositDetail'])->name('deposit.detail');
+        Route::post('/deposit/{id}/confirm', [AdminWalletController::class, 'confirmDeposit'])->name('deposit.confirm');
+        Route::post('/deposit/{id}/reject', [AdminWalletController::class, 'rejectDeposit'])->name('deposit.reject');
+
+        // Withdraw routes
+        Route::get('/withdraw/{id}', [AdminWithdrawController::class, 'detail'])->name('withdraw.detail');
+        Route::post('/withdraw/{id}/confirm', [AdminWithdrawController::class, 'confirm'])->name('withdraw.confirm');
+        Route::post('/withdraw/{id}/reject', [AdminWithdrawController::class, 'reject'])->name('withdraw.reject');
+        Route::post('/withdraw/{id}/processing', [AdminWithdrawController::class, 'markProcessing'])->name('withdraw.processing');
+
+        // Settings routes
+        Route::get('/settings', [AdminWalletSettingsController::class, 'index'])->name('settings');
+        Route::put('/settings', [AdminWalletSettingsController::class, 'update'])->name('settings.update');
     });
 });
 

@@ -7,8 +7,8 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Wallet;
-use App\Models\Transaction;
+use App\Models\ClientWallet;
+use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +42,16 @@ class CheckoutController extends Controller
 
         $type = $request->get('type', 'buy_now');
         $user = Auth::user();
+
+        // Xử lý checkout từ mua lại đơn hàng (reorder)
+        $checkoutSession = session('checkout_session');
+        if ($checkoutSession && isset($checkoutSession['type']) && $checkoutSession['type'] === 'reorder') {
+            $cartItems = $checkoutSession['items'];
+            $subtotal = $checkoutSession['subtotal'];
+            $checkoutData = $checkoutSession;
+
+            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData'));
+        }
 
         // Xử lý checkout từ giỏ hàng
         if ($type === 'cart') {
@@ -204,7 +214,7 @@ class CheckoutController extends Controller
             'shipping_ward' => 'required|string|max:255',
             'shipping_address' => 'required|string|max:500',
             'shipping_method' => 'required|string|in:standard,express,fast',
-            'payment_method' => 'required|string|in:cash,bank,momo,paypal',
+            'payment_method' => 'required|string|in:cash,wallet',
             'notes' => 'nullable|string|max:1000',
             'quantity' => 'nullable|integer|min:1',
         ], [
@@ -277,6 +287,14 @@ class CheckoutController extends Controller
         $checkoutSession['notes'] = $request->notes;
         $checkoutSession['final_total'] = $checkoutSession['subtotal'] + $shippingFee;
 
+        // Kiểm tra số dư ví nếu thanh toán bằng ví
+        if ($request->payment_method === 'wallet') {
+            $wallet = ClientWallet::where('user_id', Auth::id())->first();
+            if (!$wallet || !$wallet->hasEnoughBalance($checkoutSession['final_total'])) {
+                return back()->with('error', 'Số dư ví không đủ để thanh toán. Vui lòng nạp thêm tiền hoặc chọn phương thức thanh toán khác.');
+            }
+        }
+
         session(['checkout_session' => $checkoutSession]);
 
         return redirect()->route('client.checkout.confirm');
@@ -309,39 +327,9 @@ class CheckoutController extends Controller
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
         }
 
-        // Tạo QR code nếu thanh toán bằng chuyển khoản
-        $qrCodeUrl = null;
-        $walletInfo = null;
-
-        if (isset($checkoutSession['payment_method']) && $checkoutSession['payment_method'] === 'bank') {
-            // Lấy thông tin ví admin (ví đầu tiên có status active)
-            $wallet = Wallet::where('status', 'active')->first();
-
-            if ($wallet) {
-                $walletInfo = $wallet;
-                $amount = $checkoutSession['final_total'];
-                $orderCode = 'ORDER' . strtoupper(Str::random(8));
-
-                // Tạo QR code sử dụng API VietQR
-                // Format: https://img.vietqr.io/image/{BANK_ID}-{ACCOUNT_NUMBER}-{TEMPLATE}.png?amount={AMOUNT}&addInfo={INFO}&accountName={ACCOUNT_NAME}
-                $bankId = $this->getBankId($wallet->bank_name);
-                $accountNumber = $wallet->bank_account;
-                $template = 'compact2'; // hoặc 'compact', 'qr_only', 'print'
-                $addInfo = urlencode("Thanh toan don hang " . $orderCode);
-                $accountName = urlencode($wallet->account_holder);
-
-                $qrCodeUrl = "https://img.vietqr.io/image/{$bankId}-{$accountNumber}-{$template}.png?amount={$amount}&addInfo={$addInfo}&accountName={$accountName}";
-
-                // Lưu QR code URL vào session
-                $checkoutSession['qr_code_url'] = $qrCodeUrl;
-                $checkoutSession['temp_order_code'] = $orderCode;
-                session(['checkout_session' => $checkoutSession]);
-            }
-        }
-
-        // Nếu là checkout từ cart
-        if ($checkoutSession['type'] === 'cart') {
-            return view('client.checkout.confirm-cart', compact('checkoutSession', 'qrCodeUrl', 'walletInfo'));
+        // Nếu là checkout từ cart hoặc reorder
+        if (in_array($checkoutSession['type'], ['cart', 'reorder'])) {
+            return view('client.checkout.confirm-cart', compact('checkoutSession'));
         }
 
         // Lấy lại sản phẩm và variant cho buy_now
@@ -351,55 +339,7 @@ class CheckoutController extends Controller
             $variant = ProductVariant::find($checkoutSession['variant_id']);
         }
 
-        return view('client.checkout.confirm', compact('checkoutSession', 'product', 'variant', 'qrCodeUrl', 'walletInfo'));
-    }
-
-    /**
-     * Lấy Bank ID cho VietQR API
-     */
-    private function getBankId($bankName)
-    {
-        $bankMapping = [
-            'Vietcombank' => 'VCB',
-            'Techcombank' => 'TCB',
-            'BIDV' => 'BIDV',
-            'VietinBank' => 'CTG',
-            'Agribank' => 'AGR',
-            'ACB' => 'ACB',
-            'MB Bank' => 'MB',
-            'VPBank' => 'VPB',
-            'TPBank' => 'TPB',
-            'Sacombank' => 'STB',
-            'HDBank' => 'HDB',
-            'VIB' => 'VIB',
-            'SHB' => 'SHB',
-            'Eximbank' => 'EIB',
-            'MSB' => 'MSB',
-            'OCB' => 'OCB',
-            'SeABank' => 'SEAB',
-            'VietCapitalBank' => 'VCCB',
-            'SCB' => 'SCB',
-            'VietBank' => 'VietBank',
-            'PVcomBank' => 'PVCB',
-            'Oceanbank' => 'Oceanbank',
-            'NCB' => 'NCB',
-            'BacABank' => 'BAB',
-            'LienVietPostBank' => 'LPB',
-            'KienLongBank' => 'KLB',
-            'VietABank' => 'VAB',
-            'NamABank' => 'NAB',
-            'PGBank' => 'PGB',
-            'GPBank' => 'GPB',
-            'ABBank' => 'ABB',
-            'BaoVietBank' => 'BVB',
-            'Cake' => 'CAKE',
-            'Ubank' => 'Ubank',
-            'Timo' => 'Timo',
-            'ViettelMoney' => 'VTLMONEY',
-            'VNPTMoney' => 'VNPTMONEY',
-        ];
-
-        return $bankMapping[$bankName] ?? 'VCB'; // Mặc định là Vietcombank
+        return view('client.checkout.confirm', compact('checkoutSession', 'product', 'variant'));
     }
 
     /**
@@ -461,8 +401,8 @@ class CheckoutController extends Controller
                 'order_date' => now(),
             ]);
 
-            // Xử lý checkout từ cart (nhiều sản phẩm)
-            if ($checkoutSession['type'] === 'cart' && isset($checkoutSession['items'])) {
+            // Xử lý checkout từ cart hoặc reorder (nhiều sản phẩm)
+            if (in_array($checkoutSession['type'], ['cart', 'reorder']) && isset($checkoutSession['items'])) {
                 foreach ($checkoutSession['items'] as $item) {
                     // Kiểm tra lại tồn kho
                     $product = Product::findOrFail($item['product_id']);
@@ -570,28 +510,31 @@ class CheckoutController extends Controller
                 }
             }
 
-            // Tạo transaction nếu thanh toán qua chuyển khoản
-            if ($checkoutSession['payment_method'] === 'bank') {
-                // Lấy ví admin đầu tiên (hoặc ví mặc định)
-                $wallet = Wallet::where('status', 'active')->first();
+            // Xử lý thanh toán bằng ví
+            if ($checkoutSession['payment_method'] === 'wallet') {
+                $clientWallet = ClientWallet::where('user_id', Auth::id())->first();
 
-                if ($wallet) {
-                    // Tạo transaction với trạng thái pending
-                    $transaction = Transaction::create([
-                        'order_id' => $order->id,
-                        'wallet_id' => $wallet->id,
-                        'amount' => $checkoutSession['final_total'],
-                        'type' => 'income',
-                        'status' => 'pending', // Sẽ được cập nhật thành 'completed' khi admin xác nhận
-                        'payment_method' => 'bank',
-                        'transaction_code' => $checkoutSession['temp_order_code'] ?? $orderCode,
-                        'qr_code_url' => $checkoutSession['qr_code_url'] ?? null,
-                        'description' => "Thanh toán đơn hàng {$orderCode} - {$checkoutSession['customer_name']}",
-                    ]);
-
-                    // Đơn hàng sẽ ở trạng thái "Chờ thanh toán"
-                    // Admin sẽ xác nhận thủ công sau khi kiểm tra chuyển khoản
+                if (!$clientWallet || !$clientWallet->hasEnoughBalance($checkoutSession['final_total'])) {
+                    throw new \Exception('Số dư ví không đủ để thanh toán');
                 }
+
+                $balanceBefore = $clientWallet->balance;
+                $clientWallet->subtractBalance($checkoutSession['final_total']);
+
+                // Tạo transaction log
+                WalletTransaction::create([
+                    'wallet_id' => $clientWallet->id,
+                    'user_id' => Auth::id(),
+                    'type' => 'payment',
+                    'amount' => $checkoutSession['final_total'],
+                    'balance_before' => $balanceBefore,
+                    'balance_after' => $clientWallet->balance,
+                    'description' => 'Thanh toán đơn hàng ' . $orderCode,
+                    'order_id' => $order->id,
+                ]);
+
+                // Cập nhật trạng thái đơn hàng thành đã thanh toán
+                $order->update(['payment_status' => 'paid']);
             }
 
             DB::commit();

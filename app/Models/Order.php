@@ -182,32 +182,24 @@ class Order extends Model
             return false;
         }
 
-        // Chỉ áp dụng cho thanh toán online
-        if (!in_array($this->payment_method, ['bank', 'momo'])) {
+        // Chỉ áp dụng cho thanh toán online (bank, momo) - không cho hủy nếu đã xác nhận
+        if (in_array($this->payment_method, ['bank', 'momo']) && $this->payment_status === 'paid') {
             return false;
         }
 
-        // Kiểm tra xem admin đã ấn "Đã nhận" chưa (transaction status = 'completed')
-        $transaction = $this->transactions()
-            ->where('type', 'income')
-            ->where('payment_method', $this->payment_method)
-            ->first();
-
-        // Nếu có transaction và đã completed (admin đã ấn "Đã nhận"), thì không cho phép hủy
-        if ($transaction && $transaction->status === 'completed') {
+        // Thanh toán bằng wallet đã trừ tiền - không cho hủy nếu đã thanh toán
+        if ($this->payment_method === 'wallet' && $this->payment_status === 'paid') {
             return false;
         }
 
         return true;
     }
 
-    public function refunds()
+    /**
+     * Relationship với WalletTransaction (nếu thanh toán bằng ví)
+     */
+    public function walletTransactions()
     {
-        return $this->hasMany(\App\Models\Refund::class);
-    }
-
-    public function transactions()
-    {
-        return $this->hasMany(\App\Models\Transaction::class);
+        return $this->hasMany(\App\Models\WalletTransaction::class);
     }
 }
