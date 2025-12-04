@@ -66,7 +66,7 @@ class Banner extends Model
     }
 
     /**
-     * Lấy URL đầy đủ của ảnh
+     * Lấy URL đầy đủ của ảnh (cố gắng xử lý các trường hợp đường dẫn khác nhau)
      */
     public function getImageUrlAttribute(): ?string
     {
@@ -74,12 +74,13 @@ class Banner extends Model
             return null;
         }
 
-        // Kiểm tra file có tồn tại không
-        if (Storage::disk('public')->exists($this->image)) {
-            return asset('storage/' . $this->image);
-        }
+        // Chuẩn hóa path: loại bỏ prefix không cần thiết
+        $path = ltrim($this->image, '/');
+        $path = str_replace(['storage/', 'public/'], '', $path);
 
-        return null;
+        // Không chặn hiển thị nếu Storage::exists trả về false,
+        // vì phía view đã có onerror fallback cho trường hợp ảnh thật sự không tồn tại.
+        return asset('storage/' . $path);
     }
 
     /**

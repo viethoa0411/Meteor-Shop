@@ -79,8 +79,8 @@
                                                 class="form-check-input trash-checkbox">
                                         </td>
                                         <td>
-                                            @if ($banner->image_url)
-                                                <img src="{{ $banner->image_url }}"
+                                            @if ($banner->image)
+                                                <img src="{{ asset('storage/' . ltrim($banner->image, '/')) }}"
                                                     alt="{{ $banner->title ?? 'Banner' }}" 
                                                     class="img-thumbnail"
                                                     style="width: 60px; height: 40px; object-fit: cover;"

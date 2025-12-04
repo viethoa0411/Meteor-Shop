@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\MonthlyTarget;
 use Illuminate\Support\Facades\DB;
 
@@ -16,12 +17,13 @@ class DashboardController extends Controller
         $month = now()->month;
         $year = now()->year;
 
-        // Thống kê người dùng và đơn hàng
+        // Thống kê người dùng, đơn hàng, sản phẩm
         $totalUsers = User::where('role', 'user')->count();
         $totalOrders = Order::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->count();
         $totalAllOrders = Order::count();
+        $totalProducts = Product::count();
 
         // Tính toán so sánh với tháng trước
         $lastMonth = $month - 1;
@@ -59,6 +61,10 @@ class DashboardController extends Controller
         $currentMonthRevenue = Order::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->where('order_status', 'completed')
+            ->sum('final_total');
+
+        // Tổng doanh thu tất cả thời gian (đơn hoàn thành)
+        $totalCompletedRevenue = Order::where('order_status', 'completed')
             ->sum('final_total');
 
         // Kiểm tra mục tiêu tháng
@@ -281,6 +287,72 @@ class DashboardController extends Controller
         // Tổng số đơn hàng theo filter
         $totalFilteredOrders = $ordersQuery->count();
 
+        // ========== BIỂU ĐỒ & KPI SẢN PHẨM ==========
+        // Thống kê cho 30 ngày gần nhất, chỉ tính đơn hoàn thành
+        $productOrders = Order::with('items.product.category')
+            ->where('order_status', 'completed')
+            ->whereDate('created_at', '>=', now()->subDays(30)->toDateString())
+            ->get();
+
+        // Top sản phẩm theo doanh thu
+        $productAggregates = [];
+        foreach ($productOrders as $order) {
+            foreach ($order->items as $item) {
+                if (!$item->product) {
+                    continue;
+                }
+                $pid = $item->product->id;
+                if (!isset($productAggregates[$pid])) {
+                    $productAggregates[$pid] = [
+                        'name' => $item->product->name ?? 'Sản phẩm',
+                        'revenue' => 0,
+                        'quantity' => 0,
+                    ];
+                }
+                $productAggregates[$pid]['revenue'] += ($item->price ?? 0) * ($item->quantity ?? 1);
+                $productAggregates[$pid]['quantity'] += ($item->quantity ?? 1);
+            }
+        }
+
+        // Sắp xếp theo doanh thu giảm dần, lấy top 7
+        usort($productAggregates, function ($a, $b) {
+            return $b['revenue'] <=> $a['revenue'];
+        });
+        $topProducts = array_slice($productAggregates, 0, 7);
+
+        $topProductsLabels = array_map(fn ($p) => $p['name'], $topProducts);
+        $topProductsRevenue = array_map(fn ($p) => round($p['revenue']), $topProducts);
+
+        // Số sản phẩm đã bán (ít nhất 1 lần) trong 30 ngày gần nhất
+        $soldProductsLast30Days = count($productAggregates);
+
+        // Doanh thu theo danh mục
+        $categoryAggregates = [];
+        foreach ($productOrders as $order) {
+            foreach ($order->items as $item) {
+                $category = $item->product->category ?? null;
+                $cid = $category->id ?? null;
+                if (!$cid) {
+                    continue;
+                }
+                if (!isset($categoryAggregates[$cid])) {
+                    $categoryAggregates[$cid] = [
+                        'name' => $category->name ?? 'Danh mục',
+                        'revenue' => 0,
+                    ];
+                }
+                $categoryAggregates[$cid]['revenue'] += ($item->price ?? 0) * ($item->quantity ?? 1);
+            }
+        }
+
+        usort($categoryAggregates, function ($a, $b) {
+            return $b['revenue'] <=> $a['revenue'];
+        });
+        $topCategories = array_slice($categoryAggregates, 0, 7);
+
+        $categoryLabels = array_map(fn ($c) => $c['name'], $topCategories);
+        $categoryRevenue = array_map(fn ($c) => round($c['revenue']), $topCategories);
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalOrders',
@@ -290,6 +362,9 @@ class DashboardController extends Controller
             'thisMonthUsers',
             'todayRevenue',
             'currentMonthRevenue',
+            'totalCompletedRevenue',
+            'totalProducts',
+            'soldProductsLast30Days',
             'monthlyTarget',
             'revenueData',
             'filteredRevenue',
@@ -311,7 +386,103 @@ class DashboardController extends Controller
             'growthChartData',
             'growthChartLabels',
             'orderGrowthRate',
-            'totalFilteredOrders'
+            'totalFilteredOrders',
+            'topProductsLabels',
+            'topProductsRevenue',
+            'categoryLabels',
+            'categoryRevenue'
         ));
+    }
+
+    /**
+     * API Control Chart doanh thu theo ngày (Actual, Mean, UCL, LCL).
+     * GET /admin/api/dashboard/revenue/control-chart?range=7|30|90|month|custom&from&to
+     */
+    public function revenueControlChartApi(Request $request)
+    {
+        $range = $request->query('range', '30');
+        $from = $request->query('from');
+        $to = $request->query('to');
+
+        $now = now();
+        switch ($range) {
+            case '7':
+                $start = $now->copy()->subDays(6)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case '90':
+                $start = $now->copy()->subDays(89)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'month':
+                $start = $now->copy()->startOfMonth();
+                $end = $now->copy()->endOfMonth();
+                break;
+            case 'custom':
+                $start = $from ? now()->parse($from)->startOfDay() : $now->copy()->subDays(29)->startOfDay();
+                $end = $to ? now()->parse($to)->endOfDay() : $now->copy()->endOfDay();
+                break;
+            case '30':
+            default:
+                $start = $now->copy()->subDays(29)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+        }
+
+        // Query doanh thu theo ngày trong khoảng thời gian
+        $rows = Order::selectRaw('DATE(created_at) as date, SUM(final_total) as revenue')
+            ->whereBetween('created_at', [$start, $end])
+            ->where(function ($q) {
+                $q->where('payment_status', 'paid')
+                    ->orWhere('order_status', 'completed');
+            })
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Map doanh thu theo ngày, fill 0 cho ngày không có đơn
+        $revenueByDate = $rows->pluck('revenue', 'date');
+        $dates = [];
+        $actual = [];
+
+        $cursor = $start->copy();
+        while ($cursor->lte($end)) {
+            $dateStr = $cursor->toDateString();
+            $dates[] = $dateStr;
+            $actual[] = (float) ($revenueByDate[$dateStr] ?? 0);
+            $cursor->addDay();
+        }
+
+        $count = count($actual);
+        if ($count === 0) {
+            return response()->json([
+                'dates' => [],
+                'actual' => [],
+                'mean' => 0,
+                'ucl' => 0,
+                'lcl' => 0,
+            ]);
+        }
+
+        $mean = array_sum($actual) / $count;
+
+        // Độ lệch chuẩn mẫu
+        $variance = 0;
+        foreach ($actual as $value) {
+            $variance += pow($value - $mean, 2);
+        }
+        $variance = $variance / ($count ?: 1);
+        $stdDev = sqrt($variance);
+
+        $ucl = $mean + 3 * $stdDev;
+        $lcl = max(0, $mean - 3 * $stdDev);
+
+        return response()->json([
+            'dates' => $dates,
+            'actual' => $actual,
+            'mean' => round($mean, 2),
+            'ucl' => round($ucl, 2),
+            'lcl' => round($lcl, 2),
+        ]);
     }
 }

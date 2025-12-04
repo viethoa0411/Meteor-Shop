@@ -12,12 +12,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
-        body {
+        html, body {
             margin: 0;
             padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
             background-color: #ffffff;
             color: #333;
             transition: background 0.3s, color 0.3s;
@@ -26,7 +25,8 @@
         .admin-container {
             display: flex;
             flex: 1;
-            min-height: calc(100vh - 56px - 50px);
+            height: calc(100vh - 56px);
+            overflow: hidden;
         }
 
         /* Sidebar */
@@ -36,6 +36,10 @@
             border-right: 1px solid #e5e7eb;
             color: #333;
             flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
             transition: background 0.3s, color 0.3s, border-color 0.3s;
         }
 
@@ -101,17 +105,9 @@
             padding: 20px;
             background-color: #f8f9fa;
             color: #333;
+            overflow-y: auto;
+            height: 100%;
             transition: background 0.3s, color 0.3s;
-        }
-
-        /* Footer */
-        .footer {
-            height: 50px;
-            background-color: #343a40;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         /* MOBILE */
@@ -163,11 +159,6 @@
         }
 
         body.dark main {
-            background-color: #2b2b2b !important;
-            color: #ddd;
-        }
-
-        body.dark .footer {
             background-color: #2b2b2b !important;
             color: #ddd;
         }
@@ -488,11 +479,6 @@
             @yield('content')
         </main>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <span>© 2025 Meteor-Shop — Admin Panel</span>
-    </footer>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

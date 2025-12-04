@@ -60,6 +60,9 @@ use App\Http\Controllers\Client\Wallet\WithdrawController as ClientWithdrawContr
 |--------------------------------------------------------------------------
 */
 
+use App\Http\Controllers\Client\RoomController;
+
+
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -89,9 +92,14 @@ Route::middleware(['admin'])
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/revenue/filter', [DashboardController::class, 'index'])->name('revenue.filter');
 
-        /* Monthly Target */
-        Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])->name('monthly_target.create');
-        Route::post('monthly-target/store', [MonthlyTargetController::class, 'store'])->name('monthly_target.store');
+    // ===== DASHBOARD =====
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/revenue/filter', [DashboardController::class, 'index'])->name('revenue.filter');
+    Route::get('/api/dashboard/revenue/control-chart', [DashboardController::class, 'revenueControlChartApi'])
+        ->name('dashboard.revenue.control-chart');
+    Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])
+        ->name('monthly_target.create');
+
 
         /* Categories */
         Route::prefix('categories')->name('categories.')->group(function () {
@@ -303,13 +311,20 @@ Route::get('/products/{slug}/reviews/check-updates', [ProductClientController::c
 Route::post('/products/{slug}/review', [ProductClientController::class, 'storeReview'])->name('client.product.review.store')->middleware('auth');
 Route::post('/reviews/{review}/helpful', [ProductClientController::class, 'markHelpful'])->name('client.review.helpful')->middleware('auth');
 Route::post('/reviews/{review}/report', [ProductClientController::class, 'reportReview'])->name('client.review.report')->middleware('auth');
-Route::get('/products', [HomeController::class, 'index'])->name('client.products.index');
-
-// Blogs (public)
-Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
-Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
 
 // Cart
+
+Route::get('/products', [ProductClientController::class, 'search'])->name('client.products.index');
+Route::get('/rooms', [RoomController::class, 'index'])->name('client.rooms.index');
+Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
+Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
+Route::get('/collections', [\App\Http\Controllers\Client\CollectionController::class, 'index'])->name('client.collections.index');
+Route::get('/collections/{slug}', [\App\Http\Controllers\Client\CollectionController::class, 'show'])->name('client.collections.show');
+Route::get('/designs', [\App\Http\Controllers\Client\DesignController::class, 'index'])->name('client.designs.index');
+Route::get('/designs/{slug}', [\App\Http\Controllers\Client\DesignController::class, 'show'])->name('client.designs.show');
+Route::get('/shares', [\App\Http\Controllers\Client\ShareController::class, 'index'])->name('client.shares.index');
+Route::get('/shares/{slug}', [\App\Http\Controllers\Client\ShareController::class, 'show'])->name('client.shares.show');
+
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update-qty', [CartController::class, 'updateQty'])->name('cart.updateQty');

@@ -35,11 +35,12 @@ class ProductClientController extends Controller
             'images',
             'variants',
             'category',
+            'brand',
             'reviews.user',
         ])
-            ->where('slug', $slug)
-            ->where('status', 'active')
-            ->firstOrFail();
+        ->where('slug', $slug)
+        ->where('status', 'active')
+        ->firstOrFail();
 
         // Lấy sản phẩm liên quan
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -224,8 +225,8 @@ class ProductClientController extends Controller
     protected function buildReviewsQuery(int $productId, array $filters)
     {
         $query = Review::where('product_id', $productId)
-            ->where('status', 'approved')
-            ->with(['user', 'replies.admin', 'helpfulVotes']);
+                ->where('status', 'approved')
+                ->with(['user', 'replies.admin', 'helpfulVotes']);
 
         // Filter theo rating
         if (!empty($filters['rating']) && $filters['rating'] !== 'all') {
@@ -235,7 +236,7 @@ class ProductClientController extends Controller
         // Filter có hình ảnh
         if ($filters['has_images'] === '1' || $filters['has_images'] === true) {
             $query->whereNotNull('images')
-                ->where('images', '!=', '[]');
+                  ->where('images', '!=', '[]');
         }
 
         // Filter verified buyer
@@ -247,8 +248,8 @@ class ProductClientController extends Controller
         if ($filters['sort'] === 'helpful') {
             // Sắp xếp theo số lượt hữu ích giảm dần
             $query->withCount('helpfulVotes')
-                ->orderBy('helpful_votes_count', 'desc')
-                ->orderBy('created_at', 'desc'); // Nếu bằng nhau thì sắp xếp theo mới nhất
+                  ->orderBy('helpful_votes_count', 'desc')
+                  ->orderBy('created_at', 'desc'); // Nếu bằng nhau thì sắp xếp theo mới nhất
         } else {
             $query->latest();
         }
@@ -311,59 +312,59 @@ class ProductClientController extends Controller
 
             $imageUrls = $this->formatReviewImages($review);
 
-            $adminReplies = [];
-            if ($review->replies && $review->replies->isNotEmpty()) {
-                $adminReplies = $review->replies->map(function ($reply) {
-                    return [
-                        'content' => $reply->content ?? '',
-                        'admin_name' => $reply->admin->name ?? 'Admin',
-                        'created_at' => $reply->created_at ? $reply->created_at->format('d/m/Y') : '',
-                    ];
-                })->values()->toArray();
-            }
-
-            return [
-                'id' => $review->id ?? 0,
-                'user_name' => $hiddenName ?? 'Người dùng',
-                'user_initial' => strtoupper(substr($userName, 0, 1)) ?: 'U',
-                'rating' => $review->rating ?? 0,
-                'content' => $review->content ?? $review->comment ?? '',
-                'images' => $imageUrls,
-                'is_verified_buyer' => $review->is_verified_purchase ?? false,
-                'created_at' => $review->created_at ? $review->created_at->format('d/m/Y') : '',
-                'created_at_full' => $review->created_at ? $review->created_at->format('d/m/Y H:i') : '',
-                'created_at_human' => $review->created_at ? $review->created_at->diffForHumans() : '',
-                'helpful_count' => $review->helpfulVotes ? $review->helpfulVotes->count() : 0,
+                $adminReplies = [];
+                if ($review->replies && $review->replies->isNotEmpty()) {
+                    $adminReplies = $review->replies->map(function ($reply) {
+                        return [
+                            'content' => $reply->content ?? '',
+                            'admin_name' => $reply->admin->name ?? 'Admin',
+                            'created_at' => $reply->created_at ? $reply->created_at->format('d/m/Y') : '',
+                        ];
+                    })->values()->toArray();
+                }
+                
+                return [
+                    'id' => $review->id ?? 0,
+                    'user_name' => $hiddenName ?? 'Người dùng',
+                    'user_initial' => strtoupper(substr($userName, 0, 1)) ?: 'U',
+                    'rating' => $review->rating ?? 0,
+                    'content' => $review->content ?? $review->comment ?? '',
+                    'images' => $imageUrls,
+                    'is_verified_buyer' => $review->is_verified_purchase ?? false,
+                    'created_at' => $review->created_at ? $review->created_at->format('d/m/Y') : '',
+                    'created_at_full' => $review->created_at ? $review->created_at->format('d/m/Y H:i') : '',
+                    'created_at_human' => $review->created_at ? $review->created_at->diffForHumans() : '',
+                    'helpful_count' => $review->helpfulVotes ? $review->helpfulVotes->count() : 0,
                 'is_helpful' => ($currentUser && $review->helpfulVotes)
                     ? $review->helpfulVotes->pluck('user_id')->contains($currentUser->id)
                     : false,
-                'admin_replies' => $adminReplies,
-                'admin_reply' => $adminReplies[0] ?? null,
-            ];
-        } catch (\Exception $e) {
-            Log::error('Error formatting review', [
-                'review_id' => $review->id ?? 'unknown',
-                'error' => $e->getMessage(),
+                    'admin_replies' => $adminReplies,
+                    'admin_reply' => $adminReplies[0] ?? null,
+                ];
+            } catch (\Exception $e) {
+                Log::error('Error formatting review', [
+                    'review_id' => $review->id ?? 'unknown',
+                    'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-            ]);
+                ]);
 
-            // Return minimal data để không break frontend
-            return [
-                'id' => $review->id ?? 0,
-                'user_name' => 'Người dùng',
-                'user_initial' => 'U',
-                'rating' => 0,
-                'content' => '',
-                'images' => [],
-                'is_verified_buyer' => false,
-                'created_at' => '',
-                'created_at_full' => '',
-                'created_at_human' => '',
-                'helpful_count' => 0,
-                'is_helpful' => false,
-                'admin_reply' => null,
-            ];
-        }
+                // Return minimal data để không break frontend
+                return [
+                    'id' => $review->id ?? 0,
+                    'user_name' => 'Người dùng',
+                    'user_initial' => 'U',
+                    'rating' => 0,
+                    'content' => '',
+                    'images' => [],
+                    'is_verified_buyer' => false,
+                    'created_at' => '',
+                    'created_at_full' => '',
+                    'created_at_human' => '',
+                    'helpful_count' => 0,
+                    'is_helpful' => false,
+                    'admin_reply' => null,
+                ];
+            }
     }
 
     /**
@@ -765,7 +766,36 @@ class ProductClientController extends Controller
             ->where('status', 1)
             ->get();
 
-        // Khởi tạo truy vấn sản phẩm
+        // Nếu không có bất kỳ filter nào => trang danh sách sản phẩm dạng "mỗi danh mục 1 dòng, 4 sản phẩm mới"
+        $hasAnyFilter = $searchQuery || $slug || $categoryInput || $minPrice || $maxPrice || $sort !== 'newest';
+        if (!$hasAnyFilter) {
+            $groupedCategories = Category::query()
+                ->select(['id', 'name', 'slug'])
+                ->where('status', 1)
+                ->orderBy('name')
+                ->with(['products' => function ($q) {
+                    $q->where('status', 1)
+                        ->orderBy('created_at', 'desc')
+                        ->take(4);
+                }])
+                ->get()
+                ->filter(function ($category) {
+                    return $category->products->count() > 0;
+                });
+
+            $title = 'Sản phẩm';
+
+            return view('client.products.index', [
+                'groupedCategories' => $groupedCategories,
+                'cate' => $cate,
+                'title' => $title,
+                'searchQuery' => null,
+                'selectedCategory' => null,
+                'products' => collect(), // để view không lỗi khi check
+            ]);
+        }
+
+        // Khởi tạo truy vấn sản phẩm khi có filter
         $query = Product::query()
             ->select(['id', 'name', 'slug', 'price', 'image', 'status', 'description', 'created_at', 'category_id'])
             ->where('status', 1);
@@ -821,9 +851,19 @@ class ProductClientController extends Controller
         }
 
         // ✅ Phân trang
-        $products = $query->paginate(8)->withQueryString();
+        $products = $query->paginate(12)->withQueryString();
 
-        return view('client.search', compact('products', 'searchQuery', 'cate', 'selectedCategory'));
+        $title = $searchQuery
+            ? 'Kết quả tìm kiếm'
+            : ($selectedCategory->name ?? 'Sản phẩm');
+
+        return view('client.products.index', compact(
+            'products',
+            'searchQuery',
+            'cate',
+            'selectedCategory',
+            'title'
+        ));
     }
 
     private function getDescendantCategoryIds(int $rootCategoryId)
