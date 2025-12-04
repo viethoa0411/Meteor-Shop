@@ -1,9 +1,30 @@
 @php
-    $cart = session()->get('cart', []);
+    $cart = [];
     $cartCount = 0;
 
-    foreach ($cart as $item) {
-        $cartCount += $item['quantity'];
+    if (auth()->check()) {
+        $cartModel = \App\Models\Cart::with(['items.product'])
+            ->where('user_id', auth()->id())
+            ->where('status', 'active')
+            ->first();
+
+        if ($cartModel) {
+            foreach ($cartModel->items as $ci) {
+                $product = $ci->product;
+                $cart[$ci->id] = [
+                    'name' => $product ? $product->name : '',
+                    'price' => (float) $ci->price,
+                    'quantity' => (int) $ci->quantity,
+                ];
+                $cartCount += (int) $ci->quantity;
+            }
+        }
+    } else {
+        $sessionCart = session()->get('cart', []);
+        foreach ($sessionCart as $id => $item) {
+            $cart[$id] = $item;
+            $cartCount += $item['quantity'] ?? 0;
+        }
     }
 
     $wishlistItems = collect();
