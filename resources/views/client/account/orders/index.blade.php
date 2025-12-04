@@ -138,7 +138,8 @@
                     'pending' => ['label' => 'Chờ xác nhận', 'icon' => 'bi-hourglass-split'],
                     'processing' => ['label' => 'Chuẩn bị hàng', 'icon' => 'bi-box'],
                     'shipping' => ['label' => 'Đang giao', 'icon' => 'bi-truck'],
-                    'completed' => ['label' => 'Đã giao', 'icon' => 'bi-check2-circle'],
+                    'delivered' => ['label' => 'Đã giao', 'icon' => 'bi-box-seam'],
+                    'completed' => ['label' => 'Hoàn thành', 'icon' => 'bi-check2-circle'],
                     'cancelled' => ['label' => 'Đã hủy', 'icon' => 'bi-x-circle'],
                     'returned' => ['label' => 'Trả hàng', 'icon' => 'bi-arrow-repeat'],
                 ];
