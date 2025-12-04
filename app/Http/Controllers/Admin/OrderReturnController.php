@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ClientWallet;
+use App\Models\WalletTransaction;
 
 class OrderReturnController extends Controller
 {
@@ -300,6 +302,7 @@ class OrderReturnController extends Controller
             } elseif ($newReturnStatus === 'refunded') {
                 // Đã nhận hàng và hoàn lại tiền - giữ nguyên order_status
                 $updateData['order_status'] = $order->order_status;
+                $updateData['payment_status'] = 'refunded';
                 if ($order->return_status !== 'refunded') {
                     $items = DB::table('order_details')
                         ->select('product_id', 'variant_id', 'quantity')
@@ -317,6 +320,24 @@ class OrderReturnController extends Controller
                                 ->increment('stock', (int) $it->quantity);
                         }
                     }
+
+                    // Hoàn tiền vào ví khách hàng
+                    $wallet = ClientWallet::getOrCreateForUser((int) $order->user_id);
+                    $balanceBefore = $wallet->balance;
+                    $wallet->addBalance((float) $order->final_total);
+
+                    WalletTransaction::create([
+                        'wallet_id' => $wallet->id,
+                        'user_id' => (int) $order->user_id,
+                        'type' => WalletTransaction::TYPE_REFUND,
+                        'amount' => (float) $order->final_total,
+                        'balance_before' => $balanceBefore,
+                        'balance_after' => $wallet->balance,
+                        'description' => 'Hoàn tiền trả hàng đơn #' . ($order->order_code ?? $orderId),
+                        'order_id' => (int) $orderId,
+                        'processed_by' => Auth::id(),
+                        'status' => 'completed',
+                    ]);
                 }
             } elseif ($newReturnStatus === 'completed') {
                 // Hoàn hàng thành công - trạng thái cuối cùng
