@@ -434,6 +434,7 @@ Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('c
 Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
 Route::post('/checkout/apply-promotion', [CheckoutController::class, 'applyPromotion'])->name('client.checkout.applyPromotion');
 Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
+Route::post('/checkout/calculate-shipping', [CheckoutController::class, 'calculateShippingFee'])->name('client.checkout.calculateShipping');
 
 
 /*

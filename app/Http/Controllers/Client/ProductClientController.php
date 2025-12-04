@@ -10,7 +10,6 @@ use App\Models\Wishlist;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\Review;
-use App\Models\Brand;
 use App\Models\User;
 
 use Illuminate\Http\Request;

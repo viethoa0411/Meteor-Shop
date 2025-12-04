@@ -11,12 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Schema;
 use App\Models\OrderStatusHistory;
 use App\Models\OrderLog;
-=======
->>>>>>> origin/Trang_Chu_Client
+
+
 
 class RefundController extends Controller
 {
@@ -32,7 +31,6 @@ class RefundController extends Controller
             return back()->with('error', 'Chỉ có thể yêu cầu trả hàng hoàn tiền khi đơn hàng đã giao thành công.');
         }
 
-<<<<<<< HEAD
         // Kiểm tra đã nhận hàng chưa
         if (!$order->delivered_at) {
             return back()->with('error', 'Đơn hàng chưa được xác nhận đã nhận hàng.');
@@ -44,8 +42,6 @@ class RefundController extends Controller
             return back()->with('error', "Đơn hàng đã quá hạn để yêu cầu trả hàng hoàn tiền. Thời gian cho phép là 7 ngày kể từ khi nhận hàng (đã qua {$daysSinceDelivery} ngày).");
         }
 
-=======
->>>>>>> origin/Trang_Chu_Client
         // Kiểm tra xem đã có yêu cầu hoàn tiền chưa
         $existingRefund = Refund::where('order_id', $order->id)
             ->where('refund_type', 'return')
@@ -130,16 +126,11 @@ class RefundController extends Controller
 
             // Cập nhật trạng thái đơn hàng
             $order->update([
-<<<<<<< HEAD
                 'order_status' => 'return_requested',
-=======
->>>>>>> origin/Trang_Chu_Client
                 'return_status' => 'requested',
                 'return_reason' => $request->cancel_reason,
                 'return_note' => $request->reason_description,
             ]);
-
-<<<<<<< HEAD
             if (Schema::hasTable('order_status_history')) {
                 OrderStatusHistory::create([
                     'order_id' => $order->id,
@@ -160,19 +151,12 @@ class RefundController extends Controller
                 ]);
             }
 
-=======
->>>>>>> origin/Trang_Chu_Client
             // Liên kết refund với transaction nếu có (cho đơn hàng đã thanh toán online)
             if (in_array($order->payment_method, ['bank', 'momo'])) {
                 $transaction = Transaction::where('order_id', $order->id)
                     ->where('type', 'income')
                     ->where('status', 'completed')
                     ->first();
-<<<<<<< HEAD
-
-=======
-                
->>>>>>> origin/Trang_Chu_Client
                 if ($transaction) {
                     $transaction->update(['refund_id' => $refund->id]);
                 }
@@ -247,11 +231,6 @@ class RefundController extends Controller
                 ->where('type', 'income')
                 ->whereIn('status', ['pending', 'completed'])
                 ->first();
-<<<<<<< HEAD
-
-=======
-            
->>>>>>> origin/Trang_Chu_Client
             if ($transaction) {
                 $transaction->update(['refund_id' => $refund->id]);
             }
@@ -341,7 +320,4 @@ class RefundController extends Controller
         abort_if($order->user_id !== $userId, 403, 'Bạn không có quyền truy cập đơn hàng này.');
     }
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Trang_Chu_Client

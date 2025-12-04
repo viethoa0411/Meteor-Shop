@@ -26,7 +26,6 @@ class Product extends Model
         'height',
         'color_code',
         'category_id',
-        'brand_id',
         'status',
         'rating_avg',
         'total_sold',
@@ -36,10 +35,6 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
-    }
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
     }
 
 
