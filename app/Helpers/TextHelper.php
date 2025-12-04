@@ -5,6 +5,38 @@ namespace App\Helpers;
 class TextHelper
 {
     /**
+     * Sanitize HTML content for safe output on the client side.
+     *
+     * - Giữ lại một số thẻ HTML cơ bản (p, br, strong, em, ul, ol, li, h1‑h4, a, img, blockquote)
+     * - Loại bỏ <script>, <style> và các thuộc tính on* (onclick, onerror, ...)
+     * - Loại bỏ javascript: trong href / src
+     */
+    public static function sanitizeHtml(?string $html): string
+    {
+        if ($html === null || $html === '') {
+            return '';
+        }
+
+        // Allow basic formatting tags only
+        $allowedTags = '<p><br><br/><strong><b><em><i><ul><ol><li><h1><h2><h3><h4><a><img><blockquote>';
+        $clean = strip_tags($html, $allowedTags);
+
+        // Remove script and style tags explicitly if still present
+        $clean = preg_replace('#<(script|style)\b[^>]*>.*?</\1>#is', '', $clean);
+
+        // Remove inline event handlers (onclick, onerror, onload, ...)
+        $clean = preg_replace('/\s+on\w+\s*=\s*"[^"]*"/i', '', $clean);
+        $clean = preg_replace("/\s+on\w+\s*=\s*'[^']*'/i", '', $clean);
+        $clean = preg_replace('/\s+on\w+\s*=\s*[^\s>]+/i', '', $clean);
+
+        // Strip javascript: from href/src attributes
+        $clean = preg_replace('/(href|src)\s*=\s*"(javascript:[^"]*)"/i', '$1="#"', $clean);
+        $clean = preg_replace("/(href|src)\s*=\s*'(javascript:[^']*)'/i", '$1="#"', $clean);
+
+        return $clean ?? '';
+    }
+
+    /**
      * Chuyển đổi tiếng Việt có dấu thành không dấu
      * 
      * @param string $str

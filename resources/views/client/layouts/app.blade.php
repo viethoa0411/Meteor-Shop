@@ -860,6 +860,8 @@
         });
     </script>
 
+    {{-- SweetAlert2 for client-side modals (báo cáo bình luận, thông báo đẹp) --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('scripts')
 

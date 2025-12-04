@@ -9,8 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    {{-- CSRF cho JS nếu cần --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
@@ -364,9 +362,40 @@
                class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam me-2"></i> Sản phẩm
             </a>
-
-            <a href="{{ route('admin.orders.list') }}"
-               class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+            <!-- Quản lý bình luận -->
+            <div class="dropdown-menu-item {{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
+                <a href="#" class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
+                    <i class="bi bi-chat-dots me-2"></i> Quản lý bình luận
+                    <i class="bi bi-chevron-right float-end"></i>
+                </a>
+                <div class="submenu">
+                    <a href="{{ route('admin.comments.index') }}" class="{{ request()->routeIs('admin.comments.index') ? 'active' : '' }}">
+                        <i class="bi bi-list-ul me-2"></i> Tất cả bình luận
+                    </a>
+                    <a href="{{ route('admin.comments.pending') }}" class="{{ request()->routeIs('admin.comments.pending') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history me-2"></i> Chờ duyệt
+                        @php
+                            $pendingCount = \App\Models\Review::pending()->count();
+                        @endphp
+                        @if($pendingCount > 0)
+                            <span class="badge bg-warning text-dark ms-2">{{ $pendingCount }}</span>
+                        @endif
+                    </a>
+                    <a href="{{ route('admin.comments.reported') }}" class="{{ request()->routeIs('admin.comments.reported') ? 'active' : '' }}">
+                        <i class="bi bi-flag me-2"></i> Bị báo cáo
+                        @php
+                            $reportedCount = \App\Models\Review::reported()->count();
+                        @endphp
+                        @if($reportedCount > 0)
+                            <span class="badge bg-danger ms-2">{{ $reportedCount }}</span>
+                        @endif
+                    </a>
+                    <a href="{{ route('admin.comments.settings') }}" class="{{ request()->routeIs('admin.comments.settings*') ? 'active' : '' }}">
+                        <i class="bi bi-gear me-2"></i> Cài đặt
+                    </a>
+                </div>
+            </div>
+            <a href="{{ route('admin.orders.list') }}" class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                 <i class="bi bi-cart-fill me-2"></i> Đơn hàng
             </a>
 
@@ -428,9 +457,6 @@
                 </div>
             </div>
 
-            <a href="#" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                <i class="bi bi-gear-fill me-2"></i> Cài đặt
-            </a>
         </aside>
 
         <!-- Content -->
@@ -446,6 +472,14 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 for better notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js for statistics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Admin comments shared JS (không cần Vite) -->
+    <script src="{{ asset('js/admin-comments.js') }}"></script>
+    @stack('scripts')
 
     <script>
         // Dark mode
