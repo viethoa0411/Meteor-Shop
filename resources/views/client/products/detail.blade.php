@@ -582,6 +582,10 @@
                         variant_id: selectedVariantId
                     };
 
+                    const originalHTML = addBtn.innerHTML;
+                    addBtn.disabled = true;
+                    addBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang thêm...';
+
                     fetch("{{ route('cart.add') }}", {
                             method: 'POST',
                             headers: {
@@ -590,14 +594,28 @@
                             },
                             body: JSON.stringify(payload)
                         })
-                        .then(res => res.json())
+                        .then(res => {
+                            if (res.status === 401) {
+                                window.location.href = '{{ route('client.login') }}';
+                                return null;
+                            }
+                            return res.json();
+                        })
                         .then(data => {
+                            if (!data) return;
                             if (data.status === 'success') {
                                 alert('Đã thêm vào giỏ hàng!');
                                 window.location.reload();
                             } else {
                                 alert(data.message || 'Không thể thêm vào giỏ hàng.');
+                                addBtn.disabled = false;
+                                addBtn.innerHTML = originalHTML;
                             }
+                        })
+                        .catch(() => {
+                            alert('Có lỗi xảy ra, vui lòng thử lại.');
+                            addBtn.disabled = false;
+                            addBtn.innerHTML = originalHTML;
                         });
                 });
             @endauth
