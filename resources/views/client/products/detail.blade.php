@@ -989,14 +989,11 @@
                     });
             }
 
-            // Buy Now (chỉ gắn 1 handler, tránh duplicated alerts)
             (function() {
                 const btn = document.getElementById('buy-now-btn');
                 if (btn && !btn.dataset.bound) {
                     btn.dataset.bound = 'true';
-                    btn.addEventListener('click', function() {
-                        buyNow();
-                    });
+                    btn.addEventListener('click', function() { buyNow(); });
                 }
             })();
 

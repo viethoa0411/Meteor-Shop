@@ -69,7 +69,8 @@
                                     $productSlug = $product->slug ?? null;
                                 @endphp
                                 @if ($productSlug)
-                                    <a href="{{ route('client.product.detail', $productSlug) }}" class="product-item-link text-decoration-none">
+                                    <a href="{{ route('client.product.detail', $productSlug) }}"
+                                        class="product-item-link text-decoration-none">
                                         <img src="{{ $item->image_path ? asset('storage/' . $item->image_path) : 'https://via.placeholder.com/80x80?text=No+Image' }}"
                                             alt="{{ $item->product_name ?? optional($item->product)->name }}" width="80"
                                             height="80" class="rounded" style="cursor: pointer;">
@@ -82,11 +83,12 @@
                                 <div class="flex-grow-1">
                                     @if ($productSlug)
                                         <a href="{{ route('client.product.detail', $productSlug) }}"
-                                           class="product-item-link text-decoration-none text-dark fw-semibold d-inline-block">
+                                            class="product-item-link text-decoration-none text-dark fw-semibold d-inline-block">
                                             {{ $item->product_name ?? optional($item->product)->name }}
                                         </a>
                                     @else
-                                        <div class="fw-semibold">{{ $item->product_name ?? optional($item->product)->name }}</div>
+                                        <div class="fw-semibold">
+                                            {{ $item->product_name ?? optional($item->product)->name }}</div>
                                     @endif
                                     <div class="text-muted small">
                                         @if ($item->variant_name)
@@ -138,7 +140,8 @@
                         @if ($order->discount_amount > 0)
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Giảm giá</span>
-                                <span class="text-success">- {{ number_format($order->discount_amount, 0, ',', '.') }} đ</span>
+                                <span class="text-success">- {{ number_format($order->discount_amount, 0, ',', '.') }}
+                                    đ</span>
                             </div>
                         @endif
                         <div class="d-flex justify-content-between mb-2">
@@ -158,17 +161,20 @@
                         <h6 class="fw-bold mb-3">Thao tác</h6>
                         <div class="d-flex flex-wrap gap-2">
                             @if ($order->canReceive())
-                                <form action="{{ route('client.account.orders.markReceived', $order) }}" method="POST" class="d-inline">
+                                <form action="{{ route('client.account.orders.markReceived', $order) }}" method="POST"
+                                    class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-success"
-                                            onclick="return confirm('Bạn đã nhận được hàng? Xác nhận này sẽ cập nhật trạng thái đơn hàng sang "Hoàn thành".');">
+                                        onclick="return confirm('Bạn đã nhận được hàng? Xác nhận này sẽ cập nhật trạng thái đơn hàng sang "Hoàn
+                                        thành".');">
                                         <i class="bi bi-check-circle me-1"></i> Đã nhận hàng
                                     </button>
                                 </form>
                             @endif
 
                             @if ($order->canTrack())
-                                <a class="btn btn-outline-primary" href="{{ route('client.account.orders.tracking', $order) }}">
+                                <a class="btn btn-outline-primary"
+                                    href="{{ route('client.account.orders.tracking', $order) }}">
                                     <i class="bi bi-truck me-1"></i> Theo dõi vận đơn
                                 </a>
                             @endif
@@ -178,7 +184,8 @@
                                     $daysRemaining = $order->getReturnDaysRemaining();
                                 @endphp
                                 <div class="d-flex flex-column">
-                                    <a class="btn btn-outline-warning" href="{{ route('client.account.orders.refund.return', $order) }}">
+                                    <a class="btn btn-outline-warning"
+                                        href="{{ route('client.account.orders.refund.return', $order) }}">
                                         <i class="bi bi-arrow-counterclockwise me-1"></i> Trả hàng hoàn tiền
                                     </a>
                                     @if ($daysRemaining !== null && $daysRemaining > 0)
@@ -202,7 +209,8 @@
                                 @endphp
                                 <div class="alert alert-info mt-2 mb-0 w-100">
                                     <i class="bi bi-info-circle me-1"></i>
-                                    Nếu bạn không xác nhận, hệ thống sẽ tự chuyển trạng thái sang <strong>Hoàn thành</strong>
+                                    Nếu bạn không xác nhận, hệ thống sẽ tự chuyển trạng thái sang <strong>Hoàn
+                                        thành</strong>
                                     sau 2 ngày kể từ thời điểm giao hàng ({{ $deliveredAt->format('d/m/Y H:i') }}).
                                     @if ($autoCompleteAt->isFuture())
                                         <br><small>Còn {{ $remainingDays }} ngày {{ $remainingHoursMod }} giờ.</small>
@@ -211,34 +219,39 @@
                             @endif
 
                             @if ($order->canCancelRefund())
-                                <a class="btn btn-outline-danger" href="{{ route('client.account.orders.refund.cancel', $order) }}">
+                                <a class="btn btn-outline-danger"
+                                    href="{{ route('client.account.orders.refund.cancel', $order) }}">
                                     <i class="bi bi-x-circle me-1"></i> Hủy đơn và hoàn tiền
                                 </a>
                             @endif
 
                             @php
-                                $pendingCancelRefund = $order->refunds
-                                    ->where('refund_type', 'cancel')
+                                $pendingCancelRefund = $order
+                                    ->refunds()
+                                    ->where('type', 'cancel')
                                     ->where('status', 'pending')
                                     ->first();
+
                             @endphp
 
                             @if ($pendingCancelRefund)
-                                <form action="{{ route('client.account.orders.refund.cancel.reset', $order) }}" method="POST" class="d-inline">
+                                <form action="{{ route('client.account.orders.refund.cancel.reset', $order) }}"
+                                    method="POST" class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-outline-dark"
-                                            onclick="return confirm('Bạn muốn đặt lại đơn hàng và dừng hoàn tiền?');">
+                                        onclick="return confirm('Bạn muốn đặt lại đơn hàng và dừng hoàn tiền?');">
                                         <i class="bi bi-arrow-repeat me-1"></i> Đặt lại
                                     </button>
                                 </form>
-
                             @endif
                         </div>
 
                         @if ($order->canCancel() && $order->payment_method === 'wallet' && $order->payment_status === 'paid')
                             <div class="alert alert-info mt-3 mb-0">
                                 <i class="bi bi-info-circle me-1"></i>
-                                Nếu bạn hủy đơn hàng, số tiền <strong class="text-success">{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được hoàn lại vào ví của bạn.
+                                Nếu bạn hủy đơn hàng, số tiền <strong
+                                    class="text-success">{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ
+                                được hoàn lại vào ví của bạn.
                             </div>
                         @endif
                     </div>
@@ -265,7 +278,8 @@
                             @if ($order->payment_method === 'wallet' && $order->payment_status === 'paid')
                                 <div class="alert alert-success">
                                     <i class="bi bi-wallet2 me-1"></i>
-                                    Số tiền <strong>{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được hoàn lại vào ví của bạn sau khi hủy đơn.
+                                    Số tiền <strong>{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được
+                                    hoàn lại vào ví của bạn sau khi hủy đơn.
                                 </div>
                             @endif
 
@@ -275,7 +289,8 @@
                                     <option value="">-- Chọn lý do --</option>
                                     <option value="Đổi ý, không muốn mua nữa">Đổi ý, không muốn mua nữa</option>
                                     <option value="Muốn thay đổi sản phẩm">Muốn thay đổi sản phẩm</option>
-                                    <option value="Muốn thay đổi địa chỉ giao hàng">Muốn thay đổi địa chỉ giao hàng</option>
+                                    <option value="Muốn thay đổi địa chỉ giao hàng">Muốn thay đổi địa chỉ giao hàng
+                                    </option>
                                     <option value="Tìm được giá tốt hơn">Tìm được giá tốt hơn</option>
                                     <option value="Đặt nhầm">Đặt nhầm</option>
                                     <option value="Lý do khác">Lý do khác</option>

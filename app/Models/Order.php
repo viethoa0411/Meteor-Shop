@@ -122,17 +122,22 @@ class Order extends Model
 
     protected function statusLabel(): Attribute
     {
-        return Attribute::get(fn () => $this->status_meta['label']);
+        return Attribute::get(fn() => $this->status_meta['label']);
     }
 
     protected function statusBadge(): Attribute
     {
-        return Attribute::get(fn () => $this->status_meta['badge']);
+        return Attribute::get(fn() => $this->status_meta['badge']);
     }
 
     protected function statusIcon(): Attribute
     {
-        return Attribute::get(fn () => $this->status_meta['icon']);
+        return Attribute::get(fn() => $this->status_meta['icon']);
+    }
+
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(OrderRefund::class, 'order_id');
     }
 
     public function getPaymentLabelAttribute(): string
@@ -154,7 +159,7 @@ class Order extends Model
     {
         return in_array($this->order_status, ['shipping', 'processing']);
     }
-        public function canReceive(): bool
+    public function canReceive(): bool
     {
         return $this->order_status === 'shipping';
     }
