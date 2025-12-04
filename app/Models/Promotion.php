@@ -25,12 +25,19 @@ class Promotion extends Model
         'used_count',
         'status',
         'scope',
+
+        'start_date',
+        'end_date',
+        'usage_limit',
+        'used_count',
+        'status',
     ];
 
     protected $casts = [
         'discount_value' => 'decimal:2',
         'max_discount' => 'decimal:2',
         'min_amount' => 'decimal:2',
+
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
@@ -49,6 +56,7 @@ class Promotion extends Model
                     ->where(function($q) {
                         $q->whereNull('limit_global')
                           ->orWhereRaw('used_count < limit_global');
+
                     });
     }
 
@@ -95,4 +103,5 @@ class Promotion extends Model
     {
         return $this->hasMany(UserPromotionUsage::class, 'promotion_id');
     }
+
 }

@@ -4,6 +4,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Danh sách đơn hàng</h2>
+<<<<<<< HEAD
         <div>
             <a href="{{ route('admin.orders.returns.index') }}" class="btn btn-warning me-2">
                 <i class="bi bi-arrow-repeat me-1"></i>Quản lý trả hàng
@@ -12,6 +13,11 @@
                 <i class="bi bi-bar-chart me-1"></i>Thống kê
             </a>
         </div>
+=======
+        <a href="{{ route('admin.orders.analytics', ['date_range' => 'all', 'start_date' => '2025-10-01', 'end_date' => '2025-11-29', 'status' => 'all']) }}" class="btn btn-primary">
+            <i class="bi bi-bar-chart me-1"></i>Thống kê
+        </a>
+>>>>>>> origin/Trang_Chu_Client
     </div>
 
     {{-- BỘ LỌC TRẠNG THÁI + TÌM KIẾM --}}
@@ -22,7 +28,10 @@
                 <option value="pending" {{ $status == 'pending' ? 'selected' : '' }}>Chờ xác nhận</option>
                 <option value="processing" {{ $status == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
                 <option value="shipping" {{ $status == 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
+<<<<<<< HEAD
                 <option value="delivered" {{ $status == 'delivered' ? 'selected' : '' }}>Đã giao</option>
+=======
+>>>>>>> origin/Trang_Chu_Client
                 <option value="completed" {{ $status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
                 <option value="cancelled" {{ $status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
                 <option value="return_requested" {{ $status == 'return_requested' ? 'selected' : '' }}>Yêu cầu trả hàng</option>
@@ -61,6 +70,7 @@
                 <td>{{ $order->customer_name }}</td>
                 <td>{{ number_format($order->final_total, 0, ',', '.') }}₫</td>
 
+<<<<<<< HEAD
                 <td>
     @php
         $statusConfig = [
@@ -77,6 +87,38 @@
     @endphp
     <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
                 </td>
+=======
+                {{-- Badge màu trạng thái --}}
+                <td>
+    @php
+        // 7 Trạng thái mới với màu sắc và tên tiếng Việt
+        $colors = [
+            'pending'          => 'dark',      // Xám đậm
+            'processing'       => 'primary',   // Xanh dương
+            'shipping'         => 'info',      // Xanh nhạt
+            'completed'        => 'success',   // Xanh lá
+            'cancelled'        => 'danger',    // Đỏ
+            'return_requested' => 'warning',   // Vàng/Cam
+            'returned'         => 'secondary', // Xám
+        ];
+
+        $labels = [
+            'pending'          => 'Chờ xác nhận',
+            'processing'       => 'Đang xử lý',
+            'shipping'         => 'Đang giao hàng',
+            'completed'        => 'Hoàn thành',
+            'cancelled'        => 'Đã hủy',
+            'return_requested' => 'Yêu cầu trả hàng',
+            'returned'         => 'Đã trả hàng',
+        ];
+
+        $color = $colors[$order->order_status] ?? 'light';
+        $label = $labels[$order->order_status] ?? ucfirst($order->order_status);
+    @endphp
+
+    <span class="badge bg-{{ $color }}">{{ $label }}</span>
+</td>
+>>>>>>> origin/Trang_Chu_Client
 
                 <td>{{ date('d/m/Y', strtotime($order->created_at)) }}</td>
                 <td>

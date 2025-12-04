@@ -95,8 +95,13 @@
                                 <h5 class="mb-0">Hình ảnh Banner</h5>
                             </div>
                             <div class="card-body text-center">
+<<<<<<< HEAD
                                 @if ($banner->image)
                                     <img src="{{ asset('storage/' . ltrim($banner->image, '/')) }}" alt="{{ $banner->title }}"
+=======
+                                @if ($banner->image_url)
+                                    <img src="{{ $banner->image_url }}" alt="{{ $banner->title }}"
+>>>>>>> origin/Trang_Chu_Client
                                         class="img-fluid rounded shadow-sm" style="max-width: 100%;"
                                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light p-5 rounded\'><i class=\'bi bi-image text-muted\' style=\'font-size: 3rem;\'></i><p class=\'text-muted mt-2\'>Ảnh không tồn tại</p></div>';">
                                 @else

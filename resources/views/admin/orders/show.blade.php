@@ -126,6 +126,7 @@
                                 {{ $statusMeta['label'] }}
                                 </span>
                         </div>
+<<<<<<< HEAD
                         <div>
                             @php
                                 $paymentStatusLabels = [
@@ -143,6 +144,11 @@
                             @endphp
                             <span class="badge bg-{{ $paymentBadge }}">
                                 {{ $paymentStatusLabels[$order->payment_status] ?? ucfirst($order->payment_status) }}
+=======
+                                            <div>
+                            <span class="badge bg-{{ $order->payment_status === 'paid' ? 'success' : 'warning' }}">
+                                {{ ucfirst($order->payment_status) }}
+>>>>>>> origin/Trang_Chu_Client
                             </span>
                         </div>
                     </div>

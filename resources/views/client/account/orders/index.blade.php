@@ -127,7 +127,6 @@
                     <h2 class="fw-bold mb-1">Đơn hàng của tôi</h2>
                     <p class="text-muted mb-0">Theo dõi và quản lý toàn bộ đơn hàng một cách dễ dàng.</p>
                 </div>
-
             </div>
         </div>
 
@@ -140,6 +139,7 @@
                     'shipping' => ['label' => 'Đang giao', 'icon' => 'bi-truck'],
                     'delivered' => ['label' => 'Đã giao', 'icon' => 'bi-box-seam'],
                     'completed' => ['label' => 'Hoàn thành', 'icon' => 'bi-check2-circle'],
+
                     'cancelled' => ['label' => 'Đã hủy', 'icon' => 'bi-x-circle'],
                     'returned' => ['label' => 'Trả hàng', 'icon' => 'bi-arrow-repeat'],
                 ];
@@ -279,6 +279,7 @@
                             <div class="flex-grow-1">
                                 @if ($productSlug)
                                     <a href="{{ route('client.product.detail', $productSlug) }}"
+
                                        class="text-decoration-none text-dark fw-semibold d-inline-block"
                                        style="transition: color 0.2s;">
                                         {{ $productName }}
@@ -328,6 +329,7 @@
                                     <div class="flex-grow-1">
                                         @if ($productSlug)
                                             <a href="{{ route('client.product.detail', $productSlug) }}"
+
                                                class="text-decoration-none text-dark fw-semibold d-inline-block"
                                                style="transition: color 0.2s;">
                                                 {{ $productName }}
@@ -365,15 +367,14 @@
                 </div>
 
                 <hr class="my-3">
-
                 {{-- BẮT ĐẦU PHẦN ĐÃ SỬA: CÁC NÚT HÀNH ĐỘNG --}}
                 {{-- Đã thêm align-items-start để căn chỉnh các nút lên trên cùng --}}
                 <div class="d-flex flex-wrap gap-2 align-items-start">
                     {{-- Nút cơ bản: Xem chi tiết --}}
+
                     <a class="btn btn-outline-secondary" href="{{ route('client.account.orders.show', $order) }}">
                         <i class="bi bi-eye me-1"></i> Xem chi tiết
                     </a>
-
                     {{-- Nút: Đã nhận hàng --}}
                     @if ($order->canReceive())
                         <form action="{{ route('client.account.orders.markReceived', $order) }}" method="POST" class="d-inline">
@@ -386,13 +387,14 @@
                     @endif
 
                     {{-- Nút: Theo dõi vận đơn --}}
+
                     @if ($order->canTrack())
                         <a class="btn btn-outline-primary" href="{{ route('client.account.orders.tracking', $order) }}">
                             <i class="bi bi-truck me-1"></i> Theo dõi vận đơn
                         </a>
                     @endif
-
                     {{-- Nút: Hủy đơn --}}
+
                     @if ($order->canCancel())
                         <button class="btn btn-outline-danger btn-cancel-order" data-order-id="{{ $order->id }}"
                             data-order-code="{{ $order->order_code }}"
@@ -400,7 +402,6 @@
                             <i class="bi bi-x-circle me-1"></i> Hủy đơn
                         </button>
                     @endif
-
                     {{-- Nút: Mua lại --}}
                     @if ($order->canReorder())
                         <form action="{{ route('client.account.orders.reorder', $order) }}" method="POST">
@@ -410,14 +411,13 @@
                             </button>
                         </form>
                     @endif
-
                     {{-- Nút: Đánh giá --}}
+
                     @if ($order->canReview())
                         <button class="btn btn-outline-success" type="button">
                             <i class="bi bi-star me-1"></i> Đánh giá
                         </button>
                     @endif
-
                     {{-- Logic Yêu cầu đổi trả (Sử dụng flex-column và min-height để tránh lệch nút) --}}
                     @if ($order->canReturn())
                         @php
@@ -452,6 +452,7 @@
                     @endif
                 </div>
                 {{-- KẾT THÚC PHẦN ĐÃ SỬA --}}
+
             </div>
         @empty
             <div class="order-card">
@@ -470,8 +471,8 @@
             {{ $orders->onEachSide(1)->links('vendor.pagination.bootstrap-5') }}
         @endif
     </div>
-
     {{-- MODAL HỦY ĐƠN --}}
+
     <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form method="POST" class="modal-content" id="cancelOrderForm">
@@ -504,8 +505,8 @@
             </form>
         </div>
     </div>
-
     {{-- MODAL YÊU CẦU ĐỔI TRẢ --}}
+
     <div class="modal fade" id="returnOrderModal" tabindex="-1" aria-labelledby="returnOrderModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -518,6 +519,7 @@
                 <div class="modal-body">
                     <p class="text-muted">Nhập thông tin cho đơn <span class="fw-semibold"
                                 id="returnOrderCode"></span></p>
+
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Lý do đổi trả</label>
@@ -549,6 +551,7 @@
     </div>
 
     {{-- SCRIPT --}}
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cancelModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
@@ -556,7 +559,9 @@
             const cancelForm = document.getElementById('cancelOrderForm');
             const returnForm = document.getElementById('returnOrderForm');
 
+
             // Xử lý nút Hủy đơn
+
             document.querySelectorAll('.btn-cancel-order').forEach(btn => {
                 btn.addEventListener('click', () => {
                     cancelForm.action = btn.dataset.action;
@@ -566,6 +571,7 @@
             });
 
             // Xử lý nút Yêu cầu đổi trả
+
             document.querySelectorAll('.btn-return-order').forEach(btn => {
                 btn.addEventListener('click', () => {
                     returnForm.action = btn.dataset.action;
@@ -575,6 +581,7 @@
             });
 
             // Xử lý nút xem thêm sản phẩm
+
             document.querySelectorAll('.btn-toggle-products').forEach(btn => {
                 const targetSelector = btn.getAttribute('data-bs-target');
                 const target = document.querySelector(targetSelector);
@@ -585,6 +592,9 @@
                 btn.textContent = btn.dataset.closeText;
 
                 // Cập nhật văn bản khi mở
+
+                btn.textContent = btn.dataset.closeText;
+
                 target.addEventListener('show.bs.collapse', () => {
                     btn.textContent = btn.dataset.openText;
                 });

@@ -46,64 +46,70 @@ class CheckoutController extends Controller
 
         // Xử lý checkout từ mua lại đơn hàng (reorder)
         $checkoutSession = session('checkout_session');
-        if ($checkoutSession && isset($checkoutSession['type']) && $checkoutSession['type'] === 'reorder') {
-            $cartItems     = $checkoutSession['items'];
-            $subtotal      = $checkoutSession['subtotal'];
-            $checkoutData  = $checkoutSession;
+        if (
+            $checkoutSession &&
+            isset($checkoutSession['type']) &&
+            $checkoutSession['type'] === 'reorder'
+        ) {
+            $cartItems    = $checkoutSession['items'];
+            $subtotal     = $checkoutSession['subtotal'];
+            $checkoutData = $checkoutSession;
 
             return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData'));
         }
 
         // Xử lý checkout từ giỏ hàng
         if ($type === 'cart') {
-            $cart = \App\Models\Cart::with(['items.product', 'items.variant'])
-                ->where('user_id', $user->id)
-                ->where('status', 'active')
-                ->first();
+            // 1. Lấy giỏ hàng từ session
+            $cart = session()->get('cart', []);
 
-            if (!$cart || $cart->items->isEmpty()) {
+            if (empty($cart)) {
                 return redirect()->route('cart.index')
                     ->with('error', 'Giỏ hàng của bạn đang trống');
             }
 
+            // Kiểm tra tồn kho cho tất cả sản phẩm trong giỏ
             $cartItems = [];
             $subtotal  = 0;
 
-            foreach ($cart->items as $ci) {
-                $product = $ci->product;
+            foreach ($cart as $key => $item) {
+                $product = Product::find($item['product_id']);
                 if (!$product) {
-                    continue;
+                    continue; // Bỏ qua sản phẩm không tồn tại
                 }
 
                 $stock   = $product->stock ?? 0;
-                $price   = (float) ($ci->variant ? ($ci->variant->price ?? $product->price) : $ci->price);
-                $variant = $ci->variant;
+                $price   = $item['price'];
+                $variant = null;
 
-                if ($variant) {
-                    $stock = $variant->stock ?? 0;
+                if (!empty($item['variant_id'])) {
+                    $variant = ProductVariant::find($item['variant_id']);
+                    if ($variant) {
+                        $stock = $variant->stock ?? 0;
+                        $price = $variant->price ?? $product->price;
+                    }
                 }
 
-                if ($stock < $ci->quantity) {
+                // Kiểm tra tồn kho
+                if ($stock < $item['quantity']) {
                     return redirect()->route('cart.index')
-                        ->with('error', "Sản phẩm '{$product->name}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                        ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                 }
 
-                $itemSubtotal = $price * $ci->quantity;
+                $itemSubtotal = $price * $item['quantity'];
                 $subtotal    += $itemSubtotal;
 
                 $cartItems[] = [
-                    'key'        => $ci->id,
-                    'product_id' => $product->id,
-                    'variant_id' => $variant ? $variant->id : null,
-                    'name'       => $product->name,
+                    'key'        => $key,
+                    'product_id' => $item['product_id'],
+                    'variant_id' => $item['variant_id'] ?? null,
+                    'name'       => $item['name'],
                     'price'      => $price,
-                    'quantity'   => (int) $ci->quantity,
+                    'quantity'   => $item['quantity'],
                     'subtotal'   => $itemSubtotal,
-                    'image'      => $product->image,
-                    'color'      => $ci->color ?? ($variant ? $variant->color_name : null),
-                    'size'       => $ci->size ?? ($variant && $variant->length && $variant->width && $variant->height
-                        ? ($variant->length . 'x' . $variant->width . 'x' . $variant->height)
-                        : null),
+                    'image'      => $item['image'] ?? $product->image,
+                    'color'      => $item['color'] ?? null,
+                    'size'       => $item['size'] ?? null,
                     'product'    => $product,
                     'variant'    => $variant,
                 ];
@@ -164,7 +170,7 @@ class CheckoutController extends Controller
 
         // Lưu thông tin vào session
         $checkoutData = [
-            'type'       => $type,
+            'type'       => $type, // thường là buy_now
             'product_id' => $productId,
             'variant_id' => $variantId,
             'quantity'   => $qty,
@@ -192,29 +198,28 @@ class CheckoutController extends Controller
         }
 
         $request->validate([
-            'customer_name'     => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
-            'customer_phone'    => 'required|string|regex:/^[0-9]{10,11}$/',
-            'customer_email'    => 'required|email|max:255',
-            'shipping_city'     => 'required|string|max:255',
-            'shipping_district' => 'required|string|max:255',
-            'shipping_ward'     => 'required|string|max:255',
-            'shipping_address'  => 'required|string|max:500',
-            'shipping_method'   => 'required|string|in:standard,express,fast',
-            // chỉ giữ lại cash + wallet
-            'payment_method'    => 'required|string|in:cash,wallet',
-            'notes'             => 'nullable|string|max:1000',
-            'quantity'          => 'nullable|integer|min:1',
+            'customer_name'    => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
+            'customer_phone'   => 'required|string|regex:/^[0-9]{10,11}$/',
+            'customer_email'   => 'required|email|max:255',
+            'shipping_city'    => 'required|string|max:255',
+            'shipping_district'=> 'required|string|max:255',
+            'shipping_ward'    => 'required|string|max:255',
+            'shipping_address' => 'required|string|max:500',
+            'shipping_method'  => 'required|string|in:standard,express,fast',
+            'payment_method'   => 'required|string|in:cash,wallet',
+            'notes'            => 'nullable|string|max:1000',
+            'quantity'         => 'nullable|integer|min:1',
         ], [
-            'customer_name.required'     => 'Vui lòng nhập họ tên',
-            'customer_name.regex'        => 'Họ tên chỉ được chứa chữ cái và khoảng trắng',
-            'customer_phone.required'    => 'Vui lòng nhập số điện thoại',
-            'customer_phone.regex'       => 'Số điện thoại phải có 10-11 chữ số',
-            'customer_email.required'    => 'Vui lòng nhập email',
-            'customer_email.email'       => 'Email không hợp lệ',
-            'shipping_city.required'     => 'Vui lòng chọn tỉnh/thành phố',
-            'shipping_district.required' => 'Vui lòng chọn quận/huyện',
-            'shipping_ward.required'     => 'Vui lòng chọn phường/xã',
-            'shipping_address.required'  => 'Vui lòng nhập địa chỉ chi tiết',
+            'customer_name.required'    => 'Vui lòng nhập họ tên',
+            'customer_name.regex'       => 'Họ tên chỉ được chứa chữ cái và khoảng trắng',
+            'customer_phone.required'   => 'Vui lòng nhập số điện thoại',
+            'customer_phone.regex'      => 'Số điện thoại phải có 10-11 chữ số',
+            'customer_email.required'   => 'Vui lòng nhập email',
+            'customer_email.email'      => 'Email không hợp lệ',
+            'shipping_city.required'    => 'Vui lòng chọn tỉnh/thành phố',
+            'shipping_district.required'=> 'Vui lòng chọn quận/huyện',
+            'shipping_ward.required'    => 'Vui lòng chọn phường/xã',
+            'shipping_address.required' => 'Vui lòng nhập địa chỉ chi tiết',
         ]);
 
         // Lấy checkout session
@@ -259,6 +264,11 @@ class CheckoutController extends Controller
             $checkoutSession['subtotal']
         );
 
+        // Lấy số tiền giảm (nếu đã áp dụng promotion trước đó)
+        $discountAmount = isset($checkoutSession['discount_amount'])
+            ? (float) $checkoutSession['discount_amount']
+            : 0;
+
         // Cập nhật checkout session với thông tin form
         $checkoutSession['customer_name']     = $request->customer_name;
         $checkoutSession['customer_phone']    = $request->customer_phone;
@@ -271,11 +281,9 @@ class CheckoutController extends Controller
         $checkoutSession['payment_method']    = $request->payment_method;
         $checkoutSession['shipping_fee']      = $shippingFee;
         $checkoutSession['notes']             = $request->notes;
+        $checkoutSession['discount_amount']   = $discountAmount;
 
-        $discountAmount = isset($checkoutSession['discount_amount'])
-            ? (float) $checkoutSession['discount_amount']
-            : 0;
-
+        // Tổng cuối cùng sau giảm giá + phí ship
         $checkoutSession['final_total'] = max(
             0,
             $checkoutSession['subtotal'] - $discountAmount + $shippingFee
@@ -322,6 +330,7 @@ class CheckoutController extends Controller
         // Lấy lại sản phẩm và variant cho buy_now
         $product = Product::with(['variants', 'images'])->findOrFail($checkoutSession['product_id']);
         $variant = null;
+
         if (!empty($checkoutSession['variant_id'])) {
             $variant = ProductVariant::find($checkoutSession['variant_id']);
         }
@@ -331,7 +340,7 @@ class CheckoutController extends Controller
 
     /**
      * ========================================
-     * CLIENT: TẠO ĐƠN HÀNG + XỬ LÝ THANH TOÁN
+     * CLIENT: TẠO ĐƠN HÀNG + THANH TOÁN
      * ========================================
      */
     public function createOrder()
@@ -350,7 +359,6 @@ class CheckoutController extends Controller
         }
 
         DB::beginTransaction();
-
         try {
             // Tạo mã đơn hàng
             $orderCode = 'DH' . strtoupper(Str::random(8)) . Carbon::now()->format('Ymd');
@@ -437,11 +445,12 @@ class CheckoutController extends Controller
                     }
                 }
 
-                // Xóa giỏ hàng sau khi checkout
+                // Xóa giỏ hàng sau khi checkout (nếu có model Cart)
                 $userCart = \App\Models\Cart::with('items')
                     ->where('user_id', Auth::id())
                     ->where('status', 'active')
                     ->first();
+
                 if ($userCart) {
                     foreach ($userCart->items as $ci) {
                         $ci->delete();
@@ -452,7 +461,6 @@ class CheckoutController extends Controller
                 }
             } else {
                 // Xử lý checkout mua ngay (1 sản phẩm)
-                // Kiểm tra lại tồn kho
                 $product = Product::findOrFail($checkoutSession['product_id']);
                 $stock   = $product->stock ?? 0;
                 $variant = null;
@@ -517,20 +525,19 @@ class CheckoutController extends Controller
 
                 // Tạo transaction log
                 WalletTransaction::create([
-                    'wallet_id'       => $clientWallet->id,
-                    'user_id'         => Auth::id(),
-                    'type'            => 'payment',
-                    'amount'          => $checkoutSession['final_total'],
-                    'balance_before'  => $balanceBefore,
-                    'balance_after'   => $clientWallet->balance,
-                    'description'     => 'Thanh toán đơn hàng ' . $orderCode,
-                    'order_id'        => $order->id,
+                    'wallet_id'      => $clientWallet->id,
+                    'user_id'        => Auth::id(),
+                    'type'           => 'payment',
+                    'amount'         => $checkoutSession['final_total'],
+                    'balance_before' => $balanceBefore,
+                    'balance_after'  => $clientWallet->balance,
+                    'description'    => 'Thanh toán đơn hàng ' . $orderCode,
+                    'order_id'       => $order->id,
                 ]);
 
                 // Cập nhật trạng thái đơn hàng thành đã thanh toán
                 $order->update(['payment_status' => 'paid']);
             }
-
             // Nếu là tiền mặt, có thể giữ payment_status = pending để shipper thu hộ
 
             // Tăng lượt dùng mã khuyến mãi nếu có
@@ -557,6 +564,9 @@ class CheckoutController extends Controller
         }
     }
 
+    /**
+     * Áp dụng mã khuyến mãi
+     */
     public function applyPromotion(Request $request)
     {
         if (!Auth::check()) {
@@ -599,9 +609,9 @@ class CheckoutController extends Controller
         }
 
         $promotionData = [
-            'code'           => $result['code'],
-            'promotion_id'   => $result['promotion_id'],
-            'discount_amount'=> $result['discount'],
+            'code'            => $result['code'],
+            'promotion_id'    => $result['promotion_id'],
+            'discount_amount' => $result['discount'],
         ];
 
         $checkoutSession['promotion']       = $promotionData;

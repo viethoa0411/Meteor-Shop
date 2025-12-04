@@ -78,6 +78,7 @@
                         <td>Tổng đơn hàng:</td>
                         <td class="text-end fw-bold">{{ number_format($order->final_total, 0, ',', '.') }}₫</td>
                     </tr>
+<<<<<<< HEAD
                     @php
                         $paidSum = ($order->payments ? $order->payments->where('status', 'paid')->sum('amount') : 0);
                         if ($order->payment_method === 'cash' && $order->order_status === 'completed') {
@@ -88,6 +89,12 @@
                         <td>Đã thanh toán:</td>
                         <td class="text-end text-success">
                             {{ number_format($paidSum, 0, ',', '.') }}₫
+=======
+                    <tr>
+                        <td>Đã thanh toán:</td>
+                        <td class="text-end text-success">
+                            {{ number_format(($order->payments ? $order->payments->where('status', 'paid')->sum('amount') : 0), 0, ',', '.') }}₫
+>>>>>>> origin/Trang_Chu_Client
                         </td>
                     </tr>
                     <tr>
@@ -99,11 +106,16 @@
                     <tr class="border-top">
                         <td><strong>Còn lại:</strong></td>
                         <td class="text-end">
+<<<<<<< HEAD
                             @php
                                 $remaining = max(0, $order->final_total - $paidSum);
                             @endphp
                             <strong class="text-{{ $remaining == 0 ? 'success' : 'warning' }}">
                                 {{ number_format($remaining, 0, ',', '.') }}₫
+=======
+                            <strong class="text-{{ $order->payment_status === 'paid' ? 'success' : 'warning' }}">
+                                {{ number_format($order->final_total - ($order->payments ? $order->payments->where('status', 'paid')->sum('amount') : 0), 0, ',', '.') }}₫
+>>>>>>> origin/Trang_Chu_Client
                             </strong>
                         </td>
                     </tr>
@@ -154,3 +166,7 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Trang_Chu_Client

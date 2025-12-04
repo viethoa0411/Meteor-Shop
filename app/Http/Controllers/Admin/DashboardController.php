@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
+
 use App\Models\MonthlyTarget;
 use Illuminate\Support\Facades\DB;
 
@@ -18,12 +19,15 @@ class DashboardController extends Controller
         $year = now()->year;
 
         // Thống kê người dùng, đơn hàng, sản phẩm
+
+
         $totalUsers = User::where('role', 'user')->count();
         $totalOrders = Order::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->count();
         $totalAllOrders = Order::count();
         $totalProducts = Product::count();
+
 
         // Tính toán so sánh với tháng trước
         $lastMonth = $month - 1;
@@ -43,6 +47,7 @@ class DashboardController extends Controller
             ->whereMonth('created_at', $month)
             ->count();
         $userGrowth = $lastMonthUsers > 0
+
             ? round((($thisMonthUsers - $lastMonthUsers) / $lastMonthUsers) * 100, 1)
             : ($thisMonthUsers > 0 ? 100 : 0);
 
@@ -51,6 +56,7 @@ class DashboardController extends Controller
             ->whereMonth('created_at', $lastMonth)
             ->count();
         $orderGrowth = $lastMonthOrders > 0
+
             ? round((($totalOrders - $lastMonthOrders) / $lastMonthOrders) * 100, 1)
             : ($totalOrders > 0 ? 100 : 0);
 
@@ -150,12 +156,10 @@ class DashboardController extends Controller
                 // Filter hôm nay
                 $ordersQuery->whereDate('created_at', now()->toDateString());
                 break;
-
             case 'last_7_days':
                 // Filter 7 ngày gần nhất
                 $ordersQuery->whereDate('created_at', '>=', now()->subDays(7)->toDateString());
                 break;
-
             case 'last_15_days':
                 // Filter 15 ngày gần nhất
                 $ordersQuery->whereDate('created_at', '>=', now()->subDays(15)->toDateString());
@@ -164,6 +168,7 @@ class DashboardController extends Controller
             case 'all':
                 // Hiển thị tất cả - không filter thời gian
                 break;
+
 
             case 'month':
                 // Filter theo tháng/năm
@@ -178,7 +183,6 @@ class DashboardController extends Controller
                         ->whereMonth('created_at', $orderFilterMonth);
                 }
                 break;
-
             case 'date_range':
                 // Filter theo khoảng thời gian
                 if ($orderFilterStartDate) {
@@ -188,7 +192,6 @@ class DashboardController extends Controller
                     $ordersQuery->whereDate('created_at', '<=', $orderFilterEndDate);
                 }
                 break;
-
             case 'last_30_days':
             default:
                 // Mặc định: 30 ngày gần nhất
@@ -209,7 +212,6 @@ class DashboardController extends Controller
 
         // Thống kê đơn hàng theo trạng thái (dùng cùng filter với danh sách)
         $statsQuery = Order::select('order_status', DB::raw('count(*) as count'));
-
         // Áp dụng cùng filter thời gian
         switch ($orderFilterType) {
             case 'today':
@@ -252,6 +254,7 @@ class DashboardController extends Controller
 
         // Đảm bảo tất cả trạng thái đều có trong thống kê (mặc định 0)
         $allStatuses = ['pending', 'processing', 'shipping', 'delivered', 'completed', 'cancelled'];
+
         foreach ($allStatuses as $status) {
             if (!isset($orderStatsByStatus[$status])) {
                 $orderStatsByStatus[$status] = 0;
@@ -268,7 +271,6 @@ class DashboardController extends Controller
             $growthChartLabels[] = $dateStr;
 
             $countQuery = Order::whereDate('created_at', $date->toDateString());
-
             // Chỉ áp dụng filter trạng thái nếu có
             if ($orderFilterStatus && $orderFilterStatus !== 'all') {
                 $countQuery->where('order_status', $orderFilterStatus);
@@ -281,6 +283,7 @@ class DashboardController extends Controller
         $todayOrders = $growthChartData[6] ?? 0;
         $yesterdayOrders = $growthChartData[5] ?? 0;
         $orderGrowthRate = $yesterdayOrders > 0
+
             ? round((($todayOrders - $yesterdayOrders) / $yesterdayOrders) * 100, 1)
             : ($todayOrders > 0 ? 100 : 0);
 
@@ -365,6 +368,7 @@ class DashboardController extends Controller
             'totalCompletedRevenue',
             'totalProducts',
             'soldProductsLast30Days',
+
             'monthlyTarget',
             'revenueData',
             'filteredRevenue',
@@ -483,6 +487,8 @@ class DashboardController extends Controller
             'mean' => round($mean, 2),
             'ucl' => round($ucl, 2),
             'lcl' => round($lcl, 2),
-        ]);
+            'totalFilteredOrders']
+        );
     }
+
 }

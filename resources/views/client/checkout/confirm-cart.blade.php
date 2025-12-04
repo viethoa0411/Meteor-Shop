@@ -182,6 +182,39 @@
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
             });
+<<<<<<< HEAD
         </script>
     @endpush
 @endsection
+=======
+
+            // Hàm copy vào clipboard
+            function copyToClipboard(text, button) {
+                navigator.clipboard.writeText(text).then(function() {
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = '<i class="bi bi-check"></i> Đã copy';
+                    button.classList.remove('btn-outline-primary', 'btn-outline-danger');
+                    button.classList.add('btn-success');
+
+                    setTimeout(function() {
+                        button.innerHTML = originalHTML;
+                        button.classList.remove('btn-success');
+                        if (text.includes('Thanh toan') || !isNaN(parseFloat(text))) {
+                            if (isNaN(parseFloat(text))) {
+                                button.classList.add('btn-outline-primary');
+                            } else {
+                                button.classList.add('btn-outline-danger');
+                            }
+                        } else {
+                            button.classList.add('btn-outline-primary');
+                        }
+                    }, 2000);
+                }).catch(function(err) {
+                    alert('Không thể copy: ' + err);
+                });
+            }
+        </script>
+    @endpush
+@endsection
+
+>>>>>>> origin/Trang_Chu_Client

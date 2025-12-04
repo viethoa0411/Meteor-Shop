@@ -238,6 +238,7 @@ class OrderAnalyticsController extends Controller
         // Sử dụng đúng các status từ Order model
         $statuses = ['pending', 'processing', 'shipping', 'delivered', 'completed', 'cancelled', 'return_requested', 'returned'];
 
+
         foreach ($statuses as $statusKey) {
             $timeline[$statusKey] = [];
         }

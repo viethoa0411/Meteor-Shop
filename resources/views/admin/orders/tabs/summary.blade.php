@@ -148,6 +148,7 @@
                     <tr>
                         <td class="text-muted">Thanh toán:</td>
                         <td>
+<<<<<<< HEAD
                             @php
                                 $paymentStatusLabels = [
                                     'paid' => 'Đã thanh toán',
@@ -164,6 +165,10 @@
                             @endphp
                             <span class="badge bg-{{ $paymentBadge }}">
                                 {{ $paymentStatusLabels[$order->payment_status] ?? ucfirst($order->payment_status) }}
+=======
+                            <span class="badge bg-{{ $order->payment_status === 'paid' ? 'success' : 'warning' }}">
+                                {{ ucfirst($order->payment_status) }}
+>>>>>>> origin/Trang_Chu_Client
                             </span>
                         </td>
                     </tr>
@@ -221,3 +226,7 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Trang_Chu_Client

@@ -1,6 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Admin Dashboard')
+<<<<<<< HEAD
 @section('content')
 
     {{-- ========== 1. HEADER DASHBOARD ========== --}}
@@ -226,11 +227,671 @@
                                 <li class="list-group-item text-center text-muted">Chưa có dữ liệu</li>
                             @endforelse
                         </ul>
+=======
+@if ($showTargetAlert)
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Chú ý!</strong> Bạn chưa đặt mục tiêu cho tháng {{ now()->month }} năm {{ now()->year }}.
+        <a href="{{ route('admin.monthly_target.create') }}" class="btn btn-sm btn-primary ms-2">Đặt ngay</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+@section('content')
+    <div class="row g-4 mb-4 d-flex align-items-stretch">
+        {{-- Cột trái 60% --}}
+        <div class="col-md-7 d-flex flex-column">
+            <div class="row g-4 flex-grow-1">
+                {{-- Người dùng --}}
+                <div class="col-6">
+                    <a href="{{ route('admin.account.users.list') }}" class="text-decoration-none">
+                        <div class="stat-card card p-4 shadow-sm border-start border-warning border-4 h-100 position-relative overflow-hidden">
+                            <div class="stat-card-bg"></div>
+                            <div class="d-flex justify-content-between align-items-center h-100 position-relative">
+                                <div class="stat-info">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="stat-icon-wrapper bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                                            <i class="bi bi-people-fill text-warning fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-muted mb-0 small fw-normal">Tổng người dùng</h6>
+                                            <p class="text-muted mb-0 small">Tháng này: +{{ number_format($thisMonthUsers) }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mt-2">
+                                        <h2 class="fw-bold mb-0 stat-number">{{ number_format($totalUsers) }}</h2>
+                                        @if($userGrowth != 0)
+                                            <span class="badge ms-2 stat-badge {{ $userGrowth > 0 ? 'bg-success' : 'bg-danger' }}">
+                                                <i class="bi bi-arrow-{{ $userGrowth > 0 ? 'up' : 'down' }}-short"></i>
+                                                {{ abs($userGrowth) }}%
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="stat-action">
+                                    <i class="bi bi-arrow-right-circle text-muted fs-5"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- Tổng số đơn hàng --}}
+                <div class="col-6">
+                    <a href="{{ route('admin.orders.list') }}" class="text-decoration-none">
+                        <div class="stat-card card p-4 shadow-sm border-start border-success border-4 h-100 position-relative overflow-hidden">
+                            <div class="stat-card-bg"></div>
+                            <div class="d-flex justify-content-between align-items-center h-100 position-relative">
+                                <div class="stat-info">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="stat-icon-wrapper bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                            <i class="bi bi-cart-check-fill text-success fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-muted mb-0 small fw-normal">Tổng đơn hàng</h6>
+                                            <p class="text-muted mb-0 small">Tháng này: {{ number_format($totalOrders) }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mt-2">
+                                        <h2 class="fw-bold mb-0 stat-number">{{ number_format($totalAllOrders) }}</h2>
+                                        @if($orderGrowth != 0)
+                                            <span class="badge ms-2 stat-badge {{ $orderGrowth > 0 ? 'bg-success' : 'bg-danger' }}">
+                                                <i class="bi bi-arrow-{{ $orderGrowth > 0 ? 'up' : 'down' }}-short"></i>
+                                                {{ abs($orderGrowth) }}%
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="stat-action">
+                                    <i class="bi bi-arrow-right-circle text-muted fs-5"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- Biểu đồ doanh thu --}}
+                <div class="col-12 mt-3">
+                    <div class="card shadow-sm p-4 h-100">
+                        <h5 class="mb-3 fw-semibold">Doanh thu theo tháng ({{ now()->year }})</h5>
+                        <canvas id="revenueChart" style="height: 330px;"></canvas>
+>>>>>>> origin/Trang_Chu_Client
                     </div>
                 </div>
             </div>
         </div>
+<<<<<<< HEAD
     </section>
+=======
+        {{-- Cột phải 40% --}}
+        <div class="col-md-5 d-flex flex-column">
+            {{-- Mục tiêu tháng --}}
+            <div class="card shadow-sm p-4 mb-4" style="border-radius:18px;">
+                <h5 class="fw-semibold mb-1">Mục tiêu tháng</h5>
+                <p class="text-muted" style="font-size:14px;">Mục tiêu bạn đặt ra mỗi tháng</p>
+
+                <div class="half-gauge-wrapper">
+                    <svg class="half-gauge" width="250" height="140">
+                        <path class="half-gauge-bg" d="M20 120 A100 100 0 0 1 230 120" />
+                        <path class="half-gauge-value" d="M20 120 A100 100 0 0 1 230 120" />
+                    </svg>
+
+                    <div class="half-gauge-text">
+                        <h2 class="fw-bold mb-1" id="halfPercent">0%</h2>
+                    </div>
+                </div>
+
+                <p class="mt-3 text-muted text-center">
+                    Hôm nay bạn đã kiếm được {{ number_format($todayRevenue) }} ₫<br>
+                    Tiếp tục làm tốt nhé!
+                </p>
+
+                <div class="d-flex justify-content-between text-center pt-3 border-top">
+                    <div class="flex-fill">
+                        <p class="text-muted mb-1">Mục tiêu</p>
+                        <h6 class="fw-bold">{{ number_format($monthlyTarget) }} ₫</h6>
+                    </div>
+                    <div class="flex-fill">
+                        <p class="text-muted mb-1">Doanh thu</p>
+                        <h6 class="fw-bold">{{ number_format($currentMonthRevenue) }} ₫</h6>
+                    </div>
+                    <div class="flex-fill">
+                        <p class="text-muted mb-1">Hôm nay</p>
+                        <h6 class="fw-bold">{{ number_format($todayRevenue) }} ₫</h6>
+                    </div>
+                </div>
+            </div>
+
+
+
+            {{-- Bộ lọc doanh thu --}}
+            <div class="card shadow-sm p-4 flex-grow-1">
+                <h6 class="mb-3 fw-semibold">Lọc doanh thu theo khoảng thời gian</h6>
+                <form method="GET" action="{{ route('admin.dashboard') }}">
+                    <div class="mb-2">
+                        <label for="filterStartDate" class="form-label small">Từ ngày</label>
+                        <input type="date" name="start_date" id="filterStartDate" class="form-control form-control-sm"
+                            value="{{ old('start_date', $startDate) }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="filterEndDate" class="form-label small">Đến ngày</label>
+                        <input type="date" name="end_date" id="filterEndDate" class="form-control form-control-sm"
+                            value="{{ old('end_date', $endDate) }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Lọc</button>
+                </form>
+
+                @if (!is_null($filteredRevenue))
+                    <div class="mt-3 p-2 border rounded bg-light">
+                        <strong>Doanh thu: </strong> {{ number_format($filteredRevenue) }} ₫
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4 g-4">
+        {{-- Bảng Đơn hàng gần nhất --}}
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="fw-semibold mb-0">Đơn hàng gần nhất</h5>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Người đặt</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentOrders as $order)
+                                <tr>
+                                    <td>{{ $order->order_code }}</td>
+                                    <td>{{ $order->user->name ?? 'Người dùng không xác định' }}</td>
+                                    <td>{{ $order->created_at->format('d/m/Y') }}</td>
+                                    <td>{{ number_format($order->final_total) }} ₫</td>
+                                    <td>
+                                        @php
+                                            $status = [
+                                                'pending' => 'warning',
+                                                'processing' => 'info',
+                                                'completed' => 'success',
+                                                'cancelled' => 'danger',
+                                            ];
+                                        @endphp
+                                        <span class="badge bg-{{ $status[$order->order_status] ?? 'secondary' }}">
+                                            {{ ucfirst($order->order_status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">Không có đơn hàng nào.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {{-- Bảng Sản phẩm gần nhất --}}
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="fw-semibold mb-0">Sản phẩm bán gần đây nhất</h5>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tên sản phẩm</th>
+                                <th>Danh mục</th>
+                                <th>Giá</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentProducts as $item)
+                                <tr>
+                                    <td>
+                                        @if (!empty($item['image']))
+                                            <img src="{{ asset('storage/' . $item['image']) }}"
+                                                alt="{{ $item['product_name'] }}" style="width:50px; height:auto;">
+                                        @else
+                                            -
+                                        @endif
+                                        {{ $item['product_name'] }}
+                                    </td>
+                                    <td>{{ $item['category_name'] }}</td>
+                                    <td>{{ number_format($item['price'], 0, ',', '.') }} ₫</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">Không có sản phẩm nào.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Component Thống kê Đơn hàng --}}
+    <div class="row mt-4 g-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h5 class="fw-semibold mb-1">Thống kê Đơn hàng</h5>
+                            <p class="text-muted small mb-0">Phân tích và theo dõi đơn hàng chi tiết</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary fs-6 px-3 py-2">
+                                Tổng: {{ number_format($totalFilteredOrders) }} đơn
+                            </span>
+                            <a href="{{ route('admin.orders.analytics') }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-graph-up-arrow me-1"></i>Thống kê chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {{-- Bộ lọc --}}
+                    <div class="order-filter-section mb-4 p-3 p-md-4 bg-light rounded shadow-sm">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h6 class="fw-semibold mb-0">
+                                <i class="bi bi-funnel-fill me-2 text-primary"></i>Bộ lọc
+                            </h6>
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none d-md-none" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </div>
+                        
+                        <form method="GET" action="{{ route('admin.dashboard') }}" id="orderFilterForm">
+                            {{-- Giữ lại filter doanh thu nếu có --}}
+                            @if($startDate)
+                                <input type="hidden" name="start_date" value="{{ $startDate }}">
+                            @endif
+                            @if($endDate)
+                                <input type="hidden" name="end_date" value="{{ $endDate }}">
+                            @endif
+                            
+                            <div class="collapse d-md-block" id="filterCollapse">
+                                {{-- Loại filter --}}
+                                <div class="row g-3 mb-3">
+                                    <div class="col-12">
+                                        <label for="order_filter_type" class="form-label small fw-semibold">
+                                            <i class="bi bi-filter-circle me-1 text-primary"></i>Loại lọc
+                                        </label>
+                                        <select name="order_filter_type" id="order_filter_type" class="form-select" onchange="toggleFilterOptions()">
+                                            <option value="today" {{ ($orderFilterType ?? '') == 'today' ? 'selected' : '' }}>Hôm nay</option>
+                                            <option value="last_7_days" {{ ($orderFilterType ?? '') == 'last_7_days' ? 'selected' : '' }}>7 ngày gần nhất</option>
+                                            <option value="last_15_days" {{ ($orderFilterType ?? '') == 'last_15_days' ? 'selected' : '' }}>15 ngày gần nhất</option>
+                                            <option value="last_30_days" {{ ($orderFilterType ?? 'last_30_days') == 'last_30_days' ? 'selected' : '' }}>30 ngày gần nhất</option>
+                                            <option value="all" {{ ($orderFilterType ?? '') == 'all' ? 'selected' : '' }}>Tất cả</option>
+                                            <option value="month" {{ ($orderFilterType ?? '') == 'month' ? 'selected' : '' }}>Theo tháng</option>
+                                            <option value="date_range" {{ ($orderFilterType ?? '') == 'date_range' ? 'selected' : '' }}>Khoảng thời gian</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Filter theo tháng --}}
+                                <div class="row g-3 mb-3" id="filter_month_group" style="display: {{ ($orderFilterType ?? 'last_30_days') == 'month' ? 'flex' : 'none' }};">
+                                    <div class="col-12 col-sm-6 col-md-6">
+                                        <label for="order_month" class="form-label small fw-semibold">
+                                            <i class="bi bi-calendar-month me-1 text-primary"></i>Tháng
+                                        </label>
+                                        <select name="order_month" id="order_month" class="form-select">
+                                            <option value="">-- Chọn tháng --</option>
+                                            @for($m = 1; $m <= 12; $m++)
+                                                <option value="{{ $m }}" {{ ($orderFilterMonth ?? '') == $m ? 'selected' : '' }}>
+                                                    Tháng {{ $m }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-sm-6 col-md-6">
+                                        <label for="order_year" class="form-label small fw-semibold">
+                                            <i class="bi bi-calendar-year me-1 text-primary"></i>Năm
+                                        </label>
+                                        <select name="order_year" id="order_year" class="form-select">
+                                            <option value="">-- Chọn năm --</option>
+                                            @for($y = now()->year; $y >= now()->year - 5; $y--)
+                                                <option value="{{ $y }}" {{ ($orderFilterYear ?? '') == $y ? 'selected' : '' }}>
+                                                    {{ $y }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Filter theo khoảng thời gian --}}
+                                <div class="row g-3 mb-3" id="filter_date_range_group" style="display: {{ ($orderFilterType ?? '') == 'date_range' ? 'flex' : 'none' }};">
+                                    <div class="col-12 col-sm-6">
+                                        <label for="order_start_date" class="form-label small fw-semibold">
+                                            <i class="bi bi-calendar-event me-1 text-primary"></i>Từ ngày
+                                        </label>
+                                        <input type="date" name="order_start_date" id="order_start_date" 
+                                            class="form-control" 
+                                            value="{{ $orderFilterStartDate ?? '' }}">
+                                    </div>
+
+                                    <div class="col-12 col-sm-6">
+                                        <label for="order_end_date" class="form-label small fw-semibold">
+                                            <i class="bi bi-calendar-event-fill me-1 text-primary"></i>Đến ngày
+                                        </label>
+                                        <input type="date" name="order_end_date" id="order_end_date" 
+                                            class="form-control" 
+                                            value="{{ $orderFilterEndDate ?? '' }}">
+                                    </div>
+                                </div>
+
+                                {{-- Filter theo trạng thái --}}
+                                <div class="row g-3 mb-3">
+                                    <div class="col-12 col-md-4">
+                                        <label for="order_status" class="form-label small fw-semibold">
+                                            <i class="bi bi-funnel me-1 text-primary"></i>Trạng thái đơn hàng
+                                        </label>
+                                        <select name="order_status" id="order_status" class="form-select">
+                                            <option value="all" {{ ($orderFilterStatus ?? 'all') == 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
+                                            <option value="pending" {{ ($orderFilterStatus ?? '') == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
+                                            <option value="processing" {{ ($orderFilterStatus ?? '') == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
+                                            <option value="shipping" {{ ($orderFilterStatus ?? '') == 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
+                                            <option value="completed" {{ ($orderFilterStatus ?? '') == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
+                                            <option value="cancelled" {{ ($orderFilterStatus ?? '') == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-md-8 d-flex align-items-end gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-search me-1"></i>Áp dụng bộ lọc
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="resetOrderFilter()">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i>Đặt lại
+                                        </button>
+                                        <a href="{{ route('admin.orders.list') }}" class="btn btn-outline-primary">
+                                            <i class="bi bi-list-ul me-1"></i>Xem tất cả
+                                        </a>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    {{-- Thống kê theo trạng thái --}}
+                    <div class="row g-3 mb-4">
+                        @php
+                            $statusConfig = [
+                                'pending' => ['label' => 'Chờ xử lý', 'color' => 'warning', 'icon' => 'clock'],
+                                'processing' => ['label' => 'Đang xử lý', 'color' => 'info', 'icon' => 'gear'],
+                                'shipping' => ['label' => 'Đang giao hàng', 'color' => 'primary', 'icon' => 'truck'],
+                                'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'check-circle'],
+                                'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'x-circle'],
+                            ];
+                        @endphp
+                        @foreach($statusConfig as $status => $config)
+                            <div class="col-6 col-md-3 col-lg">
+                                <div class="stat-mini-card p-3 p-md-3 rounded border border-{{ $config['color'] }} border-2 bg-{{ $config['color'] }} bg-opacity-10 h-100">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted small mb-1 fw-medium">{{ $config['label'] }}</p>
+                                            <h4 class="fw-bold mb-0 stat-mini-number">{{ $orderStatsByStatus[$status] ?? 0 }}</h4>
+                                        </div>
+                                        <div class="stat-mini-icon bg-{{ $config['color'] }} bg-opacity-25 rounded-circle p-2 flex-shrink-0">
+                                            @if($status == 'shipping')
+                                                <i class="bi bi-car-front-fill text-primary fs-5"></i>
+                                            @else
+                                                <i class="bi bi-{{ $config['icon'] }}-fill text-{{ $config['color'] }} fs-5"></i>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Biểu đồ tăng trưởng --}}
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-lg-8">
+                            <div class="card border-0 bg-gradient-primary text-white shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px !important;">
+                                <div class="card-body p-3 p-md-4">
+                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 gap-2">
+                                        <div>
+                                            <h6 class="text-white-50 mb-1 small">Tăng trưởng đơn hàng</h6>
+                                            <h3 class="fw-bold mb-0 text-white fs-4 fs-md-3">7 ngày gần nhất</h3>
+                                        </div>
+                                        <div class="text-start text-sm-end">
+                                            @if($orderGrowthRate != 0)
+                                                <span class="badge bg-{{ $orderGrowthRate > 0 ? 'success' : 'danger' }} fs-6 px-3 py-2">
+                                                    <i class="bi bi-arrow-{{ $orderGrowthRate > 0 ? 'up' : 'down' }}-short"></i>
+                                                    {{ abs($orderGrowthRate) }}%
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="orderGrowthChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body p-3 p-md-4">
+                                    <h6 class="fw-semibold mb-3 d-flex align-items-center">
+                                        <i class="bi bi-graph-up-arrow me-2 text-primary"></i>Tổng quan
+                                    </h6>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-calendar-day text-primary me-2"></i>
+                                                <span class="text-muted small">Hôm nay</span>
+                                            </div>
+                                            <span class="fw-bold text-primary">{{ $growthChartData[6] ?? 0 }} đơn</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-calendar-minus text-info me-2"></i>
+                                                <span class="text-muted small">Hôm qua</span>
+                                            </div>
+                                            <span class="fw-bold text-info">{{ $growthChartData[5] ?? 0 }} đơn</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-calendar-week text-success me-2"></i>
+                                                <span class="text-muted small">7 ngày qua</span>
+                                            </div>
+                                            <span class="fw-bold text-success">{{ array_sum($growthChartData) }} đơn</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center p-2 p-md-3 bg-light rounded stat-overview-item">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-bar-chart text-warning me-2"></i>
+                                                <span class="text-muted small">Trung bình/ngày</span>
+                                            </div>
+                                            <span class="fw-bold text-warning">{{ round(array_sum($growthChartData) / 7, 1) }} đơn</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Danh sách đơn hàng --}}
+                    {{-- Desktop Table View --}}
+                    <div class="table-responsive d-none d-md-block">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="fw-semibold">Mã đơn</th>
+                                    <th class="fw-semibold">Khách hàng</th>
+                                    <th class="fw-semibold">Ngày đặt</th>
+                                    <th class="fw-semibold">Tổng tiền</th>
+                                    <th class="fw-semibold">Trạng thái</th>
+                                    <th class="fw-semibold text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($filteredOrders as $order)
+                                    <tr class="order-table-row">
+                                        <td>
+                                            <span class="fw-semibold text-primary">{{ $order->order_code }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <i class="bi bi-person-circle text-muted fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-medium">{{ $order->user->name ?? 'N/A' }}</div>
+                                                    <small class="text-muted">{{ Str::limit($order->user->email ?? '', 25) }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-medium">{{ $order->created_at->format('d/m/Y') }}</div>
+                                            <small class="text-muted">{{ $order->created_at->format('H:i') }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-success fs-6">{{ number_format($order->final_total) }} ₫</span>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $statusColors = [
+                                                    'pending' => 'warning',
+                                                    'processing' => 'info',
+                                                    'shipping' => 'primary',
+                                                    'completed' => 'success',
+                                                    'cancelled' => 'danger',
+                                                ];
+                                                $statusLabels = [
+                                                    'pending' => 'Chờ xử lý',
+                                                    'processing' => 'Đang xử lý',
+                                                    'shipping' => 'Đang giao hàng',
+                                                    'completed' => 'Hoàn thành',
+                                                    'cancelled' => 'Đã hủy',
+                                                ];
+                                            @endphp
+                                            <span class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
+                                                {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('admin.orders.show', $order->id) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye me-1"></i>Chi tiết
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+                                            <p class="text-muted mb-0">Không có đơn hàng nào phù hợp với bộ lọc</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Mobile Card View --}}
+                    <div class="d-md-none">
+                        @forelse($filteredOrders as $order)
+                            @php
+                                $statusColors = [
+                                    'pending' => 'warning',
+                                    'processing' => 'info',
+                                    'shipping' => 'primary',
+                                    'completed' => 'success',
+                                    'cancelled' => 'danger',
+                                ];
+                                $statusLabels = [
+                                    'pending' => 'Chờ xử lý',
+                                    'processing' => 'Đang xử lý',
+                                    'shipping' => 'Đang giao hàng',
+                                    'completed' => 'Hoàn thành',
+                                    'cancelled' => 'Đã hủy',
+                                ];
+                            @endphp
+                            <div class="card mb-3 order-mobile-card shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="fw-bold text-primary mb-1">{{ $order->order_code }}</h6>
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar3 me-1"></i>{{ $order->created_at->format('d/m/Y H:i') }}
+                                            </small>
+                                        </div>
+                                        <span class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
+                                            {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-person-circle text-muted me-2"></i>
+                                            <div>
+                                                <div class="fw-medium small">{{ $order->user->name ?? 'N/A' }}</div>
+                                                <small class="text-muted">{{ Str::limit($order->user->email ?? '', 30) }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                        <div>
+                                            <small class="text-muted d-block">Tổng tiền</small>
+                                            <span class="fw-bold text-success fs-5">{{ number_format($order->final_total) }} ₫</span>
+                                        </div>
+                                        <a href="{{ route('admin.orders.show', $order->id) }}" 
+                                           class="btn btn-sm btn-primary">
+                                            <i class="bi bi-eye me-1"></i>Chi tiết
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="card text-center py-5">
+                                <div class="card-body">
+                                    <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+                                    <p class="text-muted mb-0">Không có đơn hàng nào phù hợp với bộ lọc</p>
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    {{-- Phân trang sticky --}}
+                    @if($filteredOrders->hasPages())
+                        <div class="sticky-pagination-wrapper">
+                            <div class="sticky-pagination">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-3 bg-white border-top shadow-sm">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted small">
+                                            Hiển thị {{ $filteredOrders->firstItem() ?? 0 }} - {{ $filteredOrders->lastItem() ?? 0 }} 
+                                            trong tổng số {{ $filteredOrders->total() }} đơn hàng
+                                        </span>
+                                    </div>
+                                    <div>
+                                        {{ $filteredOrders->links('pagination::bootstrap-4') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+>>>>>>> origin/Trang_Chu_Client
 
     <style>
         /* Stat Card Styles */
@@ -290,6 +951,7 @@
             transition: all 0.3s ease;
         }
 
+<<<<<<< HEAD
         /* KPI cards */
         .kpi-card {
             border-radius: 16px;
@@ -311,6 +973,8 @@
             font-size: 1.3rem;
         }
 
+=======
+>>>>>>> origin/Trang_Chu_Client
         body.dark .stat-number {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             -webkit-background-clip: text;
@@ -754,8 +1418,13 @@
         }
     </style>
 
+<<<<<<< HEAD
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+=======
+    {{-- Chart.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+>>>>>>> origin/Trang_Chu_Client
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Counter Animation cho số liệu thống kê
@@ -799,14 +1468,73 @@
             }
         });
 
+<<<<<<< HEAD
+=======
+
+
+        const revenueData = @json($revenueData);
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+
+>>>>>>> origin/Trang_Chu_Client
         let isDark = document.documentElement.classList.contains("dark");
 
         const textColor = () => isDark ? '#ffffff' : '#000000';
         const bgColor = () => isDark ? 'rgba(59,130,246,0.4)' : 'rgba(59,130,246,0.6)';
         const borderCol = 'rgb(59,130,246)';
 
+<<<<<<< HEAD
         window.addEventListener("theme-changed", () => {
             isDark = document.documentElement.classList.contains("dark");
+=======
+        let chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: revenueData,
+                    backgroundColor: bgColor(),
+                    borderColor: borderCol,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let v = context.raw ?? 0;
+                                return Math.round(v).toLocaleString('vi-VN') + ' ₫';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: textColor()
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: textColor(),
+                            callback: function(value) {
+                                return Math.round(value).toLocaleString('vi-VN') + ' ₫';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        window.addEventListener("theme-changed", () => {
+            isDark = document.documentElement.classList.contains("dark");
+            chart.options.scales.x.ticks.color = textColor();
+            chart.options.scales.y.ticks.color = textColor();
+            chart.data.datasets[0].backgroundColor = bgColor();
+            chart.update();
+>>>>>>> origin/Trang_Chu_Client
             
             // Update order growth chart
             if (orderGrowthChart) {
@@ -922,6 +1650,7 @@
             });
         }
 
+<<<<<<< HEAD
         // Control chart doanh thu 30 ngày
         // Control chart doanh thu theo thời gian (ApexCharts)
         let revenueControlChart = null;
@@ -1186,6 +1915,8 @@
             }
         }
 
+=======
+>>>>>>> origin/Trang_Chu_Client
         // Toggle filter options based on filter type
         function toggleFilterOptions() {
             const filterType = document.getElementById('order_filter_type').value;
@@ -1232,5 +1963,8 @@
             form.submit();
         }
     </script>
+<<<<<<< HEAD
     @endpush
+=======
+>>>>>>> origin/Trang_Chu_Client
 @endsection

@@ -4,11 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+<<<<<<< HEAD
     <title>@yield('title', 'Meteor Admin')</title>
+=======
+    <title>Meteor Admin</title>
+>>>>>>> origin/Trang_Chu_Client
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<<<<<<< HEAD
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
@@ -17,6 +22,16 @@
             padding: 0;
             height: 100%;
             overflow: hidden;
+=======
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+>>>>>>> origin/Trang_Chu_Client
             background-color: #ffffff;
             color: #333;
             transition: background 0.3s, color 0.3s;
@@ -25,8 +40,12 @@
         .admin-container {
             display: flex;
             flex: 1;
+<<<<<<< HEAD
             height: calc(100vh - 56px);
             overflow: hidden;
+=======
+            min-height: calc(100vh - 56px - 50px);
+>>>>>>> origin/Trang_Chu_Client
         }
 
         /* Sidebar */
@@ -36,6 +55,7 @@
             border-right: 1px solid #e5e7eb;
             color: #333;
             flex-shrink: 0;
+<<<<<<< HEAD
             height: 100%;
             overflow-y: auto;
             position: sticky;
@@ -50,6 +70,11 @@
             font-weight: 600;
         }
 
+=======
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+>>>>>>> origin/Trang_Chu_Client
         .sidebar a {
             color: #333;
             padding: 12px 30px;
@@ -64,10 +89,13 @@
         }
 
         /* Submenu */
+<<<<<<< HEAD
         .dropdown-menu-item {
             border-top: 1px solid rgba(0, 0, 0, 0.02);
         }
 
+=======
+>>>>>>> origin/Trang_Chu_Client
         .submenu {
             display: none;
             background-color: #f8f9fa;
@@ -92,7 +120,11 @@
 
         .dropdown-menu-item.active > a .bi-chevron-right {
             transform: rotate(90deg);
+<<<<<<< HEAD
         }
+=======
+            }
+>>>>>>> origin/Trang_Chu_Client
 
         /* Header */
         .navbar {
@@ -105,11 +137,27 @@
             padding: 20px;
             background-color: #f8f9fa;
             color: #333;
+<<<<<<< HEAD
             overflow-y: auto;
             height: 100%;
             transition: background 0.3s, color 0.3s;
         }
 
+=======
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Footer */
+        .footer {
+            height: 50px;
+            background-color: #343a40;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+>>>>>>> origin/Trang_Chu_Client
         /* MOBILE */
         @media (max-width: 768px) {
             .sidebar {
@@ -163,6 +211,14 @@
             color: #ddd;
         }
 
+<<<<<<< HEAD
+=======
+        body.dark .footer {
+            background-color: #2b2b2b !important;
+            color: #ddd;
+        }
+
+>>>>>>> origin/Trang_Chu_Client
         /* Dark mode helpers for components */
         body.dark .card {
             background-color: #1f1f1f;
@@ -207,7 +263,11 @@
             color: #ffffff !important;
         }
 
+<<<<<<< HEAD
         body.dark .table-bordered> :not(caption)>*>* {
+=======
+        body.dark .table-bordered > :not(caption) > * > * {
+>>>>>>> origin/Trang_Chu_Client
             border-color: #2f2f2f;
         }
 
@@ -218,11 +278,19 @@
 
         body.dark table.table tbody tr:nth-of-type(odd),
         body.dark table.table tbody tr:nth-of-type(odd) td,
+<<<<<<< HEAD
         body.dark .table-striped>tbody>tr:nth-of-type(odd) {
             background-color: #1c1c1c !important;
         }
 
         body.dark .table-striped>tbody>tr:nth-of-type(odd)>* {
+=======
+        body.dark .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #1c1c1c !important;
+        }
+
+        body.dark .table-striped > tbody > tr:nth-of-type(odd) > * {
+>>>>>>> origin/Trang_Chu_Client
             background-color: #1c1c1c !important;
         }
 
@@ -294,23 +362,34 @@
             box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.65) !important;
         }
     </style>
+<<<<<<< HEAD
 
     @stack('styles')
+=======
+>>>>>>> origin/Trang_Chu_Client
 </head>
 
 <body>
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg px-3 shadow-sm">
+<<<<<<< HEAD
         <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Meteor-Shop</a>
 
         <div class="ms-auto d-flex align-items-center">
+=======
+                <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Meteor-Shop</a>
+
+        <div class="ms-auto d-flex align-items-center">
+
+>>>>>>> origin/Trang_Chu_Client
             <!-- Nút Dark/Light -->
             <button id="themeToggle" class="btn btn-outline-secondary me-3">
                 <i id="themeIcon" class="bi bi-moon-fill"></i>
             </button>
 
             <!-- Tài khoản -->
+<<<<<<< HEAD
             <div class="dropdown">
                 <a class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="bi bi-person-circle"></i>
@@ -449,27 +528,118 @@
                     </a>
                     <a href="{{ route('admin.account.users.list') }}"
                        class="{{ request()->routeIs('admin.account.users.*') ? 'active' : '' }}">
+=======
+                    <div class="dropdown">
+                <a class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i>
+                            {{ Auth::user()->name ?? 'Admin' }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a href="" class="dropdown-item">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                        <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+                            <button class="dropdown-item">
+                                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                        </button>
+                                    </form>
+                            </li>
+                        </ul>
+                    </div>
+
+            </div>
+        </nav>
+
+    <!-- Admin Layout -->
+    <div class="admin-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h5 class="navbar navbar-expand-lg px-3 shadow-sm">Quản trị</h5>
+
+            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <i class="bi bi-house-door-fill me-2"></i> Dashboard
+            </a>
+            <a href="{{ route('admin.categories.list') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                <i class="bi bi-folder-plus me-2"></i> Danh mục
+            </a>
+            <a href="{{ route('admin.home-categories.index') }}" class="{{ request()->routeIs('admin.home-categories.*') ? 'active' : '' }}">
+                <i class="bi bi-grid-fill me-2"></i> Danh mục trang chủ
+            </a>
+            <a href="{{ route('admin.products.list') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam me-2"></i> Sản phẩm
+            </a>
+            <a href="{{ route('admin.orders.list') }}" class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                <i class="bi bi-cart-fill me-2"></i> Đơn hàng
+            </a>
+            <a href="{{ route('admin.contacts.index') }}">
+              <i class="bi bi-envelope me-2"></i> Liên hệ
+            </a>
+            <a href="{{ route('admin.chatbox.index') }}" class="{{ request()->routeIs('admin.chatbox.*') ? 'active' : '' }}">
+                <i class="bi bi-chat-dots-fill me-2"></i> Chatbox
+                @php
+                    $unreadChatCount = \App\Models\ChatSession::where('unread_count', '>', 0)->count();
+                @endphp
+                @if($unreadChatCount > 0)
+                    <span class="badge bg-danger ms-1">{{ $unreadChatCount }}</span>
+                @endif
+            </a>
+            <a href="{{ route('admin.blogs.list') }}" class="{{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
+                <i class="bi bi-list-ul me-2"></i> Danh sách bài viết
+            </a>
+            <a href="{{ route('admin.banners.list') }}" class="{{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+                <i class="bi bi-image-fill me-2"></i> Quản lý Banner
+            </a>
+            <!-- Quản lý tài khoản -->
+            <div class="dropdown-menu-item {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
+                <a href="#" class="{{ request()->routeIs('admin.account.*') ? 'active' : '' }}"><i class="bi bi-people-fill me-2"></i> Quản lý tài khoản
+                    <i class="bi bi-chevron-right float-end"></i>
+                </a>
+                <div class="submenu">
+                    <a href="{{ route('admin.account.admin.list') }}" class="{{ request()->routeIs('admin.account.admin.*') ? 'active' : '' }}">
+                        <i class="bi bi-person-badge-fill me-2"></i> Quản lý Admin
+                    </a>
+                    <a href="{{ route('admin.account.users.list') }}" class="{{ request()->routeIs('admin.account.users.*') ? 'active' : '' }}">
+>>>>>>> origin/Trang_Chu_Client
                         <i class="bi bi-people-fill me-2"></i> Quản lý User
                     </a>
                 </div>
             </div>
 
+<<<<<<< HEAD
             {{-- Quản lý Ví --}}
+=======
+>>>>>>> origin/Trang_Chu_Client
             @php
                 $pendingDeposits = \App\Models\DepositRequest::where('status', 'pending')->count();
                 $pendingWithdraws = \App\Models\WithdrawRequest::whereIn('status', ['pending', 'processing'])->count();
                 $totalPending = $pendingDeposits + $pendingWithdraws;
             @endphp
+<<<<<<< HEAD
             <a href="{{ route('admin.wallet.index') }}"
                class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
+=======
+            <a href="{{ route('admin.wallet.index') }}" class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
+>>>>>>> origin/Trang_Chu_Client
                 <i class="bi bi-wallet2 me-2"></i> Quản lý Ví
                 @if($totalPending > 0)
                     <span class="badge bg-danger ms-1">{{ $totalPending > 99 ? '99+' : $totalPending }}</span>
                 @endif
             </a>
+<<<<<<< HEAD
 
             <a href="#"
                class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+=======
+            <a href="{{ route('admin.shipping.index') }}" class="{{ request()->routeIs('admin.shipping.*') ? 'active' : '' }}">
+                <i class="bi bi-truck me-2"></i> Cài đặt vận chuyển
+            </a>
+
+            <a href="#" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+>>>>>>> origin/Trang_Chu_Client
                 <i class="bi bi-gear-fill me-2"></i> Cài đặt
             </a>
         </aside>
@@ -480,6 +650,7 @@
         </main>
     </div>
 
+<<<<<<< HEAD
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- SweetAlert2 for better notifications -->
@@ -489,6 +660,15 @@
 
     <!-- Admin comments shared JS (không cần Vite) -->
     <script src="{{ asset('js/admin-comments.js') }}"></script>
+=======
+    <!-- Footer -->
+    <footer class="footer">
+        <span>© 2025 Meteor-Shop — Admin Panel</span>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+>>>>>>> origin/Trang_Chu_Client
 
     <script>
         // Dark mode
@@ -501,9 +681,13 @@
             themeIcon.classList.toggle("bi-moon-fill", !isDark);
             themeIcon.classList.toggle("bi-sun-fill", isDark);
             localStorage.setItem("theme", isDark ? "dark" : "light");
+<<<<<<< HEAD
             window.dispatchEvent(new CustomEvent("theme-changed", {
                 detail: { isDark }
             }));
+=======
+            window.dispatchEvent(new CustomEvent("theme-changed", { detail: { isDark } }));
+>>>>>>> origin/Trang_Chu_Client
         };
 
         setTheme(localStorage.getItem("theme") === "dark");

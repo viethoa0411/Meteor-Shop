@@ -17,8 +17,6 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             UserSeeder::class,
             ProductSeeder::class,
-            // ReviewSeeder::class, // Uncomment sau khi có products và users
-            // OrderSeeder::class, // Uncomment sau khi có products và users
         ]);
     }
 }

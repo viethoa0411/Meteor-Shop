@@ -74,8 +74,7 @@ class Order extends Model
         'pending' => ['label' => 'Chờ xác nhận', 'badge' => 'warning', 'icon' => 'bi-hourglass-split'],
         'processing' => ['label' => 'Chuẩn bị hàng', 'badge' => 'info', 'icon' => 'bi-box'],
         'shipping' => ['label' => 'Đang giao', 'badge' => 'primary', 'icon' => 'bi-truck'],
-        'delivered' => ['label' => 'Đã giao', 'badge' => 'success', 'icon' => 'bi-box-seam'],
-        'completed' => ['label' => 'Hoàn thành', 'badge' => 'success', 'icon' => 'bi-check-circle'],
+        'completed' => ['label' => 'Đã giao', 'badge' => 'success', 'icon' => 'bi-check-circle'],
         'cancelled' => ['label' => 'Đã hủy', 'badge' => 'danger', 'icon' => 'bi-x-circle'],
         'return_requested' => ['label' => 'Yêu cầu đổi trả', 'badge' => 'secondary', 'icon' => 'bi-arrow-repeat'],
         'returned' => ['label' => 'Đã đổi trả', 'badge' => 'secondary', 'icon' => 'bi-arrow-counterclockwise'],
@@ -123,7 +122,7 @@ class Order extends Model
 
     protected function statusLabel(): Attribute
     {
-        return Attribute::get(fn() => $this->status_meta['label']);
+        return Attribute::get(fn () => $this->status_meta['label']);
     }
 
     protected function statusBadge(): Attribute
@@ -176,6 +175,7 @@ class Order extends Model
 
         return $remaining > 0 ? $remaining : 0;
     }
+
 
     public function canReorder(): bool
     {

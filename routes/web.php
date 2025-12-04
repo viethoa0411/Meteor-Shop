@@ -38,6 +38,10 @@ use App\Http\Controllers\Admin\Wallet\WalletController as AdminWalletController;
 use App\Http\Controllers\Admin\Wallet\WithdrawController as AdminWithdrawController;
 use App\Http\Controllers\Admin\Wallet\SettingsController as AdminWalletSettingsController;
 
+// Thêm từ nhánh Trang_Chu_Client
+use App\Http\Controllers\Admin\HomeCategoryController;
+use App\Http\Controllers\Admin\ShippingSettingController;
+
 // ===== CLIENT CONTROLLERS =====
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProductClientController;
@@ -54,15 +58,20 @@ use App\Http\Controllers\Client\Wallet\WalletController as ClientWalletControlle
 use App\Http\Controllers\Client\Wallet\DepositController as ClientDepositController;
 use App\Http\Controllers\Client\Wallet\WithdrawController as ClientWithdrawController;
 
+// Bổ sung các controller client khác mà route đang dùng
+use App\Http\Controllers\Client\RoomController;
+use App\Http\Controllers\Client\CollectionController;
+use App\Http\Controllers\Client\DesignController;
+use App\Http\Controllers\Client\ShareController;
+
+
 /*
 |--------------------------------------------------------------------------
-| AUTHENTICATION ROUTES
+| AUTH ROUTES
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\Client\RoomController;
-
-
+// Admin login / logout
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -79,11 +88,13 @@ Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name
 Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN ROUTES
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['admin'])
     ->prefix('admin')
     ->name('admin.')
@@ -91,15 +102,14 @@ Route::middleware(['admin'])
         /* Dashboard */
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/revenue/filter', [DashboardController::class, 'index'])->name('revenue.filter');
+        Route::get('/api/dashboard/revenue/control-chart', [DashboardController::class, 'revenueControlChartApi'])
+            ->name('dashboard.revenue.control-chart');
 
-    // ===== DASHBOARD =====
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/revenue/filter', [DashboardController::class, 'index'])->name('revenue.filter');
-    Route::get('/api/dashboard/revenue/control-chart', [DashboardController::class, 'revenueControlChartApi'])
-        ->name('dashboard.revenue.control-chart');
-    Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])
-        ->name('monthly_target.create');
-
+        // Monthly Target
+        Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])
+            ->name('monthly_target.create');
+        Route::post('monthly-target/store', [MonthlyTargetController::class, 'store'])
+            ->name('monthly_target.store');
 
         /* Categories */
         Route::prefix('categories')->name('categories.')->group(function () {
@@ -109,6 +119,16 @@ Route::middleware(['admin'])
             Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('edit');
             Route::put('/update/{id}', [CategoryController::class, 'update'])->name('update');
             Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
+        });
+
+        /* Home Categories (3 ảnh trang chủ) */
+        Route::prefix('home-categories')->name('home-categories.')->group(function () {
+            Route::get('/', [HomeCategoryController::class, 'index'])->name('index');
+            Route::get('/create', [HomeCategoryController::class, 'create'])->name('create');
+            Route::post('/', [HomeCategoryController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [HomeCategoryController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [HomeCategoryController::class, 'update'])->name('update');
+            Route::delete('/{id}', [HomeCategoryController::class, 'destroy'])->name('destroy');
         });
 
         /* Products */
@@ -284,17 +304,28 @@ Route::middleware(['admin'])
             Route::delete('/{id}', [ChatboxController::class, 'deleteSession'])->name('delete');
             Route::get('/{id}/messages', [ChatboxController::class, 'getNewMessages'])->name('messages');
         });
+
+        /* Shipping settings */
+        Route::prefix('shipping')->name('shipping.')->group(function () {
+            Route::get('/', [ShippingSettingController::class, 'index'])->name('index');
+            Route::put('/', [ShippingSettingController::class, 'update'])->name('update');
+            Route::post('/calculate-fee', [ShippingSettingController::class, 'calculateFee'])->name('calculate-fee');
+        });
     });
+
 
 /*
 |--------------------------------------------------------------------------
 | CLIENT ROUTES (PUBLIC)
 |--------------------------------------------------------------------------
 */
+
+// Auth client (guest)
 Route::middleware('guest')->group(function () {
     Route::get('/login-client', [AuthController::class, 'showLoginFormClient'])->name('client.login');
     Route::post('/login-client', [AuthController::class, 'loginClient'])->name('client.login.post');
 });
+
 Route::post('/logout-client', [AuthController::class, 'logoutClient'])->name('client.logout');
 
 // Home
@@ -312,19 +343,19 @@ Route::post('/products/{slug}/review', [ProductClientController::class, 'storeRe
 Route::post('/reviews/{review}/helpful', [ProductClientController::class, 'markHelpful'])->name('client.review.helpful')->middleware('auth');
 Route::post('/reviews/{review}/report', [ProductClientController::class, 'reportReview'])->name('client.review.report')->middleware('auth');
 
-// Cart
-
+// Danh sách sản phẩm, phòng, blog, collection, design, share
 Route::get('/products', [ProductClientController::class, 'search'])->name('client.products.index');
 Route::get('/rooms', [RoomController::class, 'index'])->name('client.rooms.index');
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
-Route::get('/collections', [\App\Http\Controllers\Client\CollectionController::class, 'index'])->name('client.collections.index');
-Route::get('/collections/{slug}', [\App\Http\Controllers\Client\CollectionController::class, 'show'])->name('client.collections.show');
-Route::get('/designs', [\App\Http\Controllers\Client\DesignController::class, 'index'])->name('client.designs.index');
-Route::get('/designs/{slug}', [\App\Http\Controllers\Client\DesignController::class, 'show'])->name('client.designs.show');
-Route::get('/shares', [\App\Http\Controllers\Client\ShareController::class, 'index'])->name('client.shares.index');
-Route::get('/shares/{slug}', [\App\Http\Controllers\Client\ShareController::class, 'show'])->name('client.shares.show');
+Route::get('/collections', [CollectionController::class, 'index'])->name('client.collections.index');
+Route::get('/collections/{slug}', [CollectionController::class, 'show'])->name('client.collections.show');
+Route::get('/designs', [DesignController::class, 'index'])->name('client.designs.index');
+Route::get('/designs/{slug}', [DesignController::class, 'show'])->name('client.designs.show');
+Route::get('/shares', [ShareController::class, 'index'])->name('client.shares.index');
+Route::get('/shares/{slug}', [ShareController::class, 'show'])->name('client.shares.show');
 
+// Cart (session-based)
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update-qty', [CartController::class, 'updateQty'])->name('cart.updateQty');
@@ -345,6 +376,7 @@ Route::prefix('chat')->name('chat.')->group(function () {
     Route::get('/messages', [ChatController::class, 'getMessages'])->name('messages');
     Route::post('/guest-info', [ChatController::class, 'updateGuestInfo'])->name('guest-info');
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -390,6 +422,7 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
     Route::get('/review-reports', [\App\Http\Controllers\Client\Account\ReviewReportController::class, 'index'])->name('review-reports.index');
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | CHECKOUT (không gắn middleware, controller tự kiểm tra đăng nhập)
@@ -401,6 +434,7 @@ Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('c
 Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
 Route::post('/checkout/apply-promotion', [CheckoutController::class, 'applyPromotion'])->name('client.checkout.applyPromotion');
 Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
+
 
 /*
 |--------------------------------------------------------------------------

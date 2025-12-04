@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
+
 class ProductClientController extends Controller
 {
     public function productsByCategory($slug)
@@ -40,6 +41,9 @@ class ProductClientController extends Controller
         ->where('slug', $slug)
         ->where('status', 'active')
         ->firstOrFail();
+
+        // Lấy sản phẩm + ảnh phụ
+        $product = Product::with('images')->where('slug', $slug)->firstOrFail();
 
         // Lấy sản phẩm liên quan
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -750,6 +754,17 @@ class ProductClientController extends Controller
      * @param Request $request
      * @param string|null $slug
      * @return \Illuminate\Contracts\View\View
+            ->take(4)
+            ->get();
+
+        return view('client.products.detail', compact('product', 'relatedProducts', 'cate'));
+    }
+
+    /**
+     * Lấy danh sách ID của danh mục và toàn bộ danh mục con (đệ quy/BFS).
+     *
+     * @param int $rootCategoryId ID của danh mục gốc
+     * @return array Mảng chứa ID của danh mục gốc và tất cả danh mục con
      */
     public function search(Request $request, ?string $slug = null)
     {
@@ -795,6 +810,8 @@ class ProductClientController extends Controller
         }
 
         // Khởi tạo truy vấn sản phẩm khi có filter
+
+        // Khởi tạo truy vấn sản phẩm
         $query = Product::query()
             ->select(['id', 'name', 'slug', 'price', 'image', 'status', 'description', 'created_at', 'category_id'])
             ->where('status', 1);
@@ -863,6 +880,9 @@ class ProductClientController extends Controller
             'selectedCategory',
             'title'
         ));
+
+        return view('client.search', compact('products', 'searchQuery', 'cate', 'selectedCategory'));
+
     }
 
     private function getDescendantCategoryIds(int $rootCategoryId)

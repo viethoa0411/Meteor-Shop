@@ -16,11 +16,13 @@ class OrderController extends Controller
 {
     private const ADMIN_EDITABLE_STATUSES = ['processing', 'shipping', 'delivered', 'returned'];
 
+
     private const STATUS_TRANSITIONS = [
         'pending' => ['processing'],
         'processing' => ['shipping', 'returned'],
         'shipping' => ['delivered'],
         'delivered' => [],
+
         'return_requested' => ['returned'],
         'returned' => [],
         'completed' => [],
@@ -66,11 +68,17 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::with(['user:id,name,email,phone,role,status'])
-            ->find($id);
-        if (!$order) {
-            return redirect()->route('admin.orders.list')->with('error', 'Đơn hàng không tồn tại');
-        }
+        // Lấy thông tin đơn
+        $order = DB::table('orders')
+            ->join('users', 'orders.user_id', '=', 'users.id')
+            ->select(
+                'orders.*',
+                'users.name as customer_name',
+                'users.phone as customer_phone'
+            )
+            ->where('orders.id', $id)
+            ->first();
+
 
         // Lấy danh sách sản phẩm trong đơn
         $orderDetails = DB::table('order_details')
@@ -104,6 +112,7 @@ class OrderController extends Controller
         $hasReturnRequest = $order->return_status && $order->return_status !== 'none' && $order->return_status !== 'rejected';
 
         return view('admin.orders.detail', compact('order', 'orderDetails', 'statusHistory', 'orderLogs', 'hasReturnRequest'));
+
     }
 
     public function updateStatus(Request $request, $id)
@@ -133,6 +142,7 @@ class OrderController extends Controller
         }
 
         // 3. Kiểm tra rule chuyển trạng thái hợp lệ
+
         $validTransitions = self::STATUS_TRANSITIONS[$currentStatus] ?? [];
 
         if (!in_array($newStatus, $validTransitions, true)) {

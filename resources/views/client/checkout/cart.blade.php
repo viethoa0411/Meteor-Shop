@@ -66,8 +66,9 @@
                             {{-- Địa chỉ --}}
                             <div class="mb-3">
                                 <label class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
-                                <input type="text" name="shipping_city" class="form-control"
-                                    value="{{ old('shipping_city') }}" required>
+                                <select name="shipping_city" id="shipping_city" class="form-select" required>
+                                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                                </select>
                                 @error('shipping_city')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -76,8 +77,9 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Quận/Huyện <span class="text-danger">*</span></label>
-                                    <input type="text" name="shipping_district" class="form-control"
-                                        value="{{ old('shipping_district') }}" required>
+                                    <select name="shipping_district" id="shipping_district" class="form-select" required disabled>
+                                        <option value="">-- Chọn Quận/Huyện --</option>
+                                    </select>
                                     @error('shipping_district')
                                         <div class="text-danger small">{{ $message }}</div>
                                     @enderror
@@ -85,8 +87,9 @@
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Phường/Xã <span class="text-danger">*</span></label>
-                                    <input type="text" name="shipping_ward" class="form-control"
-                                        value="{{ old('shipping_ward') }}" required>
+                                    <select name="shipping_ward" id="shipping_ward" class="form-select" required disabled>
+                                        <option value="">-- Chọn Phường/Xã --</option>
+                                    </select>
                                     @error('shipping_ward')
                                         <div class="text-danger small">{{ $message }}</div>
                                     @enderror
@@ -101,35 +104,14 @@
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
-
-                            {{-- Phương thức vận chuyển --}}
+                            {{-- Phí vận chuyển (tự động tính) --}}
                             <div class="mb-3">
-                                <label class="form-label">Phương thức vận chuyển <span class="text-danger">*</span></label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="shipping_method" id="standard"
-                                        value="standard" {{ old('shipping_method', 'standard') == 'standard' ? 'checked' : '' }}
-                                        required>
-                                    <label class="form-check-label" for="standard">
-                                        <strong>Giao hàng tiêu chuẩn</strong> - 30.000đ (3-5 ngày)
-                                    </label>
+                                <label class="form-label">Phí vận chuyển</label>
+                                <div id="shipping-fee-display" class="alert alert-info mb-0">
+                                    <i class="bi bi-truck me-2"></i>
+                                    <span id="shipping-fee-text">Vui lòng chọn địa chỉ để tính phí vận chuyển</span>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="shipping_method" id="express"
-                                        value="express" {{ old('shipping_method') == 'express' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="express">
-                                        <strong>Giao hàng nhanh</strong> - 50.000đ (1-2 ngày)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="shipping_method" id="fast"
-                                        value="fast" {{ old('shipping_method') == 'fast' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="fast">
-                                        <strong>Giao hàng hỏa tốc</strong> - 70.000đ (Trong ngày)
-                                    </label>
-                                </div>
-                                @error('shipping_method')
-                                    <div class="text-danger small">{{ $message }}</div>
-                                @enderror
+                                <input type="hidden" name="shipping_fee" id="shipping_fee_input" value="0">
                             </div>
 
                             {{-- Phương thức thanh toán --}}
@@ -214,6 +196,7 @@
                                         @endif
                                         <div class="mt-1">
                                             <small class="text-muted">SL: {{ $item['quantity'] }} x
+
                                                 {{ number_format($item['price'], 0, ',', '.') }} đ
                                             </small>
                                         </div>
@@ -246,7 +229,6 @@
                                 {{ number_format($subtotal, 0, ',', '.') }} đ
                             </span>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Mã khuyến mãi</label>
                             <div class="input-group">
@@ -411,12 +393,90 @@
                     }
                 }
 
+                const subtotal = {{ $subtotal }};
+                let currentShippingFee = 0;
+
+                // Hàm tính phí vận chuyển qua API
+                function calculateShippingFee() {
+                    const citySelect = document.getElementById('shipping_city');
+                    const districtSelect = document.getElementById('shipping_district');
+
+                    if (!citySelect || !districtSelect) return;
+
+                    const cityOption = citySelect.options[citySelect.selectedIndex];
+                    const districtOption = districtSelect.options[districtSelect.selectedIndex];
+
+                    const cityName = cityOption ? cityOption.text : '';
+                    const districtName = districtOption ? districtOption.text : '';
+
+                    if (!cityName || cityName === '-- Chọn Tỉnh/Thành phố --' ||
+                        !districtName || districtName === '-- Chọn Quận/Huyện --') {
+                        document.getElementById('shipping-fee-text').textContent = 'Vui lòng chọn địa chỉ để tính phí vận chuyển';
+                        document.getElementById('shipping-fee-display').className = 'alert alert-info mb-0';
+                        return;
+                    }
+
+                    // Gọi API tính phí vận chuyển
+                    fetch('{{ route("client.checkout.calculateShipping") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            city: cityName,
+                            district: districtName,
+                            subtotal: subtotal
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            currentShippingFee = data.fee;
+                            document.getElementById('shipping_fee_input').value = data.fee;
+
+                            if (data.is_free_shipping) {
+                                document.getElementById('shipping-fee-text').innerHTML =
+                                    '<strong class="text-success">🎉 Đơn hàng được MIỄN PHÍ vận chuyển!</strong>';
+                                document.getElementById('shipping-fee-display').className = 'alert alert-success mb-0';
+                            } else {
+                                document.getElementById('shipping-fee-text').innerHTML =
+                                    'Phí vận chuyển của quý khách: <strong>' + data.fee_formatted + '</strong>';
+                                document.getElementById('shipping-fee-display').className = 'alert alert-warning mb-0';
+                            }
+
+                            // Cập nhật tổng tiền
+                            updateTotalDisplay();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+
+                // Hàm cập nhật hiển thị tổng tiền
+                function updateTotalDisplay() {
+                    const total = subtotal + currentShippingFee;
+                    const shippingFeeEl = document.getElementById('shipping-fee');
+                    const totalAmountEl = document.getElementById('total-amount');
+
+                    if (shippingFeeEl) {
+                        shippingFeeEl.textContent = currentShippingFee === 0
+                            ? 'Miễn phí'
+                            : currentShippingFee.toLocaleString('vi-VN') + ' đ';
+                    }
+                    if (totalAmountEl) {
+                        totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
+                    }
+                }
+
                 // Xử lý khi chọn tỉnh/thành phố
                 document.getElementById('shipping_city').addEventListener('change', function() {
                     const selectedOption = this.options[this.selectedIndex];
                     if (selectedOption.dataset.code) {
                         loadDistricts(selectedOption.dataset.code);
                     }
+                    setTimeout(calculateShippingFee, 500);
                 });
 
                 // Xử lý khi chọn quận/huyện
@@ -537,7 +597,13 @@
                         }
                     });
                 }
+                    setTimeout(calculateShippingFee, 300);
+                });
+
+                // Khởi tạo lần đầu - tính phí sau khi trang load
+                setTimeout(calculateShippingFee, 1000);
             });
         </script>
     @endpush
 @endsection
+

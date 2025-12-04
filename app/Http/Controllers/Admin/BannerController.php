@@ -103,13 +103,13 @@ class BannerController extends Controller
             return back()->withInput()
                 ->withErrors(['image' => 'Lỗi khi upload ảnh: ' . $e->getMessage()]);
         }
-
         // Chuẩn hóa path ảnh (đảm bảo luôn dạng banners/filename.ext)
         if (!empty($imagePath)) {
             $normalized = ltrim($imagePath, '/');
             $normalized = str_replace(['storage/', 'public/'], '', $normalized);
             $imagePath = $normalized;
         }
+
 
         // Lấy sort_order cao nhất + 1 nếu không nhập
         $sortOrder = $request->sort_order ?? (Banner::max('sort_order') ?? 0) + 1;
@@ -211,6 +211,7 @@ class BannerController extends Controller
             $normalized = str_replace(['storage/', 'public/'], '', $normalized);
             $imagePath = $normalized;
         }
+
 
         $banner->update([
             'title' => $request->title,

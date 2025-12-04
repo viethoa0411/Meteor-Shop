@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Wishlist; 
 
 
+
 class Product extends Model
 {
     protected $fillable = [
@@ -16,6 +17,8 @@ class Product extends Model
         'short_description',
         'price',
         'sale_price',
+        'description',
+        'price',
         'stock',
         'image',
         'length',
@@ -34,6 +37,11 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
 
     public function variants()
     {
@@ -44,6 +52,7 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
+
 
      public function wishlists()
     {

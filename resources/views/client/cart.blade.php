@@ -2,10 +2,12 @@
 
 @section('content')
     <div class="container pb-5">
+
         <div class="text-center mb-4">
             <h2>Giỏ hàng</h2>
         </div>
         @if (count($cart) > 0)
+
             <table class="table table-bordered align-middle">
                 <tr>
                     <th style="width:40px;">
@@ -25,6 +27,7 @@
                             <input type="checkbox" class="cart-item-checkbox" data-id="{{ $id }}"
                                 data-subtotal="{{ $item['price'] * $item['quantity'] }}" checked>
                         </td>
+
                         <td>
                             <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/70x70?text=No+Image' }}"
                                 width="70" alt="{{ $item['name'] }}">
@@ -76,6 +79,7 @@
                 <button id="checkout-selected" class="btn btn-dark mt-2 mt-md-0">
                     Đặt hàng
                 </button>
+
             </div>
         @else
             <div class="text-center mt-4">
@@ -110,6 +114,7 @@
                 </div>
             </div>
         @endif
+
     </div>
 @endsection
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -165,6 +170,7 @@
             window.location.href = checkoutUrl + '?' + params.toString();
         });
 
+
         // Update số lượng
         $(document).on('click', '.updateQty', function() {
             let id = $(this).data('id');
@@ -193,6 +199,7 @@
                     $(".cart-item-checkbox[data-id='" + id + "']").attr('data-subtotal', data.subtotal);
                     updateSelectedTotal();
                     syncSelectAll();
+
                     if (typeof data.max_stock !== 'undefined') {
                         if (data.max_stock) {
                             $("#stock-note-" + id).text('Tối đa: ' + data.max_stock);
@@ -222,10 +229,12 @@
                     updateSelectedTotal();
                     syncSelectAll();
 
+
                     if (data.total == 0) {
                         $("table").remove();
                         $(".container").append("<p>Giỏ hàng của bạn trống.</p>");
                         $('#selected-total').text("0đ");
+
                     }
                 }
             });

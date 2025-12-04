@@ -7,6 +7,7 @@ use App\Models\Banner;
 use App\Models\Blog;
 use App\Models\Product;
 use App\Models\Wishlist;
+
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -17,9 +18,9 @@ class HomeController extends Controller
         // lấy 4 sp mới nhât(theo ngày tạo)
         $newProducts = Product::query()
             ->select(['id', 'name',  'slug', 'price', 'image', 'status', 'created_at'])
-            ->where('status', 1)
-            ->orderByDesc('created_at')
-            ->limit(4)
+            ->where('status', 1) // chỉ lấy sản phẩm đang active
+            ->orderByDesc('created_at') //lấy 4 cái ngày tạo mới nhất giảm dần
+            ->limit(4) // lấy 4cp
             ->get();
 
         $outstandingProducts = Product::query()
@@ -50,6 +51,7 @@ class HomeController extends Controller
             ->take(2)
             ->get();
 
+
         return view('client.home', compact(
             'newProducts',
             'outstandingProducts',
@@ -65,8 +67,7 @@ class HomeController extends Controller
     public function getVersion($id)
     {
         $product = Product::select('id', 'version')->find($id);
-        return response()->json([
-            'version' => $product->version,
-        ]);
+        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners','latestBlogs'));
     }
+
 }

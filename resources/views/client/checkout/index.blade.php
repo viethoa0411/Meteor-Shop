@@ -105,35 +105,14 @@
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
-
-                            {{-- Phương thức vận chuyển --}}
+                            {{-- Phí vận chuyển (tự động tính) --}}
                             <div class="mb-3">
-                                <label class="form-label">Phương thức vận chuyển <span class="text-danger">*</span></label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="shipping_method" id="standard"
-                                        value="standard" {{ old('shipping_method', 'standard') == 'standard' ? 'checked' : '' }}
-                                        required>
-                                    <label class="form-check-label" for="standard">
-                                        <strong>Giao hàng tiêu chuẩn</strong> - 30.000đ (3-5 ngày)
-                                    </label>
+                                <label class="form-label">Phí vận chuyển</label>
+                                <div id="shipping-fee-display" class="alert alert-info mb-0">
+                                    <i class="bi bi-truck me-2"></i>
+                                    <span id="shipping-fee-text">Vui lòng chọn địa chỉ để tính phí vận chuyển</span>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="shipping_method" id="express"
-                                        value="express" {{ old('shipping_method') == 'express' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="express">
-                                        <strong>Giao hàng nhanh</strong> - 50.000đ (1-2 ngày)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="shipping_method" id="fast"
-                                        value="fast" {{ old('shipping_method') == 'fast' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="fast">
-                                        <strong>Giao hàng hỏa tốc</strong> - 70.000đ (Trong ngày)
-                                    </label>
-                                </div>
-                                @error('shipping_method')
-                                    <div class="text-danger small">{{ $message }}</div>
-                                @enderror
+                                <input type="hidden" name="shipping_fee" id="shipping_fee_input" value="0">
                             </div>
 
                             {{-- Phương thức thanh toán --}}
@@ -250,13 +229,13 @@
                             <span>Giảm giá (<span id="applied-code"></span>):</span>
                             <strong class="text-success" id="discount-amount">- 0 đ</strong>
                         </div>
+
                         <div class="mb-3 pt-2 border-top d-flex justify-content-between">
                             <span class="fs-5 fw-bold">Tổng cộng:</span>
                             <span class="fs-5 fw-bold text-danger" id="total-amount">
                                 {{ number_format($checkoutData['subtotal'], 0, ',', '.') }} đ
                             </span>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Mã khuyến mãi</label>
                             <div class="input-group">
@@ -283,6 +262,7 @@
         <script>
             let currentDiscount = 0;
             let appliedCode = '';
+
             // Load dữ liệu địa chỉ từ API
             let provinces = [];
             let districts = [];
@@ -418,12 +398,9 @@
                 
                 const price = parseFloat(quantityInput.getAttribute('data-price')) || 0;
                 const maxStock = parseInt(quantityInput.getAttribute('data-stock')) || 1;
-                
-                const shippingFees = {
-                    'standard': 30000,
-                    'express': 50000,
-                    'fast': 70000
-                };
+
+                let currentShippingFee = 0;
+                let currentSubtotal = price;
 
                 // Hàm cập nhật số lượng và tính toán
                 function updateQuantity(newQty) {
@@ -435,48 +412,104 @@
                     }
 
                     // Tính lại subtotal
-                    const subtotal = price * newQty;
-                    
+                    currentSubtotal = price * newQty;
+
                     // Cập nhật hiển thị
                     const productSubtotalEl = document.getElementById('product-subtotal');
                     const subtotalDisplayEl = document.getElementById('subtotal-display');
-                    
+
                     if (productSubtotalEl) {
-                        productSubtotalEl.textContent = subtotal.toLocaleString('vi-VN') + ' đ';
+                        productSubtotalEl.textContent = currentSubtotal.toLocaleString('vi-VN') + ' đ';
                     }
                     if (subtotalDisplayEl) {
-                        subtotalDisplayEl.textContent = subtotal.toLocaleString('vi-VN') + ' đ';
+                        subtotalDisplayEl.textContent = currentSubtotal.toLocaleString('vi-VN') + ' đ';
                     }
-                    
+
                     // Cập nhật phí vận chuyển và tổng
-                    updateShippingFee(subtotal);
+                    calculateShippingFee();
                 }
 
-                // Hàm cập nhật phí vận chuyển
-                function updateShippingFee(subtotal) {
-                    const selected = document.querySelector('input[name="shipping_method"]:checked');
-                    if (!selected) return;
+                // Hàm tính phí vận chuyển qua API
+                function calculateShippingFee() {
+                    const citySelect = document.getElementById('city');
+                    const districtSelect = document.getElementById('district');
 
-                    let fee = shippingFees[selected.value] || 0;
-                    
-                    // Miễn phí ship cho đơn trên 500k
-                    if (subtotal >= 500000) {
-                        fee = 0;
+                    if (!citySelect || !districtSelect) return;
+
+                    const cityOption = citySelect.options[citySelect.selectedIndex];
+                    const districtOption = districtSelect.options[districtSelect.selectedIndex];
+
+                    const cityName = cityOption ? cityOption.text : '';
+                    const districtName = districtOption ? districtOption.text : '';
+
+                    if (!cityName || cityName === '-- Chọn Tỉnh/Thành phố --' ||
+                        !districtName || districtName === '-- Chọn Quận/Huyện --') {
+                        document.getElementById('shipping-fee-text').textContent = 'Vui lòng chọn địa chỉ để tính phí vận chuyển';
+                        document.getElementById('shipping-fee-display').className = 'alert alert-info mb-0';
+                        return;
                     }
 
-                    const total = Math.max(0, subtotal - currentDiscount + fee);
+                    // Gọi API tính phí vận chuyển
+                    fetch('{{ route("client.checkout.calculateShipping") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            city: cityName,
+                            district: districtName,
+                            subtotal: currentSubtotal
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            currentShippingFee = data.fee;
+                            document.getElementById('shipping_fee_input').value = data.fee;
+
+                            if (data.is_free_shipping) {
+                                document.getElementById('shipping-fee-text').innerHTML =
+                                    '<strong class="text-success">🎉 Đơn hàng được MIỄN PHÍ vận chuyển!</strong>';
+                                document.getElementById('shipping-fee-display').className = 'alert alert-success mb-0';
+                            } else {
+                                document.getElementById('shipping-fee-text').innerHTML =
+                                    'Phí vận chuyển của quý khách: <strong>' + data.fee_formatted + '</strong>';
+                                document.getElementById('shipping-fee-display').className = 'alert alert-warning mb-0';
+                            }
+
+                            // Cập nhật tổng tiền
+                            updateTotalDisplay();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+
+                // Hàm cập nhật hiển thị tổng tiền
+                function updateTotalDisplay() {
+                    const total = currentSubtotal + currentShippingFee;
                     const shippingFeeEl = document.getElementById('shipping-fee');
                     const totalAmountEl = document.getElementById('total-amount');
-                    
+
                     if (shippingFeeEl) {
-                        shippingFeeEl.textContent = fee === 0 
-                            ? 'Miễn phí' 
-                            : fee.toLocaleString('vi-VN') + ' đ';
+                        shippingFeeEl.textContent = currentShippingFee === 0
+                            ? 'Miễn phí'
+                            : currentShippingFee.toLocaleString('vi-VN') + ' đ';
                     }
                     if (totalAmountEl) {
                         totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
                     }
                 }
+
+                // Lắng nghe sự kiện thay đổi địa chỉ
+                document.getElementById('city').addEventListener('change', function() {
+                    setTimeout(calculateShippingFee, 500);
+                });
+                document.getElementById('district').addEventListener('change', function() {
+                    setTimeout(calculateShippingFee, 300);
+                });
 
                 // Nút giảm số lượng
                 qtyMinus.addEventListener('click', function(e) {
@@ -513,6 +546,7 @@
                         clearPromotion();
                         setMessage('Số lượng đã thay đổi. Vui lòng áp dụng lại mã.', 'warning');
                     }
+
                 });
 
                 // Khi người dùng nhập từ bàn phím (real-time)
@@ -540,78 +574,15 @@
                         const subtotal = price * parseInt(quantityInput.value) || price;
                         updateShippingFee(subtotal);
                     });
+
                 });
 
                 // Khởi tạo lần đầu
                 const initialQty = parseInt(quantityInput.value) || 1;
-                const initialSubtotal = price * initialQty;
-                updateShippingFee(initialSubtotal);
+                currentSubtotal = price * initialQty;
 
-                // Áp dụng mã khuyến mãi
-                const applyBtn = document.getElementById('apply-promotion-btn');
-                const codeInput = document.getElementById('promotion-code');
-                const discountRow = document.getElementById('discount-row');
-                const discountAmountEl = document.getElementById('discount-amount');
-                const appliedCodeEl = document.getElementById('applied-code');
-                const messageEl = document.getElementById('promotion-message');
-
-                function setMessage(text, type = 'info') {
-                    if (!messageEl) return;
-                    messageEl.className = 'small mt-2 text-' + (type === 'error' ? 'danger' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'muted');
-                    messageEl.textContent = text;
-                }
-
-                function clearPromotion() {
-                    currentDiscount = 0;
-                    appliedCode = '';
-                    if (discountRow) discountRow.style.display = 'none';
-                    if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
-                    if (appliedCodeEl) appliedCodeEl.textContent = '';
-                    const subtotal = price * (parseInt(quantityInput.value) || 1);
-                    updateShippingFee(subtotal);
-                }
-
-                if (applyBtn) {
-                    applyBtn.addEventListener('click', async function() {
-                        const code = codeInput ? codeInput.value.trim() : '';
-                        if (!code) {
-                            setMessage('Vui lòng nhập mã khuyến mãi', 'error');
-                            return;
-                        }
-                        setMessage('Đang kiểm tra mã...', 'info');
-                        applyBtn.disabled = true;
-                        try {
-                            const res = await fetch('{{ route('client.checkout.applyPromotion') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({ code })
-                            });
-                            const data = await res.json();
-                            if (!res.ok || !data.ok) {
-                                const err = data.error || 'Mã không hợp lệ';
-                                setMessage(err, 'error');
-                                clearPromotion();
-                            } else {
-                                currentDiscount = parseFloat(data.promotion.discount_amount) || 0;
-                                appliedCode = data.promotion.code || code;
-                                if (discountRow) discountRow.style.display = 'flex';
-                                if (discountAmountEl) discountAmountEl.textContent = '- ' + currentDiscount.toLocaleString('vi-VN') + ' đ';
-                                if (appliedCodeEl) appliedCodeEl.textContent = appliedCode;
-                                const subtotal = price * (parseInt(quantityInput.value) || 1);
-                                updateShippingFee(subtotal);
-                                setMessage('Áp dụng mã thành công', 'success');
-                            }
-                        } catch (e) {
-                            setMessage('Lỗi kết nối. Vui lòng thử lại.', 'error');
-                            clearPromotion();
-                        } finally {
-                            applyBtn.disabled = false;
-                        }
-                    });
-                }
+                // Tính phí vận chuyển sau khi trang load xong
+                setTimeout(calculateShippingFee, 1000);
             });
         </script>
     @endpush

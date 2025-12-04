@@ -5,6 +5,7 @@ namespace App\Helpers;
 class TextHelper
 {
     /**
+<<<<<<< HEAD
      * Sanitize HTML content for safe output on the client side.
      *
      * - Giữ lại một số thẻ HTML cơ bản (p, br, strong, em, ul, ol, li, h1‑h4, a, img, blockquote)
@@ -37,6 +38,8 @@ class TextHelper
     }
 
     /**
+=======
+>>>>>>> origin/Trang_Chu_Client
      * Chuyển đổi tiếng Việt có dấu thành không dấu
      * 
      * @param string $str

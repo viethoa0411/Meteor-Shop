@@ -14,6 +14,8 @@ use App\Models\WalletTransaction;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 
 class OrderController extends Controller
 {
@@ -21,8 +23,6 @@ class OrderController extends Controller
     {
         $userId = $request->user()->id;
         $status = $request->get('status', 'all');
-
-
         $ordersQuery = Order::with(['items.product', 'walletTransactions'])
             ->ownedBy($userId)
             ->status($status)
@@ -54,12 +54,14 @@ class OrderController extends Controller
     {
         $this->authorizeOwnership($request->user()->id, $order);
         $order->loadMissing(['items.product', 'walletTransactions']);
+
         return view('client.account.orders.show', compact('order'));
     }
 
     public function tracking(Request $request, Order $order)
     {
         $this->authorizeOwnership($request->user()->id, $order);
+        $order->loadMissing(['walletTransactions']);
 
         $timeline = [
             'order_date' => $order->display_order_date,
@@ -86,8 +88,8 @@ class OrderController extends Controller
             $refundMessage = '';
             if ($order->payment_method === 'wallet' && $order->payment_status === 'paid') {
                 $wallet = ClientWallet::where('user_id', $order->user_id)->first();
-
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
+
 
                 if ($wallet) {
                     $refundAmount = $order->final_total;
@@ -119,13 +121,8 @@ class OrderController extends Controller
                 'cancelled_at' => now(),
                 'payment_status' => $order->payment_method === 'wallet' ? 'refunded' : $order->payment_status,
             ]);
+            $this->logStatusChange($order, 'cancelled', $request->user()->id);
 
-            OrderLog::create([
-                'order_id' => $order->id,
-                'user_id' => $request->user()->id,
-                'status' => 'cancelled',
-                'note' => 'Khách hàng hủy đơn hàng.',
-            ]);
 
             DB::commit();
 
@@ -134,7 +131,6 @@ class OrderController extends Controller
             DB::rollBack();
             return back()->with('error', 'Có lỗi xảy ra khi hủy đơn hàng: ' . $e->getMessage());
         }
-
     }
 
     public function reorder(Request $request, Order $order)
@@ -201,21 +197,7 @@ class OrderController extends Controller
         $this->authorizeOwnership($request->user()->id, $order);
 
         if (! $order->canReturn()) {
-            $errorMessage = 'Đơn hàng không đủ điều kiện đổi trả.';
-
-            // Kiểm tra các điều kiện cụ thể để đưa ra thông báo chi tiết
-            if ($order->order_status !== 'completed') {
-                $errorMessage = 'Chỉ có thể yêu cầu đổi trả khi đơn hàng đã được giao thành công.';
-            } elseif (!$order->delivered_at) {
-                $errorMessage = 'Đơn hàng chưa được xác nhận đã nhận hàng.';
-            } elseif ($order->isReturnExpired()) {
-                $daysSinceDelivery = now()->diffInDays($order->delivered_at);
-                $errorMessage = "Đơn hàng đã quá hạn để yêu cầu đổi trả. Thời gian cho phép là 7 ngày kể từ khi nhận hàng (đã qua {$daysSinceDelivery} ngày).";
-            } elseif (!in_array($order->return_status, ['none', 'rejected'])) {
-                $errorMessage = 'Đơn hàng này đã có yêu cầu đổi trả đang được xử lý.';
-            }
-
-            return back()->with('error', $errorMessage);
+            return back()->with('error', 'Đơn hàng không đủ điều kiện đổi trả.');
         }
 
         $attachments = $order->return_attachments ?? [];
@@ -237,12 +219,7 @@ class OrderController extends Controller
             'return_attachments' => $attachments,
         ]);
 
-        OrderLog::create([
-            'order_id' => $order->id,
-            'user_id' => $request->user()->id,
-            'status' => 'return_requested',
-            'note' => 'Khách hàng yêu cầu đổi trả.',
-        ]);
+        $this->logStatusChange($order, 'return_requested', $request->user()->id);
 
         return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');
     }
@@ -303,6 +280,7 @@ class OrderController extends Controller
 
         // Đảm bảo tất cả các trạng thái đều có giá trị mặc định
         $allStatuses = ['pending', 'processing', 'shipping', 'delivered', 'completed', 'cancelled', 'return_requested', 'returned'];
+
         $counts = [];
         foreach ($allStatuses as $status) {
             $counts[$status] = $baseCounts[$status] ?? 0;
@@ -317,5 +295,20 @@ class OrderController extends Controller
     protected function authorizeOwnership(int $userId, Order $order): void
     {
         abort_if($order->user_id !== $userId, 403, 'Bạn không có quyền truy cập đơn hàng này.');
+    }
+
+    protected function logStatusChange(Order $order, string $status, int $userId): void
+    {
+        if (!Schema::hasTable('order_logs')) {
+            return;
+        }
+
+        OrderLog::create([
+            'order_id' => $order->id,
+            'status' => $status,
+            'updated_by' => $userId,
+            'role' => 'customer',
+            'created_at' => now(),
+        ]);
     }
 }

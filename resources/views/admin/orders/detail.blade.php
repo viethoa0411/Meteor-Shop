@@ -29,6 +29,7 @@
                 </div>
                 <div class="card-body">
 
+<<<<<<< HEAD
                     @php
                         $statusConfig = [
                             'pending' => ['label' => 'Chờ xác nhận', 'color' => 'dark', 'icon' => 'bi-hourglass-split'],
@@ -41,24 +42,61 @@
                             'returned' => ['label' => 'Đã trả hàng', 'color' => 'secondary', 'icon' => 'bi-arrow-counterclockwise'],
                         ];
                         $cfg = $statusConfig[$order->order_status] ?? ['label' => ucfirst($order->order_status), 'color' => 'secondary', 'icon' => 'bi-question-circle'];
+=======
+                    {{-- TRẠNG THÁI HIỆN TẠI --}}
+                    @php
+                        // Logic dịch và màu trạng thái
+                        $colors = [
+                            'pending' => 'dark',
+                            'processing' => 'primary',
+                            'shipping' => 'info',
+                            'completed' => 'success',
+                            'cancelled' => 'danger',
+                            'return_requested' => 'warning',
+                            'returned' => 'secondary',
+                        ];
+                        $labels = [
+                            'pending' => 'Chờ xác nhận',
+                            'processing' => 'Đang xử lý',
+                            'shipping' => 'Đang giao hàng',
+                            'completed' => 'Hoàn thành',
+                            'cancelled' => 'Đã hủy',
+                            'return_requested' => 'Yêu cầu hoàn hàng',
+                            'returned' => 'Đã trả hàng',
+                        ];
+                        $currentStatusColor = $colors[$order->order_status] ?? 'light';
+                        $currentStatusLabel = $labels[$order->order_status] ?? ucfirst($order->order_status);
+>>>>>>> origin/Trang_Chu_Client
                     @endphp
 
                     <p class="h4 d-flex justify-content-between align-items-center">
                         <strong>Trạng thái:</strong>
+<<<<<<< HEAD
                         <span class="badge rounded-pill border border-{{ $cfg['color'] }} text-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
+=======
+                        <span class="badge bg-{{ $currentStatusColor }} py-2 px-3">{{ $currentStatusLabel }}</span>
+>>>>>>> origin/Trang_Chu_Client
                     </p>
 
                     {{-- FORM UPDATE TRẠNG THÁI --}}
                     @php
                         // Admin chỉ được cập nhật các trạng thái xử lý - không gồm hủy/hoàn thành
+<<<<<<< HEAD
                         $adminAllowedStatuses = ['processing', 'shipping', 'delivered', 'returned'];
+=======
+                        $adminAllowedStatuses = ['processing', 'shipping', 'returned'];
+>>>>>>> origin/Trang_Chu_Client
 
                         // Quy tắc chuyển trạng thái đồng bộ với backend
                         $validTransitions = [
                             'pending' => ['processing'],
                             'processing' => ['shipping', 'returned'],
+<<<<<<< HEAD
                             'shipping' => ['delivered'],
                             'delivered' => [],
+=======
+                            'shipping' => ['returned'],
+>>>>>>> origin/Trang_Chu_Client
                             'return_requested' => ['returned'],
                             'returned' => [],
                             'completed' => [],
@@ -68,7 +106,10 @@
                         $statusLabels = [
                             'processing' => 'Đang xử lý',
                             'shipping' => 'Đang giao hàng',
+<<<<<<< HEAD
                             'delivered' => 'Đã giao',
+=======
+>>>>>>> origin/Trang_Chu_Client
                             'returned' => 'Đã trả hàng',
                         ];
 
@@ -83,6 +124,7 @@
                         });
                     @endphp
 
+<<<<<<< HEAD
                     {{-- THÔNG BÁO VỀ YÊU CẦU TRẢ HÀNG --}}
                     @if (isset($hasReturnRequest) && $hasReturnRequest)
                         <div class="alert alert-warning mt-3">
@@ -191,6 +233,33 @@
                                 <i class="bi bi-eye"></i> Xem chi tiết và quản lý
                             </a>
                         </div>
+=======
+                    @if (!empty($allowedNextStatuses))
+                        @php
+                            $nextStatus = $allowedNextStatuses[0]; // Lấy trạng thái duy nhất
+                            $nextStatusLabel = $statusLabels[$nextStatus] ?? ucfirst($nextStatus);
+                        @endphp
+
+                        <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
+                            @csrf
+                            @method('PUT')
+
+                            <p class="h6 mb-2">Trạng thái tiếp theo:</p>
+                            <div class="d-flex align-items-center gap-3">
+                                {{-- THẺ TRẠNG THÁI TO HƠN --}}
+                                <span class="badge bg-info text-dark fs-5 py-2 px-3 fw-bold">
+                                    {{ $nextStatusLabel }}
+                                </span>
+
+                                <input type="hidden" name="order_status" value="{{ $nextStatus }}">
+
+                                {{-- NÚT CẬP NHẬT RÕ RÀNG HƠN --}}
+                                <button type="submit" class="btn btn-primary btn-md">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Cập nhật ngay
+                                </button>
+                            </div>
+                        </form>
+>>>>>>> origin/Trang_Chu_Client
                     @endif
 
                     <hr>
@@ -259,9 +328,14 @@
                             'pending' => 'Chờ xác nhận',
                             'processing' => 'Đang xử lý',
                             'shipping' => 'Đang giao hàng',
+<<<<<<< HEAD
                             'delivered' => 'Đã giao',
                             'completed' => 'Hoàn thành',
                             'return_requested' => 'Yêu cầu trả hàng',
+=======
+                            'completed' => 'Hoàn thành',
+                            'return_requested' => 'Yêu cầu hoàn hàng',
+>>>>>>> origin/Trang_Chu_Client
                             'returned' => 'Đã trả hàng',
                             'cancelled' => 'Đã hủy',
                         ];
@@ -269,7 +343,10 @@
                             'pending' => 'dark',
                             'processing' => 'primary',
                             'shipping' => 'info',
+<<<<<<< HEAD
                             'delivered' => 'success',
+=======
+>>>>>>> origin/Trang_Chu_Client
                             'completed' => 'success',
                             'return_requested' => 'warning',
                             'returned' => 'secondary',
@@ -293,7 +370,11 @@
                                         <tr>
                                             <td class="small">{{ date('d/m/Y H:i', strtotime($log->created_at)) }}</td>
                                             <td>
+<<<<<<< HEAD
                                                 <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$log->status] ?? 'secondary' }} text-{{ $statusColors[$log->status] ?? 'secondary' }}">
+=======
+                                                <span class="badge bg-{{ $statusColors[$log->status] ?? 'light' }}">
+>>>>>>> origin/Trang_Chu_Client
                                                     {{ $statusLabels[$log->status] ?? $log->status }}
                                                 </span>
                                             </td>
@@ -334,7 +415,11 @@
                                             <td class="small">{{ date('d/m/Y H:i', strtotime($history->created_at)) }}</td>
                                             <td>
                                                 @if ($history->old_status)
+<<<<<<< HEAD
                                                     <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$history->old_status] ?? 'secondary' }} text-{{ $statusColors[$history->old_status] ?? 'secondary' }}">
+=======
+                                                    <span class="badge bg-{{ $statusColors[$history->old_status] ?? 'light' }}">
+>>>>>>> origin/Trang_Chu_Client
                                                         {{ $statusLabels[$history->old_status] ?? $history->old_status }}
                                                     </span>
                                                 @else
@@ -342,7 +427,11 @@
                                                 @endif
                                             </td>
                                             <td>
+<<<<<<< HEAD
                                                 <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$history->new_status] ?? 'secondary' }} text-{{ $statusColors[$history->new_status] ?? 'secondary' }}">
+=======
+                                                <span class="badge bg-{{ $statusColors[$history->new_status] ?? 'light' }}">
+>>>>>>> origin/Trang_Chu_Client
                                                     {{ $statusLabels[$history->new_status] ?? $history->new_status }}
                                                 </span>
                                             </td>
@@ -388,7 +477,11 @@
 
                         {{-- THÔNG TIN NGƯỜI NHẬN --}}
                         <div class="col-md-6">
+<<<<<<< HEAD
                             <h6><i class="bi bi-person-fill"></i> Người nhận </h6>
+=======
+                            <h6><i class="bi bi-person-fill"></i> Người nhận (Shipping)</h6>
+>>>>>>> origin/Trang_Chu_Client
                             <ul class="list-unstyled mb-2 small">
                                 <li><strong>Tên:</strong> {{ $order->customer_name }}</li>
                                 <li><strong>SĐT:</strong> {{ $order->customer_phone }}</li>

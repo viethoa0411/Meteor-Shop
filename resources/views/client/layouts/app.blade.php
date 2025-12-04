@@ -230,43 +230,19 @@
             font: inherit;
             padding: 0;
             cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .client-nav a:hover,
-        .client-nav a.active {
-            color: #ffb703;
         }
 
         .client-nav .dropdown-menu {
             display: none;
             position: absolute;
-            top: 100%;
+            top: calc(100% + 12px);
             left: 0;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
             min-width: 220px;
-            padding: 12px 0;
+            padding: 8px 0;
             z-index: 1002;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            pointer-events: none;
-        }
-
-        .client-nav li:hover>.dropdown-menu {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        .client-nav li.show>.dropdown-menu {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
         }
 
         .client-nav .dropdown-menu li a {
@@ -282,6 +258,9 @@
             color: #2b5c73;
         }
 
+        .client-nav li:hover>.dropdown-menu {
+            display: block;
+        }
 
         /* Icon menu dọc */
         .menu-toggle {
@@ -497,67 +476,6 @@
                 gap: 16px;
             }
         }
-
-        /* Mobile Menu Toggle */
-        .client-nav-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #111;
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        @media (max-width: 768px) {
-            .client-nav-toggle {
-                display: block;
-            }
-
-            .client-nav__inner {
-                flex-direction: column;
-                padding: 0;
-            }
-
-            .client-nav ul {
-                flex-direction: column;
-                gap: 0;
-                width: 100%;
-                display: none;
-            }
-
-            .client-nav ul.active {
-                display: flex;
-            }
-
-            .client-nav li {
-                border-bottom: 1px solid #eee;
-            }
-
-            .client-nav a,
-            .client-nav button {
-                padding: 12px 24px;
-                display: block;
-                width: 100%;
-            }
-
-            .client-nav .dropdown-menu {
-                position: static;
-                display: none;
-                box-shadow: none;
-                border-radius: 0;
-                padding: 0;
-                background: #f9f9f9;
-                opacity: 1;
-                transform: none;
-                pointer-events: auto;
-            }
-
-            .client-nav li:hover > .dropdown-menu,
-            .client-nav li.active > .dropdown-menu {
-                display: block;
-            }
-        }
     </style>
     @stack('head')
 
@@ -664,12 +582,9 @@
 
         <nav class="client-nav">
             <div class="client-nav__inner">
-                <button class="client-nav-toggle" type="button" aria-label="Toggle menu">
-                    <i class="bi bi-list"></i>
-                </button>
-                <ul id="client-nav-menu">
-                    <li class="has-dropdown">
-                        <a href="{{ route('client.products.index') }}" class="dropdown-toggle {{ request()->routeIs('client.products.index') ? 'active' : '' }}">Sản phẩm </a>
+                <ul>
+                    <li>
+                        <a href="#" class="dropdown-toggle">Sản phẩm </a>
                         <ul class="dropdown-menu">
                             @forelse ($childCategories as $child)
                                 <li>
@@ -682,8 +597,8 @@
                             @endforelse
                         </ul>
                     </li>
-                    <li class="has-dropdown">
-                        <a href="{{ route('client.rooms.index') }}" class="dropdown-toggle {{ request()->routeIs('client.rooms.index') ? 'active' : '' }}">Phòng </a>
+                    <li>
+                        <a href="#" class="dropdown-toggle">Phòng </a>
                         <ul class="dropdown-menu">
                             @foreach ($parentCategories as $parent)
                                 <li>
@@ -694,11 +609,10 @@
                             @endforeach
                         </ul>
                     </li>
-                    <li><a href="{{ route('client.collections.index') }}" class="{{ request()->routeIs('client.collections.*') ? 'active' : '' }}">Bộ sưu tập</a></li>
-                    <li><a href="{{ route('client.designs.index') }}" class="{{ request()->routeIs('client.designs.*') ? 'active' : '' }}">Thiết kế nội thất</a></li>
-                    <li><a href="{{ route('client.blogs.list') }}" class="{{ request()->routeIs('client.blogs.*') || request()->routeIs('client.blog.*') ? 'active' : '' }}">Bài Viết</a></li>
-                    <li><a href="{{ route('client.shares.index') }}" class="{{ request()->routeIs('client.shares.*') ? 'active' : '' }}">Góc chia sẻ</a></li>
-
+                    <li><a href="#">Bộ sưu tập</a></li>
+                    <li><a href="{{ route('client.contact.list') }}">Thiết kế nội thất</a></li>
+                    <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
+                    <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </div>
         </nav>
@@ -877,6 +791,34 @@
                             <p role="status" aria-live="polite" aria-atomic="true"></p>
                             <ul></ul>
                         </div>
+                        <form action="" method="post" class="wpcf7-form init" novalidate="novalidate"
+                            data-status="init">
+                            <div style="display: none;">
+                                <input type="hidden" name="_wpcf7" value="9">
+                                <input type="hidden" name="_wpcf7_version" value="5.5.2">
+                                <input type="hidden" name="_wpcf7_locale" value="en_US">
+                                <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f9-o1">
+                                <input type="hidden" name="_wpcf7_container_post" value="0">
+                                <input type="hidden" name="_wpcf7_posted_data_hash" value="">
+                                <input type="hidden" name="_wpcf7_recaptcha_response"
+                                    value="0cAFcWeA7swwLl_8VvpFI06BH3gsjO68Ua_z5VNFU3hy53nMAl1Ib7MeCY5iXtu94dRupk7wiA0keDJ5HgJdgtgo0EYcDooyKZ63qDfxkzaFXYp5nkEMhcr5_ue_kmeQU92aHNxsy1mWUxkQSKxN8OWCh6dzQdp-KzwjpGSFz4OPB-SOb1hbW1z8pZO8-hDZet1qfO2B5uU3s3GdEUfy1YJxrd7si21y0xUlVXLGtRiCG0t8dNFC_5oplJUw-1SX90fY-210RRm1Ee7D2dBieO58yWy-vKauhvB0yohn7yrNyo9CIvSYVz-QUfGqHLrgkOtkGddun16vrAHo8Z_ElyFdzntv7DI6ZDLfUi_mPDOnaataHiFt2X4nDFOq97xzSs9xEZxMR6SB5R9WTqJtC8lLASyMMnBeUsZBH-PB0yjNhs6B4kD2RMULDnqLynhTXu5sprEQIi3oh-hij4WC9plTBrZgcT5pcoRABIzY5xI6IGrLQfVwqY5tqcpPr0COV8-bFAlVDRQa9NO7AaXdPYQCCeM4aLO9CQvgA4oV4SsCs7gbTRZofv0P1hswqLW-dN1WYbDYRn0OPu3-A1A2RTbPNWikLvekFLE23T5y62gi5akjQVwaIdh5W9dOAcP6Se3m65nJCIk5AJ_fUhmc8HmBG4ieMc9ezZSLa0lG7_WqkTJ4AHm28pSwdK9SYiUdG4xQwZcxHHBW05E3Jex1l4im_aN5gAmzXxOrbckL8vXAzrYDQ7L2jNxTHuzTncUOIs1i8soQ_wUrerU40dgDRKcz-5qMYD6HwW-h8feMooaH2QXYRmbn2FByIMFCr7Bw8jvgyKCDlCJRz7">
+                            </div>
+                            <div class="flex-row form-flat medium-flex-wrap">
+                                <div class="flex-col flex-grow">
+                                    <span class="wpcf7-form-control-wrap your-email"><input type="email"
+                                            name="your-email" value="" size="40"
+                                            class="wpcf7-form-control wpcf7-text wpcf7-email wpcf7-validates-as-required wpcf7-validates-as-email"
+                                            aria-required="true" aria-invalid="false"
+                                            placeholder="Nhập email của bạn"></span>
+                                </div>
+                                <div class="flex-col ml-half">
+                                    <input type="submit" value="Đăng ký"
+                                        class="wpcf7-form-control has-spinner wpcf7-submit button"><span
+                                        class="wpcf7-spinner"></span>
+                                </div>
+                            </div>
+                            <div class="wpcf7-response-output" aria-hidden="true"></div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -920,63 +862,6 @@
                         })
                         .catch(err => console.error(err));
                 });
-            });
-
-            // ----- Mobile Menu Toggle -----
-            const navToggle = document.querySelector('.client-nav-toggle');
-            const navMenu = document.getElementById('client-nav-menu');
-            const navItems = document.querySelectorAll('.client-nav li');
-
-            if (navToggle && navMenu) {
-                navToggle.addEventListener('click', function() {
-                    navMenu.classList.toggle('active');
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.classList.toggle('bi-list');
-                        icon.classList.toggle('bi-x');
-                    }
-                });
-
-                // Close menu when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
-                        navMenu.classList.remove('active');
-                        const icon = navToggle.querySelector('i');
-                        if (icon) {
-                            icon.classList.add('bi-list');
-                            icon.classList.remove('bi-x');
-                        }
-                    }
-                });
-            }
-
-            // ----- Dropdown hover for desktop, click for mobile -----
-            navItems.forEach(item => {
-                const dropdown = item.querySelector('.dropdown-menu');
-                const toggle = item.querySelector('.dropdown-toggle');
-                if (!dropdown) return;
-
-                // Desktop hover
-                item.addEventListener('mouseenter', () => {
-                    if (window.innerWidth > 768) {
-                        item.classList.add('show');
-                    }
-                });
-                item.addEventListener('mouseleave', () => {
-                    if (window.innerWidth > 768) {
-                        item.classList.remove('show');
-                    }
-                });
-
-                // Mobile click toggle
-                if (toggle) {
-                    toggle.addEventListener('click', (event) => {
-                        if (window.innerWidth <= 768) {
-                            event.preventDefault();
-                            item.classList.toggle('active');
-                        }
-                    });
-                }
             });
 
         });
@@ -1776,6 +1661,7 @@
                             headers: {
                                 'Accept': 'application/json',
                                 'X-CSRF-TOKEN': csrfToken
+
                             },
                             body: formData
                         });
@@ -1785,7 +1671,6 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-
                                 'Accept': 'application/json',
                                 'X-CSRF-TOKEN': csrfToken
                             },

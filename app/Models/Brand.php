@@ -1,21 +1,2 @@
-<?php
+//khong dung thuong hieu nua
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Brand extends Model
-{
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'logo',
-        'status',
-    ];
-
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
-}

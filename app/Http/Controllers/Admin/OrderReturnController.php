@@ -17,9 +17,11 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\ClientWallet;
 use App\Models\WalletTransaction;
 
+
 class OrderReturnController extends Controller
 {
     /**
+
      * List Returns - Hiển thị danh sách đơn hàng có yêu cầu trả hàng
      */
     public function index(Request $request)
@@ -256,15 +258,28 @@ class OrderReturnController extends Controller
             $return->update($updateData);
 
             // Đồng bộ với order status
+
             if ($newStatus === 'approved' && $order->order_status !== 'return_requested') {
                 $order->update(['order_status' => 'return_requested']);
             }
 
+            // 如果已完成，更新订单状态
             if ($newStatus === 'completed') {
-                $order->update(['order_status' => 'returned', 'returned_at' => now()]);
+                $order->update(['order_status' => 'returned']);
             }
 
+            // 添加时间线
+            $order->addTimeline(
+                'return_approved',
+                'Cập nhật trạng thái trả hàng',
+                "Trạng thái trả hàng đã thay đổi từ {$oldStatus} sang {$newStatus}",
+                $oldStatus,
+                $newStatus,
+                ['return_id' => $return->id]
+            );
+
             DB::commit();
+
             return back()->with('success', 'Cập nhật trạng thái trả hàng thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
