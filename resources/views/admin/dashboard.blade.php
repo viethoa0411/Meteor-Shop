@@ -537,7 +537,7 @@
                                                     'icon' => 'bi-question-circle',
                                                 ];
                                             @endphp
-                                            <<<<<<< HEAD <span
+                                            <span
                                                 class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
                                                 {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
                                                 </span>
@@ -545,14 +545,13 @@
                                         <td class="text-center">
                                             <a href="{{ route('admin.orders.show', $order->id) }}"
                                                 class="btn btn-sm btn-outline-primary">
-                                                =======
+                                                
                                                 <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i
                                                         class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{ route('admin.orders.show', $order->id) }}"
                                                 class="btn btn-sm btn-outline-primary">
-                                                >>>>>>> origin/order_admin
                                                 <i class="bi bi-eye me-1"></i>Chi tiết
                                             </a>
                                         </td>
@@ -612,15 +611,13 @@
                                                 <i
                                                     class="bi bi-calendar3 me-1"></i>{{ $order->created_at->format('d/m/Y H:i') }}
                                             </small>
-                                        </div>
-                                        <<<<<<< HEAD <span
+                                        </div>   <span
                                             class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
                                             {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
                                             </span>
-                                            =======
+
                                             <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i
                                                     class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
-                                            >>>>>>> origin/order_admin
                                     </div>
 
                                     <div class="mb-3">
@@ -641,13 +638,6 @@
                                                 class="fw-bold text-success fs-5">{{ number_format($order->final_total) }}
                                                 ₫</span>
                                         </div>
-                                        <a href="{{ route('admin.orders.show', $order->id) }}" <<<<<<< HEAD
-                                            class="btn btn-sm btn-primary">
-                                            =======
-                                            class="btn btn-sm btn-primary">
-                                            >>>>>>> origin/order_admin
-                                            <i class="bi bi-eye me-1"></i>Chi tiết
-                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -669,10 +659,10 @@
                                     class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-3 bg-white border-top shadow-sm">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-muted small">
-                                            <<<<<<< HEAD Hiển thị {{ $filteredOrders->firstItem() ?? 0 }} -
-                                                {{ $filteredOrders->lastItem() ?? 0 }}=======Hiển thị
-                                                {{ $filteredOrders->firstItem() ?? 0 }} -
-                                                {{ $filteredOrders->lastItem() ?? 0 }}>>>>>>> origin/order_admin
+                                            {{ $filteredOrders->firstItem() ?? 0 }} -
+                                                {{ $filteredOrders->lastItem() ?? 0 }}Hiển thị
+                                                {{ $filteredOrders->firstItem() ?? 0 }} 
+                                                {{ $filteredOrders->lastItem() ?? 0 }}
                                                 trong tổng số {{ $filteredOrders->total() }} đơn hàng
                                         </span>
                                     </div>
