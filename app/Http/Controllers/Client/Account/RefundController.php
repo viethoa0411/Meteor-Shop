@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
+use App\Models\OrderStatusHistory;
+use App\Models\OrderLog;
 
 class RefundController extends Controller
 {
@@ -121,10 +124,31 @@ class RefundController extends Controller
 
             // Cập nhật trạng thái đơn hàng
             $order->update([
+                'order_status' => 'return_requested',
                 'return_status' => 'requested',
                 'return_reason' => $request->cancel_reason,
                 'return_note' => $request->reason_description,
             ]);
+
+            if (Schema::hasTable('order_status_history')) {
+                OrderStatusHistory::create([
+                    'order_id' => $order->id,
+                    'admin_id' => null,
+                    'old_status' => 'completed',
+                    'new_status' => 'return_requested',
+                    'note' => 'Khách hàng yêu cầu trả hàng hoàn tiền',
+                ]);
+            }
+
+            if (Schema::hasTable('order_logs')) {
+                OrderLog::create([
+                    'order_id' => $order->id,
+                    'status' => 'return_requested',
+                    'updated_by' => Auth::id(),
+                    'role' => 'client',
+                    'created_at' => now(),
+                ]);
+            }
 
             // Liên kết refund với transaction nếu có (cho đơn hàng đã thanh toán online)
             if (in_array($order->payment_method, ['bank', 'momo'])) {
@@ -297,4 +321,3 @@ class RefundController extends Controller
         abort_if($order->user_id !== $userId, 403, 'Bạn không có quyền truy cập đơn hàng này.');
     }
 }
-
