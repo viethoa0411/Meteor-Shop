@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             UserSeeder::class,
+            ProductSeeder::class,
             // ReviewSeeder::class, // Uncomment sau khi có products và users
             // OrderSeeder::class, // Uncomment sau khi có products và users
         ]);
