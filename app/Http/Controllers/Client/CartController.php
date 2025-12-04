@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
@@ -13,29 +15,49 @@ class CartController extends Controller
 
     public function index()
     {
-        $cart = session()->get('cart', []);
-
-        $productIds = collect($cart)->pluck('product_id')->filter()->unique()->values();
-        $products = Product::whereIn('id', $productIds)->with('category')->get()->keyBy('id');
-
-        foreach ($cart as $id => &$item) {
-            $product = $products->get($item['product_id']);
-            if ($product) {
-                $item['image'] = $product->image;
-                $item['category'] = $product->category;
-            } else {
-                $item['image'] = null;
-                $item['category'] = null;
-            }
-
-            $item['color'] = $item['color'] ?? null;
-            $item['size'] = $item['size'] ?? null;
+        if (!Auth::check()) {
+            return redirect()->route('client.login');
         }
 
+        $cartModel = Cart::with(['items.product.category', 'items.variant'])
+            ->where('user_id', Auth::id())
+            ->where('status', 'active')
+            ->first();
+
+        $items = $cartModel ? $cartModel->items : collect();
+
+        $cart = [];
+        foreach ($items as $item) {
+            $product = $item->product;
+            $variant = $item->variant;
+            $size = null;
+            if ($variant && $variant->length && $variant->width && $variant->height) {
+                $size = $variant->length . 'x' . $variant->width . 'x' . $variant->height;
+            }
+            $maxStock = 0;
+            if ($variant) {
+                $maxStock = $variant->stock ?? 0;
+            } else {
+                $maxStock = $product->stock ?? 0;
+            }
+            $cart[$item->id] = [
+                'product_id' => $product ? $product->id : null,
+                'variant_id' => $variant ? $variant->id : null,
+                'name' => $product ? $product->name : '',
+                'price' => (float) $item->price,
+                'quantity' => (int) $item->quantity,
+                'color' => $item->color ?? ($variant ? $variant->color_name : null),
+                'size' => $item->size ?? $size,
+                'image' => $product ? $product->image : null,
+                'category' => $product ? $product->category : null,
+                'max_stock' => $maxStock,
+            ];
+        }
+
+        $productIds = collect($cart)->pluck('product_id')->filter()->unique()->values();
         $suggestedProducts = collect();
         if ($productIds->isNotEmpty()) {
-            $categories = $products->pluck('category_id')->filter()->unique();
-
+            $categories = collect($cart)->pluck('category.id')->filter()->unique();
             if ($categories->isNotEmpty()) {
                 $suggestedProducts = Product::whereIn('category_id', $categories)
                     ->whereNotIn('id', $productIds)
@@ -45,7 +67,10 @@ class CartController extends Controller
             }
         }
 
-        $total = $this->getTotal();
+        $total = 0;
+        foreach ($cart as $ci) {
+            $total += $ci['quantity'] * $ci['price'];
+        }
 
         return view('client.cart', [
             'cart' => $cart,
@@ -70,6 +95,7 @@ class CartController extends Controller
         $quantity = (int)($request->quantity ?? 1);
         $color = $request->color;
         $size = $request->size;
+        $variantIdInput = $request->variant_id;
 
         $product = Product::find($productId);
         if (!$product) {
@@ -81,17 +107,23 @@ class CartController extends Controller
         $variantId = null;
         $price = $product->price;
 
-        // Nếu sản phẩm có variant
         if ($product->variants->count() > 0) {
-            $variant = $product->variants()
-                ->when($color, fn($q) => $q->where('color_name', $color))
-                ->when($size, function ($q) use ($size) {
-                    [$l, $w, $h] = explode('x', $size);
-                    return $q->where('length', $l)
-                        ->where('width', $w)
-                        ->where('height', $h);
-                })
-                ->first();
+            if (!empty($variantIdInput)) {
+                $variant = ProductVariant::where('id', $variantIdInput)
+                    ->where('product_id', $productId)
+                    ->first();
+            }
+            if (!isset($variant) || !$variant) {
+                $variant = $product->variants()
+                    ->when($color, fn($q) => $q->where('color_name', $color))
+                    ->when($size, function ($q) use ($size) {
+                        [$l, $w, $h] = explode('x', $size);
+                        return $q->where('length', $l)
+                            ->where('width', $w)
+                            ->where('height', $h);
+                    })
+                    ->first();
+            }
 
             if (!$variant) {
                 return response()->json(['status' => 'error', 'message' => 'Biến thể không tồn tại hoặc đã hết hàng']);
@@ -107,10 +139,20 @@ class CartController extends Controller
         }
 
         // --- 2. KIỂM TRA SỐ LƯỢNG ĐÃ CÓ TRONG GIỎ ---
-        $cart = session()->get('cart', []);
-        $key = $variantId ?? $product->id; // Key để phân biệt item trong giỏ
+        $cartModel = Cart::firstOrCreate([
+            'user_id' => Auth::id(),
+            'status' => 'active',
+        ], [
+            'total_price' => 0,
+        ]);
 
-        $currentQtyInCart = isset($cart[$key]) ? $cart[$key]['quantity'] : 0;
+        $existingItem = CartItem::where('cart_id', $cartModel->id)
+            ->where('product_id', $product->id)
+            ->when($variantId, fn($q) => $q->where('variant_id', $variantId))
+            ->when(!$variantId, fn($q) => $q->whereNull('variant_id'))
+            ->first();
+
+        $currentQtyInCart = $existingItem ? $existingItem->quantity : 0;
 
         // --- 3. SO SÁNH VỚI TỒN KHO ---
         if (($currentQtyInCart + $quantity) > $currentStock) {
@@ -121,26 +163,29 @@ class CartController extends Controller
         }
 
         // --- 4. THÊM VÀO GIỎ ---
-        if (isset($cart[$key])) {
-            $cart[$key]['quantity'] += $quantity;
+        if ($existingItem) {
+            $existingItem->quantity += $quantity;
+            $existingItem->price = $price;
+            $existingItem->subtotal = $existingItem->quantity * $price;
+            $existingItem->save();
         } else {
-            $cart[$key] = [
+            $newItem = CartItem::create([
+                'cart_id' => $cartModel->id,
                 'product_id' => $product->id,
                 'variant_id' => $variantId,
-                'name' => $product->name,
-                'price' => $price,
-                'quantity' => $quantity,
                 'color' => $color,
                 'size' => $size,
-                'image' => $product->image,
-            ];
+                'quantity' => $quantity,
+                'price' => $price,
+                'subtotal' => $quantity * $price,
+            ]);
         }
 
-        session()->put('cart', $cart);
+        $cartModel->recalculateTotals();
 
-        $cartCount = array_sum(array_map(fn($i) => $i['quantity'], $cart));
+        $cartCount = CartItem::where('cart_id', $cartModel->id)->sum('quantity');
 
-        return response()->json(['status' => 'success', 'cartCount' => $cartCount]);
+        return response()->json(['status' => 'success', 'cartCount' => (int) $cartCount]);
     }
 
     public function updateQty(Request $request)
@@ -154,53 +199,55 @@ class CartController extends Controller
             ], 401);
         }
 
-        $id = $request->id; // Đây là key trong session cart
+        $id = $request->id;
         $type = $request->type;
 
-        $cart = session()->get('cart', []);
+        $cartItem = CartItem::whereHas('cart', function ($q) {
+                $q->where('user_id', Auth::id())->where('status', 'active');
+            })->where('id', $id)->first();
 
-        if (!isset($cart[$id])) {
+        if (!$cartItem) {
             return response()->json(['status' => 'error', 'message' => 'Sản phẩm không tìm thấy'], 404);
         }
 
         if ($type == 'plus') {
             // --- KIỂM TRA TỒN KHO TRƯỚC KHI TĂNG ---
-            $item = $cart[$id];
-            $product = Product::find($item['product_id']);
+            $product = Product::find($cartItem->product_id);
             $realStock = 0;
 
             if($product) {
-                if($item['variant_id']) {
-                    // Tìm variant theo ID
-                    $variant = ProductVariant::find($item['variant_id']);
+                if($cartItem->variant_id) {
+                    $variant = ProductVariant::find($cartItem->variant_id);
                     $realStock = $variant ? $variant->stock : 0;
                 } else {
-                    // Sản phẩm đơn giản
                     $realStock = $product->stock;
                 }
             }
 
-            // Nếu cộng thêm 1 mà vượt quá tồn kho -> Báo lỗi
-            if (($cart[$id]['quantity'] + 1) > $realStock) {
+            if (($cartItem->quantity + 1) > $realStock) {
                  return response()->json([
                     'status' => 'error', 
                     'message' => "Kho chỉ còn $realStock sản phẩm!"
                 ]);
             }
 
-            $cart[$id]['quantity']++;
+            $cartItem->quantity++;
 
-        } elseif ($type == 'minus' && $cart[$id]['quantity'] > 1) {
-            $cart[$id]['quantity']--;
+        } elseif ($type == 'minus' && $cartItem->quantity > 1) {
+            $cartItem->quantity--;
         }
+        $cartItem->subtotal = $cartItem->quantity * $cartItem->price;
+        $cartItem->save();
 
-        session()->put('cart', $cart);
+        $cartModel = $cartItem->cart;
+        $cartModel->recalculateTotals();
 
         return response()->json([
             'status' => 'success',
-            'quantity' => $cart[$id]['quantity'],
-            'subtotal' => $cart[$id]['quantity'] * $cart[$id]['price'],
-            'total' => array_sum(array_map(fn($i) => $i['quantity'] * $i['price'], $cart))
+            'quantity' => (int) $cartItem->quantity,
+            'subtotal' => (float) ($cartItem->quantity * $cartItem->price),
+            'total' => (float) $cartModel->total_price,
+            'max_stock' => isset($realStock) ? (int) $realStock : null,
         ]);
     }
 
@@ -218,29 +265,28 @@ class CartController extends Controller
         }
 
         $id = $request->id;
-        $cart = session()->get('cart', []);
+        $cartItem = CartItem::whereHas('cart', function ($q) {
+                $q->where('user_id', Auth::id())->where('status', 'active');
+            })->where('id', $id)->first();
 
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            session()->put('cart', $cart);
+        if ($cartItem) {
+            $cartModel = $cartItem->cart;
+            $cartItem->delete();
+            $cartModel->recalculateTotals();
+            $cartCount = CartItem::where('cart_id', $cartModel->id)->sum('quantity');
+            return response()->json(['status' => 'success', 'cartCount' => (int) $cartCount, 'total' => (float) $cartModel->total_price]);
         }
 
-        // trả về tổng số lượng còn lại
-        $cartCount = array_sum(array_map(fn($i) => $i['quantity'], $cart));
-
-        return response()->json(['status' => 'success', 'cartCount' => $cartCount]);
+        return response()->json(['status' => 'success', 'cartCount' => 0, 'total' => 0]);
     }
 
 
     private function getTotal()
     {
-        $cart = session()->get('cart', []);
-        $total = 0;
-
-        foreach ($cart as $item) {
-            $total += $item['quantity'] * $item['price'];
+        if (!Auth::check()) {
+            return 0;
         }
-
-        return $total;
+        $cartModel = Cart::where('user_id', Auth::id())->where('status', 'active')->first();
+        return $cartModel ? (float) $cartModel->total_price : 0;
     }
 }
