@@ -535,24 +535,16 @@
                                         </td>
                                         <td>
                                             @php
-                                                $statusColors = [
-                                                    'pending' => 'warning',
-                                                    'processing' => 'info',
-                                                    'shipping' => 'primary',
-                                                    'completed' => 'success',
-                                                    'cancelled' => 'danger',
+                                                $statusConfig = [
+                                                    'pending' => ['label' => 'Chờ xử lý', 'color' => 'warning', 'icon' => 'bi-hourglass-split'],
+                                                    'processing' => ['label' => 'Đang xử lý', 'color' => 'info', 'icon' => 'bi-gear'],
+                                                    'shipping' => ['label' => 'Đang giao hàng', 'color' => 'primary', 'icon' => 'bi-truck'],
+                                                    'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'bi-check-circle'],
+                                                    'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
                                                 ];
-                                                $statusLabels = [
-                                                    'pending' => 'Chờ xử lý',
-                                                    'processing' => 'Đang xử lý',
-                                                    'shipping' => 'Đang giao hàng',
-                                                    'completed' => 'Hoàn thành',
-                                                    'cancelled' => 'Đã hủy',
-                                                ];
+                                                $cfg = $statusConfig[$order->order_status] ?? ['label' => ucfirst($order->order_status), 'color' => 'secondary', 'icon' => 'bi-question-circle'];
                                             @endphp
-                                            <span class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
-                                                {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
-                                            </span>
+                                            <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{ route('admin.orders.show', $order->id) }}" 
@@ -577,20 +569,14 @@
                     <div class="d-md-none">
                         @forelse($filteredOrders as $order)
                             @php
-                                $statusColors = [
-                                    'pending' => 'warning',
-                                    'processing' => 'info',
-                                    'shipping' => 'primary',
-                                    'completed' => 'success',
-                                    'cancelled' => 'danger',
+                                $statusConfig = [
+                                    'pending' => ['label' => 'Chờ xử lý', 'color' => 'warning', 'icon' => 'bi-hourglass-split'],
+                                    'processing' => ['label' => 'Đang xử lý', 'color' => 'info', 'icon' => 'bi-gear'],
+                                    'shipping' => ['label' => 'Đang giao hàng', 'color' => 'primary', 'icon' => 'bi-truck'],
+                                    'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'bi-check-circle'],
+                                    'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
                                 ];
-                                $statusLabels = [
-                                    'pending' => 'Chờ xử lý',
-                                    'processing' => 'Đang xử lý',
-                                    'shipping' => 'Đang giao hàng',
-                                    'completed' => 'Hoàn thành',
-                                    'cancelled' => 'Đã hủy',
-                                ];
+                                $cfg = $statusConfig[$order->order_status] ?? ['label' => ucfirst($order->order_status), 'color' => 'secondary', 'icon' => 'bi-question-circle'];
                             @endphp
                             <div class="card mb-3 order-mobile-card shadow-sm">
                                 <div class="card-body">
@@ -601,9 +587,7 @@
                                                 <i class="bi bi-calendar3 me-1"></i>{{ $order->created_at->format('d/m/Y H:i') }}
                                             </small>
                                         </div>
-                                        <span class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
-                                            {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
-                                        </span>
+                                        <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
                                     </div>
                                     
                                     <div class="mb-3">
