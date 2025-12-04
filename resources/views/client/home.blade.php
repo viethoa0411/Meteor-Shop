@@ -3,36 +3,294 @@
 @section('title', 'Trang chủ')
 @section('content')
 
-    {{-- Slide --}}
-    <div class="slide-wrapper">
-        @if ($banners->count() > 0)
-            @foreach ($banners as $index => $banner)
-                <div class="slide {{ $index === 0 ? 'active' : '' }}">
-                    @if (!empty($banner->image))
-                        <img class="imageSlide" src="{{ asset('storage/' . $banner->image) }}"
-                            alt="{{ $banner->title ?? 'Banner' }}"
-                            onerror="this.src='https://via.placeholder.com/1200x800?text=Banner'">
-                    @else
-                        <img class="imageSlide" src="https://via.placeholder.com/1200x800?text=Banner" alt="Banner">
-                    @endif
-                    @if (!empty($banner->link))
-                        <a href="{{ $banner->link }}" style="text-decoration: none;">
-                            <button>Xem ngay</button>
-                        </a>
-                    @else
-                        <button onclick="alert('{{ $banner->title ?? 'Banner' }}')">Xem ngay</button>
-                    @endif
+    {{-- Hero Banner / Slider --}}
+    <section class="hero-banner">
+        <div class="hero-banner-inner">
+            @if ($banners->count() > 0)
+                <div class="hero-banner-viewport">
+                    <div class="hero-banner-track">
+                        @foreach ($banners as $index => $banner)
+                            @php
+                                $bannerImage = $banner->image_url ?? null;
+                                $isFirst = $index === 0;
+                            @endphp
+                            <div class="hero-slide">
+                                @if ($bannerImage)
+                                    <img class="hero-slide-image"
+                                        src="{{ $bannerImage }}"
+                                        @unless($isFirst) loading="lazy" @endunless
+                                        alt="{{ $banner->title ?? 'Banner trang chủ Meteor Shop' }}"
+                                        onerror="this.src='https://via.placeholder.com/1600x700?text=Banner';">
+                                @else
+                                    <img class="hero-slide-image"
+                                        src="https://via.placeholder.com/1600x700?text=Banner"
+                                        @unless($isFirst) loading="lazy" @endunless
+                                        alt="Banner trang chủ Meteor Shop">
+                                @endif
+
+                                <div class="hero-slide-overlay"></div>
+
+                                <div class="hero-slide-content container">
+                                    @if (!empty($banner->title))
+                                        <h1 class="hero-slide-title">
+                                            {{ $banner->title }}
+                                        </h1>
+                                    @else
+                                        <h1 class="hero-slide-title">
+                                            Meteor Shop – Nội thất hiện đại
+                                        </h1>
+                                    @endif
+
+                                    @if (!empty($banner->description))
+                                        <p class="hero-slide-subtitle">
+                                            {{ $banner->description }}
+                                        </p>
+                                    @endif
+
+                                    @if (!empty($banner->link))
+                                        <a href="{{ $banner->link }}"
+                                            class="hero-slide-cta"
+                                            title="Xem chi tiết {{ $banner->title ?? 'banner' }}">
+                                            Xem ngay
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-            @endforeach
-        @else
-            {{-- Fallback nếu không có banner --}}
-            <div class="slide active">
-                <img class="imageSlide" src="https://picsum.photos/1200/800?random=1">
-                <h2 style="color: #fff">Chào mừng đến với Meteor Shop</h2>
-                <button onclick="alert('Khám phá ngay')">Xem ngay</button>
-            </div>
-        @endif
-    </div>
+
+                @if ($banners->count() > 1)
+                    <button class="hero-nav hero-nav-prev" type="button" aria-label="Banner trước">
+                        <span>&lt;</span>
+                    </button>
+                    <button class="hero-nav hero-nav-next" type="button" aria-label="Banner tiếp theo">
+                        <span>&gt;</span>
+                    </button>
+
+                    <div class="hero-dots">
+                        @foreach ($banners as $index => $banner)
+                            <button type="button"
+                                class="hero-dot {{ $index === 0 ? 'is-active' : '' }}"
+                                data-index="{{ $index }}"
+                                aria-label="Chuyển đến banner {{ $index + 1 }}"
+                                aria-current="{{ $index === 0 ? 'true' : 'false' }}">
+                            </button>
+                        @endforeach
+                    </div>
+                @endif
+            @else
+                {{-- Fallback nếu không có banner --}}
+                <div class="hero-banner-viewport">
+                    <div class="hero-banner-track">
+                        <div class="hero-slide">
+                            <img class="hero-slide-image" src="https://picsum.photos/1600/700?random=1"
+                                alt="Meteor Shop Banner">
+                            <div class="hero-slide-overlay"></div>
+                            <div class="hero-slide-content container">
+                                <h1 class="hero-slide-title">
+                                    Chào mừng đến với Meteor Shop
+                                </h1>
+                                <p class="hero-slide-subtitle">
+                                    Khám phá bộ sưu tập nội thất hiện đại, tinh tế cho không gian sống của bạn.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    <style>
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #111;
+        }
+
+        .hero-banner-inner {
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-slide {
+            position: relative;
+            flex: 0 0 100%;
+            height: clamp(260px, 55vw, 520px);
+        }
+
+        .hero-banner-viewport {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .hero-slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hero-slide-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.35) 45%, transparent 100%);
+        }
+
+        .hero-slide-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            padding: clamp(16px, 4vw, 40px);
+            text-align: center;
+        }
+
+        .hero-slide-title {
+            font-size: clamp(22px, 3vw, 36px);
+            font-weight: 700;
+            margin: 0;
+            max-width: 640px;
+        }
+
+        .hero-slide-subtitle {
+            margin: 0;
+            max-width: 640px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e2e2e2;
+        }
+
+        .hero-slide-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 8px;
+            padding: 10px 24px;
+            border-radius: 999px;
+            background: #f97316;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.35);
+            transition: all 0.25s ease;
+        }
+
+        .hero-slide-cta:hover {
+            background: #ea580c;
+            box-shadow: 0 12px 30px rgba(234, 88, 12, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .hero-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease, background 0.2s ease;
+            z-index: 5;
+        }
+
+        .hero-nav span {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .hero-nav.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .hero-nav:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-nav-prev {
+            left: 12px;
+        }
+
+        .hero-nav-next {
+            right: 12px;
+        }
+
+        .hero-dots {
+            position: absolute;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 5;
+        }
+
+        .hero-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            border: none;
+            background: rgba(255, 255, 255, 0.4);
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hero-dot.is-active {
+            width: 22px;
+            background: #f97316;
+        }
+
+        @media (max-width: 768px) {
+            .hero-slide-subtitle {
+                max-width: 100%;
+            }
+
+            .hero-slide-cta {
+                width: 100%;
+                max-width: 260px;
+                justify-content: center;
+            }
+
+            .hero-nav {
+                width: 32px;
+                height: 32px;
+            }
+
+            .hero-nav-prev {
+                left: 8px;
+            }
+
+            .hero-nav-next {
+                right: 8px;
+            }
+        }
+    </style>
 
 
     {{-- Sản phẩm mới --}}
@@ -291,13 +549,131 @@
     </div>
 
     <script>
-        let i = 0,
-            s = document.querySelectorAll('.slide');
-        setInterval(() => {
-            s[i].classList.remove('active');
-            i = (i + 1) % s.length;
-            s[i].classList.add('active');
-        }, 4000); // 4000ms = 4 giây
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.querySelector('.hero-banner-track');
+            const slides = Array.from(document.querySelectorAll('.hero-slide'));
+            const dots = Array.from(document.querySelectorAll('.hero-dot'));
+            const prevBtn = document.querySelector('.hero-nav-prev');
+            const nextBtn = document.querySelector('.hero-nav-next');
+            const slider = document.querySelector('.hero-banner-viewport');
+
+            if (!track || !slides.length) return;
+
+            let current = 0;
+            let timer = null;
+            const AUTO_TIME = 5000;
+            let touchStartX = 0;
+            let touchEndX = 0;
+            const SWIPE_THRESHOLD = 50; // px
+            let navTimer = null;
+            const NAV_IDLE_TIME = 2500;
+
+            const heroNavs = [prevBtn, nextBtn].filter(Boolean);
+
+            const showNav = () => {
+                heroNavs.forEach(btn => btn.classList.add('is-visible'));
+                if (navTimer) {
+                    clearTimeout(navTimer);
+                }
+                navTimer = setTimeout(() => {
+                    heroNavs.forEach(btn => btn.classList.remove('is-visible'));
+                }, NAV_IDLE_TIME);
+            };
+
+            const goTo = (index) => {
+                current = (index + slides.length) % slides.length;
+
+                track.style.transform = `translateX(-${current * 100}%)`;
+
+                if (dots[current]) {
+                    dots[current].classList.add('is-active');
+                }
+                dots.forEach((dot, i) => {
+                    if (i !== current) {
+                        dot.classList.remove('is-active');
+                    }
+                });
+            };
+
+            const next = () => goTo(current + 1);
+            const prev = () => goTo(current - 1);
+
+            const startAuto = () => {
+                if (timer || slides.length <= 1) return;
+                timer = setInterval(next, AUTO_TIME);
+            };
+
+            const stopAuto = () => {
+                if (!timer) return;
+                clearInterval(timer);
+                timer = null;
+            };
+
+            nextBtn && nextBtn.addEventListener('click', () => {
+                stopAuto();
+                next();
+                startAuto();
+                showNav();
+            });
+
+            prevBtn && prevBtn.addEventListener('click', () => {
+                stopAuto();
+                prev();
+                startAuto();
+                showNav();
+            });
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    stopAuto();
+                    goTo(index);
+                    startAuto();
+                    showNav();
+                });
+            });
+
+            if (slider) {
+                slider.addEventListener('mouseenter', () => {
+                    stopAuto();
+                    showNav();
+                });
+                slider.addEventListener('mouseleave', () => {
+                    startAuto();
+                });
+
+                slider.addEventListener('mousemove', () => {
+                    showNav();
+                });
+
+                // Swipe trên mobile
+                slider.addEventListener('touchstart', (e) => {
+                    if (!e.touches || !e.touches.length) return;
+                    stopAuto();
+                    showNav();
+                    touchStartX = e.touches[0].clientX;
+                    touchEndX = touchStartX;
+                }, { passive: true });
+
+                slider.addEventListener('touchmove', (e) => {
+                    if (!e.touches || !e.touches.length) return;
+                    touchEndX = e.touches[0].clientX;
+                }, { passive: true });
+
+                slider.addEventListener('touchend', () => {
+                    const deltaX = touchEndX - touchStartX;
+                    if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+                        if (deltaX < 0) {
+                            next();
+                        } else {
+                            prev();
+                        }
+                    }
+                    startAuto();
+                });
+            }
+
+            startAuto();
+        });
     </script>
 
 

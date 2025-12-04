@@ -32,6 +32,7 @@ use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\Blog\BlogClientController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
+use App\Http\Controllers\Client\RoomController;
 
 // ============ AUTHENTICATION ROUTES ============
 Route::get('/login', [AuthController::class, 'showLoginFormadmin'])->name('login');
@@ -232,9 +233,16 @@ Route::get('/products/{slug}/reviews/check-updates', [ProductClientController::c
 Route::post('/products/{slug}/review', [ProductClientController::class, 'storeReview'])->name('client.product.review.store')->middleware('auth');
 Route::post('/reviews/{review}/helpful', [ProductClientController::class, 'markHelpful'])->name('client.review.helpful')->middleware('auth');
 Route::post('/reviews/{review}/report', [ProductClientController::class, 'reportReview'])->name('client.review.report')->middleware('auth');
-Route::get('/products', [HomeController::class, 'index'])->name('client.products.index');
+Route::get('/products', [ProductClientController::class, 'search'])->name('client.products.index');
+Route::get('/rooms', [RoomController::class, 'index'])->name('client.rooms.index');
 Route::get('/blogs/list', [BlogClientController::class, 'list'])->name('client.blogs.list');
 Route::get('/blog/{slug}', [BlogClientController::class, 'show'])->name('client.blog.show');
+Route::get('/collections', [\App\Http\Controllers\Client\CollectionController::class, 'index'])->name('client.collections.index');
+Route::get('/collections/{slug}', [\App\Http\Controllers\Client\CollectionController::class, 'show'])->name('client.collections.show');
+Route::get('/designs', [\App\Http\Controllers\Client\DesignController::class, 'index'])->name('client.designs.index');
+Route::get('/designs/{slug}', [\App\Http\Controllers\Client\DesignController::class, 'show'])->name('client.designs.show');
+Route::get('/shares', [\App\Http\Controllers\Client\ShareController::class, 'index'])->name('client.shares.index');
+Route::get('/shares/{slug}', [\App\Http\Controllers\Client\ShareController::class, 'show'])->name('client.shares.show');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update-qty', [CartController::class, 'updateQty'])->name('cart.updateQty');

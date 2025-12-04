@@ -197,19 +197,43 @@
             font: inherit;
             padding: 0;
             cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .client-nav a:hover,
+        .client-nav a.active {
+            color: #ffb703;
         }
 
         .client-nav .dropdown-menu {
             display: none;
             position: absolute;
-            top: calc(100% + 12px);
+            top: 100%;
             left: 0;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
             min-width: 220px;
-            padding: 8px 0;
+            padding: 12px 0;
             z-index: 1002;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .client-nav li:hover>.dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .client-nav li.show>.dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .client-nav .dropdown-menu li a {
@@ -225,9 +249,6 @@
             color: #2b5c73;
         }
 
-        .client-nav li:hover>.dropdown-menu {
-            display: block;
-        }
 
         /* Icon menu dọc */
         .menu-toggle {
@@ -443,6 +464,67 @@
                 gap: 16px;
             }
         }
+
+        /* Mobile Menu Toggle */
+        .client-nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #111;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .client-nav-toggle {
+                display: block;
+            }
+
+            .client-nav__inner {
+                flex-direction: column;
+                padding: 0;
+            }
+
+            .client-nav ul {
+                flex-direction: column;
+                gap: 0;
+                width: 100%;
+                display: none;
+            }
+
+            .client-nav ul.active {
+                display: flex;
+            }
+
+            .client-nav li {
+                border-bottom: 1px solid #eee;
+            }
+
+            .client-nav a,
+            .client-nav button {
+                padding: 12px 24px;
+                display: block;
+                width: 100%;
+            }
+
+            .client-nav .dropdown-menu {
+                position: static;
+                display: none;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 0;
+                background: #f9f9f9;
+                opacity: 1;
+                transform: none;
+                pointer-events: auto;
+            }
+
+            .client-nav li:hover > .dropdown-menu,
+            .client-nav li.active > .dropdown-menu {
+                display: block;
+            }
+        }
     </style>
     @stack('head')
 
@@ -531,9 +613,12 @@
 
         <nav class="client-nav">
             <div class="client-nav__inner">
-                <ul>
-                    <li>
-                        <a href="#" class="dropdown-toggle">Sản phẩm </a>
+                <button class="client-nav-toggle" type="button" aria-label="Toggle menu">
+                    <i class="bi bi-list"></i>
+                </button>
+                <ul id="client-nav-menu">
+                    <li class="has-dropdown">
+                        <a href="{{ route('client.products.index') }}" class="dropdown-toggle {{ request()->routeIs('client.products.index') ? 'active' : '' }}">Sản phẩm </a>
                         <ul class="dropdown-menu">
                             @forelse ($childCategories as $child)
                                 <li>
@@ -546,8 +631,8 @@
                             @endforelse
                         </ul>
                     </li>
-                    <li>
-                        <a href="#" class="dropdown-toggle">Phòng </a>
+                    <li class="has-dropdown">
+                        <a href="{{ route('client.rooms.index') }}" class="dropdown-toggle {{ request()->routeIs('client.rooms.index') ? 'active' : '' }}">Phòng </a>
                         <ul class="dropdown-menu">
                             @foreach ($parentCategories as $parent)
                                 <li>
@@ -558,10 +643,10 @@
                             @endforeach
                         </ul>
                     </li>
-                    <li><a href="#">Bộ sưu tập</a></li>
-                    <li><a href="#">Thiết kế nội thất</a></li>
-                    <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
-                    <li><a href="#">Góc chia sẻ</a></li>
+                    <li><a href="{{ route('client.collections.index') }}" class="{{ request()->routeIs('client.collections.*') ? 'active' : '' }}">Bộ sưu tập</a></li>
+                    <li><a href="{{ route('client.designs.index') }}" class="{{ request()->routeIs('client.designs.*') ? 'active' : '' }}">Thiết kế nội thất</a></li>
+                    <li><a href="{{ route('client.blogs.list') }}" class="{{ request()->routeIs('client.blogs.*') || request()->routeIs('client.blog.*') ? 'active' : '' }}">Bài Viết</a></li>
+                    <li><a href="{{ route('client.shares.index') }}" class="{{ request()->routeIs('client.shares.*') ? 'active' : '' }}">Góc chia sẻ</a></li>
                 </ul>
             </div>
         </nav>
@@ -764,6 +849,63 @@
                         })
                         .catch(err => console.error(err));
                 });
+            });
+
+            // ----- Mobile Menu Toggle -----
+            const navToggle = document.querySelector('.client-nav-toggle');
+            const navMenu = document.getElementById('client-nav-menu');
+            const navItems = document.querySelectorAll('.client-nav li');
+
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('bi-list');
+                        icon.classList.toggle('bi-x');
+                    }
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
+                        navMenu.classList.remove('active');
+                        const icon = navToggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.add('bi-list');
+                            icon.classList.remove('bi-x');
+                        }
+                    }
+                });
+            }
+
+            // ----- Dropdown hover for desktop, click for mobile -----
+            navItems.forEach(item => {
+                const dropdown = item.querySelector('.dropdown-menu');
+                const toggle = item.querySelector('.dropdown-toggle');
+                if (!dropdown) return;
+
+                // Desktop hover
+                item.addEventListener('mouseenter', () => {
+                    if (window.innerWidth > 768) {
+                        item.classList.add('show');
+                    }
+                });
+                item.addEventListener('mouseleave', () => {
+                    if (window.innerWidth > 768) {
+                        item.classList.remove('show');
+                    }
+                });
+
+                // Mobile click toggle
+                if (toggle) {
+                    toggle.addEventListener('click', (event) => {
+                        if (window.innerWidth <= 768) {
+                            event.preventDefault();
+                            item.classList.toggle('active');
+                        }
+                    });
+                }
             });
 
         });
