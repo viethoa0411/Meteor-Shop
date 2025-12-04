@@ -96,7 +96,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/create', [HomeCategoryController::class, 'create'])->name('create');
         Route::post('/', [HomeCategoryController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [HomeCategoryController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [HomeCategoryController::class, 'update'])->name('update'); 
+        Route::put('/{id}', [HomeCategoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [HomeCategoryController::class, 'destroy'])->name('destroy');
     });
 
 
