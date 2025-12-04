@@ -33,7 +33,7 @@ use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderCon
 use App\Http\Controllers\Client\Contact\ContactController as ClientContactController;
 
 // Wallet Controllers
- 
+use App\Http\Controllers\Admin\Wallet\WalletController as AdminWalletController; 
 use App\Http\Controllers\Client\Wallet\WalletController as ClientWalletController;
 use App\Http\Controllers\Client\Wallet\DepositController as ClientDepositController;
 use App\Http\Controllers\Client\Wallet\WithdrawController as ClientWithdrawController;
@@ -193,7 +193,10 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/{id}/messages', [ChatboxController::class, 'getNewMessages'])->name('messages');
     });
 
-     
+    // ====== WALLET MANAGEMENT ======
+    Route::prefix('wallet')->name('wallet.')->group(function () {
+        Route::get('/', [AdminWalletController::class, 'index'])->name('index'); 
+    });
 });
 
 // ============ CLIENT ROUTES ============

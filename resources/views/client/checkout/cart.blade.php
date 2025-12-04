@@ -35,7 +35,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Họ tên <span class="text-danger">*</span></label>
                                 <input type="text" name="customer_name" class="form-control"
-                                    value="{{ old('customer_name', $user->name ?? '') }}" required>
+                                    value="{{ old('customer_name', $checkoutData['customer_name'] ?? $user->name ?? '') }}" required>
                                 @error('customer_name')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -46,7 +46,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
                                     <input type="text" name="customer_phone" class="form-control"
-                                        value="{{ old('customer_phone', $user->phone ?? '') }}" required>
+                                        value="{{ old('customer_phone', $checkoutData['customer_phone'] ?? $user->phone ?? '') }}" required>
                                     @error('customer_phone')
                                         <div class="text-danger small">{{ $message }}</div>
                                     @enderror
@@ -56,7 +56,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email <span class="text-danger">*</span></label>
                                     <input type="email" name="customer_email" class="form-control"
-                                        value="{{ old('customer_email', $user->email ?? '') }}" required>
+                                        value="{{ old('customer_email', $checkoutData['customer_email'] ?? $user->email ?? '') }}" required>
                                     @error('customer_email')
                                         <div class="text-danger small">{{ $message }}</div>
                                     @enderror
@@ -99,7 +99,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Số nhà, tên đường <span class="text-danger">*</span></label>
                                 <input type="text" name="shipping_address" class="form-control"
-                                    value="{{ old('shipping_address') }}" required>
+                                    value="{{ old('shipping_address', $checkoutData['shipping_address'] ?? '') }}" required>
                                 @error('shipping_address')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -138,27 +138,33 @@
                             {{-- Phương thức thanh toán --}}
                             <div class="mb-3">
                                 <label class="form-label">Phương thức thanh toán <span class="text-danger">*</span></label>
-                                <div class="form-check">
+                                <div class="form-check mb-2">
                                     <input class="form-check-input" type="radio" name="payment_method" id="cash"
                                         value="cash" {{ old('payment_method', 'cash') == 'cash' ? 'checked' : '' }} required>
                                     <label class="form-check-label" for="cash">
                                         <strong>Thanh toán khi nhận hàng (COD)</strong>
                                     </label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="payment_method" id="bank"
-                                        value="bank" {{ old('payment_method') == 'bank' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="bank">
-                                        <strong>Chuyển khoản ngân hàng</strong>
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="payment_method" id="momo"
-                                        value="momo" {{ old('payment_method') == 'momo' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="momo">
-                                        <strong>Ví Momo</strong>
-                                    </label>
-                                </div>
+
+                                @auth
+                                    @php
+                                        $wallet = \App\Models\ClientWallet::where('user_id', auth()->id())->first();
+                                        $walletBalance = $wallet ? $wallet->balance : 0;
+                                    @endphp
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="wallet"
+                                            value="wallet" {{ old('payment_method') == 'wallet' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="wallet">
+                                            <strong>Thanh toán bằng Ví</strong>
+                                            <span class="text-muted ms-2">(Số dư: {{ number_format($walletBalance) }}đ)</span>
+                                        </label>
+                                    </div>
+                                    <div id="wallet-warning" class="alert alert-warning mt-2 py-2 d-none">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Số dư ví không đủ. <a href="{{ route('client.account.wallet.deposit') }}">Nạp thêm tiền</a>
+                                    </div>
+                                @endauth
+
                                 @error('payment_method')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -352,9 +358,46 @@
                 }
             }
 
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', async function() {
+                // Lấy thông tin địa chỉ cũ từ reorder (nếu có)
+                const savedCity = @json($checkoutData['shipping_city'] ?? null);
+                const savedDistrict = @json($checkoutData['shipping_district'] ?? null);
+                const savedWard = @json($checkoutData['shipping_ward'] ?? null);
+
                 // Load tỉnh/thành phố khi trang load
-                loadProvinces();
+                await loadProvinces();
+
+                // Nếu có địa chỉ cũ, tự động chọn
+                if (savedCity) {
+                    const citySelect = document.getElementById('shipping_city');
+                    for (let option of citySelect.options) {
+                        if (option.value === savedCity) {
+                            citySelect.value = savedCity;
+                            if (option.dataset.code) {
+                                await loadDistricts(option.dataset.code);
+
+                                if (savedDistrict) {
+                                    const districtSelect = document.getElementById('shipping_district');
+                                    for (let dOption of districtSelect.options) {
+                                        if (dOption.value === savedDistrict) {
+                                            districtSelect.value = savedDistrict;
+                                            if (dOption.dataset.code) {
+                                                await loadWards(dOption.dataset.code);
+
+                                                if (savedWard) {
+                                                    const wardSelect = document.getElementById('shipping_ward');
+                                                    wardSelect.value = savedWard;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
 
                 // Xử lý khi chọn tỉnh/thành phố
                 document.getElementById('shipping_city').addEventListener('change', function() {

@@ -3,100 +3,65 @@
 @section('title', 'Quản lý Ví')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="bi bi-wallet2 me-2"></i>Quản lý Ví</h2>
-            <a href="{{ route('admin.wallet.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Tạo ví mới
-            </a>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0"><i class="bi bi-wallet2 me-2"></i>Quản lý Ví</h4>
+        <a href="{{ route('admin.wallet.settings') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-gear me-1"></i>Cài đặt
+        </a>
+    </div>
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+    @endif
 
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        <div class="card shadow-sm">
-            <div class="card-body">
-                @if ($wallets->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Chủ ví</th>
-                                    <th>Ngân hàng</th>
-                                    <th>Số tài khoản</th>
-                                    <th>Chủ tài khoản</th>
-                                    <th>Số dư</th>
-                                    <th>Trạng thái</th>
-                                    <th>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($wallets as $wallet)
-                                    <tr>
-                                        <td>{{ $wallet->id }}</td>
-                                        <td>
-                                            <i class="bi bi-person-circle me-1"></i>
-                                            {{ $wallet->user->name }}
-                                        </td>
-                                        <td>{{ $wallet->bank_name }}</td>
-                                        <td><code>{{ $wallet->bank_account }}</code></td>
-                                        <td>{{ $wallet->account_holder }}</td>
-                                        <td>
-                                            <strong class="text-success">
-                                                {{ number_format($wallet->balance, 0, ',', '.') }} đ
-                                            </strong>
-                                        </td>
-                                        <td>
-                                            @if ($wallet->status === 'active')
-                                                <span class="badge bg-success">Hoạt động</span>
-                                            @else
-                                                <span class="badge bg-secondary">Không hoạt động</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a href="{{ route('admin.wallet.show', $wallet->id) }}" 
-                                                   class="btn btn-sm btn-info" title="Xem chi tiết">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                                <a href="{{ route('admin.wallet.edit', $wallet->id) }}" 
-                                                   class="btn btn-sm btn-warning" title="Chỉnh sửa">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mt-3">
-                        {{ $wallets->links() }}
-                    </div>
-                @else
-                    <div class="text-center py-5">
-                        <i class="bi bi-wallet2 text-muted" style="font-size: 4rem;"></i>
-                        <p class="text-muted mt-3">Chưa có ví nào. Hãy tạo ví mới!</p>
-                        <a href="{{ route('admin.wallet.create') }}" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-2"></i>Tạo ví mới
-                        </a>
-                    </div>
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link {{ $tab == 'deposits' ? 'active' : '' }}" href="{{ route('admin.wallet.index', ['tab' => 'deposits']) }}">
+                <i class="bi bi-arrow-down-circle me-1"></i>Nạp tiền
+                @if($pendingDeposits > 0)
+                    <span class="badge bg-danger ms-1">{{ $pendingDeposits > 99 ? '99+' : $pendingDeposits }}</span>
                 @endif
-            </div>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ $tab == 'withdrawals' ? 'active' : '' }}" href="{{ route('admin.wallet.index', ['tab' => 'withdrawals']) }}">
+                <i class="bi bi-arrow-up-circle me-1"></i>Rút tiền
+                @if($pendingWithdraws > 0)
+                    <span class="badge bg-warning text-dark ms-1">{{ $pendingWithdraws > 99 ? '99+' : $pendingWithdraws }}</span>
+                @endif
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ $tab == 'history' ? 'active' : '' }}" href="{{ route('admin.wallet.index', ['tab' => 'history']) }}">
+                <i class="bi bi-clock-history me-1"></i>Lịch sử
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @if($tab == 'deposits')
+                @include('admin.wallet.partials.deposits-table')
+            @elseif($tab == 'withdrawals')
+                @include('admin.wallet.partials.withdrawals-table')
+            @else
+                @include('admin.wallet.partials.history-table')
+            @endif
         </div>
     </div>
+</div>
 @endsection
 

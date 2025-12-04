@@ -100,13 +100,11 @@
                             @endif
                         </p>
                         <p class="mb-0">
-                            <strong>Thanh toán:</strong> 
+                            <strong>Thanh toán:</strong>
                             @if ($checkoutSession['payment_method'] == 'cash')
                                 Thanh toán khi nhận hàng (COD)
-                            @elseif ($checkoutSession['payment_method'] == 'bank')
-                                Chuyển khoản ngân hàng
-                            @elseif ($checkoutSession['payment_method'] == 'momo')
-                                Ví Momo
+                            @elseif ($checkoutSession['payment_method'] == 'wallet')
+                                <span class="text-success"><i class="bi bi-wallet2 me-1"></i>Thanh toán bằng Ví</span>
                             @else
                                 {{ $checkoutSession['payment_method'] }}
                             @endif
@@ -121,107 +119,6 @@
                         </div>
                         <div class="card-body">
                             <p class="mb-0">{{ $checkoutSession['notes'] }}</p>
-                        </div>
-                    </div>
-                @endif
-
-                <style>
-                    .qr-scan-wrapper {
-                        position: relative;
-                        display: inline-block;
-                        overflow: hidden;
-                        border-radius: 12px;
-                    }
-
-                    .qr-scan-wrapper img {
-                        display: block;
-                        position: relative;
-                        z-index: 2;
-                    }
-
-                    .qr-scan-line {
-                        position: absolute;
-                        top: -100%;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0) 100%);
-                        animation: qrScan 2.5s linear infinite;
-                        mix-blend-mode: screen;
-                    }
-
-                    @keyframes qrScan {
-                        from {
-                            top: -100%;
-                        }
-
-                        to {
-                            top: 100%;
-                        }
-                    }
-                </style>
-
-                {{-- QR Code thanh toán (nếu chọn chuyển khoản) --}}
-                @if ($checkoutSession['payment_method'] == 'bank' && isset($qrCodeUrl) && isset($walletInfo))
-                    <div class="card shadow-sm mb-4 border-success">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="bi bi-qr-code me-2"></i>Quét mã QR để thanh toán</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <div class="alert alert-info mb-3">
-                                <i class="bi bi-info-circle me-2"></i>
-                                <strong>Hướng dẫn:</strong> Mở ứng dụng ngân hàng và quét mã QR bên dưới để thanh toán
-                            </div>
-
-                            {{-- QR Code Image --}}
-                            <div class="mb-3 qr-scan-wrapper mx-auto" style="max-width: 300px;">
-                                <img src="{{ $qrCodeUrl }}"
-                                     alt="QR Code thanh toán"
-                                     class="img-fluid border rounded shadow-sm w-100">
-                                <span class="qr-scan-line"></span>
-                            </div>
-
-                            {{-- Thông tin chuyển khoản --}}
-                            <div class="text-start bg-light p-3 rounded">
-                                <h6 class="text-success mb-3"><i class="bi bi-bank me-2"></i>Thông tin chuyển khoản</h6>
-                                <p class="mb-2">
-                                    <strong>Ngân hàng:</strong>
-                                    <span class="text-primary">{{ $walletInfo->bank_name }}</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Số tài khoản:</strong>
-                                    <span class="text-primary fw-bold">{{ $walletInfo->bank_account }}</span>
-                                    <button class="btn btn-sm btn-outline-primary ms-2"
-                                            onclick="copyToClipboard('{{ $walletInfo->bank_account }}', this)">
-                                        <i class="bi bi-clipboard"></i> Copy
-                                    </button>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Chủ tài khoản:</strong>
-                                    <span class="text-primary">{{ $walletInfo->account_holder }}</span>
-                                </p>
-                                <p class="mb-2">
-                                    <strong>Số tiền:</strong>
-                                    <span class="text-danger fw-bold fs-5">{{ number_format($checkoutSession['final_total'], 0, ',', '.') }} đ</span>
-                                    <button class="btn btn-sm btn-outline-danger ms-2"
-                                            onclick="copyToClipboard('{{ $checkoutSession['final_total'] }}', this)">
-                                        <i class="bi bi-clipboard"></i> Copy
-                                    </button>
-                                </p>
-                                <p class="mb-0">
-                                    <strong>Nội dung:</strong>
-                                    <span class="text-primary">Thanh toan don hang {{ $checkoutSession['temp_order_code'] ?? '' }}</span>
-                                    <button class="btn btn-sm btn-outline-primary ms-2"
-                                            onclick="copyToClipboard('Thanh toan don hang {{ $checkoutSession['temp_order_code'] ?? '' }}', this)">
-                                        <i class="bi bi-clipboard"></i> Copy
-                                    </button>
-                                </p>
-                            </div>
-
-                            <div class="alert alert-warning mt-3 mb-0">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <small><strong>Lưu ý:</strong> Vui lòng chuyển khoản đúng số tiền và nội dung để đơn hàng được xử lý nhanh chóng.</small>
-                            </div>
                         </div>
                     </div>
                 @endif

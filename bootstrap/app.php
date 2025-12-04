@@ -23,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => AdminMiddleware::class,
         ]);
 
+        // Exclude chat routes from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            'chat/*',
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
