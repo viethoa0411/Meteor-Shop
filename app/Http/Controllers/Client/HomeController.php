@@ -7,6 +7,7 @@ use App\Models\Banner;
 use App\Models\Blog;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\HomeCategory;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -43,7 +44,12 @@ class HomeController extends Controller
             ->take(2)
             ->get();
 
-        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners','latestBlogs'));
+        // Lấy danh mục hiển thị trên trang chủ (3 ảnh: Sofa, Giường, Bàn làm việc)
+        $homeCategories = HomeCategory::active()
+            ->ordered()
+            ->get();
+
+        return view('client.home', compact('newProducts', 'outstandingProducts', 'cate', 'banners', 'latestBlogs', 'homeCategories'));
     }
 
 

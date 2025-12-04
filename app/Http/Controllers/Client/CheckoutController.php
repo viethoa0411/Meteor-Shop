@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ClientWallet;
 use App\Models\WalletTransaction;
+use App\Models\ShippingSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -213,7 +214,6 @@ class CheckoutController extends Controller
             'shipping_district' => 'required|string|max:255',
             'shipping_ward' => 'required|string|max:255',
             'shipping_address' => 'required|string|max:500',
-            'shipping_method' => 'required|string|in:standard,express,fast',
             'payment_method' => 'required|string|in:cash,wallet',
             'notes' => 'nullable|string|max:1000',
             'quantity' => 'nullable|integer|min:1',
@@ -266,10 +266,11 @@ class CheckoutController extends Controller
             $checkoutSession['subtotal'] = $checkoutSession['price'] * $newQuantity;
         }
 
-        // Tính phí vận chuyển
-        $shippingFee = $this->calculateShippingFee(
-            $request->shipping_method,
+        // Tính phí vận chuyển tự động dựa trên địa chỉ
+        $shippingSettings = ShippingSetting::getSettings();
+        $shippingFee = $shippingSettings->calculateShippingFee(
             $request->shipping_city,
+            $request->shipping_district,
             $checkoutSession['subtotal']
         );
 
@@ -281,7 +282,7 @@ class CheckoutController extends Controller
         $checkoutSession['shipping_district'] = $request->shipping_district;
         $checkoutSession['shipping_ward'] = $request->shipping_ward;
         $checkoutSession['shipping_address'] = $request->shipping_address;
-        $checkoutSession['shipping_method'] = $request->shipping_method;
+        $checkoutSession['shipping_method'] = 'standard'; // Mặc định
         $checkoutSession['payment_method'] = $request->payment_method;
         $checkoutSession['shipping_fee'] = $shippingFee;
         $checkoutSession['notes'] = $request->notes;
@@ -578,32 +579,35 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Tính phí vận chuyển
+     * API tính phí vận chuyển (cho AJAX từ client)
      */
-    private function calculateShippingFee($method, $city, $subtotal)
+    public function calculateShippingFee(Request $request)
     {
-        // Logic tính phí vận chuyển đơn giản
-        $baseFee = 30000; // Phí cơ bản
+        $request->validate([
+            'city' => 'required|string',
+            'district' => 'required|string',
+            'subtotal' => 'required|numeric|min:0',
+        ]);
 
-        switch ($method) {
-            case 'express':
-                $baseFee = 50000;
-                break;
-            case 'fast':
-                $baseFee = 70000;
-                break;
-            case 'standard':
-            default:
-                $baseFee = 30000;
-                break;
-        }
+        $settings = ShippingSetting::getSettings();
+        $fee = $settings->calculateShippingFee(
+            $request->city,
+            $request->district,
+            $request->subtotal
+        );
 
-        // Miễn phí ship cho đơn trên 500k
-        if ($subtotal >= 500000) {
-            return 0;
-        }
+        $isFreeShipping = $request->subtotal >= $settings->free_shipping_threshold;
 
-        return $baseFee;
+        return response()->json([
+            'success' => true,
+            'fee' => $fee,
+            'fee_formatted' => $fee > 0 ? number_format($fee) . ' đ' : 'Miễn phí',
+            'is_free_shipping' => $isFreeShipping,
+            'free_shipping_threshold' => $settings->free_shipping_threshold,
+            'message' => $isFreeShipping
+                ? 'Đơn hàng được miễn phí vận chuyển!'
+                : 'Phí vận chuyển của quý khách: ' . number_format($fee) . ' đ'
+        ]);
     }
 }
 

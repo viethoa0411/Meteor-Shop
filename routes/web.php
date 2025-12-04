@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\HomeCategoryController;
+use App\Http\Controllers\Admin\ShippingSettingController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderAnalyticsController;
 use App\Http\Controllers\Client\HomeController;
@@ -86,6 +88,16 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [CategoryController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
+    });
+
+    // ====== HOME CATEGORIES (3 ảnh trang chủ) ======
+    Route::prefix('home-categories')->name('home-categories.')->group(function () {
+        Route::get('/', [HomeCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [HomeCategoryController::class, 'create'])->name('create');
+        Route::post('/', [HomeCategoryController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [HomeCategoryController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [HomeCategoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [HomeCategoryController::class, 'destroy'])->name('destroy');
     });
 
 
@@ -214,6 +226,13 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::get('/settings', [AdminWalletSettingsController::class, 'index'])->name('settings');
         Route::put('/settings', [AdminWalletSettingsController::class, 'update'])->name('settings.update');
     });
+
+    // ====== SHIPPING SETTINGS ======
+    Route::prefix('shipping')->name('shipping.')->group(function () {
+        Route::get('/', [ShippingSettingController::class, 'index'])->name('index');
+        Route::put('/', [ShippingSettingController::class, 'update'])->name('update');
+        Route::post('/calculate-fee', [ShippingSettingController::class, 'calculateFee'])->name('calculate-fee');
+    });
 });
 
 // ============ CLIENT ROUTES ============
@@ -289,6 +308,7 @@ Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('
 Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('client.checkout.confirm');
 Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
 Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
+Route::post('/checkout/calculate-shipping', [CheckoutController::class, 'calculateShippingFee'])->name('client.checkout.calculateShipping');
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

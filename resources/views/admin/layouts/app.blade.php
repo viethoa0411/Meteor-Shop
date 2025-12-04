@@ -344,6 +344,9 @@
             <a href="{{ route('admin.categories.list') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                 <i class="bi bi-folder-plus me-2"></i> Danh mục
             </a>
+            <a href="{{ route('admin.home-categories.index') }}" class="{{ request()->routeIs('admin.home-categories.*') ? 'active' : '' }}">
+                <i class="bi bi-grid-fill me-2"></i> Danh mục trang chủ
+            </a>
             <a href="{{ route('admin.products.list') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam me-2"></i> Sản phẩm
             </a>
@@ -393,6 +396,9 @@
                 @if($totalPending > 0)
                     <span class="badge bg-danger ms-1">{{ $totalPending > 99 ? '99+' : $totalPending }}</span>
                 @endif
+            </a>
+            <a href="{{ route('admin.shipping.index') }}" class="{{ request()->routeIs('admin.shipping.*') ? 'active' : '' }}">
+                <i class="bi bi-truck me-2"></i> Cài đặt vận chuyển
             </a>
 
             <a href="#" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
@@ -446,6 +452,8 @@
             });
         });
     </script>
+
+    @stack('scripts')
 </body>
 
 </html>
