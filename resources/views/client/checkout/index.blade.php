@@ -469,7 +469,7 @@
                         subtotalDisplayEl.textContent = currentSubtotal.toLocaleString('vi-VN') + ' đ';
                     }
 
-                    // Cập nhật phí vận chuyển và tổng
+                    updateTotalDisplay();
                     calculateShippingFee();
                 }
 
@@ -490,6 +490,7 @@
                         !districtName || districtName === '-- Chọn Quận/Huyện --') {
                         document.getElementById('shipping-fee-text').textContent = 'Vui lòng chọn địa chỉ để tính phí vận chuyển';
                         document.getElementById('shipping-fee-display').className = 'alert alert-info mb-0';
+                        updateTotalDisplay();
                         return;
                     }
 
@@ -533,7 +534,7 @@
 
                 // Hàm cập nhật hiển thị tổng tiền
                 function updateTotalDisplay() {
-                    const total = currentSubtotal + currentShippingFee;
+                    const total = Math.max(0, (currentSubtotal - currentDiscount) + currentShippingFee);
                     const shippingFeeEl = document.getElementById('shipping-fee');
                     const totalAmountEl = document.getElementById('total-amount');
 
@@ -664,10 +665,10 @@
                             currentDiscount = Number(data.promotion.discount_amount) || 0;
                             appliedCode = data.promotion.code || '';
 
-                            if (discountRow) discountRow.style.display = 'flex';
-                            if (appliedCodeEl) appliedCodeEl.textContent = appliedCode;
-                            if (discountAmountEl) discountAmountEl.textContent = '- ' + currentDiscount.toLocaleString('vi-VN') + ' đ';
-                            if (totalAmountEl) totalAmountEl.textContent = Number(data.final_total).toLocaleString('vi-VN') + ' đ';
+                        if (discountRow) discountRow.style.display = 'flex';
+                        if (appliedCodeEl) appliedCodeEl.textContent = appliedCode;
+                        if (discountAmountEl) discountAmountEl.textContent = '- ' + currentDiscount.toLocaleString('vi-VN') + ' đ';
+                        updateTotalDisplay();
 
                             setMessage('Áp dụng mã thành công.', 'success');
                         })
