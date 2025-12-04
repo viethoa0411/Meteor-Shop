@@ -34,6 +34,7 @@
                             'pending' => ['label' => 'Chờ xác nhận', 'color' => 'dark', 'icon' => 'bi-hourglass-split'],
                             'processing' => ['label' => 'Đang xử lý', 'color' => 'primary', 'icon' => 'bi-gear'],
                             'shipping' => ['label' => 'Đang giao hàng', 'color' => 'info', 'icon' => 'bi-truck'],
+                            'delivered' => ['label' => 'Đã giao', 'color' => 'success', 'icon' => 'bi-box-seam'],
                             'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'bi-check-circle'],
                             'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
                             'return_requested' => ['label' => 'Yêu cầu trả hàng', 'color' => 'warning', 'icon' => 'bi-arrow-repeat'],
@@ -50,13 +51,14 @@
                     {{-- FORM UPDATE TRẠNG THÁI --}}
                     @php
                         // Admin chỉ được cập nhật các trạng thái xử lý - không gồm hủy/hoàn thành
-                        $adminAllowedStatuses = ['processing', 'shipping', 'returned'];
+                        $adminAllowedStatuses = ['processing', 'shipping', 'delivered', 'returned'];
 
                         // Quy tắc chuyển trạng thái đồng bộ với backend
                         $validTransitions = [
                             'pending' => ['processing'],
                             'processing' => ['shipping', 'returned'],
-                            'shipping' => [], // Không cho admin cập nhật từ shipping, user sẽ cập nhật sang completed
+                            'shipping' => ['delivered'],
+                            'delivered' => [],
                             'return_requested' => ['returned'],
                             'returned' => [],
                             'completed' => [],
@@ -66,6 +68,7 @@
                         $statusLabels = [
                             'processing' => 'Đang xử lý',
                             'shipping' => 'Đang giao hàng',
+                            'delivered' => 'Đã giao',
                             'returned' => 'Đã trả hàng',
                         ];
 
@@ -92,13 +95,8 @@
                         </div>
                     @endif
 
-                    {{-- Hiển thị thông báo khi đang giao hàng --}}
-                    @if ($order->order_status === 'shipping')
-                        <div class="alert alert-info mt-3">
-                            <i class="bi bi-truck"></i>
-                            <strong>Đơn hàng đang giao hàng.</strong> Vui lòng đợi khách hàng xác nhận đã nhận hàng. Khách hàng sẽ cập nhật trạng thái sang "Giao hàng thành công" khi đã nhận hàng.
-                        </div>
-                    @elseif (!empty($allowedNextStatuses))
+                    {{-- Hành động chuyển trạng thái hoặc thông báo --}}
+                    @if (!empty($allowedNextStatuses))
                         @php
                             $nextStatus = $allowedNextStatuses[0];
                             $nextStatusLabel = $statusLabels[$nextStatus] ?? ucfirst($nextStatus);
@@ -153,6 +151,11 @@
                                 </div>
                             </form>
                         @endif
+                    @elseif ($order->order_status === 'shipping')
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-truck"></i>
+                            <strong>Đơn hàng đang giao hàng.</strong> Khi đơn vị vận chuyển xác nhận đã giao, chuyển trạng thái sang "Đã giao". Khách hàng sẽ xác nhận để hệ thống chuyển sang "Hoàn thành".
+                        </div>
                     @endif
 
                     {{-- THÔNG TIN TRẢ HÀNG --}}
@@ -256,6 +259,7 @@
                             'pending' => 'Chờ xác nhận',
                             'processing' => 'Đang xử lý',
                             'shipping' => 'Đang giao hàng',
+                            'delivered' => 'Đã giao',
                             'completed' => 'Hoàn thành',
                             'return_requested' => 'Yêu cầu trả hàng',
                             'returned' => 'Đã trả hàng',
@@ -265,6 +269,7 @@
                             'pending' => 'dark',
                             'processing' => 'primary',
                             'shipping' => 'info',
+                            'delivered' => 'success',
                             'completed' => 'success',
                             'return_requested' => 'warning',
                             'returned' => 'secondary',
@@ -288,7 +293,7 @@
                                         <tr>
                                             <td class="small">{{ date('d/m/Y H:i', strtotime($log->created_at)) }}</td>
                                             <td>
-                                                <span class="badge bg-{{ $statusColors[$log->status] ?? 'light' }}">
+                                                <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$log->status] ?? 'secondary' }} text-{{ $statusColors[$log->status] ?? 'secondary' }}">
                                                     {{ $statusLabels[$log->status] ?? $log->status }}
                                                 </span>
                                             </td>
@@ -329,7 +334,7 @@
                                             <td class="small">{{ date('d/m/Y H:i', strtotime($history->created_at)) }}</td>
                                             <td>
                                                 @if ($history->old_status)
-                                                    <span class="badge bg-{{ $statusColors[$history->old_status] ?? 'light' }}">
+                                                    <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$history->old_status] ?? 'secondary' }} text-{{ $statusColors[$history->old_status] ?? 'secondary' }}">
                                                         {{ $statusLabels[$history->old_status] ?? $history->old_status }}
                                                     </span>
                                                 @else
@@ -337,7 +342,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="badge bg-{{ $statusColors[$history->new_status] ?? 'light' }}">
+                                                <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$history->new_status] ?? 'secondary' }} text-{{ $statusColors[$history->new_status] ?? 'secondary' }}">
                                                     {{ $statusLabels[$history->new_status] ?? $history->new_status }}
                                                 </span>
                                             </td>
