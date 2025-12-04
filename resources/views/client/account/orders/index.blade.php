@@ -440,7 +440,14 @@
                                 <small style="min-height: 18px;"></small>
                             @endif
                         </div>
-                    @elseif ($order->order_status === 'completed' && $order->isReturnExpired() && in_array($order->return_status, ['none', 'rejected']))
+                    @elseif ($order->order_status === 'completed' && $order->return_status === 'rejected')
+                        <div class="d-flex align-items-start">
+                            <div class="alert alert-info small mb-0 py-2">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Yêu cầu đổi trả đã bị từ chối. Bạn không thể gửi lại yêu cầu.
+                            </div>
+                        </div>
+                    @elseif ($order->order_status === 'completed' && $order->isReturnExpired() && in_array($order->return_status, ['none']))
                         {{-- Thông báo hết hạn đổi trả, dùng d-flex align-items-center để căn giữa theo chiều dọc --}}
                         {{-- Lưu ý: Với align-items-start ở container cha, khối này sẽ căn trên cùng --}}
                         <div class="d-flex align-items-start">

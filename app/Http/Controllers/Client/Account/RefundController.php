@@ -29,6 +29,10 @@ class RefundController extends Controller
             return back()->with('error', 'Chỉ có thể yêu cầu trả hàng hoàn tiền khi đơn hàng đã giao thành công.');
         }
 
+        if ($order->return_status === 'rejected') {
+            return back()->with('error', 'Yêu cầu trả hàng của đơn này đã bị từ chối. Bạn không thể gửi lại yêu cầu.');
+        }
+
         // Kiểm tra đã nhận hàng chưa
         if (!$order->delivered_at) {
             return back()->with('error', 'Đơn hàng chưa được xác nhận đã nhận hàng.');
@@ -145,7 +149,7 @@ class RefundController extends Controller
                     'order_id' => $order->id,
                     'status' => 'return_requested',
                     'updated_by' => Auth::id(),
-                    'role' => 'client',
+                    'role' => 'customer',
                     'created_at' => now(),
                 ]);
             }

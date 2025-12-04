@@ -122,9 +122,10 @@ class OrderController extends Controller
 
             OrderLog::create([
                 'order_id' => $order->id,
-                'user_id' => $request->user()->id,
                 'status' => 'cancelled',
-                'note' => 'Khách hàng hủy đơn hàng.',
+                'updated_by' => $request->user()->id,
+                'role' => 'customer',
+                'created_at' => now(),
             ]);
 
             DB::commit();
@@ -211,8 +212,10 @@ class OrderController extends Controller
             } elseif ($order->isReturnExpired()) {
                 $daysSinceDelivery = now()->diffInDays($order->delivered_at);
                 $errorMessage = "Đơn hàng đã quá hạn để yêu cầu đổi trả. Thời gian cho phép là 7 ngày kể từ khi nhận hàng (đã qua {$daysSinceDelivery} ngày).";
-            } elseif (!in_array($order->return_status, ['none', 'rejected'])) {
+            } elseif (!in_array($order->return_status, ['none'])) {
                 $errorMessage = 'Đơn hàng này đã có yêu cầu đổi trả đang được xử lý.';
+            } elseif ($order->return_status === 'rejected') {
+                $errorMessage = 'Yêu cầu đổi trả đã bị từ chối trước đó. Bạn không thể gửi lại yêu cầu cho đơn này.';
             }
 
             return back()->with('error', $errorMessage);
@@ -239,9 +242,10 @@ class OrderController extends Controller
 
         OrderLog::create([
             'order_id' => $order->id,
-            'user_id' => $request->user()->id,
             'status' => 'return_requested',
-            'note' => 'Khách hàng yêu cầu đổi trả.',
+            'updated_by' => $request->user()->id,
+            'role' => 'customer',
+            'created_at' => now(),
         ]);
 
         return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');
@@ -259,6 +263,14 @@ class OrderController extends Controller
             'order_status' => 'completed',
             'delivered_at' => $order->delivered_at ?: now(),
             'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
+        ]);
+
+        OrderLog::create([
+            'order_id' => $order->id,
+            'status' => 'completed',
+            'updated_by' => $request->user()->id,
+            'role' => 'customer',
+            'created_at' => now(),
         ]);
 
         return back()->with('success', 'Đã xác nhận nhận hàng thành công! Cảm ơn bạn đã mua sắm.');
