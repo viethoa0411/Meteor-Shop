@@ -245,7 +245,7 @@ class DashboardController extends Controller
             ->pluck('count', 'order_status');
         
         // Đảm bảo tất cả trạng thái đều có trong thống kê (mặc định 0)
-        $allStatuses = ['pending', 'processing', 'shipping', 'completed', 'cancelled'];
+        $allStatuses = ['pending', 'processing', 'shipping', 'delivered', 'completed', 'cancelled'];
         foreach ($allStatuses as $status) {
             if (!isset($orderStatsByStatus[$status])) {
                 $orderStatsByStatus[$status] = 0;
