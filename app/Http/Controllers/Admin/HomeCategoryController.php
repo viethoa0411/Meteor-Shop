@@ -86,19 +86,6 @@ class HomeCategoryController extends Controller
             ->with('success', 'Cập nhật danh mục trang chủ thành công!');
     }
 
-    public function destroy($id)
-    {
-        $category = HomeCategory::findOrFail($id);
-        
-        // Xóa ảnh
-        if ($category->image && Storage::disk('public')->exists($category->image)) {
-            Storage::disk('public')->delete($category->image);
-        }
-        
-        $category->delete();
-
-        return redirect()->route('admin.home-categories.index')
-            ->with('success', 'Xóa danh mục trang chủ thành công!');
-    }
+    
 }
 
