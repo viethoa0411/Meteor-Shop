@@ -66,16 +66,11 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        // Lấy thông tin đơn
-        $order = DB::table('orders')
-            ->join('users', 'orders.user_id', '=', 'users.id')
-            ->select(
-                'orders.*',
-                'users.name as customer_name',
-                'users.phone as customer_phone'
-            )
-            ->where('orders.id', $id)
-            ->first();
+        $order = Order::with(['user:id,name,email,phone,role,status'])
+            ->find($id);
+        if (!$order) {
+            return redirect()->route('admin.orders.list')->with('error', 'Đơn hàng không tồn tại');
+        }
 
         // Lấy danh sách sản phẩm trong đơn
         $orderDetails = DB::table('order_details')

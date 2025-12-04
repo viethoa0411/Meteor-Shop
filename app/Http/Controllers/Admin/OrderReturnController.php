@@ -300,6 +300,24 @@ class OrderReturnController extends Controller
             } elseif ($newReturnStatus === 'refunded') {
                 // Đã nhận hàng và hoàn lại tiền - giữ nguyên order_status
                 $updateData['order_status'] = $order->order_status;
+                if ($order->return_status !== 'refunded') {
+                    $items = DB::table('order_details')
+                        ->select('product_id', 'variant_id', 'quantity')
+                        ->where('order_id', $orderId)
+                        ->get();
+
+                    foreach ($items as $it) {
+                        if (!empty($it->variant_id)) {
+                            DB::table('product_variants')
+                                ->where('id', $it->variant_id)
+                                ->increment('stock', (int) $it->quantity);
+                        } else {
+                            DB::table('products')
+                                ->where('id', $it->product_id)
+                                ->increment('stock', (int) $it->quantity);
+                        }
+                    }
+                }
             } elseif ($newReturnStatus === 'completed') {
                 // Hoàn hàng thành công - trạng thái cuối cùng
                 $updateData['order_status'] = 'returned';
@@ -351,4 +369,3 @@ class OrderReturnController extends Controller
         }
     }
 }
-
