@@ -47,55 +47,52 @@ class CheckoutController extends Controller
 
         // Xử lý checkout từ giỏ hàng
         if ($type === 'cart') {
-            $cart = session()->get('cart', []);
+            $cart = \App\Models\Cart::with(['items.product', 'items.variant'])
+                ->where('user_id', $user->id)
+                ->where('status', 'active')
+                ->first();
 
-            if (empty($cart)) {
+            if (!$cart || $cart->items->isEmpty()) {
                 return redirect()->route('cart.index')
                     ->with('error', 'Giỏ hàng của bạn đang trống');
             }
 
-            // Kiểm tra tồn kho cho tất cả sản phẩm trong giỏ
             $cartItems = [];
             $subtotal = 0;
 
-            foreach ($cart as $key => $item) {
-                $product = Product::find($item['product_id']);
+            foreach ($cart->items as $ci) {
+                $product = $ci->product;
                 if (!$product) {
-                    continue; // Bỏ qua sản phẩm không tồn tại
+                    continue;
                 }
 
                 $stock = $product->stock ?? 0;
-                $price = $item['price'];
-                $variant = null;
+                $price = (float) ($ci->variant ? ($ci->variant->price ?? $product->price) : $ci->price);
+                $variant = $ci->variant;
 
-                if (!empty($item['variant_id'])) {
-                    $variant = ProductVariant::find($item['variant_id']);
-                    if ($variant) {
-                        $stock = $variant->stock ?? 0;
-                        $price = $variant->price ?? $product->price;
-                    }
+                if ($variant) {
+                    $stock = $variant->stock ?? 0;
                 }
 
-                // Kiểm tra tồn kho
-                if ($stock < $item['quantity']) {
+                if ($stock < $ci->quantity) {
                     return redirect()->route('cart.index')
-                        ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                        ->with('error', "Sản phẩm '{$product->name}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                 }
 
-                $itemSubtotal = $price * $item['quantity'];
+                $itemSubtotal = $price * $ci->quantity;
                 $subtotal += $itemSubtotal;
 
                 $cartItems[] = [
-                    'key'        => $key,
-                    'product_id' => $item['product_id'],
-                    'variant_id' => $item['variant_id'] ?? null,
-                    'name'       => $item['name'],
+                    'key'        => $ci->id,
+                    'product_id' => $product->id,
+                    'variant_id' => $variant ? $variant->id : null,
+                    'name'       => $product->name,
                     'price'      => $price,
-                    'quantity'   => $item['quantity'],
+                    'quantity'   => (int) $ci->quantity,
                     'subtotal'   => $itemSubtotal,
-                    'image'      => $item['image'] ?? $product->image,
-                    'color'      => $item['color'] ?? null,
-                    'size'       => $item['size'] ?? null,
+                    'image'      => $product->image,
+                    'color'      => $ci->color ?? ($variant ? $variant->color_name : null),
+                    'size'       => $ci->size ?? ($variant && $variant->length && $variant->width && $variant->height ? ($variant->length.'x'.$variant->width.'x'.$variant->height) : null),
                     'product'    => $product,
                     'variant'    => $variant,
                 ];
@@ -499,8 +496,18 @@ class CheckoutController extends Controller
                     }
                 }
 
-                // Xóa giỏ hàng sau khi đặt hàng thành công
-                session()->forget('cart');
+                $userCart = \App\Models\Cart::with('items')
+                    ->where('user_id', Auth::id())
+                    ->where('status', 'active')
+                    ->first();
+                if ($userCart) {
+                    foreach ($userCart->items as $ci) {
+                        $ci->delete();
+                    }
+                    $userCart->status = 'checked_out';
+                    $userCart->total_price = 0;
+                    $userCart->save();
+                }
             } else {
                 // Xử lý checkout mua ngay (1 sản phẩm)
                 // Kiểm tra lại tồn kho
@@ -715,8 +722,8 @@ class CheckoutController extends Controller
 
         }
 
-        // Miễn phí ship cho đơn trên 500k
-        if ($subtotal >= 500000) {
+        // Miễn phí ship cho đơn trên 10.000.000
+        if ($subtotal >= 10000000) {
             return 0;
         }
 
