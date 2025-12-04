@@ -57,6 +57,8 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
     // ===== DASHBOARD =====
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/revenue/filter', [DashboardController::class, 'index'])->name('revenue.filter');
+    Route::get('/api/dashboard/revenue/control-chart', [DashboardController::class, 'revenueControlChartApi'])
+        ->name('dashboard.revenue.control-chart');
     Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])
         ->name('monthly_target.create');
 
