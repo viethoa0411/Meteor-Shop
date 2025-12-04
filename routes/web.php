@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MonthlyTargetController;
+use App\Http\Controllers\Admin\PromotionController;
 
 use App\Http\Controllers\Admin\Wallet\WalletDetailController;
 use App\Http\Controllers\Admin\Wallet\WalletManagementController;
@@ -108,6 +109,16 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::delete('{product}/images/{image}', [ProductController::class, 'destroyImage'])->name('images.destroy');
     });
 
+    // ====== PROMOTIONS ======
+    Route::prefix('promotions')->name('promotions.')->group(function () {
+        Route::get('/', [PromotionController::class, 'list'])->name('list');
+        Route::get('/create', [PromotionController::class, 'create'])->name('create');
+        Route::post('/store', [PromotionController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [PromotionController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [PromotionController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [PromotionController::class, 'destroy'])->name('destroy');
+    });
+
     // ====== ORDERS ======
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'list'])->name('list');
@@ -159,7 +170,7 @@ Route::middleware(['admin'])->prefix('/admin')->name('admin.')->group(function (
         Route::post('/{id}/duplicate', [BannerController::class, 'duplicate'])->name('duplicate');
     });
 
-    // Tư Vấn Thiết Kế 
+    // Tư Vấn Thiết Kế
     Route::prefix('contacts')->name('contacts.')->group(function () {
 
         Route::get('/', [ContactController::class, 'index'])->name('index');
@@ -318,6 +329,7 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('client.chec
 Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('client.checkout.process');
 Route::get('/checkout/confirm', [CheckoutController::class, 'confirm'])->name('client.checkout.confirm');
 Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder'])->name('client.checkout.createOrder');
+Route::post('/checkout/apply-promotion', [CheckoutController::class, 'applyPromotion'])->name('client.checkout.applyPromotion');
 Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
 
 Route::fallback(function () {

@@ -240,6 +240,13 @@
                                 @endif
                             </strong>
                         </div>
+                        @php $discount = $checkoutSession['discount_amount'] ?? 0; @endphp
+                        @if ($discount > 0)
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span>Giảm giá @if(!empty($checkoutSession['promotion']['code']))(<strong>{{ $checkoutSession['promotion']['code'] }}</strong>)@endif:</span>
+                                <strong class="text-success">- {{ number_format($discount, 0, ',', '.') }} đ</strong>
+                            </div>
+                        @endif
                         <div class="mb-3 pt-2 border-top d-flex justify-content-between">
                             <span class="fs-5 fw-bold">Tổng cộng:</span>
                             <span class="fs-5 fw-bold text-danger">
@@ -295,4 +302,3 @@
         </script>
     @endpush
 @endsection
-

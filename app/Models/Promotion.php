@@ -15,15 +15,22 @@ class Promotion extends Model
         'description',
         'discount_type',
         'discount_value',
+        'max_discount',
+        'min_amount',
+        'min_orders',
         'start_date',
         'end_date',
-        'usage_limit',
+        'limit_per_user',
+        'limit_global',
         'used_count',
         'status',
+        'scope',
     ];
 
     protected $casts = [
         'discount_value' => 'decimal:2',
+        'max_discount' => 'decimal:2',
+        'min_amount' => 'decimal:2',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
@@ -40,8 +47,8 @@ class Promotion extends Model
     {
         return $query->active()
                     ->where(function($q) {
-                        $q->whereNull('usage_limit')
-                          ->orWhereRaw('used_count < usage_limit');
+                        $q->whereNull('limit_global')
+                          ->orWhereRaw('used_count < limit_global');
                     });
     }
 
@@ -72,5 +79,20 @@ class Promotion extends Model
             'inactive' => 'Không hoạt động',
             default => 'Không xác định'
         };
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'promotion_categories', 'promotion_id', 'category_id');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'promotion_products', 'promotion_id', 'product_id');
+    }
+
+    public function userUsages()
+    {
+        return $this->hasMany(UserPromotionUsage::class, 'promotion_id');
     }
 }

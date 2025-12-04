@@ -191,7 +191,7 @@
                             @foreach ($cartItems as $item)
                                 <div class="d-flex mb-3">
                                     <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/80' }}"
-                                        alt="{{ $item['name'] }}" 
+                                        alt="{{ $item['name'] }}"
                                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
                                     <div class="ms-3 flex-grow-1">
                                         <h6 class="mb-1" style="font-size: 0.9rem;">{{ $item['name'] }}</h6>
@@ -207,7 +207,7 @@
                                             </small>
                                         @endif
                                         <div class="mt-1">
-                                            <small class="text-muted">SL: {{ $item['quantity'] }} x 
+                                            <small class="text-muted">SL: {{ $item['quantity'] }} x
                                                 {{ number_format($item['price'], 0, ',', '.') }} đ
                                             </small>
                                         </div>
@@ -230,11 +230,26 @@
                             <span>Phí vận chuyển:</span>
                             <strong id="shipping-fee">-</strong>
                         </div>
+                        <div class="mb-2 d-flex justify-content-between" id="discount-row" style="display:none;">
+                            <span>Giảm giá (<span id="applied-code"></span>):</span>
+                            <strong class="text-success" id="discount-amount">- 0 đ</strong>
+                        </div>
                         <div class="mb-3 pt-2 border-top d-flex justify-content-between">
                             <span class="fs-5 fw-bold">Tổng cộng:</span>
                             <span class="fs-5 fw-bold text-danger" id="total-amount">
                                 {{ number_format($subtotal, 0, ',', '.') }} đ
                             </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mã khuyến mãi</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="promotion-code" placeholder="Nhập mã khuyến mãi">
+                                <button class="btn btn-outline-primary" type="button" id="apply-promotion-btn">
+                                    Áp dụng
+                                </button>
+                            </div>
+                            <div class="small mt-2" id="promotion-message"></div>
                         </div>
 
                         <div class="alert alert-info small mb-0">
@@ -252,7 +267,9 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
                 const subtotal = {{ $subtotal }};
-                
+
+                let currentDiscount = 0;
+                let appliedCode = '';
                 const shippingFees = {
                     'standard': 30000,
                     'express': 50000,
@@ -265,19 +282,19 @@
                     if (!selected) return;
 
                     let fee = shippingFees[selected.value] || 0;
-                    
+
                     // Miễn phí ship cho đơn trên 500k
                     if (subtotal >= 500000) {
                         fee = 0;
                     }
 
-                    const total = subtotal + fee;
+                    const total = Math.max(0, subtotal - currentDiscount + fee);
                     const shippingFeeEl = document.getElementById('shipping-fee');
                     const totalAmountEl = document.getElementById('total-amount');
-                    
+
                     if (shippingFeeEl) {
-                        shippingFeeEl.textContent = fee === 0 
-                            ? 'Miễn phí' 
+                        shippingFeeEl.textContent = fee === 0
+                            ? 'Miễn phí'
                             : fee.toLocaleString('vi-VN') + ' đ';
                     }
                     if (totalAmountEl) {
@@ -294,8 +311,71 @@
 
                 // Khởi tạo lần đầu
                 updateShippingFee();
+
+                // Áp dụng mã khuyến mãi
+                const applyBtn = document.getElementById('apply-promotion-btn');
+                const codeInput = document.getElementById('promotion-code');
+                const discountRow = document.getElementById('discount-row');
+                const discountAmountEl = document.getElementById('discount-amount');
+                const appliedCodeEl = document.getElementById('applied-code');
+                const messageEl = document.getElementById('promotion-message');
+
+                function setMessage(text, type = 'info') {
+                    if (!messageEl) return;
+                    messageEl.className = 'small mt-2 text-' + (type === 'error' ? 'danger' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'muted');
+                    messageEl.textContent = text;
+                }
+
+                function clearPromotion() {
+                    currentDiscount = 0;
+                    appliedCode = '';
+                    if (discountRow) discountRow.style.display = 'none';
+                    if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
+                    if (appliedCodeEl) appliedCodeEl.textContent = '';
+                    updateShippingFee();
+                }
+
+                if (applyBtn) {
+                    applyBtn.addEventListener('click', async function() {
+                        const code = codeInput ? codeInput.value.trim() : '';
+                        if (!code) {
+                            setMessage('Vui lòng nhập mã khuyến mãi', 'error');
+                            return;
+                        }
+                        setMessage('Đang kiểm tra mã...', 'info');
+                        applyBtn.disabled = true;
+                        try {
+                            const res = await fetch('{{ route('client.checkout.applyPromotion') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ code })
+                            });
+                            const data = await res.json();
+                            if (!res.ok || !data.ok) {
+                                const err = data.error || 'Mã không hợp lệ';
+                                setMessage(err, 'error');
+                                clearPromotion();
+                            } else {
+                                currentDiscount = parseFloat(data.promotion.discount_amount) || 0;
+                                appliedCode = data.promotion.code || code;
+                                if (discountRow) discountRow.style.display = 'flex';
+                                if (discountAmountEl) discountAmountEl.textContent = '- ' + currentDiscount.toLocaleString('vi-VN') + ' đ';
+                                if (appliedCodeEl) appliedCodeEl.textContent = appliedCode;
+                                updateShippingFee();
+                                setMessage('Áp dụng mã thành công', 'success');
+                            }
+                        } catch (e) {
+                            setMessage('Lỗi kết nối. Vui lòng thử lại.', 'error');
+                            clearPromotion();
+                        } finally {
+                            applyBtn.disabled = false;
+                        }
+                    });
+                }
             });
         </script>
     @endpush
 @endsection
-

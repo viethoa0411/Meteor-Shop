@@ -400,7 +400,10 @@
                class="{{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                 <i class="bi bi-image-fill me-2"></i> Quản lý Banner
             </a>
-
+            <a href="{{ route('admin.promotions.list') }}"
+                class="{{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}">
+                <i class="bi bi-ticket-perforated me-2"></i> Quản lý Voucher
+            </a>
             <!-- Quản lý Ví -->
             <a href="{{ route('admin.wallet.index') }}"
                class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
