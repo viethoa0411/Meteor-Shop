@@ -92,70 +92,83 @@
             </div>
         </div>
 
-        {{-- Thông báo hoàn tiền thành công --}}
-        @php
-            $completedRefund = $order->refunds->where('status', 'completed')->first();
-        @endphp
-        @if($completedRefund)
-            <div class="card border-0 shadow-sm mt-4 border-success">
-                <div class="card-body">
-                    <div class="alert alert-success mb-0">
-                        <h6 class="alert-heading fw-bold">
-                            <i class="bi bi-check-circle-fill me-2"></i>Đã hoàn tiền thành công
-                        </h6>
-                        <p class="mb-0">
-                            Quý khách có gì thắc mắc xin liên hệ đội ngũ Meteor Shop.
-                        </p>
-                        @if($completedRefund->refund_amount)
-                            <hr>
-                            <p class="mb-0">
-                                <strong>Số tiền đã hoàn:</strong> 
-                                <span class="text-success">{{ number_format($completedRefund->refund_amount, 0, ',', '.') }} đ</span>
-                            </p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        @endif
-
         {{-- Action buttons --}}
-        @if ($order->order_status === 'completed' || $order->canCancelRefund())
-            <div class="card border-0 shadow-sm mt-4">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3">Thao tác</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        @if ($order->order_status === 'completed')
-                            <a class="btn btn-outline-warning" href="{{ route('client.account.orders.refund.return', $order) }}">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i> Trả hàng hoàn tiền
-                            </a>
-                        @endif
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">Thao tác</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-outline-secondary" href="{{ route('client.account.orders.show', $order) }}">
+                        <i class="bi bi-eye me-1"></i> Xem chi tiết đơn hàng
+                    </a>
 
-                        @if ($order->canCancelRefund())
-                            <a class="btn btn-outline-danger" href="{{ route('client.account.orders.refund.cancel', $order) }}">
-                                <i class="bi bi-x-circle me-1"></i> Hủy đơn và hoàn tiền
-                            </a>
-                        @endif
+                    @if ($order->canCancel())
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+                            <i class="bi bi-x-circle me-1"></i>
+                            @if ($order->payment_method === 'wallet' && $order->payment_status === 'paid')
+                                Hủy đơn và hoàn tiền
+                            @else
+                                Hủy đơn hàng
+                            @endif
+                        </button>
+                    @endif
+                </div>
 
-                        @php
-                            $pendingCancelRefund = $order->refunds
-                                ->where('refund_type', 'cancel')
-                                ->where('status', 'pending')
-                                ->first();
-                        @endphp
+                @if ($order->canCancel() && $order->payment_method === 'wallet' && $order->payment_status === 'paid')
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Nếu bạn hủy đơn hàng, số tiền <strong class="text-success">{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được hoàn lại vào ví của bạn.
+                    </div>
+                @endif
+            </div>
+        </div>
 
-                        @if ($pendingCancelRefund)
-                            <form action="{{ route('client.account.orders.refund.cancel.reset', $order) }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-outline-dark"
-                                        onclick="return confirm('Bạn muốn đặt lại đơn hàng và dừng hoàn tiền?');">
-                                    <i class="bi bi-arrow-repeat me-1"></i> Đặt lại
+        {{-- Modal hủy đơn --}}
+        @if ($order->canCancel())
+            <div class="modal fade" id="cancelOrderModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                Xác nhận hủy đơn hàng
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ route('client.account.orders.cancel', $order) }}" method="POST">
+                            @csrf
+                            <div class="modal-body">
+                                @if ($order->payment_method === 'wallet' && $order->payment_status === 'paid')
+                                    <div class="alert alert-success">
+                                        <i class="bi bi-wallet2 me-1"></i>
+                                        Số tiền <strong>{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được hoàn lại vào ví của bạn sau khi hủy đơn.
+                                    </div>
+                                @endif
+
+                                <div class="mb-3">
+                                    <label class="form-label">Lý do hủy đơn <span class="text-danger">*</span></label>
+                                    <select name="reason" class="form-select" required>
+                                        <option value="">-- Chọn lý do --</option>
+                                        <option value="Đổi ý, không muốn mua nữa">Đổi ý, không muốn mua nữa</option>
+                                        <option value="Muốn thay đổi sản phẩm">Muốn thay đổi sản phẩm</option>
+                                        <option value="Muốn thay đổi địa chỉ giao hàng">Muốn thay đổi địa chỉ giao hàng</option>
+                                        <option value="Tìm được giá tốt hơn">Tìm được giá tốt hơn</option>
+                                        <option value="Đặt nhầm">Đặt nhầm</option>
+                                        <option value="Lý do khác">Lý do khác</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Ghi chú thêm</label>
+                                    <textarea name="notes" class="form-control" rows="3" placeholder="Nhập ghi chú nếu có..."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-x-circle me-1"></i> Xác nhận hủy đơn
                                 </button>
-                            </form>
-                        @endif
-
-                        <a class="btn btn-outline-secondary" href="{{ route('client.account.orders.show', $order) }}">
-                            <i class="bi bi-eye me-1"></i> Xem chi tiết đơn hàng
-                        </a>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

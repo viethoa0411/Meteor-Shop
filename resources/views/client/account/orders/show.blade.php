@@ -231,11 +231,71 @@
                                         <i class="bi bi-arrow-repeat me-1"></i> Đặt lại
                                     </button>
                                 </form>
+
                             @endif
                         </div>
+
+                        @if ($order->canCancel() && $order->payment_method === 'wallet' && $order->payment_status === 'paid')
+                            <div class="alert alert-info mt-3 mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Nếu bạn hủy đơn hàng, số tiền <strong class="text-success">{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được hoàn lại vào ví của bạn.
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- Modal hủy đơn --}}
+    @if ($order->canCancel())
+        <div class="modal fade" id="cancelOrderModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                            Xác nhận hủy đơn hàng
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('client.account.orders.cancel', $order) }}" method="POST">
+                        @csrf
+                        <div class="modal-body">
+                            @if ($order->payment_method === 'wallet' && $order->payment_status === 'paid')
+                                <div class="alert alert-success">
+                                    <i class="bi bi-wallet2 me-1"></i>
+                                    Số tiền <strong>{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được hoàn lại vào ví của bạn sau khi hủy đơn.
+                                </div>
+                            @endif
+
+                            <div class="mb-3">
+                                <label class="form-label">Lý do hủy đơn <span class="text-danger">*</span></label>
+                                <select name="reason" class="form-select" required>
+                                    <option value="">-- Chọn lý do --</option>
+                                    <option value="Đổi ý, không muốn mua nữa">Đổi ý, không muốn mua nữa</option>
+                                    <option value="Muốn thay đổi sản phẩm">Muốn thay đổi sản phẩm</option>
+                                    <option value="Muốn thay đổi địa chỉ giao hàng">Muốn thay đổi địa chỉ giao hàng</option>
+                                    <option value="Tìm được giá tốt hơn">Tìm được giá tốt hơn</option>
+                                    <option value="Đặt nhầm">Đặt nhầm</option>
+                                    <option value="Lý do khác">Lý do khác</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ghi chú thêm</label>
+                                <textarea name="notes" class="form-control" rows="3" placeholder="Nhập ghi chú nếu có..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-x-circle me-1"></i> Xác nhận hủy đơn
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection

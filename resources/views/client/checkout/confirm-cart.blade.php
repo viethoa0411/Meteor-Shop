@@ -100,13 +100,11 @@
                             @endif
                         </p>
                         <p class="mb-0">
-                            <strong>Thanh toán:</strong> 
+                            <strong>Thanh toán:</strong>
                             @if ($checkoutSession['payment_method'] == 'cash')
                                 Thanh toán khi nhận hàng (COD)
-                            @elseif ($checkoutSession['payment_method'] == 'bank')
-                                Chuyển khoản ngân hàng
-                            @elseif ($checkoutSession['payment_method'] == 'momo')
-                                Ví Momo
+                            @elseif ($checkoutSession['payment_method'] == 'wallet')
+                                <span class="text-success"><i class="bi bi-wallet2 me-1"></i>Thanh toán bằng Ví</span>
                             @else
                                 {{ $checkoutSession['payment_method'] }}
                             @endif

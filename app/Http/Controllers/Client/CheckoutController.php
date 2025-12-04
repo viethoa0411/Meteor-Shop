@@ -7,14 +7,13 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Wallet;
-use App\Models\Transaction;
+use App\Models\ClientWallet;
+use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
-use App\Models\Promotion;
 use App\Services\PromotionService;
 
 class CheckoutController extends Controller
@@ -45,6 +44,16 @@ class CheckoutController extends Controller
         $type = $request->get('type', 'buy_now');
         $user = Auth::user();
 
+        // Xử lý checkout từ mua lại đơn hàng (reorder)
+        $checkoutSession = session('checkout_session');
+        if ($checkoutSession && isset($checkoutSession['type']) && $checkoutSession['type'] === 'reorder') {
+            $cartItems     = $checkoutSession['items'];
+            $subtotal      = $checkoutSession['subtotal'];
+            $checkoutData  = $checkoutSession;
+
+            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData'));
+        }
+
         // Xử lý checkout từ giỏ hàng
         if ($type === 'cart') {
             $cart = \App\Models\Cart::with(['items.product', 'items.variant'])
@@ -58,7 +67,7 @@ class CheckoutController extends Controller
             }
 
             $cartItems = [];
-            $subtotal = 0;
+            $subtotal  = 0;
 
             foreach ($cart->items as $ci) {
                 $product = $ci->product;
@@ -66,8 +75,8 @@ class CheckoutController extends Controller
                     continue;
                 }
 
-                $stock = $product->stock ?? 0;
-                $price = (float) ($ci->variant ? ($ci->variant->price ?? $product->price) : $ci->price);
+                $stock   = $product->stock ?? 0;
+                $price   = (float) ($ci->variant ? ($ci->variant->price ?? $product->price) : $ci->price);
                 $variant = $ci->variant;
 
                 if ($variant) {
@@ -80,7 +89,7 @@ class CheckoutController extends Controller
                 }
 
                 $itemSubtotal = $price * $ci->quantity;
-                $subtotal += $itemSubtotal;
+                $subtotal    += $itemSubtotal;
 
                 $cartItems[] = [
                     'key'        => $ci->id,
@@ -92,7 +101,9 @@ class CheckoutController extends Controller
                     'subtotal'   => $itemSubtotal,
                     'image'      => $product->image,
                     'color'      => $ci->color ?? ($variant ? $variant->color_name : null),
-                    'size'       => $ci->size ?? ($variant && $variant->length && $variant->width && $variant->height ? ($variant->length.'x'.$variant->width.'x'.$variant->height) : null),
+                    'size'       => $ci->size ?? ($variant && $variant->length && $variant->width && $variant->height
+                        ? ($variant->length . 'x' . $variant->width . 'x' . $variant->height)
+                        : null),
                     'product'    => $product,
                     'variant'    => $variant,
                 ];
@@ -181,17 +192,18 @@ class CheckoutController extends Controller
         }
 
         $request->validate([
-            'customer_name'    => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
-            'customer_phone'   => 'required|string|regex:/^[0-9]{10,11}$/',
-            'customer_email'   => 'required|email|max:255',
-            'shipping_city'    => 'required|string|max:255',
-            'shipping_district'=> 'required|string|max:255',
-            'shipping_ward'    => 'required|string|max:255',
-            'shipping_address' => 'required|string|max:500',
-            'shipping_method'  => 'required|string|in:standard,express,fast',
-            'payment_method'   => 'required|string|in:cash,bank,momo,paypal',
-            'notes'            => 'nullable|string|max:1000',
-            'quantity'         => 'nullable|integer|min:1',
+            'customer_name'     => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
+            'customer_phone'    => 'required|string|regex:/^[0-9]{10,11}$/',
+            'customer_email'    => 'required|email|max:255',
+            'shipping_city'     => 'required|string|max:255',
+            'shipping_district' => 'required|string|max:255',
+            'shipping_ward'     => 'required|string|max:255',
+            'shipping_address'  => 'required|string|max:500',
+            'shipping_method'   => 'required|string|in:standard,express,fast',
+            // chỉ giữ lại cash + wallet
+            'payment_method'    => 'required|string|in:cash,wallet',
+            'notes'             => 'nullable|string|max:1000',
+            'quantity'          => 'nullable|integer|min:1',
         ], [
             'customer_name.required'     => 'Vui lòng nhập họ tên',
             'customer_name.regex'        => 'Họ tên chỉ được chứa chữ cái và khoảng trắng',
@@ -248,17 +260,17 @@ class CheckoutController extends Controller
         );
 
         // Cập nhật checkout session với thông tin form
-        $checkoutSession['customer_name']    = $request->customer_name;
-        $checkoutSession['customer_phone']   = $request->customer_phone;
-        $checkoutSession['customer_email']   = $request->customer_email;
-        $checkoutSession['shipping_city']    = $request->shipping_city;
-        $checkoutSession['shipping_district']= $request->shipping_district;
-        $checkoutSession['shipping_ward']    = $request->shipping_ward;
-        $checkoutSession['shipping_address'] = $request->shipping_address;
-        $checkoutSession['shipping_method']  = $request->shipping_method;
-        $checkoutSession['payment_method']   = $request->payment_method;
-        $checkoutSession['shipping_fee']     = $shippingFee;
-        $checkoutSession['notes']            = $request->notes;
+        $checkoutSession['customer_name']     = $request->customer_name;
+        $checkoutSession['customer_phone']    = $request->customer_phone;
+        $checkoutSession['customer_email']    = $request->customer_email;
+        $checkoutSession['shipping_city']     = $request->shipping_city;
+        $checkoutSession['shipping_district'] = $request->shipping_district;
+        $checkoutSession['shipping_ward']     = $request->shipping_ward;
+        $checkoutSession['shipping_address']  = $request->shipping_address;
+        $checkoutSession['shipping_method']   = $request->shipping_method;
+        $checkoutSession['payment_method']    = $request->payment_method;
+        $checkoutSession['shipping_fee']      = $shippingFee;
+        $checkoutSession['notes']             = $request->notes;
 
         $discountAmount = isset($checkoutSession['discount_amount'])
             ? (float) $checkoutSession['discount_amount']
@@ -269,6 +281,14 @@ class CheckoutController extends Controller
             $checkoutSession['subtotal'] - $discountAmount + $shippingFee
         );
 
+        // Kiểm tra số dư ví nếu thanh toán bằng ví
+        if ($request->payment_method === 'wallet') {
+            $wallet = ClientWallet::where('user_id', Auth::id())->first();
+            if (!$wallet || !$wallet->hasEnoughBalance($checkoutSession['final_total'])) {
+                return back()->with('error', 'Số dư ví không đủ để thanh toán. Vui lòng nạp thêm tiền hoặc chọn phương thức thanh toán khác.');
+            }
+        }
+
         session(['checkout_session' => $checkoutSession]);
 
         return redirect()->route('client.checkout.confirm');
@@ -276,7 +296,7 @@ class CheckoutController extends Controller
 
     /**
      * ========================================
-     * CLIENT: TRANG XÁC NHẬN ĐƠN HÀNG + THANH TOÁN ONLINE
+     * CLIENT: TRANG XÁC NHẬN ĐƠN HÀNG
      * ========================================
      */
     public function confirm()
@@ -294,39 +314,9 @@ class CheckoutController extends Controller
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
         }
 
-        // Tạo QR code nếu thanh toán bằng chuyển khoản
-        $qrCodeUrl  = null;
-        $walletInfo = null;
-
-        if (isset($checkoutSession['payment_method']) && $checkoutSession['payment_method'] === 'bank') {
-            // Lấy thông tin ví admin (ví đầu tiên có status active)
-            $wallet = Wallet::where('status', 'active')->first();
-
-            if ($wallet) {
-                $walletInfo = $wallet;
-                $amount     = $checkoutSession['final_total'];
-                $orderCode  = 'ORDER' . strtoupper(Str::random(8));
-
-                // Tạo QR code sử dụng API VietQR
-                $bankId        = $this->getBankId($wallet->bank_name);
-                $accountNumber = $wallet->bank_account;
-                $template      = 'compact2'; // hoặc 'compact', 'qr_only', 'print'
-                $addInfo       = urlencode("Thanh toan don hang " . $orderCode);
-                $accountName   = urlencode($wallet->account_holder);
-
-                $qrCodeUrl = "https://img.vietqr.io/image/{$bankId}-{$accountNumber}-{$template}.png"
-                    . "?amount={$amount}&addInfo={$addInfo}&accountName={$accountName}";
-
-                // Lưu QR code URL vào session
-                $checkoutSession['qr_code_url']     = $qrCodeUrl;
-                $checkoutSession['temp_order_code'] = $orderCode;
-                session(['checkout_session' => $checkoutSession]);
-            }
-        }
-
-        // Nếu là checkout từ cart
-        if ($checkoutSession['type'] === 'cart') {
-            return view('client.checkout.confirm-cart', compact('checkoutSession', 'qrCodeUrl', 'walletInfo'));
+        // Nếu là checkout từ cart hoặc reorder
+        if (in_array($checkoutSession['type'], ['cart', 'reorder'])) {
+            return view('client.checkout.confirm-cart', compact('checkoutSession'));
         }
 
         // Lấy lại sản phẩm và variant cho buy_now
@@ -336,61 +326,12 @@ class CheckoutController extends Controller
             $variant = ProductVariant::find($checkoutSession['variant_id']);
         }
 
-        return view('client.checkout.confirm', compact('checkoutSession', 'product', 'variant', 'qrCodeUrl', 'walletInfo'));
-    }
-
-    /**
-     * Lấy Bank ID cho VietQR API
-     */
-    private function getBankId($bankName)
-    {
-        $bankMapping = [
-            'Vietcombank'     => 'VCB',
-            'Techcombank'     => 'TCB',
-            'BIDV'            => 'BIDV',
-            'VietinBank'      => 'CTG',
-            'Agribank'        => 'AGR',
-            'ACB'             => 'ACB',
-            'MB Bank'         => 'MB',
-            'VPBank'          => 'VPB',
-            'TPBank'          => 'TPB',
-            'Sacombank'       => 'STB',
-            'HDBank'          => 'HDB',
-            'VIB'             => 'VIB',
-            'SHB'             => 'SHB',
-            'Eximbank'        => 'EIB',
-            'MSB'             => 'MSB',
-            'OCB'             => 'OCB',
-            'SeABank'         => 'SEAB',
-            'VietCapitalBank' => 'VCCB',
-            'SCB'             => 'SCB',
-            'VietBank'        => 'VietBank',
-            'PVcomBank'       => 'PVCB',
-            'Oceanbank'       => 'Oceanbank',
-            'NCB'             => 'NCB',
-            'BacABank'        => 'BAB',
-            'LienVietPostBank'=> 'LPB',
-            'KienLongBank'    => 'KLB',
-            'VietABank'       => 'VAB',
-            'NamABank'        => 'NAB',
-            'PGBank'          => 'PGB',
-            'GPBank'          => 'GPB',
-            'ABBank'          => 'ABB',
-            'BaoVietBank'     => 'BVB',
-            'Cake'            => 'CAKE',
-            'Ubank'           => 'Ubank',
-            'Timo'            => 'Timo',
-            'ViettelMoney'    => 'VTLMONEY',
-            'VNPTMoney'       => 'VNPTMONEY',
-        ];
-
-        // Mặc định là Vietcombank nếu không map được
-        return $bankMapping[$bankName] ?? 'VCB';
+        return view('client.checkout.confirm', compact('checkoutSession', 'product', 'variant'));
     }
 
     /**
      * ========================================
-     * CLIENT: TẠO ĐƠN HÀNG + HIỂN THỊ TẤT CẢ MÃ GIAO DỊCH
+     * CLIENT: TẠO ĐƠN HÀNG + XỬ LÝ THANH TOÁN
      * ========================================
      */
     public function createOrder()
@@ -416,32 +357,32 @@ class CheckoutController extends Controller
 
             // Tạo order
             $order = Order::create([
-                'user_id'         => Auth::id(),
-                'order_code'      => $orderCode,
-                'customer_name'   => $checkoutSession['customer_name'],
-                'customer_phone'  => $checkoutSession['customer_phone'],
-                'customer_email'  => $checkoutSession['customer_email'],
-                'shipping_city'   => $checkoutSession['shipping_city'],
+                'user_id'          => Auth::id(),
+                'order_code'       => $orderCode,
+                'customer_name'    => $checkoutSession['customer_name'],
+                'customer_phone'   => $checkoutSession['customer_phone'],
+                'customer_email'   => $checkoutSession['customer_email'],
+                'shipping_city'    => $checkoutSession['shipping_city'],
                 'shipping_district'=> $checkoutSession['shipping_district'],
-                'shipping_ward'   => $checkoutSession['shipping_ward'],
-                'shipping_address'=> $checkoutSession['shipping_address'],
-                'shipping_method' => $checkoutSession['shipping_method'],
-                'shipping_fee'    => $checkoutSession['shipping_fee'],
-                'payment_method'  => $checkoutSession['payment_method'],
-                'sub_total'       => $checkoutSession['subtotal'],
+                'shipping_ward'    => $checkoutSession['shipping_ward'],
+                'shipping_address' => $checkoutSession['shipping_address'],
+                'shipping_method'  => $checkoutSession['shipping_method'],
+                'shipping_fee'     => $checkoutSession['shipping_fee'],
+                'payment_method'   => $checkoutSession['payment_method'],
+                'sub_total'        => $checkoutSession['subtotal'],
                 // tổng cuối cùng khách phải trả (sau giảm giá + phí ship)
-                'total_price'     => $checkoutSession['final_total'],
-                'discount_amount' => $checkoutSession['discount_amount'] ?? 0,
-                'promotion_id'    => $checkoutSession['promotion']['promotion_id'] ?? null,
-                'final_total'     => $checkoutSession['final_total'],
-                'order_status'    => 'pending',
-                'payment_status'  => 'pending',
-                'notes'           => $checkoutSession['notes'] ?? null,
-                'order_date'      => now(),
+                'total_price'      => $checkoutSession['final_total'],
+                'discount_amount'  => $checkoutSession['discount_amount'] ?? 0,
+                'promotion_id'     => $checkoutSession['promotion']['promotion_id'] ?? null,
+                'final_total'      => $checkoutSession['final_total'],
+                'order_status'     => 'pending',
+                'payment_status'   => 'pending',
+                'notes'            => $checkoutSession['notes'] ?? null,
+                'order_date'       => now(),
             ]);
 
-            // Xử lý checkout từ cart (nhiều sản phẩm)
-            if ($checkoutSession['type'] === 'cart' && isset($checkoutSession['items'])) {
+            // Xử lý checkout từ cart hoặc reorder (nhiều sản phẩm)
+            if (in_array($checkoutSession['type'], ['cart', 'reorder']) && isset($checkoutSession['items'])) {
                 foreach ($checkoutSession['items'] as $item) {
                     // Kiểm tra lại tồn kho
                     $product = Product::findOrFail($item['product_id']);
@@ -468,22 +409,22 @@ class CheckoutController extends Controller
 
                     // Tạo order detail
                     OrderDetail::create([
-                        'order_id'    => $order->id,
-                        'product_id'  => $productForSnapshot->id,
-                        'product_name'=> $item['name'],
-                        'variant_id'  => $variant ? $variant->id : null,
-                        'variant_name'=> $variant ? (
+                        'order_id'     => $order->id,
+                        'product_id'   => $productForSnapshot->id,
+                        'product_name' => $item['name'],
+                        'variant_id'   => $variant ? $variant->id : null,
+                        'variant_name' => $variant ? (
                             ($variant->color_name ?? '') .
                             ($variant->length && $variant->width && $variant->height
                                 ? ' - ' . $variant->length . 'x' . $variant->width . 'x' . $variant->height . ' cm'
                                 : '')
                         ) : null,
-                        'variant_sku' => $variant ? $variant->sku : null,
-                        'quantity'    => $item['quantity'],
-                        'price'       => $item['price'],
-                        'subtotal'    => $item['subtotal'],
-                        'total_price' => $item['subtotal'],
-                        'image_path'  => $item['image']
+                        'variant_sku'  => $variant ? $variant->sku : null,
+                        'quantity'     => $item['quantity'],
+                        'price'        => $item['price'],
+                        'subtotal'     => $item['subtotal'],
+                        'total_price'  => $item['subtotal'],
+                        'image_path'   => $item['image']
                             ?? ($productForSnapshot->image
                                 ?? ($productForSnapshot->images->first()->image ?? null)),
                     ]);
@@ -496,6 +437,7 @@ class CheckoutController extends Controller
                     }
                 }
 
+                // Xóa giỏ hàng sau khi checkout
                 $userCart = \App\Models\Cart::with('items')
                     ->where('user_id', Auth::id())
                     ->where('status', 'active')
@@ -504,7 +446,7 @@ class CheckoutController extends Controller
                     foreach ($userCart->items as $ci) {
                         $ci->delete();
                     }
-                    $userCart->status = 'checked_out';
+                    $userCart->status      = 'checked_out';
                     $userCart->total_price = 0;
                     $userCart->save();
                 }
@@ -535,22 +477,22 @@ class CheckoutController extends Controller
 
                 // Tạo order detail với snapshot đầy đủ
                 OrderDetail::create([
-                    'order_id'    => $order->id,
-                    'product_id'  => $productForSnapshot->id,
-                    'product_name'=> $productForSnapshot->name,
-                    'variant_id'  => $variant ? $variant->id : null,
-                    'variant_name'=> $variant ? (
+                    'order_id'     => $order->id,
+                    'product_id'   => $productForSnapshot->id,
+                    'product_name' => $productForSnapshot->name,
+                    'variant_id'   => $variant ? $variant->id : null,
+                    'variant_name' => $variant ? (
                         ($variant->color_name ?? '') .
                         ($variant->length && $variant->width && $variant->height
                             ? ' - ' . $variant->length . 'x' . $variant->width . 'x' . $variant->height . ' cm'
                             : '')
                     ) : null,
-                    'variant_sku' => $variant ? $variant->sku : null,
-                    'quantity'    => $checkoutSession['quantity'],
-                    'price'       => $checkoutSession['price'],
-                    'subtotal'    => $checkoutSession['subtotal'],
-                    'total_price' => $checkoutSession['subtotal'],
-                    'image_path'  => $productForSnapshot->image
+                    'variant_sku'  => $variant ? $variant->sku : null,
+                    'quantity'     => $checkoutSession['quantity'],
+                    'price'        => $checkoutSession['price'],
+                    'subtotal'     => $checkoutSession['subtotal'],
+                    'total_price'  => $checkoutSession['subtotal'],
+                    'image_path'   => $productForSnapshot->image
                         ?? ($productForSnapshot->images->first()->image ?? null),
                 ]);
 
@@ -562,29 +504,34 @@ class CheckoutController extends Controller
                 }
             }
 
-            // Tạo transaction nếu thanh toán qua chuyển khoản
-            if ($checkoutSession['payment_method'] === 'bank') {
-                // Lấy ví admin đầu tiên (hoặc ví mặc định)
-                $wallet = Wallet::where('status', 'active')->first();
+            // Xử lý thanh toán bằng ví
+            if ($checkoutSession['payment_method'] === 'wallet') {
+                $clientWallet = ClientWallet::where('user_id', Auth::id())->first();
 
-                if ($wallet) {
-                    // Tạo transaction với trạng thái pending
-                    Transaction::create([
-                        'order_id'        => $order->id,
-                        'wallet_id'       => $wallet->id,
-                        'amount'          => $checkoutSession['final_total'],
-                        'type'            => 'income',
-                        'status'          => 'pending', // Sẽ được cập nhật thành 'completed' khi admin xác nhận
-                        'payment_method'  => 'bank',
-                        'transaction_code'=> $checkoutSession['temp_order_code'] ?? $orderCode,
-                        'qr_code_url'     => $checkoutSession['qr_code_url'] ?? null,
-                        'description'     => "Thanh toán đơn hàng {$orderCode} - {$checkoutSession['customer_name']}",
-                    ]);
-
-                    // Đơn hàng sẽ ở trạng thái "Chờ thanh toán"
-                    // Admin sẽ xác nhận thủ công sau khi kiểm tra chuyển khoản
+                if (!$clientWallet || !$clientWallet->hasEnoughBalance($checkoutSession['final_total'])) {
+                    throw new \Exception('Số dư ví không đủ để thanh toán');
                 }
+
+                $balanceBefore = $clientWallet->balance;
+                $clientWallet->subtractBalance($checkoutSession['final_total']);
+
+                // Tạo transaction log
+                WalletTransaction::create([
+                    'wallet_id'       => $clientWallet->id,
+                    'user_id'         => Auth::id(),
+                    'type'            => 'payment',
+                    'amount'          => $checkoutSession['final_total'],
+                    'balance_before'  => $balanceBefore,
+                    'balance_after'   => $clientWallet->balance,
+                    'description'     => 'Thanh toán đơn hàng ' . $orderCode,
+                    'order_id'        => $order->id,
+                ]);
+
+                // Cập nhật trạng thái đơn hàng thành đã thanh toán
+                $order->update(['payment_status' => 'paid']);
             }
+
+            // Nếu là tiền mặt, có thể giữ payment_status = pending để shipper thu hộ
 
             // Tăng lượt dùng mã khuyến mãi nếu có
             if (!empty($checkoutSession['promotion']['promotion_id'])) {
@@ -652,8 +599,8 @@ class CheckoutController extends Controller
         }
 
         $promotionData = [
-            'code'          => $result['code'],
-            'promotion_id'  => $result['promotion_id'],
+            'code'           => $result['code'],
+            'promotion_id'   => $result['promotion_id'],
             'discount_amount'=> $result['discount'],
         ];
 
@@ -719,7 +666,6 @@ class CheckoutController extends Controller
             default:
                 $baseFee = 30000;
                 break;
-
         }
 
         // Miễn phí ship cho đơn trên 10.000.000

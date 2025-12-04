@@ -128,9 +128,6 @@
                         <label class="form-label">Phương thức thanh toán</label>
                         <select name="payment_method" class="form-select" required>
                             <option value="cash">Tiền mặt</option>
-                            <option value="bank">Chuyển khoản</option>
-                            <option value="momo">Ví Momo</option>
-                            <option value="paypal">PayPal</option>
                         </select>
                     </div>
                     <div class="mb-3">

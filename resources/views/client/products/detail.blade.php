@@ -69,23 +69,6 @@
                 <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
             </ol>
         </nav>
-
-        {{-- Product Name, SKU, Status --}}
-        <div class="mb-3">
-            <h1 class="h2 mb-2" style="font-weight:700;">{{ $product->name }}</h1>
-            @if ($product->sku)
-                <p class="text-muted small mb-1">SKU: <strong>{{ $product->sku }}</strong></p>
-            @endif
-            <p class="mb-0">
-                <span class="badge {{ $product->in_stock ? 'bg-success' : 'bg-danger' }}">
-                    {{ $product->in_stock ? '✓ Còn hàng' : '✗ Hết hàng' }}
-                </span>
-                @if ($product->total_sold > 0)
-                    <span class="badge bg-info ms-2">Đã bán: {{ $product->total_sold }}</span>
-                @endif
-            </p>
-        </div>
-
         {{-- Main Product Layout --}}
         <div class="row g-4 mb-5">
             {{-- B. PRODUCT GALLERY (Left) --}}
@@ -129,7 +112,7 @@
                 {{-- Tên + Giá --}}
                 <h2 style="font-size:28px; font-weight:700; margin-bottom:10px;">{{ $product->name }}</h2>
 
-                {{-- 3. Rating --}}
+                {{-- Rating + số lượng đánh giá --}}
                 <div class="mb-3 d-flex align-items-center gap-2">
                     <div class="rating-stars" style="color: #f4b400; font-size: 20px;">
                         @for ($i = 1; $i <= 5; $i++)
@@ -168,22 +151,9 @@
                     </p>
                 </div>
 
-                {{-- 4. Short Description --}}
-                @if ($product->short_description)
-                    <div class="mb-4">
-                        <ul class="list-unstyled">
-                            @foreach (explode("\n", $product->short_description) as $line)
-                                @if (trim($line))
-                                    <li class="mb-1">✓ {{ trim($line) }}</li>
-                                @endif
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                {{-- 5. Variants Selection --}}
-                @if ($product->variants && $product->variants->count() > 0)
-                    {{-- 5.1 Color Selection --}}
+                {{-- Chọn biến thể --}}
+                {{-- CHỌN MÀU --}}
+                @if ($product->variants->count() > 0)
                     <div style="margin-bottom:20px;">
                         <label style="font-weight:600; display:block; margin-bottom:6px;">Chọn màu:</label>
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -202,6 +172,7 @@
                         </div>
                     </div>
 
+                    {{-- CHỌN KÍCH CỠ --}}
                     <div style="margin-bottom:20px;">
                         <label style="font-weight:600; display:block; margin-bottom:6px;">Chọn kích cỡ:</label>
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -220,22 +191,24 @@
                         </div>
                     </div>
                 @else
-                <div style="margin-bottom:20px;">
-                    <label style="font-weight:600; display:block; margin-bottom:6px;">Chọn màu:</label>
-                    <button type="button" class="btn-variant active"
-                        style="border:1px solid #111; background:#111; color:#fff; padding:6px 12px; border-radius:6px;">
-                        {{ $product->color ?? 'Không xác định' }}
-                    </button>
-                </div>
+                    {{-- fallback nếu sản phẩm không có variant --}}
+                    <div style="margin-bottom:20px;">
+                        <label style="font-weight:600; display:block; margin-bottom:6px;">Chọn màu:</label>
+                        <button type="button" class="btn-variant active"
+                            style="border:1px solid #111; background:#111; color:#fff; padding:6px 12px; border-radius:6px;">
+                            {{ $product->color ?? 'Không xác định' }}
+                        </button>
+                    </div>
 
-                <div style="margin-bottom:20px;">
-                    <label style="font-weight:600; display:block; margin-bottom:6px;">Chọn kích cỡ:</label>
-                    <button type="button" class="btn-variant"
-                        style="border:1px solid #111; background:#fff; color:#111; padding:6px 12px; border-radius:6px;">
-                        {{ $product->length ?? '?' }}x{{ $product->width ?? '?' }}x{{ $product->height ?? '?' }}
-                    </button>
-                </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="font-weight:600; display:block; margin-bottom:6px;">Chọn kích cỡ:</label>
+                        <button type="button" class="btn-variant"
+                            style="border:1px solid #111; background:#fff; color:#111; padding:6px 12px; border-radius:6px;">
+                            {{ $product->length ?? '?' }}x{{ $product->width ?? '?' }}x{{ $product->height ?? '?' }}
+                        </button>
+                    </div>
                 @endif
+
 
                 {{-- Số lượng --}}
                 <div style="display:flex; align-items:center; margin-bottom:24px;">
@@ -253,7 +226,6 @@
 
 
                 {{-- Nút hành động --}}
-
                 <div style="display:flex; flex-wrap:wrap; gap:16px;">
                     <button type="button" id="wishlist-toggle" class="product-action-btn"
                         data-product-id="{{ $product->id }}" data-liked="{{ $isInWishlist ? 'true' : 'false' }}"
@@ -465,7 +437,9 @@
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
-                            body: JSON.stringify({ product_id: productId })
+                            body: JSON.stringify({
+                                product_id: productId
+                            })
                         })
                         .then(async res => {
                             if (res.status === 401) {
@@ -529,268 +503,253 @@
                 const baseProductStock = {{ (int) ($product->stock ?? 0) }};
                 @auth
                 const isAuthenticated = true;
-                @else
+            @else
                 const isAuthenticated = false;
-                @endauth
-                let selectedVariantId = null;
-                let currentMaxStock = productVariants.length > 0 ? 0 : baseProductStock;
+            @endauth
+            let selectedVariantId = null;
+            let currentMaxStock = productVariants.length > 0 ? 0 : baseProductStock;
 
-                const normalize = (value) => (value || '').toString().trim().toLowerCase();
-                const parseSize = (size) => {
-                    if (!size) {
-                        return {
-                            length: null,
-                            width: null,
-                            height: null
-                        };
-                    }
-                    const parts = size.split('x').map(num => parseInt(num, 10) || null);
+            const normalize = (value) => (value || '').toString().trim().toLowerCase();
+            const parseSize = (size) => {
+                if (!size) {
                     return {
-                        length: parts[0] ?? null,
-                        width: parts[1] ?? null,
-                        height: parts[2] ?? null,
+                        length: null,
+                        width: null,
+                        height: null
                     };
+                }
+                const parts = size.split('x').map(num => parseInt(num, 10) || null);
+                return {
+                    length: parts[0] ?? null,
+                    width: parts[1] ?? null,
+                    height: parts[2] ?? null,
                 };
+            };
 
-                const clampQuantity = () => {
-                    let val = parseInt(qtyInput.value, 10) || 1;
-                    if (val < 1) val = 1;
-                    if (currentMaxStock > 0 && val > currentMaxStock) {
-                        val = currentMaxStock;
-                    }
-                    qtyInput.value = val;
-                };
+            const clampQuantity = () => {
+                let val = parseInt(qtyInput.value, 10) || 1;
+                if (val < 1) val = 1;
+                if (currentMaxStock > 0 && val > currentMaxStock) {
+                    val = currentMaxStock;
+                }
+                qtyInput.value = val;
+            };
 
-                const updateSelectedVariant = () => {
-                    const activeColor = document.querySelector('.color-btn.active');
-                    const activeSize = document.querySelector('.size-btn.active');
+            const updateSelectedVariant = () => {
+                const activeColor = document.querySelector('.color-btn.active');
+                const activeSize = document.querySelector('.size-btn.active');
 
-                    if (!activeColor || !activeSize) {
-                        selectedVariantId = null;
-                        return null;
-                    }
+                if (!activeColor || !activeSize) {
+                    selectedVariantId = null;
+                    return null;
+                }
 
-                    const {
-                        length,
-                        width,
-                        height
-                    } = parseSize(activeSize.dataset.size);
+                const {
+                    length,
+                    width,
+                    height
+                } = parseSize(activeSize.dataset.size);
 
-                    const matchedVariant = productVariants.find(variant =>
-                        normalize(variant.color_name) === normalize(activeColor.dataset.color) &&
-                        Number(variant.length) === Number(length) &&
-                        Number(variant.width) === Number(width) &&
-                        Number(variant.height) === Number(height)
-                    );
+                const matchedVariant = productVariants.find(variant =>
+                    normalize(variant.color_name) === normalize(activeColor.dataset.color) &&
+                    Number(variant.length) === Number(length) &&
+                    Number(variant.width) === Number(width) &&
+                    Number(variant.height) === Number(height)
+                );
 
-                    selectedVariantId = matchedVariant ? matchedVariant.id : null;
-                    return matchedVariant;
-                };
+                selectedVariantId = matchedVariant ? matchedVariant.id : null;
+                return matchedVariant;
+            };
 
-                const updateStockInfo = () => {
-                    if (productVariants.length === 0) {
-                        stockDisplay.textContent = baseProductStock;
-                        currentMaxStock = baseProductStock;
-                        qtyInput.setAttribute('max', baseProductStock);
-                        clampQuantity();
-                        return;
-                    }
-
-                    const selectedVariant = updateSelectedVariant();
-
-                    if (selectedVariant && selectedVariant.stock > 0) {
-                        currentMaxStock = selectedVariant.stock;
-                        stockDisplay.textContent = currentMaxStock;
-                        qtyInput.setAttribute('max', currentMaxStock);
-                    } else if (selectedVariant) {
-                        currentMaxStock = 0;
-                        stockDisplay.textContent = '0 (Hết hàng)';
-                        qtyInput.setAttribute('max', 0);
-                    } else {
-                        stockDisplay.textContent = '-- (Vui lòng chọn phân loại)';
-                        currentMaxStock = 0;
-                        qtyInput.removeAttribute('max');
-                    }
-
+            const updateStockInfo = () => {
+                if (productVariants.length === 0) {
+                    stockDisplay.textContent = baseProductStock;
+                    currentMaxStock = baseProductStock;
+                    qtyInput.setAttribute('max', baseProductStock);
                     clampQuantity();
-                };
-
-                // Init stock display
-                // Auto-select first color and size to avoid missing selection
-                if (productVariants.length > 0) {
-                    const firstColor = document.querySelector('.color-btn');
-                    const firstSize = document.querySelector('.size-btn');
-                    if (firstColor && !document.querySelector('.color-btn.active')) {
-                        firstColor.classList.add('active');
-                        firstColor.style.background = '#111';
-                        firstColor.style.color = '#fff';
-                    }
-                    if (firstSize && !document.querySelector('.size-btn.active')) {
-                        firstSize.classList.add('active');
-                        firstSize.style.background = '#111';
-                        firstSize.style.color = '#fff';
-                    }
+                    return;
                 }
 
-                updateStockInfo();
+                const selectedVariant = updateSelectedVariant();
 
-                minus?.addEventListener('click', () => {
-                    let val = parseInt(qtyInput.value, 10) || 1;
-                    if (val > 1) {
-                        qtyInput.value = val - 1;
-                    }
-                });
+                if (selectedVariant && selectedVariant.stock > 0) {
+                    currentMaxStock = selectedVariant.stock;
+                    stockDisplay.textContent = currentMaxStock;
+                    qtyInput.setAttribute('max', currentMaxStock);
+                } else if (selectedVariant) {
+                    currentMaxStock = 0;
+                    stockDisplay.textContent = '0 (Hết hàng)';
+                    qtyInput.setAttribute('max', 0);
+                } else {
+                    stockDisplay.textContent = '-- (Vui lòng chọn phân loại)';
+                    currentMaxStock = 0;
+                    qtyInput.removeAttribute('max');
+                }
 
-                plus?.addEventListener('click', () => {
-                    let val = parseInt(qtyInput.value, 10) || 1;
-                    if (productVariants.length > 0 && currentMaxStock === 0) {
-                        alert('Vui lòng chọn Màu và Kích cỡ trước!');
-                        return;
-                    }
+                clampQuantity();
+            };
 
-                    if (currentMaxStock === 0 || val < currentMaxStock) {
-                        qtyInput.value = val + 1;
-                    } else {
-                        alert('Đã đạt giới hạn tồn kho (' + currentMaxStock + ')');
-                    }
-                });
+            updateStockInfo();
 
-                qtyInput.addEventListener('change', clampQuantity);
+            minus?.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value, 10) || 1;
+                if (val > 1) {
+                    qtyInput.value = val - 1;
+                }
+            });
 
-                document.querySelectorAll('.btn-variant').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const isColor = btn.classList.contains('color-btn');
-                        const group = isColor ? '.color-btn' : '.size-btn';
+            plus?.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value, 10) || 1;
+                if (productVariants.length > 0 && currentMaxStock === 0) {
+                    alert('Vui lòng chọn Màu và Kích cỡ trước! 590');
+                    return;
+                }
 
-                        document.querySelectorAll(group).forEach(b => {
-                            b.classList.remove('active');
-                            if (isColor && b.dataset.color) {
-                                b.style.background = b.dataset.color;
-                                b.style.color = '#fff';
-                            } else {
-                                b.style.background = '#fff';
-                                b.style.color = '#111';
-                            }
-                        });
+                if (currentMaxStock === 0 || val < currentMaxStock) {
+                    qtyInput.value = val + 1;
+                } else {
+                    alert('Đã đạt giới hạn tồn kho (' + currentMaxStock + ')');
+                }
+            });
 
-                        btn.classList.add('active');
-                        btn.style.background = '#111';
-                        btn.style.color = '#fff';
+            qtyInput.addEventListener('change', clampQuantity);
 
-                        updateStockInfo();
-                    });
-                });
+            document.querySelectorAll('.btn-variant').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const isColor = btn.classList.contains('color-btn');
+                    const group = isColor ? '.color-btn' : '.size-btn';
 
-                if (buyNowBtn && !buyNowBtn.dataset.bound) {
-                    buyNowBtn.dataset.bound = 'true';
-                    buyNowBtn.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        const quantity = parseInt(qtyInput.value, 10) || 1;
-                        const colorBtn = document.querySelector('.color-btn.active');
-                        const sizeBtn = document.querySelector('.size-btn.active');
-
-                        @if ($product->variants->count() > 0)
-                            if (!colorBtn || !sizeBtn) {
-                                alert('Vui lòng chọn màu và kích cỡ');
-                                return;
-                            }
-                            const selectedVariant = updateSelectedVariant();
-                            if (!selectedVariant || !selectedVariant.id) {
-                                alert('Không tìm thấy biến thể phù hợp cho lựa chọn hiện tại.');
-                                return;
-                            }
-                        @endif
-
-                        const params = new URLSearchParams({
-                            product_id: productId,
-                            qty: quantity,
-                            type: 'buy_now'
-                        });
-
-                        if (selectedVariantId) {
-                            params.append('variant_id', selectedVariantId);
-                        }
-                        if (colorBtn) {
-                            params.append('color', colorBtn.dataset.color);
-                        }
-                        if (sizeBtn) {
-                            params.append('size', sizeBtn.dataset.size);
-                        }
-
-                        if (isAuthenticated) {
-                            window.location.href = '{{ route('client.checkout.index') }}' + '?' + params.toString();
+                    document.querySelectorAll(group).forEach(b => {
+                        b.classList.remove('active');
+                        if (isColor && b.dataset.color) {
+                            b.style.background = b.dataset.color;
+                            b.style.color = '#fff';
                         } else {
-                            window.location.href = '{{ route('client.login') }}';
+                            b.style.background = '#fff';
+                            b.style.color = '#111';
                         }
                     });
-                }
+
+                    btn.classList.add('active');
+                    btn.style.background = '#111';
+                    btn.style.color = '#fff';
+
+                    updateStockInfo();
+                });
+            });
+
+            if (buyNowBtn && !buyNowBtn.dataset.bound) {
+                buyNowBtn.dataset.bound = 'true';
+                buyNowBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const quantity = parseInt(qtyInput.value, 10) || 1;
+                    const colorBtn = document.querySelector('.color-btn.active');
+                    const sizeBtn = document.querySelector('.size-btn.active');
+
+                    @if ($product->variants->count() > 0)
+                        if (!colorBtn || !sizeBtn) {
+                            alert('Vui lòng chọn màu và kích cỡ 637');
+                            return;
+                        }
+                        const selectedVariant = updateSelectedVariant();
+                        if (!selectedVariant || !selectedVariant.id) {
+                            alert('Không tìm thấy biến thể phù hợp cho lựa chọn hiện tại.');
+                            return;
+                        }
+                    @endif
+
+                    const params = new URLSearchParams({
+                        product_id: productId,
+                        qty: quantity,
+                        type: 'buy_now'
+                    });
+
+                    if (selectedVariantId) {
+                        params.append('variant_id', selectedVariantId);
+                    }
+                    if (colorBtn) {
+                        params.append('color', colorBtn.dataset.color);
+                    }
+                    if (sizeBtn) {
+                        params.append('size', sizeBtn.dataset.size);
+                    }
+
+                    if (isAuthenticated) {
+                        window.location.href = '{{ route('client.checkout.index') }}' + '?' + params
+                            .toString();
+                    } else {
+                        window.location.href = '{{ route('client.login') }}';
+                    }
+                });
+            }
 
             @auth
-                if (addBtn && !addBtn.dataset.bound) {
-                    addBtn.dataset.bound = 'true';
-                    addBtn.addEventListener('click', (event) => {
-                        event.preventDefault();
-                        const quantity = parseInt(qtyInput.value, 10) || 1;
-                        const colorBtn = document.querySelector('.color-btn.active');
-                        const sizeBtn = document.querySelector('.size-btn.active');
+            if (addBtn && !addBtn.dataset.bound) {
+                addBtn.dataset.bound = 'true';
+                addBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const quantity = parseInt(qtyInput.value, 10) || 1;
+                    const colorBtn = document.querySelector('.color-btn.active');
+                    const sizeBtn = document.querySelector('.size-btn.active');
 
-                @if ($product->variants->count() > 0)
-                    if (!colorBtn || !sizeBtn) {
-                        alert('Vui lòng chọn màu và kích cỡ');
-                        return;
-                    }
-                    const selectedVariant = updateSelectedVariant();
-                    if (!selectedVariant || !selectedVariant.id) {
-                        alert('Không tìm thấy biến thể hợp lệ.');
-                        return;
-                    }
-                @endif
-
-                const payload = {
-                    product_id: {{ $product->id }},
-                    quantity: quantity,
-                    color: colorBtn ? colorBtn.dataset.color : null,
-                    size: sizeBtn ? sizeBtn.dataset.size : null,
-                    variant_id: selectedVariantId
-                };
-
-                const originalHTML = addBtn.innerHTML;
-                addBtn.disabled = true;
-                addBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang thêm...';
-
-                fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(res => {
-                        if (res.status === 401) {
-                            window.location.href = '{{ route('client.login') }}';
-                            return null;
+                    @if ($product->variants->count() > 0)
+                        if (!colorBtn || !sizeBtn) {
+                            alert('Vui lòng chọn màu và kích cỡ ');
+                            return;
                         }
-                        return res.json();
-                    })
-                    .then(data => {
-                        if (!data) return;
-                        if (data.status === 'success') {
-                            alert('Đã thêm vào giỏ hàng!');
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Không thể thêm vào giỏ hàng.');
-                            addBtn.disabled = false;
-                            addBtn.innerHTML = originalHTML;
+                        const selectedVariant = updateSelectedVariant();
+                        if (!selectedVariant || !selectedVariant.id) {
+                            alert('Không tìm thấy biến thể hợp lệ.');
+                            return;
                         }
+                    @endif
+
+                    const payload = {
+                        product_id: {{ $product->id }},
+                        quantity: quantity,
+                        color: colorBtn ? colorBtn.dataset.color : null,
+                        size: sizeBtn ? sizeBtn.dataset.size : null,
+                        variant_id: selectedVariantId
+                    };
+
+                    const originalHTML = addBtn.innerHTML;
+                    addBtn.disabled = true;
+                    addBtn.innerHTML =
+                        '<span class="spinner-border spinner-border-sm me-2"></span>Đang thêm...';
+
+                    fetch("{{ route('cart.add') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                        .then(res => {
+                            if (res.status === 401) {
+                                window.location.href = '{{ route('client.login') }}';
+                                return null;
+                            }
+                            return res.json();
+                        })
+                        .then(data => {
+                            if (!data) return;
+                            if (data.status === 'success') {
+                                alert('Đã thêm vào giỏ hàng!');
+                                window.location.reload();
+                            } else {
+                                alert(data.message || 'Không thể thêm vào giỏ hàng.');
+                                addBtn.disabled = false;
+                                addBtn.innerHTML = originalHTML;
+                            }
                         })
                         .catch(() => {
                             alert('Có lỗi xảy ra, vui lòng thử lại.');
                             addBtn.disabled = false;
                             addBtn.innerHTML = originalHTML;
                         });
-                    });
-                }
+                });
+            }
             @endauth
             });
         </script>
@@ -816,8 +775,6 @@
                 margin: 0;
             }
         </style>
-        =======
-        >>>>>>> feature/review-system-improvements
     </div>
 
     {{-- Lightbox Modal --}}
@@ -981,18 +938,31 @@
             });
 
             function addToCart() {
-                if (productData.variants.length > 0 && (!selectedColor || !selectedSize)) {
+                const colorBtn = document.querySelector('.color-btn.active');
+                const sizeBtn = document.querySelector('.size-btn.active');
+                if (productData.variants.length > 0 && (!colorBtn || !sizeBtn)) {
                     alert('Vui lòng chọn màu và kích cỡ');
                     return;
                 }
 
                 const quantity = parseInt(document.getElementById('product-quantity').value) || 1;
+
+                let variantIdForSubmit = null;
+                if (colorBtn && sizeBtn) {
+                    const [l, w, h] = (sizeBtn.dataset.size || '').split('x').map(Number);
+                    const match = productData.variants.find(v =>
+                        (v.color_name || '').toLowerCase() === (colorBtn.dataset.color || '').toLowerCase() &&
+                        v.length === l && v.width === w && v.height === h
+                    );
+                    variantIdForSubmit = match ? match.id : null;
+                }
+
                 const payload = {
                     product_id: productData.id,
                     quantity: quantity,
-                    variant_id: selectedVariantId,
-                    color: selectedColor,
-                    size: selectedSize
+                    variant_id: variantIdForSubmit,
+                    color: colorBtn ? colorBtn.dataset.color : null,
+                    size: sizeBtn ? sizeBtn.dataset.size : null
                 };
 
                 fetch("{{ route('cart.add') }}", {
@@ -1019,17 +989,21 @@
                     });
             }
 
-            // Buy Now
-            document.getElementById('buy-now-btn')?.addEventListener('click', function() {
-                buyNow();
-            });
-
-            document.getElementById('mobile-buy-now')?.addEventListener('click', function() {
-                buyNow();
-            });
+            // Buy Now (chỉ gắn 1 handler, tránh duplicated alerts)
+            (function() {
+                const btn = document.getElementById('buy-now-btn');
+                if (btn && !btn.dataset.bound) {
+                    btn.dataset.bound = 'true';
+                    btn.addEventListener('click', function() {
+                        buyNow();
+                    });
+                }
+            })();
 
             function buyNow() {
-                if (productData.variants.length > 0 && (!selectedColor || !selectedSize)) {
+                const colorBtn = document.querySelector('.color-btn.active');
+                const sizeBtn = document.querySelector('.size-btn.active');
+                if (productData.variants.length > 0 && (!colorBtn || !sizeBtn)) {
                     alert('Vui lòng chọn màu và kích cỡ');
                     return;
                 }
@@ -1041,9 +1015,19 @@
                     type: 'buy_now'
                 });
 
-                if (selectedVariantId) params.append('variant_id', selectedVariantId);
-                if (selectedColor) params.append('color', selectedColor);
-                if (selectedSize) params.append('size', selectedSize);
+                let variantIdForSubmit = null;
+                if (colorBtn && sizeBtn) {
+                    const [l, w, h] = (sizeBtn.dataset.size || '').split('x').map(Number);
+                    const match = productData.variants.find(v =>
+                        (v.color_name || '').toLowerCase() === (colorBtn.dataset.color || '').toLowerCase() &&
+                        v.length === l && v.width === w && v.height === h
+                    );
+                    variantIdForSubmit = match ? match.id : null;
+                }
+
+                if (variantIdForSubmit) params.append('variant_id', variantIdForSubmit);
+                if (colorBtn) params.append('color', colorBtn.dataset.color);
+                if (sizeBtn) params.append('size', sizeBtn.dataset.size);
 
                 @auth
                 window.location.href = '{{ route('client.checkout.index') }}?' + params.toString();
@@ -1130,11 +1114,7 @@
                     });
                 }
 
-                // Initialize first color if exists
-                const firstColorBtn = document.querySelector('.variant-color-btn');
-                if (firstColorBtn) {
-                    firstColorBtn.click();
-                }
+                // Không tự động chọn biến thể mặc định
 
                 // Handle "Xem đánh giá" link - switch to reviews tab
                 const reviewsLink = document.querySelector('a[href="#reviews-section"]');

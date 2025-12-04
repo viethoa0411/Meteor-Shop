@@ -35,7 +35,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Họ tên <span class="text-danger">*</span></label>
                                 <input type="text" name="customer_name" class="form-control"
-                                    value="{{ old('customer_name', $user->name ?? '') }}" required>
+                                    value="{{ old('customer_name', $checkoutData['customer_name'] ?? $user->name ?? '') }}" required>
                                 @error('customer_name')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -46,7 +46,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
                                     <input type="text" name="customer_phone" class="form-control"
-                                        value="{{ old('customer_phone', $user->phone ?? '') }}" required>
+                                        value="{{ old('customer_phone', $checkoutData['customer_phone'] ?? $user->phone ?? '') }}" required>
                                     @error('customer_phone')
                                         <div class="text-danger small">{{ $message }}</div>
                                     @enderror
@@ -56,7 +56,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email <span class="text-danger">*</span></label>
                                     <input type="email" name="customer_email" class="form-control"
-                                        value="{{ old('customer_email', $user->email ?? '') }}" required>
+                                        value="{{ old('customer_email', $checkoutData['customer_email'] ?? $user->email ?? '') }}" required>
                                     @error('customer_email')
                                         <div class="text-danger small">{{ $message }}</div>
                                     @enderror
@@ -96,7 +96,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Số nhà, tên đường <span class="text-danger">*</span></label>
                                 <input type="text" name="shipping_address" class="form-control"
-                                    value="{{ old('shipping_address') }}" required>
+                                    value="{{ old('shipping_address', $checkoutData['shipping_address'] ?? '') }}" required>
                                 @error('shipping_address')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -135,27 +135,33 @@
                             {{-- Phương thức thanh toán --}}
                             <div class="mb-3">
                                 <label class="form-label">Phương thức thanh toán <span class="text-danger">*</span></label>
-                                <div class="form-check">
+                                <div class="form-check mb-2">
                                     <input class="form-check-input" type="radio" name="payment_method" id="cash"
                                         value="cash" {{ old('payment_method', 'cash') == 'cash' ? 'checked' : '' }} required>
                                     <label class="form-check-label" for="cash">
                                         <strong>Thanh toán khi nhận hàng (COD)</strong>
                                     </label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="payment_method" id="bank"
-                                        value="bank" {{ old('payment_method') == 'bank' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="bank">
-                                        <strong>Chuyển khoản ngân hàng</strong>
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="payment_method" id="momo"
-                                        value="momo" {{ old('payment_method') == 'momo' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="momo">
-                                        <strong>Ví Momo</strong>
-                                    </label>
-                                </div>
+
+                                @auth
+                                    @php
+                                        $wallet = \App\Models\ClientWallet::where('user_id', auth()->id())->first();
+                                        $walletBalance = $wallet ? $wallet->balance : 0;
+                                    @endphp
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="wallet"
+                                            value="wallet" {{ old('payment_method') == 'wallet' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="wallet">
+                                            <strong>Thanh toán bằng Ví</strong>
+                                            <span class="text-muted ms-2">(Số dư: {{ number_format($walletBalance) }}đ)</span>
+                                        </label>
+                                    </div>
+                                    <div id="wallet-warning" class="alert alert-warning mt-2 py-2 d-none">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Số dư ví không đủ. <a href="{{ route('client.account.wallet.deposit') }}">Nạp thêm tiền</a>
+                                    </div>
+                                @endauth
+
                                 @error('payment_method')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -264,7 +270,163 @@
 
     @push('scripts')
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            // Load dữ liệu địa chỉ từ API
+            let provinces = [];
+            let districts = [];
+            let wards = [];
+
+            // Load tỉnh/thành phố
+            async function loadProvinces() {
+                try {
+                    const response = await fetch('https://provinces.open-api.vn/api/?depth=1');
+                    if (!response.ok) {
+                        throw new Error('Không thể tải dữ liệu từ API');
+                    }
+                    provinces = await response.json();
+                    const citySelect = document.getElementById('shipping_city');
+                    if (!citySelect) return;
+                    
+                    provinces.forEach(province => {
+                        const option = document.createElement('option');
+                        option.value = province.name;
+                        option.textContent = province.name;
+                        option.dataset.code = province.code;
+                        citySelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Lỗi khi tải danh sách tỉnh/thành phố:', error);
+                    const citySelect = document.getElementById('shipping_city');
+                    if (citySelect) {
+                        const errorOption = document.createElement('option');
+                        errorOption.value = '';
+                        errorOption.textContent = 'Không thể tải dữ liệu. Vui lòng tải lại trang.';
+                        citySelect.appendChild(errorOption);
+                    }
+                }
+            }
+
+            // Load quận/huyện
+            async function loadDistricts(provinceCode) {
+                try {
+                    const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+                    if (!response.ok) {
+                        throw new Error('Không thể tải dữ liệu quận/huyện');
+                    }
+                    const data = await response.json();
+                    districts = data.districts || [];
+                    const districtSelect = document.getElementById('shipping_district');
+                    if (!districtSelect) return;
+                    
+                    districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+                    districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.name;
+                        option.textContent = district.name;
+                        option.dataset.code = district.code;
+                        districtSelect.appendChild(option);
+                    });
+                    districtSelect.disabled = false;
+                    // Reset phường/xã
+                    const wardSelect = document.getElementById('shipping_ward');
+                    if (wardSelect) {
+                        wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                        wardSelect.disabled = true;
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi tải danh sách quận/huyện:', error);
+                    const districtSelect = document.getElementById('shipping_district');
+                    if (districtSelect) {
+                        districtSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+                    }
+                }
+            }
+
+            // Load phường/xã
+            async function loadWards(districtCode) {
+                try {
+                    const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+                    if (!response.ok) {
+                        throw new Error('Không thể tải dữ liệu phường/xã');
+                    }
+                    const data = await response.json();
+                    wards = data.wards || [];
+                    const wardSelect = document.getElementById('shipping_ward');
+                    if (!wardSelect) return;
+                    
+                    wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                    wards.forEach(ward => {
+                        const option = document.createElement('option');
+                        option.value = ward.name;
+                        option.textContent = ward.name;
+                        wardSelect.appendChild(option);
+                    });
+                    wardSelect.disabled = false;
+                } catch (error) {
+                    console.error('Lỗi khi tải danh sách phường/xã:', error);
+                    const wardSelect = document.getElementById('shipping_ward');
+                    if (wardSelect) {
+                        wardSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+                    }
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', async function() {
+                // Lấy thông tin địa chỉ cũ từ reorder (nếu có)
+                const savedCity = @json($checkoutData['shipping_city'] ?? null);
+                const savedDistrict = @json($checkoutData['shipping_district'] ?? null);
+                const savedWard = @json($checkoutData['shipping_ward'] ?? null);
+
+                // Load tỉnh/thành phố khi trang load
+                await loadProvinces();
+
+                // Nếu có địa chỉ cũ, tự động chọn
+                if (savedCity) {
+                    const citySelect = document.getElementById('shipping_city');
+                    for (let option of citySelect.options) {
+                        if (option.value === savedCity) {
+                            citySelect.value = savedCity;
+                            if (option.dataset.code) {
+                                await loadDistricts(option.dataset.code);
+
+                                if (savedDistrict) {
+                                    const districtSelect = document.getElementById('shipping_district');
+                                    for (let dOption of districtSelect.options) {
+                                        if (dOption.value === savedDistrict) {
+                                            districtSelect.value = savedDistrict;
+                                            if (dOption.dataset.code) {
+                                                await loadWards(dOption.dataset.code);
+
+                                                if (savedWard) {
+                                                    const wardSelect = document.getElementById('shipping_ward');
+                                                    wardSelect.value = savedWard;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                // Xử lý khi chọn tỉnh/thành phố
+                document.getElementById('shipping_city').addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    if (selectedOption.dataset.code) {
+                        loadDistricts(selectedOption.dataset.code);
+                    }
+                });
+
+                // Xử lý khi chọn quận/huyện
+                document.getElementById('shipping_district').addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    if (selectedOption.dataset.code) {
+                        loadWards(selectedOption.dataset.code);
+                    }
+                });
+
                 const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
                 const subtotal = {{ $subtotal }};
 

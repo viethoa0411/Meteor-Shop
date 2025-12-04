@@ -60,6 +60,10 @@
         }
 
         /* Submenu */
+        .dropdown-menu-item {
+            border-top: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
         .submenu {
             display: none;
             background-color: #f8f9fa;
@@ -310,7 +314,6 @@
         <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Meteor-Shop</a>
 
         <div class="ms-auto d-flex align-items-center">
-
             <!-- Nút Dark/Light -->
             <button id="themeToggle" class="btn btn-outline-secondary me-3">
                 <i id="themeIcon" class="bi bi-moon-fill"></i>
@@ -337,13 +340,11 @@
                     </li>
                 </ul>
             </div>
-
         </div>
     </nav>
 
     <!-- Admin Layout -->
     <div class="admin-container">
-
         <!-- Sidebar -->
         <aside class="sidebar">
             <h5>Quản trị</h5>
@@ -362,40 +363,48 @@
                class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam me-2"></i> Sản phẩm
             </a>
-            <!-- Quản lý bình luận -->
+
+            {{-- Quản lý bình luận --}}
+            @php
+                $pendingCount = \App\Models\Review::pending()->count();
+                $reportedCount = \App\Models\Review::reported()->count();
+            @endphp
             <div class="dropdown-menu-item {{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                 <a href="#" class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                     <i class="bi bi-chat-dots me-2"></i> Quản lý bình luận
                     <i class="bi bi-chevron-right float-end"></i>
                 </a>
                 <div class="submenu">
-                    <a href="{{ route('admin.comments.index') }}" class="{{ request()->routeIs('admin.comments.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.comments.index') }}"
+                       class="{{ request()->routeIs('admin.comments.index') ? 'active' : '' }}">
                         <i class="bi bi-list-ul me-2"></i> Tất cả bình luận
                     </a>
-                    <a href="{{ route('admin.comments.pending') }}" class="{{ request()->routeIs('admin.comments.pending') ? 'active' : '' }}">
+
+                    <a href="{{ route('admin.comments.pending') }}"
+                       class="{{ request()->routeIs('admin.comments.pending') ? 'active' : '' }}">
                         <i class="bi bi-clock-history me-2"></i> Chờ duyệt
-                        @php
-                            $pendingCount = \App\Models\Review::pending()->count();
-                        @endphp
                         @if($pendingCount > 0)
                             <span class="badge bg-warning text-dark ms-2">{{ $pendingCount }}</span>
                         @endif
                     </a>
-                    <a href="{{ route('admin.comments.reported') }}" class="{{ request()->routeIs('admin.comments.reported') ? 'active' : '' }}">
+
+                    <a href="{{ route('admin.comments.reported') }}"
+                       class="{{ request()->routeIs('admin.comments.reported') ? 'active' : '' }}">
                         <i class="bi bi-flag me-2"></i> Bị báo cáo
-                        @php
-                            $reportedCount = \App\Models\Review::reported()->count();
-                        @endphp
                         @if($reportedCount > 0)
                             <span class="badge bg-danger ms-2">{{ $reportedCount }}</span>
                         @endif
                     </a>
-                    <a href="{{ route('admin.comments.settings') }}" class="{{ request()->routeIs('admin.comments.settings*') ? 'active' : '' }}">
+
+                    <a href="{{ route('admin.comments.settings') }}"
+                       class="{{ request()->routeIs('admin.comments.settings*') ? 'active' : '' }}">
                         <i class="bi bi-gear me-2"></i> Cài đặt
                     </a>
                 </div>
             </div>
-            <a href="{{ route('admin.orders.list') }}" class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+
+            <a href="{{ route('admin.orders.list') }}"
+               class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                 <i class="bi bi-cart-fill me-2"></i> Đơn hàng
             </a>
 
@@ -409,12 +418,13 @@
                 <i class="bi bi-heart-fill me-2"></i> Sản phẩm yêu thích
             </a>
 
+            {{-- Chatbox --}}
+            @php
+                $unreadChatCount = \App\Models\ChatSession::where('unread_count', '>', 0)->count();
+            @endphp
             <a href="{{ route('admin.chatbox.index') }}"
                class="{{ request()->routeIs('admin.chatbox.*') ? 'active' : '' }}">
                 <i class="bi bi-chat-dots-fill me-2"></i> Chatbox
-                @php
-                    $unreadChatCount = \App\Models\ChatSession::where('unread_count', '>', 0)->count();
-                @endphp
                 @if ($unreadChatCount > 0)
                     <span class="badge bg-danger ms-1">{{ $unreadChatCount }}</span>
                 @endif
@@ -429,17 +439,13 @@
                class="{{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                 <i class="bi bi-image-fill me-2"></i> Quản lý Banner
             </a>
+
             <a href="{{ route('admin.promotions.list') }}"
-                class="{{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}">
+               class="{{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}">
                 <i class="bi bi-ticket-perforated me-2"></i> Quản lý Voucher
             </a>
-            <!-- Quản lý Ví -->
-            <a href="{{ route('admin.wallet.index') }}"
-               class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
-                <i class="bi bi-wallet2 me-2"></i> Quản lý Ví
-            </a>
 
-            <!-- Quản lý tài khoản -->
+            {{-- Quản lý tài khoản --}}
             <div class="dropdown-menu-item {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
                 <a href="#" class="{{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
                     <i class="bi bi-people-fill me-2"></i> Quản lý tài khoản
@@ -457,6 +463,24 @@
                 </div>
             </div>
 
+            {{-- Quản lý Ví --}}
+            @php
+                $pendingDeposits = \App\Models\DepositRequest::where('status', 'pending')->count();
+                $pendingWithdraws = \App\Models\WithdrawRequest::whereIn('status', ['pending', 'processing'])->count();
+                $totalPending = $pendingDeposits + $pendingWithdraws;
+            @endphp
+            <a href="{{ route('admin.wallet.index') }}"
+               class="{{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
+                <i class="bi bi-wallet2 me-2"></i> Quản lý Ví
+                @if($totalPending > 0)
+                    <span class="badge bg-danger ms-1">{{ $totalPending > 99 ? '99+' : $totalPending }}</span>
+                @endif
+            </a>
+
+            <a href="#"
+               class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                <i class="bi bi-gear-fill me-2"></i> Cài đặt
+            </a>
         </aside>
 
         <!-- Content -->
@@ -479,7 +503,6 @@
 
     <!-- Admin comments shared JS (không cần Vite) -->
     <script src="{{ asset('js/admin-comments.js') }}"></script>
-    @stack('scripts')
 
     <script>
         // Dark mode

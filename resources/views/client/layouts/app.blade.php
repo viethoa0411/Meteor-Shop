@@ -552,15 +552,22 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end mt-2">
                                     <li>
+                                        <a class="dropdown-item" href="{{ route('client.account.wallet.index') }}">
+                                            <i class="bi bi-wallet2 me-2"></i>Ví của tôi
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" href="{{ route('client.account.orders.index') }}">
-                                            Đơn hàng của tôi
+                                            <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form action="{{ route('client.logout') }}" method="POST">
                                             @csrf
-                                            <button class="dropdown-item" type="submit">Đăng xuất</button>
+                                            <button class="dropdown-item" type="submit">
+                                                <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                            </button>
                                         </form>
                                     </li>
                                 </ul>
@@ -605,6 +612,8 @@
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="{{ route('client.contact.list') }}">Thiết kế nội thất</a></li>
                     <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
+                    <li><a href="#">Tư vấn thiết kế</a></li>
+
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </div>
@@ -1634,7 +1643,6 @@
 
                 try {
                     let response;
-
                     // Get CSRF token
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
@@ -1642,6 +1650,7 @@
                         // Send with FormData for image upload
                         const formData = new FormData();
                         formData.append('_token', csrfToken);
+
                         formData.append('image', imageFile);
                         if (message.trim()) {
                             formData.append('message', message);
@@ -1663,6 +1672,7 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+
                                 'Accept': 'application/json',
                                 'X-CSRF-TOKEN': csrfToken
                             },

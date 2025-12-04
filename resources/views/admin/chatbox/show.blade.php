@@ -66,7 +66,11 @@
                                  style="max-width: 70%;">
                                 <div class="p-2 px-3 rounded-3 {{ $message->sender_type == 'client' ? 'bg-white' : ($message->sender_type == 'bot' ? 'bg-info text-white' : 'bg-primary text-white') }}">
                                     @if($message->sender_type != 'client')
+<<<<<<< HEAD
                                         <small class="d-block mb-1 text-white-50">
+=======
+                                        <small class="d-block mb-1 {{ $message->sender_type == 'bot' ? 'text-white-50' : 'text-white-50' }}">
+>>>>>>> origin/Online_payment
                                             {{ $message->sender_type == 'bot' ? '🤖 Bot' : $message->sender->name ?? 'Admin' }}
                                         </small>
                                     @endif

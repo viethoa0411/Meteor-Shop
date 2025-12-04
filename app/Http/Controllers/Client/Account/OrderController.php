@@ -8,6 +8,10 @@ use App\Http\Requests\Client\Order\ReturnOrderRequest;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderLog;
+use App\Models\ClientWallet;
+use App\Models\WalletTransaction;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +22,8 @@ class OrderController extends Controller
         $userId = $request->user()->id;
         $status = $request->get('status', 'all');
 
-        $ordersQuery = Order::with(['items.product'])
+
+        $ordersQuery = Order::with(['items.product', 'walletTransactions'])
             ->ownedBy($userId)
             ->status($status)
             ->latest('order_date')
@@ -48,9 +53,7 @@ class OrderController extends Controller
     public function show(Request $request, Order $order)
     {
         $this->authorizeOwnership($request->user()->id, $order);
-
-        $order->loadMissing(['items.product']);
-
+        $order->loadMissing(['items.product', 'walletTransactions']);
         return view('client.account.orders.show', compact('order'));
     }
 
@@ -77,14 +80,56 @@ class OrderController extends Controller
             return back()->with('error', 'Đơn hàng không thể hủy ở trạng thái hiện tại.');
         }
 
-        $order->update([
-            'order_status' => 'cancelled',
-            'cancel_reason' => $request->reason,
-            'notes' => $request->notes,
-            'cancelled_at' => now(),
-        ]);
+        DB::beginTransaction();
+        try {
+            // Hoàn tiền vào ví nếu đã thanh toán bằng wallet
+            $refundMessage = '';
+            if ($order->payment_method === 'wallet' && $order->payment_status === 'paid') {
+                $wallet = ClientWallet::where('user_id', $order->user_id)->first();
 
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
+
+                if ($wallet) {
+                    $refundAmount = $order->final_total;
+                    $balanceBefore = $wallet->balance;
+
+                    // Hoàn tiền vào ví
+                    $wallet->addBalance($refundAmount);
+
+                    // Tạo transaction log
+                    WalletTransaction::create([
+                        'wallet_id' => $wallet->id,
+                        'user_id' => $order->user_id,
+                        'type' => 'refund',
+                        'amount' => $refundAmount,
+                        'balance_before' => $balanceBefore,
+                        'balance_after' => $wallet->balance,
+                        'description' => 'Hoàn tiền hủy đơn hàng ' . $order->order_code,
+                        'order_id' => $order->id,
+                    ]);
+
+                    $refundMessage = ' Đã hoàn ' . number_format($refundAmount, 0, ',', '.') . 'đ vào ví của bạn.';
+                }
+            }
+
+            $order->update([
+                'order_status' => 'cancelled',
+                'cancel_reason' => $request->reason,
+                'notes' => $request->notes,
+                'cancelled_at' => now(),
+                'payment_status' => $order->payment_method === 'wallet' ? 'refunded' : $order->payment_status,
+            ]);
+
+            $this->logStatusChange($order, 'cancelled', $request->user()->id);
+
+            DB::commit();
+
+            return back()->with('success', 'Đơn hàng đã được hủy thành công.' . $refundMessage);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Có lỗi xảy ra khi hủy đơn hàng: ' . $e->getMessage());
+        }
+
     }
 
     public function reorder(Request $request, Order $order)
@@ -95,31 +140,55 @@ class OrderController extends Controller
             return back()->with('error', 'Chỉ có thể mua lại đơn đã hoàn tất hoặc đã hủy.');
         }
 
-        DB::transaction(function () use ($order, $request) {
-            $cart = Cart::firstOrCreate(
-                ['user_id' => $request->user()->id, 'status' => 'active'],
-                ['total_price' => 0]
-            );
+        $user = $request->user();
+        $cartItems = [];
+        $subtotal = 0;
 
-            $cart->items()->delete();
-
-            foreach ($order->items as $item) {
-                // Chỉ thêm sản phẩm còn tồn tại
-                if ($item->product_id && \App\Models\Product::find($item->product_id)) {
-                    CartItem::create([
-                        'cart_id' => $cart->id,
-                        'product_id' => $item->product_id,
-                        'quantity' => $item->quantity,
-                        'price' => $item->price,
-                        'subtotal' => $item->subtotal,
-                    ]);
-                }
+        foreach ($order->items as $item) {
+            $product = \App\Models\Product::find($item->product_id);
+            if (!$product) {
+                continue;
             }
 
-            $cart->recalculateTotals();
-        });
+            $itemSubtotal = $item->price * $item->quantity;
+            $subtotal += $itemSubtotal;
 
-        return back()->with('success', 'Đã sao chép sản phẩm vào giỏ hàng. Vui lòng kiểm tra giỏ hàng của bạn.');
+            $cartItems[] = [
+                'product_id' => $item->product_id,
+                'variant_id' => $item->variant_id ?? null,
+                'name' => $product->name,
+                'price' => $item->price,
+                'quantity' => $item->quantity,
+                'subtotal' => $itemSubtotal,
+                'image' => $product->image,
+                'color' => $item->color ?? null,
+                'size' => $item->size ?? null,
+            ];
+        }
+
+        if (empty($cartItems)) {
+            return back()->with('error', 'Không có sản phẩm nào còn tồn tại để mua lại.');
+        }
+
+        // Tạo checkout session
+        $checkoutSession = [
+            'type' => 'reorder',
+            'order_id' => $order->id,
+            'items' => $cartItems,
+            'subtotal' => $subtotal,
+            'customer_name' => $user->name,
+            'customer_phone' => $user->phone ?? $order->customer_phone,
+            'customer_email' => $user->email,
+            'shipping_city' => $order->shipping_city,
+            'shipping_district' => $order->shipping_district,
+            'shipping_ward' => $order->shipping_ward,
+            'shipping_address' => $order->shipping_address,
+        ];
+
+        session(['checkout_session' => $checkoutSession]);
+
+        // Chuyển hướng sang trang thanh toán
+        return redirect()->route('client.checkout.index');
     }
 
     public function returnRequest(ReturnOrderRequest $request, Order $order)
