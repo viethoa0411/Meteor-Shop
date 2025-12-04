@@ -14,12 +14,13 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    private const ADMIN_EDITABLE_STATUSES = ['processing', 'shipping', 'returned'];
+    private const ADMIN_EDITABLE_STATUSES = ['processing', 'shipping', 'delivered', 'returned'];
 
     private const STATUS_TRANSITIONS = [
         'pending' => ['processing'],
         'processing' => ['shipping', 'returned'],
-        'shipping' => [], // Không cho admin cập nhật từ shipping, user sẽ cập nhật sang completed
+        'shipping' => ['delivered'],
+        'delivered' => [],
         'return_requested' => ['returned'],
         'returned' => [],
         'completed' => [],
@@ -147,6 +148,7 @@ class OrderController extends Controller
         $statusTimestamps = [
             'processing' => 'confirmed_at',
             'shipping'   => 'shipped_at',
+            'delivered'  => 'delivered_at',
             'returned'   => 'returned_at',
         ];
 
@@ -203,6 +205,7 @@ class OrderController extends Controller
         $statusLabels = [
             'processing' => 'Đang xử lý',
             'shipping' => 'Đang giao hàng',
+            'delivered' => 'Đã giao',
             'returned' => 'Đã trả hàng',
         ];
 

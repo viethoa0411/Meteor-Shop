@@ -282,7 +282,7 @@
                                 <i class="bi bi-chevron-down"></i>
                             </button>
                         </div>
-                        
+
                         <form method="GET" action="{{ route('admin.dashboard') }}" id="orderFilterForm">
                             {{-- Giữ lại filter doanh thu nếu có --}}
                             @if($startDate)
@@ -291,7 +291,7 @@
                             @if($endDate)
                                 <input type="hidden" name="end_date" value="{{ $endDate }}">
                             @endif
-                            
+
                             <div class="collapse d-md-block" id="filterCollapse">
                                 {{-- Loại filter --}}
                                 <div class="row g-3 mb-3">
@@ -348,8 +348,8 @@
                                         <label for="order_start_date" class="form-label small fw-semibold">
                                             <i class="bi bi-calendar-event me-1 text-primary"></i>Từ ngày
                                         </label>
-                                        <input type="date" name="order_start_date" id="order_start_date" 
-                                            class="form-control" 
+                                        <input type="date" name="order_start_date" id="order_start_date"
+                                            class="form-control"
                                             value="{{ $orderFilterStartDate ?? '' }}">
                                     </div>
 
@@ -357,8 +357,8 @@
                                         <label for="order_end_date" class="form-label small fw-semibold">
                                             <i class="bi bi-calendar-event-fill me-1 text-primary"></i>Đến ngày
                                         </label>
-                                        <input type="date" name="order_end_date" id="order_end_date" 
-                                            class="form-control" 
+                                        <input type="date" name="order_end_date" id="order_end_date"
+                                            class="form-control"
                                             value="{{ $orderFilterEndDate ?? '' }}">
                                     </div>
                                 </div>
@@ -389,7 +389,7 @@
                                         <a href="{{ route('admin.orders.list') }}" class="btn btn-outline-primary">
                                             <i class="bi bi-list-ul me-1"></i>Xem tất cả
                                         </a>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -539,6 +539,7 @@
                                                     'pending' => ['label' => 'Chờ xử lý', 'color' => 'warning', 'icon' => 'bi-hourglass-split'],
                                                     'processing' => ['label' => 'Đang xử lý', 'color' => 'info', 'icon' => 'bi-gear'],
                                                     'shipping' => ['label' => 'Đang giao hàng', 'color' => 'primary', 'icon' => 'bi-truck'],
+                                                    'delivered' => ['label' => 'Đã giao', 'color' => 'success', 'icon' => 'bi-box-seam'],
                                                     'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'bi-check-circle'],
                                                     'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
                                                 ];
@@ -547,7 +548,7 @@
                                             <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('admin.orders.show', $order->id) }}" 
+                                            <a href="{{ route('admin.orders.show', $order->id) }}"
                                                class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-eye me-1"></i>Chi tiết
                                             </a>
@@ -573,6 +574,7 @@
                                     'pending' => ['label' => 'Chờ xử lý', 'color' => 'warning', 'icon' => 'bi-hourglass-split'],
                                     'processing' => ['label' => 'Đang xử lý', 'color' => 'info', 'icon' => 'bi-gear'],
                                     'shipping' => ['label' => 'Đang giao hàng', 'color' => 'primary', 'icon' => 'bi-truck'],
+                                    'delivered' => ['label' => 'Đã giao', 'color' => 'success', 'icon' => 'bi-box-seam'],
                                     'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'bi-check-circle'],
                                     'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
                                 ];
@@ -589,7 +591,7 @@
                                         </div>
                                         <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <div class="d-flex align-items-center mb-2">
                                             <i class="bi bi-person-circle text-muted me-2"></i>
@@ -599,13 +601,13 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
                                         <div>
                                             <small class="text-muted d-block">Tổng tiền</small>
                                             <span class="fw-bold text-success fs-5">{{ number_format($order->final_total) }} ₫</span>
                                         </div>
-                                        <a href="{{ route('admin.orders.show', $order->id) }}" 
+                                        <a href="{{ route('admin.orders.show', $order->id) }}"
                                            class="btn btn-sm btn-primary">
                                             <i class="bi bi-eye me-1"></i>Chi tiết
                                         </a>
@@ -629,7 +631,7 @@
                                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-3 bg-white border-top shadow-sm">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-muted small">
-                                            Hiển thị {{ $filteredOrders->firstItem() ?? 0 }} - {{ $filteredOrders->lastItem() ?? 0 }} 
+                                            Hiển thị {{ $filteredOrders->firstItem() ?? 0 }} - {{ $filteredOrders->lastItem() ?? 0 }}
                                             trong tổng số {{ $filteredOrders->total() }} đơn hàng
                                         </span>
                                     </div>
@@ -1250,7 +1252,7 @@
             chart.options.scales.y.ticks.color = textColor();
             chart.data.datasets[0].backgroundColor = bgColor();
             chart.update();
-            
+
             // Update order growth chart
             if (orderGrowthChart) {
                 orderGrowthChart.options.scales.x.ticks.color = textColor();
@@ -1370,11 +1372,11 @@
             const filterType = document.getElementById('order_filter_type').value;
             const monthGroup = document.getElementById('filter_month_group');
             const dateRangeGroup = document.getElementById('filter_date_range_group');
-            
+
             // Hide all groups first
             monthGroup.style.display = 'none';
             dateRangeGroup.style.display = 'none';
-            
+
             // Show relevant group
             if (filterType === 'month') {
                 monthGroup.style.display = 'flex';
@@ -1396,10 +1398,10 @@
             document.getElementById('order_start_date').value = '';
             document.getElementById('order_end_date').value = '';
             document.getElementById('order_status').value = 'all';
-            
+
             // Toggle filter options
             toggleFilterOptions();
-            
+
             // Xóa các hidden input filter doanh thu
             const form = document.getElementById('orderFilterForm');
             const hiddenInputs = form.querySelectorAll('input[type="hidden"]');

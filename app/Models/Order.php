@@ -74,7 +74,8 @@ class Order extends Model
         'pending' => ['label' => 'Chờ xác nhận', 'badge' => 'warning', 'icon' => 'bi-hourglass-split'],
         'processing' => ['label' => 'Chuẩn bị hàng', 'badge' => 'info', 'icon' => 'bi-box'],
         'shipping' => ['label' => 'Đang giao', 'badge' => 'primary', 'icon' => 'bi-truck'],
-        'completed' => ['label' => 'Đã giao', 'badge' => 'success', 'icon' => 'bi-check-circle'],
+        'delivered' => ['label' => 'Đã giao', 'badge' => 'success', 'icon' => 'bi-box-seam'],
+        'completed' => ['label' => 'Hoàn thành', 'badge' => 'success', 'icon' => 'bi-check-circle'],
         'cancelled' => ['label' => 'Đã hủy', 'badge' => 'danger', 'icon' => 'bi-x-circle'],
         'return_requested' => ['label' => 'Yêu cầu đổi trả', 'badge' => 'secondary', 'icon' => 'bi-arrow-repeat'],
         'returned' => ['label' => 'Đã đổi trả', 'badge' => 'secondary', 'icon' => 'bi-arrow-counterclockwise'],
@@ -157,7 +158,7 @@ class Order extends Model
 
     public function canReceive(): bool
     {
-        return $this->order_status === 'shipping';
+        return $this->order_status === 'delivered';
     }
 
     public function canReorder(): bool
