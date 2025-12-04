@@ -131,10 +131,10 @@
                                 @enderror
 
                                 {{-- Preview ảnh hiện tại --}}
-                                @if ($banner->image_url)
+                                @if ($banner->image)
                                     <div class="mt-3">
                                         <label class="form-label">Ảnh hiện tại:</label>
-                                        <img src="{{ $banner->image_url }}" alt="Current"
+                                        <img src="{{ asset('storage/' . ltrim($banner->image, '/')) }}" alt="Current"
                                             class="img-fluid rounded shadow-sm" style="max-height: 300px; width: 100%; object-fit: contain;"
                                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light p-3 rounded text-center\'><i class=\'bi bi-image text-muted\' style=\'font-size: 2rem;\'></i><p class=\'text-muted mt-2 mb-0\'>Ảnh không tồn tại</p></div>';">
                                     </div>
