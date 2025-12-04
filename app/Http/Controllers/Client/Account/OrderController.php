@@ -120,7 +120,12 @@ class OrderController extends Controller
                 'payment_status' => $order->payment_method === 'wallet' ? 'refunded' : $order->payment_status,
             ]);
 
-            $this->logStatusChange($order, 'cancelled', $request->user()->id);
+            OrderLog::create([
+                'order_id' => $order->id,
+                'user_id' => $request->user()->id,
+                'status' => 'cancelled',
+                'note' => 'Khách hàng hủy đơn hàng.',
+            ]);
 
             DB::commit();
 
@@ -225,10 +230,18 @@ class OrderController extends Controller
         }
 
         $order->update([
+            'order_status' => 'return_requested',
             'return_status' => 'requested',
             'return_reason' => $request->reason,
             'return_note' => $request->description,
             'return_attachments' => $attachments,
+        ]);
+
+        OrderLog::create([
+            'order_id' => $order->id,
+            'user_id' => $request->user()->id,
+            'status' => 'return_requested',
+            'note' => 'Khách hàng yêu cầu đổi trả.',
         ]);
 
         return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');
@@ -289,7 +302,7 @@ class OrderController extends Controller
             ->toArray();
 
         // Đảm bảo tất cả các trạng thái đều có giá trị mặc định
-        $allStatuses = ['pending', 'processing', 'shipping', 'completed', 'cancelled', 'return_requested', 'returned'];
+        $allStatuses = ['pending', 'processing', 'shipping', 'delivered', 'completed', 'cancelled', 'return_requested', 'returned'];
         $counts = [];
         foreach ($allStatuses as $status) {
             $counts[$status] = $baseCounts[$status] ?? 0;

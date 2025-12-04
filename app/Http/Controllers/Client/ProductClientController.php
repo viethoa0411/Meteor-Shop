@@ -35,7 +35,6 @@ class ProductClientController extends Controller
             'images',
             'variants',
             'category',
-            'brand',
             'reviews.user',
         ])
         ->where('slug', $slug)

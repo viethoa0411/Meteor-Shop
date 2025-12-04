@@ -406,7 +406,7 @@
                 {{-- Loaded via JavaScript from localStorage --}}
             </div>
         </div>
-        <<<<<<< HEAD @php
+         @php
             $variantOptions = $product->variants
                 ->map(function ($variant) {
                     return [
