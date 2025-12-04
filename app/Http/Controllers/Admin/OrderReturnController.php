@@ -125,16 +125,7 @@ class OrderReturnController extends Controller
                 ]);
             }
 
-            if (Schema::hasTable('order_logs')) {
-                $authUser = Auth::user();
-                OrderLog::create([
-                    'order_id' => $orderId,
-                    'status' => 'return_requested',
-                    'updated_by' => $authUser?->id,
-                    'role' => ($authUser?->role === 'staff') ? 'staff' : 'admin',
-                    'created_at' => now(),
-                ]);
-            }
+            // Không tạo log 'return_requested' từ Admin để tránh ghi đè thông tin khách hàng
 
             DB::commit();
 

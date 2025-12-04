@@ -115,6 +115,32 @@
                                 <input type="hidden" name="shipping_fee" id="shipping_fee_input" value="0">
                             </div>
 
+                            {{-- Phương thức vận chuyển --}}
+                            <div class="mb-3">
+                                <label class="form-label">Phương thức vận chuyển <span class="text-danger">*</span></label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="shipping_method" id="shipping_standard" value="standard" checked>
+                                    <label class="form-check-label" for="shipping_standard">
+                                        Chuẩn (3-5 ngày)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="shipping_method" id="shipping_express" value="express">
+                                    <label class="form-check-label" for="shipping_express">
+                                        Nhanh (2-3 ngày)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="shipping_method" id="shipping_fast" value="fast">
+                                    <label class="form-check-label" for="shipping_fast">
+                                        Hỏa tốc (Trong ngày tại nội thành)
+                                    </label>
+                                </div>
+                                @error('shipping_method')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             {{-- Phương thức thanh toán --}}
                             <div class="mb-3">
                                 <label class="form-label">Phương thức thanh toán <span class="text-danger">*</span></label>
@@ -250,7 +276,7 @@
 
                         <div class="alert alert-info small mb-0">
                             <i class="bi bi-info-circle me-1"></i>
-                            Miễn phí vận chuyển cho đơn hàng từ 500.000đ
+                            Miễn phí vận chuyển cho đơn hàng từ 10.000.000đ
                         </div>
                     </div>
                 </div>
@@ -395,12 +421,30 @@
                 }
                 
                 const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
-                
+
                 const price = parseFloat(quantityInput.getAttribute('data-price')) || 0;
                 const maxStock = parseInt(quantityInput.getAttribute('data-stock')) || 1;
 
                 let currentShippingFee = 0;
                 let currentSubtotal = price;
+
+                function setMessage(message, type = 'info') {
+                    const el = document.getElementById('promotion-message');
+                    if (!el) return;
+                    el.textContent = message;
+                    el.className = type === 'success' ? 'text-success' : (type === 'warning' ? 'text-warning' : 'text-danger');
+                }
+
+                function clearPromotion() {
+                    const discountRow = document.getElementById('discount-row');
+                    const appliedCodeEl = document.getElementById('applied-code');
+                    const discountAmountEl = document.getElementById('discount-amount');
+                    if (discountRow) discountRow.style.display = 'none';
+                    if (appliedCodeEl) appliedCodeEl.textContent = '';
+                    if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
+                    currentDiscount = 0;
+                    appliedCode = '';
+                }
 
                 // Hàm cập nhật số lượng và tính toán
                 function updateQuantity(newQty) {
@@ -431,8 +475,8 @@
 
                 // Hàm tính phí vận chuyển qua API
                 function calculateShippingFee() {
-                    const citySelect = document.getElementById('city');
-                    const districtSelect = document.getElementById('district');
+                    const citySelect = document.getElementById('shipping_city');
+                    const districtSelect = document.getElementById('shipping_district');
 
                     if (!citySelect || !districtSelect) return;
 
@@ -504,10 +548,10 @@
                 }
 
                 // Lắng nghe sự kiện thay đổi địa chỉ
-                document.getElementById('city').addEventListener('change', function() {
+                document.getElementById('shipping_city').addEventListener('change', function() {
                     setTimeout(calculateShippingFee, 500);
                 });
-                document.getElementById('district').addEventListener('change', function() {
+                document.getElementById('shipping_district').addEventListener('change', function() {
                     setTimeout(calculateShippingFee, 300);
                 });
 
@@ -572,10 +616,70 @@
                 shippingInputs.forEach(input => {
                     input.addEventListener('change', function() {
                         const subtotal = price * parseInt(quantityInput.value) || price;
-                        updateShippingFee(subtotal);
+                        currentSubtotal = subtotal;
+                        calculateShippingFee();
                     });
 
                 });
+
+                const applyBtn = document.getElementById('apply-promotion-btn');
+                const codeInput = document.getElementById('promotion-code');
+                const discountRow = document.getElementById('discount-row');
+                const appliedCodeEl = document.getElementById('applied-code');
+                const discountAmountEl = document.getElementById('discount-amount');
+                const totalAmountEl = document.getElementById('total-amount');
+
+                if (applyBtn) {
+                    applyBtn.addEventListener('click', function() {
+                        const code = (codeInput?.value || '').trim();
+                        if (!code) {
+                            setMessage('Vui lòng nhập mã khuyến mãi.', 'danger');
+                            return;
+                        }
+
+                        applyBtn.disabled = true;
+                        setMessage('Đang áp dụng mã...', 'warning');
+
+                        fetch('{{ route('client.checkout.applyPromotion') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ code })
+                        })
+                        .then(async res => {
+                            if (res.status === 401) {
+                                window.location.href = '{{ route('client.login') }}';
+                                return null;
+                            }
+                            const data = await res.json();
+                            if (!data.ok) {
+                                throw new Error(data.error || 'Mã khuyến mãi không hợp lệ.');
+                            }
+                            return data;
+                        })
+                        .then(data => {
+                            if (!data) return;
+                            currentDiscount = Number(data.promotion.discount_amount) || 0;
+                            appliedCode = data.promotion.code || '';
+
+                            if (discountRow) discountRow.style.display = 'flex';
+                            if (appliedCodeEl) appliedCodeEl.textContent = appliedCode;
+                            if (discountAmountEl) discountAmountEl.textContent = '- ' + currentDiscount.toLocaleString('vi-VN') + ' đ';
+                            if (totalAmountEl) totalAmountEl.textContent = Number(data.final_total).toLocaleString('vi-VN') + ' đ';
+
+                            setMessage('Áp dụng mã thành công.', 'success');
+                        })
+                        .catch(err => {
+                            clearPromotion();
+                            setMessage(err.message || 'Không thể áp dụng mã. Vui lòng thử lại.', 'danger');
+                        })
+                        .finally(() => {
+                            applyBtn.disabled = false;
+                        });
+                    });
+                }
 
                 // Khởi tạo lần đầu
                 const initialQty = parseInt(quantityInput.value) || 1;

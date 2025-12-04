@@ -123,6 +123,13 @@ class OrderController extends Controller
             ]);
             $this->logStatusChange($order, 'cancelled', $request->user()->id);
 
+            OrderLog::create([
+                'order_id' => $order->id,
+                'status' => 'cancelled',
+                'updated_by' => $request->user()->id,
+                'role' => 'customer',
+                'created_at' => now(),
+            ]);
 
             DB::commit();
 
@@ -197,7 +204,24 @@ class OrderController extends Controller
         $this->authorizeOwnership($request->user()->id, $order);
 
         if (! $order->canReturn()) {
-            return back()->with('error', 'Đơn hàng không đủ điều kiện đổi trả.');
+            $errorMessage = 'Đơn hàng không đủ điều kiện đổi trả.';
+
+            // Kiểm tra các điều kiện cụ thể để đưa ra thông báo chi tiết
+            if ($order->order_status !== 'completed') {
+                $errorMessage = 'Chỉ có thể yêu cầu đổi trả khi đơn hàng đã được giao thành công.';
+            } elseif (!$order->delivered_at) {
+                $errorMessage = 'Đơn hàng chưa được xác nhận đã nhận hàng.';
+            } elseif ($order->isReturnExpired()) {
+                $daysSinceDelivery = now()->diffInDays($order->delivered_at);
+                $errorMessage = "Đơn hàng đã quá hạn để yêu cầu đổi trả. Thời gian cho phép là 7 ngày kể từ khi nhận hàng (đã qua {$daysSinceDelivery} ngày).";
+            } elseif (!in_array($order->return_status, ['none'])) {
+                $errorMessage = 'Đơn hàng này đã có yêu cầu đổi trả đang được xử lý.';
+            } elseif ($order->return_status === 'rejected') {
+                $errorMessage = 'Yêu cầu đổi trả đã bị từ chối trước đó. Bạn không thể gửi lại yêu cầu cho đơn này.';
+            }
+
+            return back()->with('error', $errorMessage);
+
         }
 
         $attachments = $order->return_attachments ?? [];
@@ -219,7 +243,15 @@ class OrderController extends Controller
             'return_attachments' => $attachments,
         ]);
 
-        $this->logStatusChange($order, 'return_requested', $request->user()->id);
+
+        OrderLog::create([
+            'order_id' => $order->id,
+            'status' => 'return_requested',
+            'updated_by' => $request->user()->id,
+            'role' => 'customer',
+            'created_at' => now(),
+        ]);
+
 
         return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');
     }
@@ -236,6 +268,14 @@ class OrderController extends Controller
             'order_status' => 'completed',
             'delivered_at' => $order->delivered_at ?: now(),
             'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
+        ]);
+
+        OrderLog::create([
+            'order_id' => $order->id,
+            'status' => 'completed',
+            'updated_by' => $request->user()->id,
+            'role' => 'customer',
+            'created_at' => now(),
         ]);
 
         return back()->with('success', 'Đã xác nhận nhận hàng thành công! Cảm ơn bạn đã mua sắm.');

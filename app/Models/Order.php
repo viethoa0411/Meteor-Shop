@@ -189,7 +189,7 @@ class Order extends Model
 
     public function canReturn(): bool
     {
-        return $this->order_status === 'completed' && in_array($this->return_status, ['none', 'rejected']);
+        return $this->order_status === 'completed' && $this->return_status === 'none';
     }
 
     public function isReturnExpired(): bool

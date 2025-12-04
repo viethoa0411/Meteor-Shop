@@ -199,7 +199,3 @@
         </script>
     @endpush
 @endsection
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/Trang_Chu_Client

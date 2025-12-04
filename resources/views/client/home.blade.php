@@ -428,21 +428,21 @@
                 <div class="grid-products">
                     @foreach ($outstandingProducts as $o)
                         @php
-                            $liked = auth()->check() && in_array($p->id, $wishlistIds ?? []);
+                            $liked = auth()->check() && in_array($o->id, $wishlistIds ?? []);
                         @endphp
                         <div class="product-card position-relative">
-                            <button type="button" class="wishlist-toggle-home" data-product-id="{{ $p->id }}"
+                            <button type="button" class="wishlist-toggle-home" data-product-id="{{ $o->id }}"
                                 style="position:absolute; top:8px; right:8px; z-index:2; border-radius:999px; border:none; background:rgba(255,255,255,0.9); padding:4px 8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
                                 <i class="bi {{ $liked ? 'bi-heart-fill text-danger' : 'bi-heart text-dark' }}"></i>
                             </button>
-                            <a href="{{ route('client.product.detail', $p->slug) }}" class="product-card-link">
+                            <a href="{{ route('client.product.detail', $o->slug) }}" class="product-card-link">
                                 <div class="product-img">
-                                    <img src="{{ $p->image ? asset('storage/' . $p->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}"
-                                        alt="{{ $p->name }}">
+                                    <img src="{{ $o->image ? asset('storage/' . $o->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}"
+                                        alt="{{ $o->name }}">
                                 </div>
-                                <div class="product-name">{{ $p->name }}</div>
+                                <div class="product-name">{{ $o->name }}</div>
                                 <div class="product-price">
-                                    {{ number_format($p->price, 0, ',', '.') }} đ
+                                    {{ number_format($o->price, 0, ',', '.') }} đ
                                 </div>
                             </a>
                         </div>

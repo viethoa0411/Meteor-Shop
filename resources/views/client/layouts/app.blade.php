@@ -235,7 +235,7 @@
         .client-nav .dropdown-menu {
             display: none;
             position: absolute;
-            top: calc(100% + 12px);
+            top:100%
             left: 0;
             background: #fff;
             border-radius: 8px;

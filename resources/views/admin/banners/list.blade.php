@@ -142,13 +142,9 @@
                                                 class="form-check-input banner-checkbox">
                                         </td>
                                         <td>
-<<<<<<< HEAD
                                             @if ($banner->image)
                                                 <img src="{{ asset('storage/' . ltrim($banner->image, '/')) }}" alt="{{ $banner->title }}"
-=======
-                                            @if ($banner->image_url)
-                                                <img src="{{ $banner->image_url }}" alt="{{ $banner->title }}"
->>>>>>> origin/Trang_Chu_Client
+
                                                     class="img-thumbnail" style="width: 60px; height: 40px; object-fit: cover;"
                                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light d-flex align-items-center justify-content-center\' style=\'width: 60px; height: 40px;\'><i class=\'bi bi-image text-muted\'></i></div>';">
                                             @else

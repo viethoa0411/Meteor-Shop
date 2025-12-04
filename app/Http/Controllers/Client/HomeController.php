@@ -52,13 +52,21 @@ class HomeController extends Controller
             ->get();
 
 
+        $wishlistIds = [];
+        if (auth()->check()) {
+            $wishlistIds = Wishlist::where('user_id', auth()->id())
+                ->pluck('product_id')
+                ->all();
+        }
+
         return view('client.home', compact(
             'newProducts',
             'outstandingProducts',
             'cate',
             'banners',
             'latestBlogs',
-            'homeCategories' // ⭐ THÊM DÒNG NÀY
+            'homeCategories',
+            'wishlistIds'
         ));
     }
 

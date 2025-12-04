@@ -419,6 +419,11 @@
                 </div>
             </div>
 
+            <a href="{{ route('admin.promotions.list') }}"
+                class="{{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}">
+                <i class="bi bi-ticket-perforated me-2"></i> Quản lý Voucher
+            </a>
+
             {{-- Quản lý Ví --}}
 
             @php

@@ -29,34 +29,23 @@
                 </div>
                 <div class="card-body">
 
-                    {{-- TRẠNG THÁI HIỆN TẠI --}}
                     @php
-                        // Logic dịch và màu trạng thái
-                        $colors = [
-                            'pending' => 'dark',
-                            'processing' => 'primary',
-                            'shipping' => 'info',
-                            'completed' => 'success',
-                            'cancelled' => 'danger',
-                            'return_requested' => 'warning',
-                            'returned' => 'secondary',
+                        $statusConfig = [
+                            'pending' => ['label' => 'Chờ xác nhận', 'color' => 'dark', 'icon' => 'bi-hourglass-split'],
+                            'processing' => ['label' => 'Đang xử lý', 'color' => 'primary', 'icon' => 'bi-gear'],
+                            'shipping' => ['label' => 'Đang giao hàng', 'color' => 'info', 'icon' => 'bi-truck'],
+                            'delivered' => ['label' => 'Đã giao', 'color' => 'success', 'icon' => 'bi-box-seam'],
+                            'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'bi-check-circle'],
+                            'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
+                            'return_requested' => ['label' => 'Yêu cầu trả hàng', 'color' => 'warning', 'icon' => 'bi-arrow-repeat'],
+                            'returned' => ['label' => 'Đã trả hàng', 'color' => 'secondary', 'icon' => 'bi-arrow-counterclockwise'],
                         ];
-                        $labels = [
-                            'pending' => 'Chờ xác nhận',
-                            'processing' => 'Đang xử lý',
-                            'shipping' => 'Đang giao hàng',
-                            'completed' => 'Hoàn thành',
-                            'cancelled' => 'Đã hủy',
-                            'return_requested' => 'Yêu cầu hoàn hàng',
-                            'returned' => 'Đã trả hàng',
-                        ];
-                        $currentStatusColor = $colors[$order->order_status] ?? 'light';
-                        $currentStatusLabel = $labels[$order->order_status] ?? ucfirst($order->order_status);
+                        $cfg = $statusConfig[$order->order_status] ?? ['label' => ucfirst($order->order_status), 'color' => 'secondary', 'icon' => 'bi-question-circle'];
                     @endphp
 
                     <p class="h4 d-flex justify-content-between align-items-center">
                         <strong>Trạng thái:</strong>
-                        <span class="badge bg-{{ $currentStatusColor }} py-2 px-3">{{ $currentStatusLabel }}</span>
+                        <span class="badge rounded-pill border border-{{ $cfg['color'] }} text-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
                     </p>
 
                     {{-- FORM UPDATE TRẠNG THÁI --}}
@@ -64,14 +53,12 @@
                         // Admin chỉ được cập nhật các trạng thái xử lý - không gồm hủy/hoàn thành
                         $adminAllowedStatuses = ['processing', 'shipping', 'delivered', 'returned'];
 
-
                         // Quy tắc chuyển trạng thái đồng bộ với backend
                         $validTransitions = [
                             'pending' => ['processing'],
                             'processing' => ['shipping', 'returned'],
                             'shipping' => ['delivered'],
                             'delivered' => [],
-
                             'return_requested' => ['returned'],
                             'returned' => [],
                             'completed' => [],
@@ -82,7 +69,6 @@
                             'processing' => 'Đang xử lý',
                             'shipping' => 'Đang giao hàng',
                             'delivered' => 'Đã giao',
-
                             'returned' => 'Đã trả hàng',
                         ];
 
@@ -97,32 +83,114 @@
                         });
                     @endphp
 
+                    {{-- THÔNG BÁO VỀ YÊU CẦU TRẢ HÀNG --}}
+                    @if (isset($hasReturnRequest) && $hasReturnRequest)
+                        <div class="alert alert-warning mt-3">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Đơn hàng này có yêu cầu trả hàng!</strong>
+                            <br>
+                            <a href="{{ route('admin.orders.returns.show', $order->id) }}" class="btn btn-sm btn-warning mt-2">
+                                <i class="bi bi-arrow-repeat"></i> Xem và quản lý yêu cầu trả hàng
+                            </a>
+                        </div>
+                    @endif
+
+                    {{-- Hành động chuyển trạng thái hoặc thông báo --}}
                     @if (!empty($allowedNextStatuses))
                         @php
-                            $nextStatus = $allowedNextStatuses[0]; // Lấy trạng thái duy nhất
+                            $nextStatus = $allowedNextStatuses[0];
                             $nextStatusLabel = $statusLabels[$nextStatus] ?? ucfirst($nextStatus);
+                            $nextCfg = $statusConfig[$nextStatus] ?? ['label' => $nextStatusLabel, 'color' => 'info', 'icon' => 'bi-info-circle'];
                         @endphp
 
-                        <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
-                            @csrf
-                            @method('PUT')
+                        {{-- Cho phép cập nhật sang returned nếu return_status là refunded --}}
+                        @if ($nextStatus === 'returned' && isset($hasReturnRequest) && $hasReturnRequest)
+                            @if ($order->return_status === 'refunded')
+                                {{-- Nếu đã refunded thì cho phép cập nhật sang returned --}}
+                                <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
+                                    @csrf
+                                    @method('PUT')
 
-                            <p class="h6 mb-2">Trạng thái tiếp theo:</p>
-                            <div class="d-flex align-items-center gap-3">
-                                {{-- THẺ TRẠNG THÁI TO HƠN --}}
-                                <span class="badge bg-info text-dark fs-5 py-2 px-3 fw-bold">
-                                    {{ $nextStatusLabel }}
+                                    <p class="h6 mb-2">Trạng thái tiếp theo:</p>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="badge rounded-pill border border-{{ $nextCfg['color'] }} text-{{ $nextCfg['color'] }} fs-5 py-2 px-3 fw-bold">
+                                            <i class="bi {{ $nextCfg['icon'] }} me-2"></i>{{ $nextStatusLabel }}
+                                        </span>
+
+                                        <input type="hidden" name="order_status" value="{{ $nextStatus }}">
+
+                                        <button type="submit" class="btn btn-primary btn-md">
+                                            <i class="bi bi-arrow-clockwise me-1"></i> Cập nhật ngay
+                                        </button>
+                                    </div>
+                                </form>
+                            @else
+                                {{-- Nếu chưa refunded thì không cho phép --}}
+                                <div class="alert alert-info mt-3">
+                                    <i class="bi bi-info-circle"></i>
+                                    Vui lòng duyệt yêu cầu trả hàng và hoàn tiền trước khi cập nhật trạng thái này.
+                                </div>
+                            @endif
+                        @else
+                            <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
+                                @csrf
+                                @method('PUT')
+
+                                <p class="h6 mb-2">Trạng thái tiếp theo:</p>
+                                    <div class="d-flex align-items-center gap-3">
+                                    <span class="badge rounded-pill border border-{{ $nextCfg['color'] }} text-{{ $nextCfg['color'] }} fs-5 py-2 px-3 fw-bold">
+                                        <i class="bi {{ $nextCfg['icon'] }} me-2"></i>{{ $nextStatusLabel }}
+                                    </span>
+
+                                    <input type="hidden" name="order_status" value="{{ $nextStatus }}">
+
+                                    {{-- NÚT CẬP NHẬT RÕ RÀNG HƠN --}}
+                                    <button type="submit" class="btn btn-primary btn-md">
+                                        <i class="bi bi-arrow-clockwise me-1"></i> Chuyển trạng thái
+                                    </button>
+                                </div>
+                            </form>
+                        @endif
+                    @elseif ($order->order_status === 'shipping')
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-truck"></i>
+                            <strong>Đơn hàng đang giao hàng.</strong> Khi đơn vị vận chuyển xác nhận đã giao, chuyển trạng thái sang "Đã giao". Khách hàng sẽ xác nhận để hệ thống chuyển sang "Hoàn thành".
+                        </div>
+                    @endif
+
+                    {{-- THÔNG TIN TRẢ HÀNG --}}
+                    @if ($order->return_status && $order->return_status !== 'none' && $order->return_status !== 'rejected')
+                        <hr>
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-arrow-repeat"></i> Thông tin yêu cầu trả hàng</h6>
+                            <p class="mb-1"><strong>Trạng thái:</strong>
+                                @php
+                                    $returnStatusLabels = [
+                                        'requested' => 'Đã yêu cầu',
+                                        'approved' => 'Đã duyệt hoàn hàng',
+                                        'rejected' => 'Đã từ chối',
+                                        'refunded' => 'Đã nhận hàng và hoàn tiền',
+                                        'completed' => 'Hoàn hàng thành công',
+                                    ];
+                                    $returnStatusColors = [
+                                        'requested' => 'warning',
+                                        'approved' => 'success',
+                                        'rejected' => 'danger',
+                                        'refunded' => 'primary',
+                                        'completed' => 'success',
+                                    ];
+                                @endphp
+                                <span class="badge bg-{{ $returnStatusColors[$order->return_status] ?? 'secondary' }}">
+                                    {{ $returnStatusLabels[$order->return_status] ?? $order->return_status }}
                                 </span>
-
-                                <input type="hidden" name="order_status" value="{{ $nextStatus }}">
-
-                                {{-- NÚT CẬP NHẬT RÕ RÀNG HƠN --}}
-                                <button type="submit" class="btn btn-primary btn-md">
-                                    <i class="bi bi-arrow-clockwise me-1"></i> Cập nhật ngay
-                                </button>
-                            </div>
-                        </form>
->>>>>>> origin/Trang_Chu_Client
+                            </p>
+                            @if ($order->return_reason)
+                                <p class="mb-1"><strong>Lý do:</strong> {{ $order->return_reason }}</p>
+                            @endif
+                            <a href="{{ route('admin.orders.returns.show', $order->id) }}" class="btn btn-sm btn-warning mt-2">
+                                <i class="bi bi-eye"></i> Xem chi tiết và quản lý
+                            </a>
+                        </div>
                     @endif
 
                     <hr>
@@ -194,7 +262,6 @@
                             'delivered' => 'Đã giao',
                             'completed' => 'Hoàn thành',
                             'return_requested' => 'Yêu cầu trả hàng',
-
                             'returned' => 'Đã trả hàng',
                             'cancelled' => 'Đã hủy',
                         ];
@@ -226,11 +293,7 @@
                                         <tr>
                                             <td class="small">{{ date('d/m/Y H:i', strtotime($log->created_at)) }}</td>
                                             <td>
-<<<<<<< HEAD
                                                 <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$log->status] ?? 'secondary' }} text-{{ $statusColors[$log->status] ?? 'secondary' }}">
-=======
-                                                <span class="badge bg-{{ $statusColors[$log->status] ?? 'light' }}">
->>>>>>> origin/Trang_Chu_Client
                                                     {{ $statusLabels[$log->status] ?? $log->status }}
                                                 </span>
                                             </td>
@@ -271,11 +334,7 @@
                                             <td class="small">{{ date('d/m/Y H:i', strtotime($history->created_at)) }}</td>
                                             <td>
                                                 @if ($history->old_status)
-<<<<<<< HEAD
                                                     <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$history->old_status] ?? 'secondary' }} text-{{ $statusColors[$history->old_status] ?? 'secondary' }}">
-=======
-                                                    <span class="badge bg-{{ $statusColors[$history->old_status] ?? 'light' }}">
->>>>>>> origin/Trang_Chu_Client
                                                         {{ $statusLabels[$history->old_status] ?? $history->old_status }}
                                                     </span>
                                                 @else
@@ -283,11 +342,7 @@
                                                 @endif
                                             </td>
                                             <td>
-<<<<<<< HEAD
                                                 <span class="badge rounded-pill text-nowrap border border-{{ $statusColors[$history->new_status] ?? 'secondary' }} text-{{ $statusColors[$history->new_status] ?? 'secondary' }}">
-=======
-                                                <span class="badge bg-{{ $statusColors[$history->new_status] ?? 'light' }}">
->>>>>>> origin/Trang_Chu_Client
                                                     {{ $statusLabels[$history->new_status] ?? $history->new_status }}
                                                 </span>
                                             </td>
@@ -333,11 +388,7 @@
 
                         {{-- THÔNG TIN NGƯỜI NHẬN --}}
                         <div class="col-md-6">
-<<<<<<< HEAD
                             <h6><i class="bi bi-person-fill"></i> Người nhận </h6>
-=======
-                            <h6><i class="bi bi-person-fill"></i> Người nhận (Shipping)</h6>
->>>>>>> origin/Trang_Chu_Client
                             <ul class="list-unstyled mb-2 small">
                                 <li><strong>Tên:</strong> {{ $order->customer_name }}</li>
                                 <li><strong>SĐT:</strong> {{ $order->customer_phone }}</li>

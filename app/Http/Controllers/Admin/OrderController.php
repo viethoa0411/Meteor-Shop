@@ -68,16 +68,8 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        // Lấy thông tin đơn
-        $order = DB::table('orders')
-            ->join('users', 'orders.user_id', '=', 'users.id')
-            ->select(
-                'orders.*',
-                'users.name as customer_name',
-                'users.phone as customer_phone'
-            )
-            ->where('orders.id', $id)
-            ->first();
+        // Lấy thông tin đơn bằng Eloquent và load quan hệ user
+        $order = Order::with(['user'])->findOrFail($id);
 
 
         // Lấy danh sách sản phẩm trong đơn
