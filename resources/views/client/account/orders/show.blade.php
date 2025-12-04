@@ -161,7 +161,7 @@
                                 <form action="{{ route('client.account.orders.markReceived', $order) }}" method="POST" class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-success"
-                                            onclick="return confirm('Bạn đã nhận được hàng? Xác nhận này sẽ cập nhật trạng thái đơn hàng sang "Giao hàng thành công".');">
+                                            onclick="return confirm('Bạn đã nhận được hàng? Xác nhận này sẽ cập nhật trạng thái đơn hàng sang "Hoàn thành".');">
                                         <i class="bi bi-check-circle me-1"></i> Đã nhận hàng
                                     </button>
                                 </form>
@@ -189,6 +189,24 @@
                                 <div class="alert alert-warning small mb-0 py-2">
                                     <i class="bi bi-exclamation-triangle me-1"></i>
                                     Đã quá thời hạn 7 ngày để yêu cầu trả hàng hoàn tiền
+                                </div>
+                            @endif
+
+                            @if ($order->order_status === 'delivered' && $order->delivered_at)
+                                @php
+                                    $deliveredAt = \Carbon\Carbon::parse($order->delivered_at);
+                                    $autoCompleteAt = $deliveredAt->copy()->addDays(2);
+                                    $remainingHours = max(0, now()->diffInHours($autoCompleteAt));
+                                    $remainingDays = intdiv($remainingHours, 24);
+                                    $remainingHoursMod = $remainingHours % 24;
+                                @endphp
+                                <div class="alert alert-info mt-2 mb-0 w-100">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Nếu bạn không xác nhận, hệ thống sẽ tự chuyển trạng thái sang <strong>Hoàn thành</strong>
+                                    sau 2 ngày kể từ thời điểm giao hàng ({{ $deliveredAt->format('d/m/Y H:i') }}).
+                                    @if ($autoCompleteAt->isFuture())
+                                        <br><small>Còn {{ $remainingDays }} ngày {{ $remainingHoursMod }} giờ.</small>
+                                    @endif
                                 </div>
                             @endif
 
@@ -221,4 +239,3 @@
         </div>
     </div>
 @endsection
-

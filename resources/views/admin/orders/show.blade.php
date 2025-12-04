@@ -126,9 +126,23 @@
                                 {{ $statusMeta['label'] }}
                                 </span>
                         </div>
-                                            <div>
-                            <span class="badge bg-{{ $order->payment_status === 'paid' ? 'success' : 'warning' }}">
-                                {{ ucfirst($order->payment_status) }}
+                        <div>
+                            @php
+                                $paymentStatusLabels = [
+                                    'paid' => 'Đã thanh toán',
+                                    'pending' => 'Chưa thanh toán',
+                                    'failed' => 'Thanh toán thất bại',
+                                    'refunded' => 'Đã hoàn tiền',
+                                ];
+                                $paymentBadge = match($order->payment_status) {
+                                    'paid' => 'success',
+                                    'failed' => 'danger',
+                                    'refunded' => 'secondary',
+                                    default => 'warning',
+                                };
+                            @endphp
+                            <span class="badge bg-{{ $paymentBadge }}">
+                                {{ $paymentStatusLabels[$order->payment_status] ?? ucfirst($order->payment_status) }}
                             </span>
                         </div>
                     </div>

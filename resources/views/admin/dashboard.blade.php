@@ -285,14 +285,10 @@
                                         </label>
                                         <input type="date" name="order_start_date" id="order_start_date"
                                             class="form-control" value="{{ $orderFilterStartDate ?? '' }}">
-                                    </div>
 
-                                    <div class="col-12 col-sm-6">
-                                        <label for="order_end_date" class="form-label small fw-semibold">
-                                            <i class="bi bi-calendar-event-fill me-1 text-primary"></i>Đến ngày
-                                        </label>
-                                        <input type="date" name="order_end_date" id="order_end_date"
-                                            class="form-control" value="{{ $orderFilterEndDate ?? '' }}">
+                                        class="form-control"
+                                        value="{{ $orderFilterStartDate ?? '' }}">
+
                                     </div>
                                 </div>
 
@@ -503,29 +499,60 @@
                                         </td>
                                         <td>
                                             @php
-                                                $statusColors = [
-                                                    'pending' => 'warning',
-                                                    'processing' => 'info',
-                                                    'shipping' => 'primary',
-                                                    'completed' => 'success',
-                                                    'cancelled' => 'danger',
+                                                $statusConfig = [
+                                                    'pending' => [
+                                                        'label' => 'Chờ xử lý',
+                                                        'color' => 'warning',
+                                                        'icon' => 'bi-hourglass-split',
+                                                    ],
+                                                    'processing' => [
+                                                        'label' => 'Đang xử lý',
+                                                        'color' => 'info',
+                                                        'icon' => 'bi-gear',
+                                                    ],
+                                                    'shipping' => [
+                                                        'label' => 'Đang giao hàng',
+                                                        'color' => 'primary',
+                                                        'icon' => 'bi-truck',
+                                                    ],
+                                                    'delivered' => [
+                                                        'label' => 'Đã giao',
+                                                        'color' => 'success',
+                                                        'icon' => 'bi-box-seam',
+                                                    ],
+                                                    'completed' => [
+                                                        'label' => 'Hoàn thành',
+                                                        'color' => 'success',
+                                                        'icon' => 'bi-check-circle',
+                                                    ],
+                                                    'cancelled' => [
+                                                        'label' => 'Đã hủy',
+                                                        'color' => 'danger',
+                                                        'icon' => 'bi-x-circle',
+                                                    ],
                                                 ];
-                                                $statusLabels = [
-                                                    'pending' => 'Chờ xử lý',
-                                                    'processing' => 'Đang xử lý',
-                                                    'shipping' => 'Đang giao hàng',
-                                                    'completed' => 'Hoàn thành',
-                                                    'cancelled' => 'Đã hủy',
+                                                $cfg = $statusConfig[$order->order_status] ?? [
+                                                    'label' => ucfirst($order->order_status),
+                                                    'color' => 'secondary',
+                                                    'icon' => 'bi-question-circle',
                                                 ];
                                             @endphp
-                                            <span
+                                            <<<<<<< HEAD <span
                                                 class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
                                                 {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
-                                            </span>
+                                                </span>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{ route('admin.orders.show', $order->id) }}"
                                                 class="btn btn-sm btn-outline-primary">
+                                                =======
+                                                <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i
+                                                        class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('admin.orders.show', $order->id) }}"
+                                                class="btn btn-sm btn-outline-primary">
+                                                >>>>>>> origin/order_admin
                                                 <i class="bi bi-eye me-1"></i>Chi tiết
                                             </a>
                                         </td>
@@ -546,19 +573,34 @@
                     <div class="d-md-none">
                         @forelse($filteredOrders as $order)
                             @php
-                                $statusColors = [
-                                    'pending' => 'warning',
-                                    'processing' => 'info',
-                                    'shipping' => 'primary',
-                                    'completed' => 'success',
-                                    'cancelled' => 'danger',
+                                $statusConfig = [
+                                    'pending' => [
+                                        'label' => 'Chờ xử lý',
+                                        'color' => 'warning',
+                                        'icon' => 'bi-hourglass-split',
+                                    ],
+                                    'processing' => ['label' => 'Đang xử lý', 'color' => 'info', 'icon' => 'bi-gear'],
+                                    'shipping' => [
+                                        'label' => 'Đang giao hàng',
+                                        'color' => 'primary',
+                                        'icon' => 'bi-truck',
+                                    ],
+                                    'delivered' => [
+                                        'label' => 'Đã giao',
+                                        'color' => 'success',
+                                        'icon' => 'bi-box-seam',
+                                    ],
+                                    'completed' => [
+                                        'label' => 'Hoàn thành',
+                                        'color' => 'success',
+                                        'icon' => 'bi-check-circle',
+                                    ],
+                                    'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
                                 ];
-                                $statusLabels = [
-                                    'pending' => 'Chờ xử lý',
-                                    'processing' => 'Đang xử lý',
-                                    'shipping' => 'Đang giao hàng',
-                                    'completed' => 'Hoàn thành',
-                                    'cancelled' => 'Đã hủy',
+                                $cfg = $statusConfig[$order->order_status] ?? [
+                                    'label' => ucfirst($order->order_status),
+                                    'color' => 'secondary',
+                                    'icon' => 'bi-question-circle',
                                 ];
                             @endphp
                             <div class="card mb-3 order-mobile-card shadow-sm">
@@ -571,10 +613,14 @@
                                                     class="bi bi-calendar3 me-1"></i>{{ $order->created_at->format('d/m/Y H:i') }}
                                             </small>
                                         </div>
-                                        <span
+                                        <<<<<<< HEAD <span
                                             class="badge bg-{{ $statusColors[$order->order_status] ?? 'secondary' }} px-3 py-2">
                                             {{ $statusLabels[$order->order_status] ?? ucfirst($order->order_status) }}
-                                        </span>
+                                            </span>
+                                            =======
+                                            <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i
+                                                    class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
+                                            >>>>>>> origin/order_admin
                                     </div>
 
                                     <div class="mb-3">
@@ -595,8 +641,11 @@
                                                 class="fw-bold text-success fs-5">{{ number_format($order->final_total) }}
                                                 ₫</span>
                                         </div>
-                                        <a href="{{ route('admin.orders.show', $order->id) }}"
+                                        <a href="{{ route('admin.orders.show', $order->id) }}" <<<<<<< HEAD
                                             class="btn btn-sm btn-primary">
+                                            =======
+                                            class="btn btn-sm btn-primary">
+                                            >>>>>>> origin/order_admin
                                             <i class="bi bi-eye me-1"></i>Chi tiết
                                         </a>
                                     </div>
@@ -620,9 +669,11 @@
                                     class="d-flex justify-content-between align-items-center flex-wrap gap-3 p-3 bg-white border-top shadow-sm">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-muted small">
-                                            Hiển thị {{ $filteredOrders->firstItem() ?? 0 }} -
-                                            {{ $filteredOrders->lastItem() ?? 0 }}
-                                            trong tổng số {{ $filteredOrders->total() }} đơn hàng
+                                            <<<<<<< HEAD Hiển thị {{ $filteredOrders->firstItem() ?? 0 }} -
+                                                {{ $filteredOrders->lastItem() ?? 0 }}=======Hiển thị
+                                                {{ $filteredOrders->firstItem() ?? 0 }} -
+                                                {{ $filteredOrders->lastItem() ?? 0 }}>>>>>>> origin/order_admin
+                                                trong tổng số {{ $filteredOrders->total() }} đơn hàng
                                         </span>
                                     </div>
                                     <div>

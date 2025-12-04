@@ -22,6 +22,7 @@
                 <option value="pending" {{ $status == 'pending' ? 'selected' : '' }}>Chờ xác nhận</option>
                 <option value="processing" {{ $status == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
                 <option value="shipping" {{ $status == 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
+                <option value="delivered" {{ $status == 'delivered' ? 'selected' : '' }}>Đã giao</option>
                 <option value="completed" {{ $status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
                 <option value="cancelled" {{ $status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
                 <option value="return_requested" {{ $status == 'return_requested' ? 'selected' : '' }}>Yêu cầu trả hàng</option>
@@ -60,36 +61,22 @@
                 <td>{{ $order->customer_name }}</td>
                 <td>{{ number_format($order->final_total, 0, ',', '.') }}₫</td>
 
-                {{-- Badge màu trạng thái --}}
                 <td>
     @php
-        // 7 Trạng thái mới với màu sắc và tên tiếng Việt
-        $colors = [
-            'pending'          => 'dark',      // Xám đậm
-            'processing'       => 'primary',   // Xanh dương
-            'shipping'         => 'info',      // Xanh nhạt
-            'completed'        => 'success',   // Xanh lá
-            'cancelled'        => 'danger',    // Đỏ
-            'return_requested' => 'warning',   // Vàng/Cam
-            'returned'         => 'secondary', // Xám
+        $statusConfig = [
+            'pending' => ['label' => 'Chờ xác nhận', 'color' => 'dark', 'icon' => 'bi-hourglass-split'],
+            'processing' => ['label' => 'Đang xử lý', 'color' => 'primary', 'icon' => 'bi-gear'],
+            'shipping' => ['label' => 'Đang giao hàng', 'color' => 'info', 'icon' => 'bi-truck'],
+            'delivered' => ['label' => 'Đã giao', 'color' => 'success', 'icon' => 'bi-box-seam'],
+            'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'bi-check-circle'],
+            'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
+            'return_requested' => ['label' => 'Yêu cầu trả hàng', 'color' => 'warning', 'icon' => 'bi-arrow-repeat'],
+            'returned' => ['label' => 'Đã trả hàng', 'color' => 'secondary', 'icon' => 'bi-arrow-counterclockwise'],
         ];
-
-        $labels = [
-            'pending'          => 'Chờ xác nhận',
-            'processing'       => 'Đang xử lý',
-            'shipping'         => 'Đang giao hàng',
-            'completed'        => 'Hoàn thành',
-            'cancelled'        => 'Đã hủy',
-            'return_requested' => 'Yêu cầu trả hàng',
-            'returned'         => 'Đã trả hàng',
-        ];
-
-        $color = $colors[$order->order_status] ?? 'light';
-        $label = $labels[$order->order_status] ?? ucfirst($order->order_status);
+        $cfg = $statusConfig[$order->order_status] ?? ['label' => ucfirst($order->order_status), 'color' => 'secondary', 'icon' => 'bi-question-circle'];
     @endphp
-
-    <span class="badge bg-{{ $color }}">{{ $label }}</span>
-</td>
+    <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
+                </td>
 
                 <td>{{ date('d/m/Y', strtotime($order->created_at)) }}</td>
                 <td>

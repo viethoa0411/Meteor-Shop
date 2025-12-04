@@ -236,7 +236,7 @@ class OrderAnalyticsController extends Controller
 
         $timeline = [];
         // Sử dụng đúng các status từ Order model
-        $statuses = ['pending', 'processing', 'shipping', 'completed', 'cancelled', 'return_requested', 'returned'];
+        $statuses = ['pending', 'processing', 'shipping', 'delivered', 'completed', 'cancelled', 'return_requested', 'returned'];
 
         foreach ($statuses as $statusKey) {
             $timeline[$statusKey] = [];
@@ -536,4 +536,3 @@ class OrderAnalyticsController extends Controller
         return Order::PAYMENT_LABELS[$method] ?? ucfirst($method ?? 'N/A');
     }
 }
-

@@ -169,13 +169,14 @@ class OrderController extends Controller
     {
         $this->authorizeOwnership($request->user()->id, $order);
 
-        if ($order->order_status !== 'shipping') {
-            return back()->with('error', 'Chỉ có thể xác nhận đã nhận hàng khi đơn hàng đang ở trạng thái "Đang giao hàng".');
+        if ($order->order_status !== 'delivered') {
+            return back()->with('error', 'Chỉ có thể xác nhận đã nhận hàng khi đơn hàng đang ở trạng thái "Đã giao".');
         }
 
         $order->update([
             'order_status' => 'completed',
-            'delivered_at' => now(),
+            'delivered_at' => $order->delivered_at ?: now(),
+            'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
         ]);
 
         return back()->with('success', 'Đã xác nhận nhận hàng thành công! Cảm ơn bạn đã mua sắm.');
@@ -236,4 +237,3 @@ class OrderController extends Controller
         abort_if($order->user_id !== $userId, 403, 'Bạn không có quyền truy cập đơn hàng này.');
     }
 }
-

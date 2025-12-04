@@ -14,12 +14,13 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    private const ADMIN_EDITABLE_STATUSES = ['processing', 'shipping', 'returned'];
+    private const ADMIN_EDITABLE_STATUSES = ['processing', 'shipping', 'delivered', 'returned'];
 
     private const STATUS_TRANSITIONS = [
         'pending' => ['processing'],
         'processing' => ['shipping', 'returned'],
-        'shipping' => [], // Không cho admin cập nhật từ shipping, user sẽ cập nhật sang completed
+        'shipping' => ['delivered'],
+        'delivered' => [],
         'return_requested' => ['returned'],
         'returned' => [],
         'completed' => [],
@@ -65,16 +66,11 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        // Lấy thông tin đơn
-        $order = DB::table('orders')
-            ->join('users', 'orders.user_id', '=', 'users.id')
-            ->select(
-                'orders.*',
-                'users.name as customer_name',
-                'users.phone as customer_phone'
-            )
-            ->where('orders.id', $id)
-            ->first();
+        $order = Order::with(['user:id,name,email,phone,role,status'])
+            ->find($id);
+        if (!$order) {
+            return redirect()->route('admin.orders.list')->with('error', 'Đơn hàng không tồn tại');
+        }
 
         // Lấy danh sách sản phẩm trong đơn
         $orderDetails = DB::table('order_details')
@@ -147,6 +143,7 @@ class OrderController extends Controller
         $statusTimestamps = [
             'processing' => 'confirmed_at',
             'shipping'   => 'shipped_at',
+            'delivered'  => 'delivered_at',
             'returned'   => 'returned_at',
         ];
 
@@ -203,6 +200,7 @@ class OrderController extends Controller
         $statusLabels = [
             'processing' => 'Đang xử lý',
             'shipping' => 'Đang giao hàng',
+            'delivered' => 'Đã giao',
             'returned' => 'Đã trả hàng',
         ];
 

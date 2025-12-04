@@ -73,6 +73,7 @@ class Order extends Model
     ];
 
     public const STATUS_META = [
+
         'pending' => ['label' => 'Chờ xử lý', 'badge' => 'warning', 'icon' => 'bi-hourglass-split', 'color' => '#ffc107'],
         'awaiting_payment' => ['label' => 'Chờ thanh toán', 'badge' => 'warning', 'icon' => 'bi-credit-card', 'color' => '#ff9800'],
         'paid' => ['label' => 'Đã thanh toán', 'badge' => 'success', 'icon' => 'bi-check-circle', 'color' => '#28a745'],
@@ -107,6 +108,15 @@ class Order extends Model
         'cancelled' => [],
         'refunded' => [],
         'partial_refund' => [],
+
+        'pending' => ['label' => 'Chờ xác nhận', 'badge' => 'warning', 'icon' => 'bi-hourglass-split'],
+        'processing' => ['label' => 'Chuẩn bị hàng', 'badge' => 'info', 'icon' => 'bi-box'],
+        'shipping' => ['label' => 'Đang giao', 'badge' => 'primary', 'icon' => 'bi-truck'],
+        'delivered' => ['label' => 'Đã giao', 'badge' => 'success', 'icon' => 'bi-box-seam'],
+        'completed' => ['label' => 'Hoàn thành', 'badge' => 'success', 'icon' => 'bi-check-circle'],
+        'cancelled' => ['label' => 'Đã hủy', 'badge' => 'danger', 'icon' => 'bi-x-circle'],
+        'return_requested' => ['label' => 'Yêu cầu đổi trả', 'badge' => 'secondary', 'icon' => 'bi-arrow-repeat'],
+        'returned' => ['label' => 'Đã đổi trả', 'badge' => 'secondary', 'icon' => 'bi-arrow-counterclockwise'],
     ];
 
     public const PAYMENT_LABELS = [
@@ -221,7 +231,7 @@ class Order extends Model
 
     public function canReceive(): bool
     {
-        return $this->order_status === 'shipping';
+        return $this->order_status === 'delivered';
     }
 
     public function canReorder(): bool
