@@ -159,7 +159,7 @@
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             @foreach ($product->variants->unique('color_name') as $variant)
                                 <button type="button" class="btn-variant color-btn"
-                                    data-color="{{ $variant->color_name }}"
+                                    data-color="{{ $variant->color_name }}" data-color-code="{{ $variant->color_code ?? '#fff' }}"
                                     style="border:1px solid #ccc;
                                background-color: {{ $variant->color_code ?? '#fff' }};
                                color: {{ strtolower($variant->color_name) === 'trắng' ? '#000' : '#fff' }};
@@ -618,21 +618,56 @@
                 btn.addEventListener('click', () => {
                     const isColor = btn.classList.contains('color-btn');
                     const group = isColor ? '.color-btn' : '.size-btn';
+                    const wasActive = btn.classList.contains('active');
 
-                    document.querySelectorAll(group).forEach(b => {
-                        b.classList.remove('active');
-                        if (isColor && b.dataset.color) {
-                            b.style.background = b.dataset.color;
-                            b.style.color = '#fff';
+                    if (wasActive) {
+                        btn.classList.remove('active');
+                        if (isColor) {
+                            const code = btn.dataset.colorCode || '#fff';
+                            btn.style.background = code;
+                            btn.style.border = '1px solid #ccc';
+                            btn.style.boxShadow = 'none';
+                            const name = (btn.dataset.color || '').toLowerCase();
+                            btn.style.color = name === 'trắng' ? '#000' : '#fff';
                         } else {
-                            b.style.background = '#fff';
-                            b.style.color = '#111';
+                            btn.style.background = '#fff';
+                            btn.style.color = '#111';
+                            btn.style.border = '1px solid #111';
+                            btn.style.boxShadow = 'none';
                         }
-                    });
+                    } else {
+                        document.querySelectorAll(group).forEach(b => {
+                            b.classList.remove('active');
+                            if (isColor) {
+                                const code = b.dataset.colorCode || '#fff';
+                                b.style.background = code;
+                                b.style.border = '1px solid #ccc';
+                                b.style.boxShadow = 'none';
+                                const name = (b.dataset.color || '').toLowerCase();
+                                b.style.color = name === 'trắng' ? '#000' : '#fff';
+                            } else {
+                                b.style.background = '#fff';
+                                b.style.color = '#111';
+                                b.style.border = '1px solid #111';
+                                b.style.boxShadow = 'none';
+                            }
+                        });
 
-                    btn.classList.add('active');
-                    btn.style.background = '#111';
-                    btn.style.color = '#fff';
+                        btn.classList.add('active');
+                        if (isColor) {
+                            const code = btn.dataset.colorCode || '#fff';
+                            btn.style.background = code;
+                            btn.style.border = '2px solid #0d6efd';
+                            btn.style.boxShadow = '0 0 0 3px rgba(13,110,253,.2)';
+                            const name = (btn.dataset.color || '').toLowerCase();
+                            btn.style.color = name === 'trắng' ? '#000' : '#fff';
+                        } else {
+                            btn.style.background = '#eef5ff';
+                            btn.style.color = '#0d6efd';
+                            btn.style.border = '2px solid #0d6efd';
+                            btn.style.boxShadow = '0 2px 6px rgba(13,110,253,.15)';
+                        }
+                    }
 
                     updateStockInfo();
                 });
@@ -754,10 +789,17 @@
             });
         </script>
         <style>
-            .btn-variant.active {
-                border: 1px solid #111 !important;
-                background: #111 !important;
+            .color-btn.active {
+                border: 2px solid #0d6efd !important;
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
                 color: #fff !important;
+            }
+
+            .size-btn.active {
+                background: #eef5ff !important;
+                border: 2px solid #0d6efd !important;
+                color: #0d6efd !important;
+                box-shadow: 0 2px 6px rgba(13, 110, 253, 0.15);
             }
 
             .product-action-btn {

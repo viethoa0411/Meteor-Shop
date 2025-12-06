@@ -187,21 +187,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const districtInput = document.getElementById('origin_district');
     const wardInput = document.getElementById('origin_ward');
 
-    // Load tỉnh/thành phố
-    fetch('https://provinces.open-api.vn/api/p/')
+    // Load tỉnh/thành phố (Esgoo)
+    fetch('https://esgoo.net/api-tinhthanh/1/0.htm')
         .then(response => response.json())
         .then(data => {
-            data.forEach(province => {
-                const option = document.createElement('option');
-                option.value = province.code;
-                option.textContent = province.name;
-                option.dataset.name = province.name;
-                if (province.name === savedCity) {
-                    option.selected = true;
-                    loadDistricts(province.code, savedDistrict, savedWard);
-                }
-                citySelect.appendChild(option);
-            });
+            if (data.error === 0) {
+                data.data.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province.id;
+                    option.textContent = province.full_name;
+                    option.dataset.name = province.full_name;
+                    if (province.full_name === savedCity) {
+                        option.selected = true;
+                        loadDistricts(province.id, savedDistrict, savedWard);
+                    }
+                    citySelect.appendChild(option);
+                });
+            }
         })
         .catch(error => {
             console.error('Lỗi load tỉnh/thành phố:', error);
@@ -243,23 +245,25 @@ document.addEventListener('DOMContentLoaded', function() {
         districtSelect.innerHTML = '<option value="">Đang tải...</option>';
         wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
 
-        fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+        fetch(`https://esgoo.net/api-tinhthanh/2/${provinceCode}.htm`)
             .then(response => response.json())
             .then(data => {
                 districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
 
-                data.districts.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district.code;
-                    option.textContent = district.name;
-                    option.dataset.name = district.name;
-                    if (district.name === savedDistrict) {
-                        option.selected = true;
-                        districtInput.value = district.name;
-                        loadWards(district.code, savedWard);
-                    }
-                    districtSelect.appendChild(option);
-                });
+                if (data.error === 0) {
+                    data.data.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.id;
+                        option.textContent = district.full_name;
+                        option.dataset.name = district.full_name;
+                        if (district.full_name === savedDistrict) {
+                            option.selected = true;
+                            districtInput.value = district.full_name;
+                            loadWards(district.id, savedWard);
+                        }
+                        districtSelect.appendChild(option);
+                    });
+                }
             })
             .catch(error => {
                 console.error('Lỗi load quận/huyện:', error);
@@ -270,22 +274,24 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadWards(districtCode, savedWard = null) {
         wardSelect.innerHTML = '<option value="">Đang tải...</option>';
 
-        fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+        fetch(`https://esgoo.net/api-tinhthanh/3/${districtCode}.htm`)
             .then(response => response.json())
             .then(data => {
                 wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
 
-                data.wards.forEach(ward => {
-                    const option = document.createElement('option');
-                    option.value = ward.code;
-                    option.textContent = ward.name;
-                    option.dataset.name = ward.name;
-                    if (ward.name === savedWard) {
-                        option.selected = true;
-                        wardInput.value = ward.name;
-                    }
-                    wardSelect.appendChild(option);
-                });
+                if (data.error === 0) {
+                    data.data.forEach(ward => {
+                        const option = document.createElement('option');
+                        option.value = ward.id;
+                        option.textContent = ward.full_name;
+                        option.dataset.name = ward.full_name;
+                        if (ward.full_name === savedWard) {
+                            option.selected = true;
+                            wardInput.value = ward.full_name;
+                        }
+                        wardSelect.appendChild(option);
+                    });
+                }
             })
             .catch(error => {
                 console.error('Lỗi load phường/xã:', error);

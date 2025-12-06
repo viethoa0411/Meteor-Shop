@@ -35,8 +35,11 @@ class CheckoutController extends Controller
      */
     public function index(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Checkout Index called', $request->all());
+
         // Kiểm tra đăng nhập
         if (!Auth::check()) {
+            \Illuminate\Support\Facades\Log::info('Checkout: User not logged in');
             return redirect()->route('client.login')
                 ->with('error', 'Vui lòng đăng nhập để tiếp tục đặt hàng');
         }
@@ -60,12 +63,46 @@ class CheckoutController extends Controller
 
         // Xử lý checkout từ giỏ hàng
         if ($type === 'cart') {
-            // 1. Lấy giỏ hàng từ session
-            $cart = session()->get('cart', []);
+            // 1. Lấy giỏ hàng
+            $cart = [];
+            $selectedIds = $request->input('selected', []);
+            
+            if (Auth::check()) {
+                // User đã đăng nhập: Lấy từ DB
+                $cartModel = \App\Models\Cart::with(['items.product', 'items.variant'])
+                    ->where('user_id', Auth::id())
+                    ->where('status', 'active')
+                    ->first();
+                
+                if ($cartModel) {
+                    foreach ($cartModel->items as $ci) {
+                        $cart[$ci->id] = [
+                            'product_id' => $ci->product_id,
+                            'variant_id' => $ci->variant_id,
+                            'name'       => $ci->product->name ?? 'Sản phẩm',
+                            'price'      => $ci->price,
+                            'quantity'   => $ci->quantity,
+                            'image'      => $ci->product->image ?? null,
+                            'color'      => $ci->color,
+                            'size'       => $ci->size,
+                        ];
+                    }
+                }
+            } else {
+                // Fallback (nếu sau này cho phép guest checkout): Lấy từ Session
+                $cart = session()->get('cart', []);
+            }
+
+            \Illuminate\Support\Facades\Log::info('Checkout Cart', ['cart_count' => count($cart), 'selected' => $selectedIds]);
 
             if (empty($cart)) {
                 return redirect()->route('cart.index')
                     ->with('error', 'Giỏ hàng của bạn đang trống');
+            }
+
+            if (empty($selectedIds)) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Vui lòng chọn ít nhất một sản phẩm để thanh toán');
             }
 
             // Kiểm tra tồn kho cho tất cả sản phẩm trong giỏ
@@ -73,6 +110,11 @@ class CheckoutController extends Controller
             $subtotal  = 0;
 
             foreach ($cart as $key => $item) {
+                // Nếu có danh sách chọn, chỉ lấy những item được chọn
+                if (!empty($selectedIds) && !in_array($key, $selectedIds)) {
+                    continue;
+                }
+
                 $product = Product::find($item['product_id']);
                 if (!$product) {
                     continue; // Bỏ qua sản phẩm không tồn tại
@@ -92,6 +134,7 @@ class CheckoutController extends Controller
 
                 // Kiểm tra tồn kho
                 if ($stock < $item['quantity']) {
+                    \Illuminate\Support\Facades\Log::info('Checkout: Out of stock', ['item' => $item['name'], 'stock' => $stock, 'qty' => $item['quantity']]);
                     return redirect()->route('cart.index')
                         ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                 }
@@ -258,7 +301,7 @@ class CheckoutController extends Controller
         }
 
         // Tính phí vận chuyển
-        $shippingFee = $this->calculateShippingFee(
+        $shippingFee = $this->getShippingFeeValue(
             $request->shipping_method,
             $request->shipping_city,
             $checkoutSession['subtotal']
@@ -658,9 +701,30 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Tính phí vận chuyển
+     * API Tính phí vận chuyển (AJAX)
      */
-    private function calculateShippingFee($method, $city, $subtotal)
+    public function calculateShippingFee(Request $request)
+    {
+        $city = $request->input('city');
+        $district = $request->input('district');
+        $subtotal = $request->input('subtotal', 0);
+        $method = $request->input('method', 'standard');
+
+        // Gọi hàm tính phí nội bộ
+        $fee = $this->getShippingFeeValue($method, $city, $subtotal);
+        
+        return response()->json([
+            'success' => true,
+            'fee' => $fee,
+            'fee_formatted' => number_format($fee, 0, ',', '.') . ' đ',
+            'is_free_shipping' => ($fee === 0)
+        ]);
+    }
+
+    /**
+     * Helper tính phí vận chuyển (Internal)
+     */
+    private function getShippingFeeValue($method, $city, $subtotal)
     {
         // Logic tính phí vận chuyển đơn giản
         $baseFee = 30000; // Phí cơ bản

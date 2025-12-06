@@ -175,12 +175,9 @@
                             @if ($order->canTrack())
                                 <a class="btn btn-outline-primary"
                                     href="{{ route('client.account.orders.tracking', $order) }}">
-                                    @if ($order->canTrack())
-                                        <a class="btn btn-outline-primary"
-                                            href="{{ route('client.account.orders.tracking', $order) }}">
-                                            <i class="bi bi-truck me-1"></i> Theo dõi vận đơn
-                                        </a>
-                                    @endif
+                                    <i class="bi bi-truck me-1"></i> Theo dõi vận đơn
+                                </a>
+                            @endif
                                     @if ($order->canReturnRefund())
                                         @php
                                             $daysRemaining = $order->getReturnDaysRemaining();
@@ -247,7 +244,9 @@
                                                 <i class="bi bi-arrow-repeat me-1"></i> Đặt lại
                                             </button>
                                         </form>
-                                        @if ($order->canCancel())
+                                    @endif
+
+                                    @if ($order->canCancel())
                                             <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
                                                 data-bs-target="#cancelOrderModal">
                                                 <i class="bi bi-x-circle me-1"></i>

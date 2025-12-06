@@ -3,84 +3,105 @@
 @section('content')
     <div class="container pb-5">
 
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <div class="text-center mb-4">
             <h2>Giỏ hàng</h2>
         </div>
         @if (count($cart) > 0)
-
-            <table class="table table-bordered align-middle">
-                <tr>
-                    <th style="width:40px;">
-                        <input type="checkbox" id="select-all" checked>
-                    </th>
-                    <th>Ảnh</th>
-                    <th>Tên</th>
-                    <th class="text-end">Giá</th>
-                    <th>Số lượng</th>
-                    <th class="text-end">Thành tiền</th>
-                    <th>Hành động</th>
-                </tr>
-
-                @foreach ($cart as $id => $item)
-                    <tr id="row-{{ $id }}">
-                        <td class="text-center">
-                            <input type="checkbox" class="cart-item-checkbox" data-id="{{ $id }}"
-                                data-subtotal="{{ $item['price'] * $item['quantity'] }}" checked>
-                        </td>
-
-                        <td>
-                            <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/70x70?text=No+Image' }}"
-                                width="70" alt="{{ $item['name'] }}">
-                        </td>
-
-                        <td>
-                            {{ $item['name'] }}
-                            <div class="mt-1 text-muted" style="font-size: 0.9em;">
-                                @if ($item['color'])
-                                    <span>Màu: <strong>{{ $item['color'] }}</strong></span>
-                                @endif
-                                @if ($item['size'])
-                                    <span class="ms-2">Size: <strong>{{ $item['size'] }}</strong></span>
-                                @endif
-                            </div>
-                        </td>
-
-                        <td class="text-end">{{ number_format($item['price']) }}đ</td>
-
-                        <td class="d-flex align-items-center gap-2 flex-column flex-sm-row">
-                            <button class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
-                                data-type="minus">-</button>
-                            <span id="qty-{{ $id }}" data-max="{{ $item['max_stock'] ?? '' }}">{{ $item['quantity'] }}</span>
-                            <button class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
-                                data-type="plus">+</button>
-                            @if (!empty($item['max_stock']))
-                                <small class="text-muted" id="stock-note-{{ $id }}">Tối đa: {{ $item['max_stock'] }}</small>
-                            @else
-                                <small class="text-muted" id="stock-note-{{ $id }}"></small>
-                            @endif
-                        </td>
-
-                        <td class="text-end">
-                            <span
-                                id="subtotal-{{ $id }}">{{ number_format($item['price'] * $item['quantity']) }}đ</span>
-                        </td>
-
-                        <td>
-                            <button class="btn btn-danger btn-sm removeItem" data-id="{{ $id }}">Xóa</button>
-                        </td>
+            <form action="{{ route('client.checkout.index') }}" method="GET" id="cart-form">
+                <input type="hidden" name="type" value="cart">
+                <table class="table table-bordered align-middle">
+                    <tr>
+                        <th style="width:40px;">
+                            <input type="checkbox" id="select-all" checked>
+                        </th>
+                        <th>Ảnh</th>
+                        <th>Tên</th>
+                        <th class="text-end">Giá</th>
+                        <th>Số lượng</th>
+                        <th class="text-end">Thành tiền</th>
+                        <th>Hành động</th>
                     </tr>
-                @endforeach
-            </table>
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mt-3">
-                <div class="fw-semibold fs-5">
-                    Tổng tiền đã chọn:
-                    <span id="selected-total">{{ number_format($total) ?? 0 }}đ</span>
-                </div>
-                <button id="checkout-selected" class="btn btn-dark mt-2 mt-md-0">
-                    Đặt hàng
-                </button>
 
-            </div>
+                    @foreach ($cart as $id => $item)
+                        @php
+                            $maxStock = $item['max_stock'] ?? 0;
+                            $isOutOfStock = $maxStock < 1;
+                            $isNotEnough = $maxStock < $item['quantity'];
+                        @endphp
+                        <tr id="row-{{ $id }}" class="{{ $isOutOfStock ? 'table-secondary' : '' }}">
+                            <td class="text-center">
+                                <input type="checkbox" name="selected[]" value="{{ $id }}" 
+                                    class="cart-item-checkbox" 
+                                    data-id="{{ $id }}"
+                                    data-subtotal="{{ $item['price'] * $item['quantity'] }}" 
+                                    {{ $isOutOfStock ? 'disabled' : 'checked' }}>
+                            </td>
+
+                            <td>
+                                <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/70x70?text=No+Image' }}"
+                                    width="70" alt="{{ $item['name'] }}" style="{{ $isOutOfStock ? 'opacity: 0.5' : '' }}">
+                            </td>
+
+                            <td>
+                                {{ $item['name'] }}
+                                <div class="mt-1 text-muted" style="font-size: 0.9em;">
+                                    @if ($item['color'])
+                                        <span>Màu: <strong>{{ $item['color'] }}</strong></span>
+                                    @endif
+                                    @if ($item['size'])
+                                        <span class="ms-2">Size: <strong>{{ $item['size'] }}</strong></span>
+                                    @endif
+                                </div>
+                                @if ($isOutOfStock)
+                                    <div class="text-danger fw-bold small mt-1">Hết hàng</div>
+                                @elseif ($isNotEnough)
+                                    <div class="text-danger fw-bold small mt-1">Kho chỉ còn {{ $maxStock }}</div>
+                                @endif
+                            </td>
+
+                            <td class="text-end">{{ number_format($item['price']) }}đ</td>
+
+                            <td class="d-flex align-items-center gap-2 flex-column flex-sm-row">
+                                <button type="button" class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
+                                    data-type="minus">-</button>
+                                <span id="qty-{{ $id }}" data-max="{{ $item['max_stock'] ?? '' }}">{{ $item['quantity'] }}</span>
+                                <button type="button" class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
+                                    data-type="plus">+</button>
+                                @if (!empty($item['max_stock']))
+                                    <small class="text-muted" id="stock-note-{{ $id }}">Tối đa: {{ $item['max_stock'] }}</small>
+                                @else
+                                    <small class="text-muted" id="stock-note-{{ $id }}"></small>
+                                @endif
+                            </td>
+
+                            <td class="text-end">
+                                <span
+                                    id="subtotal-{{ $id }}">{{ number_format($item['price'] * $item['quantity']) }}đ</span>
+                            </td>
+
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm removeItem" data-id="{{ $id }}">Xóa</button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </table>
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mt-3">
+                    <div class="fw-semibold fs-5">
+                        Tổng tiền đã chọn:
+                        <span id="selected-total">{{ number_format($total) ?? 0 }}đ</span>
+                    </div>
+                    <button type="submit" id="checkout-selected" class="btn btn-dark mt-2 mt-md-0">
+                        Đặt hàng
+                    </button>
+                </div>
+            </form>
         @else
             <div class="text-center mt-4">
                 <p>Hiện tại giỏ hàng của bạn trống.</p>
@@ -117,12 +138,12 @@
 
     </div>
 @endsection
+
+@push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     $(document).ready(function() {
-        const checkoutUrl = "{{ route('client.checkout.index') }}";
-
         const formatCurrency = (value) => Number(value).toLocaleString('vi-VN') + "đ";
 
         const updateSelectedTotal = () => {
@@ -153,21 +174,14 @@
             updateSelectedTotal();
         });
 
-        $('#checkout-selected').on('click', function(e) {
-            e.preventDefault();
-            const selectedIds = $('.cart-item-checkbox:checked').map(function() {
-                return $(this).data('id');
-            }).get();
+        // Validate form submit
+        $('#cart-form').on('submit', function(e) {
+            const selectedCount = $('.cart-item-checkbox:checked').length;
 
-            if (selectedIds.length === 0) {
+            if (selectedCount === 0) {
+                e.preventDefault();
                 alert('Vui lòng chọn ít nhất một sản phẩm để đặt hàng.');
-                return;
             }
-
-            const params = new URLSearchParams();
-            params.append('type', 'cart');
-            selectedIds.forEach(id => params.append('selected[]', id));
-            window.location.href = checkoutUrl + '?' + params.toString();
         });
 
 
@@ -229,12 +243,8 @@
                     updateSelectedTotal();
                     syncSelectAll();
 
-
                     if (data.total == 0) {
-                        $("table").remove();
-                        $(".container").append("<p>Giỏ hàng của bạn trống.</p>");
-                        $('#selected-total').text("0đ");
-
+                        window.location.reload();
                     }
                 }
             });
@@ -242,3 +252,4 @@
 
     });
 </script>
+@endpush

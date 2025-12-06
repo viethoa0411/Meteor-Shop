@@ -105,7 +105,7 @@
                         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
                             <i class="bi bi-x-circle me-1"></i>
                             @if ($order->payment_method === 'wallet' && $order->payment_status === 'paid')
-                                Hủy đơn và hoàn tiền
+                                Hủy đơn
                             @else
                                 Hủy đơn hàng
                             @endif

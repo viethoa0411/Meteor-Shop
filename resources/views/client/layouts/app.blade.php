@@ -222,6 +222,10 @@
             position: relative;
         }
 
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
         .client-nav a,
         .client-nav button {
             color: inherit;
@@ -235,7 +239,7 @@
         .client-nav .dropdown-menu {
             display: none;
             position: absolute;
-            top:100%
+            top: 100% ;
             left: 0;
             background: #fff;
             border-radius: 8px;
@@ -316,7 +320,7 @@
         .overlay.active {
             display: block;
         }
-        
+
 
         /* Footer */
         footer {
@@ -458,9 +462,9 @@
             color: #fff;
             cursor: pointer;
             font-style: 1em;
-        } */
+        }
 
-        .article-card:hover {
+        */ .article-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 8ox 20px rgba(0, 0, 0, 0.15);
         }
@@ -562,7 +566,9 @@
                                             <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
                                         </a>
                                     </li>
-                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
                                     <li>
                                         <form action="{{ route('client.logout') }}" method="POST">
                                             @csrf
@@ -871,6 +877,28 @@
     {{-- SweetAlert2 for client-side modals (báo cáo bình luận, thông báo đẹp) --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
+
+    @if(session('error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: "{{ session('error') }}",
+            });
+        </script>
+    @endif
+
     @stack('scripts')
 
     <!-- Bootstrap JS Bundle to enable dropdown -->
@@ -1017,6 +1045,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -1073,8 +1102,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         .chatbox-popup__close {
@@ -1385,12 +1421,25 @@
             animation: typingBounce 1.4s infinite ease-in-out;
         }
 
-        .chatbox-typing__dots span:nth-child(1) { animation-delay: -0.32s; }
-        .chatbox-typing__dots span:nth-child(2) { animation-delay: -0.16s; }
+        .chatbox-typing__dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .chatbox-typing__dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
 
         @keyframes typingBounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
         }
 
         /* Responsive */
@@ -1482,7 +1531,8 @@
 
             async function initChatbox() {
                 try {
-                    const response = await fetch('/chat/settings' + (sessionToken ? '?session_token=' + sessionToken : ''));
+                    const response = await fetch('/chat/settings' + (sessionToken ? '?session_token=' +
+                        sessionToken : ''));
                     const data = await response.json();
 
                     if (!data.enabled) {
@@ -1533,7 +1583,8 @@
 
                 // Colors
                 if (settings.primary_color) {
-                    const gradient = `linear-gradient(135deg, ${settings.primary_color} 0%, ${settings.secondary_color || settings.primary_color} 100%)`;
+                    const gradient =
+                        `linear-gradient(135deg, ${settings.primary_color} 0%, ${settings.secondary_color || settings.primary_color} 100%)`;
                     chatboxHeader.style.background = gradient;
                     document.querySelector('.chatbox-toggle').style.background = gradient;
                 }
@@ -1565,13 +1616,15 @@
             function appendMessage(msg) {
                 const isClient = msg.sender_type === 'client';
                 const isBot = msg.sender_type === 'bot';
-                const typeClass = isClient ? 'chatbox-message--sent' : (isBot ? 'chatbox-message--received chatbox-message--bot' : 'chatbox-message--received');
+                const typeClass = isClient ? 'chatbox-message--sent' : (isBot ?
+                    'chatbox-message--received chatbox-message--bot' : 'chatbox-message--received');
                 const icon = isClient ? 'bi-person-fill' : (isBot ? 'bi-robot' : 'bi-headset');
 
                 // Check if message has image
                 let contentHtml = '';
                 if (msg.message_type === 'image' && msg.attachment_url) {
-                    contentHtml = `<img src="${msg.attachment_url}" class="chatbox-message__image" onclick="openImageModal('${msg.attachment_url}')" alt="Image">`;
+                    contentHtml =
+                        `<img src="${msg.attachment_url}" class="chatbox-message__image" onclick="openImageModal('${msg.attachment_url}')" alt="Image">`;
                     if (msg.message && msg.message !== '[Hình ảnh]') {
                         contentHtml += `<p>${escapeHtml(msg.message)}</p>`;
                     }
@@ -1643,7 +1696,8 @@
                 try {
                     let response;
                     // Get CSRF token
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                    'content');
 
                     if (imageFile) {
                         // Send with FormData for image upload
@@ -1738,7 +1792,8 @@
                 if (!isEnabled || !sessionToken) return;
 
                 try {
-                    const response = await fetch(`/chat/messages?session_token=${sessionToken}&last_id=${lastMessageId}`);
+                    const response = await fetch(
+                        `/chat/messages?session_token=${sessionToken}&last_id=${lastMessageId}`);
                     const data = await response.json();
 
                     if (data.messages && data.messages.length > 0) {
@@ -1779,7 +1834,9 @@
 
             function playNotificationSound() {
                 try {
-                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQAA');
+                    const audio = new Audio(
+                        'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQAA'
+                        );
                     audio.volume = 0.3;
                     audio.play().catch(() => {});
                 } catch (e) {}

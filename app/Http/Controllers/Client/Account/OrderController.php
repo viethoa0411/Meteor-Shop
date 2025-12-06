@@ -88,8 +88,6 @@ class OrderController extends Controller
             $refundMessage = '';
             if ($order->payment_method === 'wallet' && $order->payment_status === 'paid') {
                 $wallet = ClientWallet::where('user_id', $order->user_id)->first();
-        return back()->with('success', 'Đơn hàng đã được hủy thành công.');
-
 
                 if ($wallet) {
                     $refundAmount = $order->final_total;

@@ -37,20 +37,6 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-<<<<<<< HEAD
-=======
-
-                            {{-- Mô tả --}}
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Mô tả ngắn</label>
-                                <textarea class="form-control @error('description') is-invalid @enderror" id="description"
-                                    name="description" rows="3" placeholder="Nhập mô tả banner (tùy chọn)">{{ old('description') }}</textarea>
-                                @error('description')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
->>>>>>> origin/Trang_Chu_Client
                             {{-- Link --}}
                             <div class="mb-3">
                                 <label for="link" class="form-label">Liên kết (URL)</label>

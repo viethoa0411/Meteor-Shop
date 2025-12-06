@@ -327,6 +327,51 @@
         @push('scripts')
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
+                    // Hero Banner Slider Logic
+                    const track = document.querySelector('.hero-banner-track');
+                    if (track) {
+                        const slides = track.querySelectorAll('.hero-slide');
+                        if (slides.length > 1) {
+                            const prevBtn = document.querySelector('.hero-nav-prev');
+                            const nextBtn = document.querySelector('.hero-nav-next');
+                            const dots = document.querySelectorAll('.hero-dot');
+                            let currentIndex = 0;
+                            const totalSlides = slides.length;
+                            let autoSlideInterval;
+
+                            function goToSlide(index) {
+                                if (index < 0) index = totalSlides - 1;
+                                if (index >= totalSlides) index = 0;
+                                currentIndex = index;
+                                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                                dots.forEach((dot, i) => {
+                                    dot.classList.toggle('is-active', i === currentIndex);
+                                    dot.setAttribute('aria-current', i === currentIndex ? 'true' : 'false');
+                                });
+                            }
+
+                            function nextSlide() { goToSlide(currentIndex + 1); }
+                            function prevSlide() { goToSlide(currentIndex - 1); }
+                            function startAutoSlide() {
+                                stopAutoSlide();
+                                autoSlideInterval = setInterval(nextSlide, 4000);
+                            }
+                            function stopAutoSlide() {
+                                if (autoSlideInterval) clearInterval(autoSlideInterval);
+                            }
+
+                            if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); startAutoSlide(); });
+                            if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); startAutoSlide(); });
+                            dots.forEach((dot, index) => {
+                                dot.addEventListener('click', () => { goToSlide(index); startAutoSlide(); });
+                            });
+
+                            track.parentElement.addEventListener('mouseenter', stopAutoSlide);
+                            track.parentElement.addEventListener('mouseleave', startAutoSlide);
+                            startAutoSlide();
+                        }
+                    }
+
                     document.querySelectorAll('.wishlist-toggle-home').forEach(btn => {
                         btn.addEventListener('click', function(e) {
                             e.preventDefault();

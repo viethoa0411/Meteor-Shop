@@ -30,12 +30,16 @@ class CartController extends Controller
                 foreach ($cartModel->items as $ci) {
                     $product = $ci->product;
                     $variant = $ci->variant;
+
+                    $stock = $variant ? ($variant->stock ?? 0) : ($product->stock ?? 0);
+
                     $cart[$ci->id] = [
                         'product_id' => $ci->product_id,
                         'variant_id' => $ci->variant_id,
                         'name'       => $product ? $product->name : ($ci->product_id ?? 'Sản phẩm'),
                         'price'      => (float) $ci->price,
                         'quantity'   => (int) $ci->quantity,
+                        'max_stock'  => (int) $stock,
                         'color'      => $ci->color ?? ($variant->color_name ?? null),
                         'size'       => $ci->size ?? (
                             $variant && $variant->length && $variant->width && $variant->height
@@ -77,8 +81,10 @@ class CartController extends Controller
 
         foreach ($cart as $id => &$item) {
             $product = Product::with('category')->find($item['product_id'] ?? null);
+            $stock = 0;
 
             if ($product) {
+                $stock = $product->stock ?? 0;
                 $item['image']    = $product->image;
                 $item['category'] = $product->category ?? null;
                 $item['name']     = $item['name'] ?? $product->name;
@@ -86,6 +92,7 @@ class CartController extends Controller
                 if (!empty($item['variant_id'])) {
                     $variant = ProductVariant::find($item['variant_id']);
                     if ($variant) {
+                        $stock = $variant->stock ?? 0;
                         $item['color'] = $item['color'] ?? $variant->color_name;
                         if ($variant->length && $variant->width && $variant->height) {
                             $item['size'] = $item['size'] ?? ($variant->length . 'x' . $variant->width . 'x' . $variant->height);
@@ -96,6 +103,8 @@ class CartController extends Controller
                 $item['image']    = $item['image'] ?? null;
                 $item['category'] = $item['category'] ?? null;
             }
+            
+            $item['max_stock'] = $stock;
 
             $item['color'] = $item['color'] ?? null;
             $item['size']  = $item['size'] ?? null;
