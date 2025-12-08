@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ClientWallet;
 use App\Models\WalletTransaction;
+use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -60,61 +62,115 @@ class CheckoutController extends Controller
 
         // Xử lý checkout từ giỏ hàng
         if ($type === 'cart') {
-            // 1. Lấy giỏ hàng từ session
-            $cart = session()->get('cart', []);
-
-            if (empty($cart)) {
-                return redirect()->route('cart.index')
-                    ->with('error', 'Giỏ hàng của bạn đang trống');
-            }
-
-            // Kiểm tra tồn kho cho tất cả sản phẩm trong giỏ
             $cartItems = [];
             $subtotal  = 0;
+            
+            if (Auth::check()) {
 
-            foreach ($cart as $key => $item) {
-                $product = Product::find($item['product_id']);
-                if (!$product) {
-                    continue; // Bỏ qua sản phẩm không tồn tại
+                // User đã đăng nhập: lấy từ DB Cart
+                $selectedIds = $request->query('selected', []);
+                if ($selectedIds) {
+                    // Nếu có selected[], lấy những CartItem được chọn
+                    $cartItemModels = CartItem::with(['product', 'variant'])
+                        ->whereIn('id', $selectedIds)
+                        ->whereHas('cart', function ($q) {
+                            $q->where('user_id', Auth::id())
+                                ->where('status', 'active');
+                        })
+                        ->get();
+                } else {
+
+                    // Nếu không có selected[], lấy toàn bộ cart items
+
+                    $cartModel = Cart::with(['items.product', 'items.variant'])
+                        ->where('user_id', Auth::id())
+                        ->where('status', 'active')
+                        ->first();
+                    $cartItemModels = $cartModel ? $cartModel->items : collect();
                 }
-
-                $stock   = $product->stock ?? 0;
-                $price   = $item['price'];
-                $variant = null;
-
-                if (!empty($item['variant_id'])) {
-                    $variant = ProductVariant::find($item['variant_id']);
+                if ($cartItemModels->isEmpty()) {
+                    return redirect()->route('cart.index')
+                        ->with('error', 'Giỏ hàng của bạn đang trống');
+                }
+                foreach ($cartItemModels as $cartItem) {
+                    $product = $cartItem->product;
+                    $variant = $cartItem->variant;
+                    if (!$product) continue;
+                    $stock = $product->stock ?? 0;
+                    $price = $cartItem->price;
                     if ($variant) {
                         $stock = $variant->stock ?? 0;
                         $price = $variant->price ?? $product->price;
                     }
+                    // Kiểm tra tồn kho
+                    if ($stock < $cartItem->quantity) {
+                        return redirect()->route('cart.index')
+                            ->with('error', "Sản phẩm '{$product->name}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                    }
+                    $itemSubtotal = $price * $cartItem->quantity;
+                    $subtotal += $itemSubtotal;
+                    $cartItems[] = [
+                        'key'        => $cartItem->id,
+                        'product_id' => $cartItem->product_id,
+                        'variant_id' => $cartItem->variant_id,
+                        'name'       => $product->name,
+                        'price'      => $price,
+                        'quantity'   => $cartItem->quantity,
+                        'subtotal'   => $itemSubtotal,
+                        'image'      => $product->image,
+                        'color'      => $cartItem->color ?? ($variant?->color_name ?? null),
+                        'size'       => $cartItem->size ?? null,
+                        'product'    => $product,
+                        'variant'    => $variant,
+                    ];
                 }
-
-                // Kiểm tra tồn kho
-                if ($stock < $item['quantity']) {
+            } else {
+                // User chưa đăng nhập: lấy từ session
+                $cart = session()->get('cart', []);
+                if (empty($cart)) {
                     return redirect()->route('cart.index')
-                        ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                        ->with('error', 'Giỏ hàng của bạn đang trống');
                 }
+                foreach ($cart as $key => $item) {
+                    $product = Product::find($item['product_id']);
+                    if (!$product) continue;
+                    $stock = $product->stock ?? 0;
+                    $price = $item['price'];
+                    $variant = null;
+                    if (!empty($item['variant_id'])) {
+                        $variant = ProductVariant::find($item['variant_id']);
+                        if ($variant) {
+                            $stock = $variant->stock ?? 0;
+                            $price = $variant->price ?? $product->price;
+                        }
+                    }
+                    if ($stock < $item['quantity']) {
+                        return redirect()->route('cart.index')
+                            ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                    }
+                    $itemSubtotal = $price * $item['quantity'];
+                    $subtotal += $itemSubtotal;
+                    $cartItems[] = [
 
-                $itemSubtotal = $price * $item['quantity'];
-                $subtotal    += $itemSubtotal;
-
-                $cartItems[] = [
-                    'key'        => $key,
-                    'product_id' => $item['product_id'],
-                    'variant_id' => $item['variant_id'] ?? null,
-                    'name'       => $item['name'],
-                    'price'      => $price,
-                    'quantity'   => $item['quantity'],
-                    'subtotal'   => $itemSubtotal,
-                    'image'      => $item['image'] ?? $product->image,
-                    'color'      => $item['color'] ?? null,
-                    'size'       => $item['size'] ?? null,
-                    'product'    => $product,
-                    'variant'    => $variant,
-                ];
+                        'key'        => $key,
+                        'product_id' => $item['product_id'],
+                        'variant_id' => $item['variant_id'] ?? null,
+                        'name'       => $item['name'],
+                        'price'      => $price,
+                        'quantity'   => $item['quantity'],
+                        'subtotal'   => $itemSubtotal,
+                        'image'      => $item['image'] ?? $product->image,
+                        'color'      => $item['color'] ?? null,
+                        'size'       => $item['size'] ?? null,
+                        'product'    => $product,
+                        'variant'    => $variant,
+                    ];
+                }
             }
-
+            if (empty($cartItems)) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Giỏ hàng của bạn đang trống');
+            }
             // Lưu thông tin vào session
             $checkoutData = [
                 'type'       => 'cart',
@@ -124,7 +180,6 @@ class CheckoutController extends Controller
             ];
 
             session(['checkout_session' => $checkoutData]);
-
             return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData'));
         }
 
@@ -202,7 +257,7 @@ class CheckoutController extends Controller
             'customer_phone'   => 'required|string|regex:/^[0-9]{10,11}$/',
             'customer_email'   => 'required|email|max:255',
             'shipping_city'    => 'required|string|max:255',
-            'shipping_district'=> 'required|string|max:255',
+            'shipping_district' => 'required|string|max:255',
             'shipping_ward'    => 'required|string|max:255',
             'shipping_address' => 'required|string|max:500',
             'shipping_method'  => 'required|string|in:standard,express,fast',
@@ -217,7 +272,7 @@ class CheckoutController extends Controller
             'customer_email.required'   => 'Vui lòng nhập email',
             'customer_email.email'      => 'Email không hợp lệ',
             'shipping_city.required'    => 'Vui lòng chọn tỉnh/thành phố',
-            'shipping_district.required'=> 'Vui lòng chọn quận/huyện',
+            'shipping_district.required' => 'Vui lòng chọn quận/huyện',
             'shipping_ward.required'    => 'Vui lòng chọn phường/xã',
             'shipping_address.required' => 'Vui lòng nhập địa chỉ chi tiết',
         ]);
@@ -371,7 +426,7 @@ class CheckoutController extends Controller
                 'customer_phone'   => $checkoutSession['customer_phone'],
                 'customer_email'   => $checkoutSession['customer_email'],
                 'shipping_city'    => $checkoutSession['shipping_city'],
-                'shipping_district'=> $checkoutSession['shipping_district'],
+                'shipping_district' => $checkoutSession['shipping_district'],
                 'shipping_ward'    => $checkoutSession['shipping_ward'],
                 'shipping_address' => $checkoutSession['shipping_address'],
                 'shipping_method'  => $checkoutSession['shipping_method'],
