@@ -23,10 +23,20 @@
             {{-- Form thông tin --}}
             <div class="col-lg-8 mb-4">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Thông tin khách hàng</h5>
-                    </div>
-                    <div class="card-body">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Thông tin khách hàng</h5>
+    </div>
+    <div class="card-body">
+        
+        {{-- THÔNG BÁO VÀ RÀNG BUỘC KHU VỰC MIỀN BẮC --}}
+        <div class="alert alert-info py-2" role="alert" style="font-size: 0.9rem;">
+            ⚠️ Shop chỉ hỗ trợ đặt hàng trực tuyến tại khu vực Miền Bắc. Khách hàng ở khu vực khác vui lòng liên hệ trực tiếp với shop để được tư vấn.
+        </div>
+
+        {{-- Vùng hiển thị lỗi khi chọn tỉnh/thành phố không hợp lệ --}}
+        <div id="shipping-region-error" class="alert alert-danger d-none py-2" role="alert" style="font-size: 0.9rem;">
+            
+        </div>
                         <form action="{{ route('client.checkout.process') }}" method="POST" id="checkoutForm">
                             @csrf
                             {{-- Hidden input để lưu số lượng --}}
