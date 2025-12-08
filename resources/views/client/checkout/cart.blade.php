@@ -250,360 +250,400 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            // Load dữ liệu địa chỉ từ API
-            let provinces = [];
-            let districts = [];
-            let wards = [];
+@push('scripts')
+    <script>
+        // Load dữ liệu địa chỉ từ API
+        let provinces = [];
+        let districts = [];
+        let wards = [];
+        
+        // Hàm định dạng tiền tệ
+        function formatCurrency(amount) {
+            if (typeof amount !== 'number') return amount;
+            return amount.toLocaleString('vi-VN') + ' đ';
+        }
 
-            // Load tỉnh/thành phố
-            async function loadProvinces() {
-                try {
-                    const response = await fetch('https://provinces.open-api.vn/api/?depth=1');
-                    if (!response.ok) {
-                        throw new Error('Không thể tải dữ liệu từ API');
-                    }
-                    provinces = await response.json();
-                    const citySelect = document.getElementById('shipping_city');
-                    if (!citySelect) return;
-                    
-                    provinces.forEach(province => {
-                        const option = document.createElement('option');
-                        option.value = province.name;
-                        option.textContent = province.name;
-                        option.dataset.code = province.code;
-                        citySelect.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error('Lỗi khi tải danh sách tỉnh/thành phố:', error);
-                    const citySelect = document.getElementById('shipping_city');
-                    if (citySelect) {
-                        const errorOption = document.createElement('option');
-                        errorOption.value = '';
-                        errorOption.textContent = 'Không thể tải dữ liệu. Vui lòng tải lại trang.';
-                        citySelect.appendChild(errorOption);
-                    }
+        // Load tỉnh/thành phố
+        async function loadProvinces() {
+            try {
+                const response = await fetch('https://provinces.open-api.vn/api/?depth=1');
+                if (!response.ok) {
+                    throw new Error('Không thể tải dữ liệu từ API');
+                }
+                provinces = await response.json();
+                const citySelect = document.getElementById('shipping_city');
+                if (!citySelect) return;
+                
+                // Xóa các option cũ trừ option mặc định
+                citySelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
+
+                provinces.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province.name;
+                    option.textContent = province.name;
+                    option.dataset.code = province.code;
+                    citySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách tỉnh/thành phố:', error);
+                const citySelect = document.getElementById('shipping_city');
+                if (citySelect) {
+                    const errorOption = document.createElement('option');
+                    errorOption.value = '';
+                    errorOption.textContent = 'Không thể tải dữ liệu. Vui lòng tải lại trang.';
+                    citySelect.appendChild(errorOption);
                 }
             }
+        }
 
-            // Load quận/huyện
-            async function loadDistricts(provinceCode) {
-                try {
-                    const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
-                    if (!response.ok) {
-                        throw new Error('Không thể tải dữ liệu quận/huyện');
-                    }
-                    const data = await response.json();
-                    districts = data.districts || [];
-                    const districtSelect = document.getElementById('shipping_district');
-                    if (!districtSelect) return;
-                    
-                    districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
-                    districts.forEach(district => {
-                        const option = document.createElement('option');
-                        option.value = district.name;
-                        option.textContent = district.name;
-                        option.dataset.code = district.code;
-                        districtSelect.appendChild(option);
-                    });
-                    districtSelect.disabled = false;
-                    // Reset phường/xã
-                    const wardSelect = document.getElementById('shipping_ward');
-                    if (wardSelect) {
-                        wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
-                        wardSelect.disabled = true;
-                    }
-                } catch (error) {
-                    console.error('Lỗi khi tải danh sách quận/huyện:', error);
-                    const districtSelect = document.getElementById('shipping_district');
-                    if (districtSelect) {
-                        districtSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
-                    }
+        // Load quận/huyện
+        async function loadDistricts(provinceCode) {
+            try {
+                const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+                if (!response.ok) {
+                    throw new Error('Không thể tải dữ liệu quận/huyện');
                 }
-            }
-
-            // Load phường/xã
-            async function loadWards(districtCode) {
-                try {
-                    const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
-                    if (!response.ok) {
-                        throw new Error('Không thể tải dữ liệu phường/xã');
-                    }
-                    const data = await response.json();
-                    wards = data.wards || [];
-                    const wardSelect = document.getElementById('shipping_ward');
-                    if (!wardSelect) return;
-                    
+                const data = await response.json();
+                districts = data.districts || [];
+                const districtSelect = document.getElementById('shipping_district');
+                if (!districtSelect) return;
+                
+                districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+                districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district.name;
+                    option.textContent = district.name;
+                    option.dataset.code = district.code;
+                    districtSelect.appendChild(option);
+                });
+                districtSelect.disabled = false;
+                
+                // Reset phường/xã
+                const wardSelect = document.getElementById('shipping_ward');
+                if (wardSelect) {
                     wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
-                    wards.forEach(ward => {
-                        const option = document.createElement('option');
-                        option.value = ward.name;
-                        option.textContent = ward.name;
-                        wardSelect.appendChild(option);
-                    });
-                    wardSelect.disabled = false;
-                } catch (error) {
-                    console.error('Lỗi khi tải danh sách phường/xã:', error);
-                    const wardSelect = document.getElementById('shipping_ward');
-                    if (wardSelect) {
-                        wardSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
-                    }
+                    wardSelect.disabled = true;
+                }
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách quận/huyện:', error);
+                const districtSelect = document.getElementById('shipping_district');
+                if (districtSelect) {
+                    districtSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+                    districtSelect.disabled = true;
                 }
             }
+        }
 
-            document.addEventListener('DOMContentLoaded', async function() {
-                // Lấy thông tin địa chỉ cũ từ reorder (nếu có)
-                const savedCity = @json($checkoutData['shipping_city'] ?? null);
-                const savedDistrict = @json($checkoutData['shipping_district'] ?? null);
-                const savedWard = @json($checkoutData['shipping_ward'] ?? null);
+        // Load phường/xã
+        async function loadWards(districtCode) {
+            try {
+                const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+                if (!response.ok) {
+                    throw new Error('Không thể tải dữ liệu phường/xã');
+                }
+                const data = await response.json();
+                wards = data.wards || [];
+                const wardSelect = document.getElementById('shipping_ward');
+                if (!wardSelect) return;
+                
+                wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                wards.forEach(ward => {
+                    const option = document.createElement('option');
+                    option.value = ward.name;
+                    option.textContent = ward.name;
+                    wardSelect.appendChild(option);
+                });
+                wardSelect.disabled = false;
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách phường/xã:', error);
+                const wardSelect = document.getElementById('shipping_ward');
+                if (wardSelect) {
+                    wardSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+                    wardSelect.disabled = true;
+                }
+            }
+        }
 
-                // Load tỉnh/thành phố khi trang load
-                await loadProvinces();
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Lấy thông tin địa chỉ cũ từ Blade
+            const savedCity = @json($checkoutData['shipping_city'] ?? null);
+            const savedDistrict = @json($checkoutData['shipping_district'] ?? null);
+            const savedWard = @json($checkoutData['shipping_ward'] ?? null);
+            
+            // Khởi tạo các biến tính toán
+            const subtotal = {{ $subtotal }};
+            let currentShippingFee = 0;
+            let currentDiscount = 0;
+            
+            // Tải Tỉnh/Thành phố đầu tiên
+            await loadProvinces();
 
-                // Nếu có địa chỉ cũ, tự động chọn
-                if (savedCity) {
-                    const citySelect = document.getElementById('shipping_city');
-                    for (let option of citySelect.options) {
-                        if (option.value === savedCity) {
-                            citySelect.value = savedCity;
-                            if (option.dataset.code) {
-                                await loadDistricts(option.dataset.code);
+            // Nếu có địa chỉ cũ, tự động chọn và tải dữ liệu liên quan
+            if (savedCity) {
+                const citySelect = document.getElementById('shipping_city');
+                for (let option of citySelect.options) {
+                    if (option.value === savedCity) {
+                        citySelect.value = savedCity;
+                        
+                        if (option.dataset.code) {
+                            await loadDistricts(option.dataset.code);
 
-                                if (savedDistrict) {
-                                    const districtSelect = document.getElementById('shipping_district');
-                                    for (let dOption of districtSelect.options) {
-                                        if (dOption.value === savedDistrict) {
-                                            districtSelect.value = savedDistrict;
-                                            if (dOption.dataset.code) {
-                                                await loadWards(dOption.dataset.code);
+                            if (savedDistrict) {
+                                const districtSelect = document.getElementById('shipping_district');
+                                for (let dOption of districtSelect.options) {
+                                    if (dOption.value === savedDistrict) {
+                                        districtSelect.value = savedDistrict;
+                                        
+                                        if (dOption.dataset.code) {
+                                            await loadWards(dOption.dataset.code);
 
-                                                if (savedWard) {
-                                                    const wardSelect = document.getElementById('shipping_ward');
+                                            if (savedWard) {
+                                                const wardSelect = document.getElementById('shipping_ward');
+                                                if (wardSelect) {
                                                     wardSelect.value = savedWard;
                                                 }
                                             }
-                                            break;
                                         }
+                                        break;
                                     }
                                 }
                             }
-                            break;
                         }
+                        break;
                     }
                 }
+                // Sau khi khôi phục địa chỉ, tính phí vận chuyển lần đầu
+                setTimeout(calculateShippingFee, 500); 
+            }
+            
+            // Hàm cập nhật hiển thị tổng tiền
+            function updateTotalDisplay() {
+                const total = Math.max(0, subtotal - currentDiscount + currentShippingFee);
+                const shippingFeeEl = document.getElementById('shipping-fee');
+                const totalAmountEl = document.getElementById('total-amount');
 
-                const subtotal = {{ $subtotal }};
-                let currentShippingFee = 0;
+                if (shippingFeeEl) {
+                    shippingFeeEl.textContent = currentShippingFee === 0
+                        ? 'Miễn phí'
+                        : formatCurrency(currentShippingFee);
+                }
+                if (totalAmountEl) {
+                    totalAmountEl.textContent = formatCurrency(total);
+                }
+            }
 
-                // Hàm tính phí vận chuyển qua API
-                function calculateShippingFee() {
-                    const citySelect = document.getElementById('shipping_city');
-                    const districtSelect = document.getElementById('shipping_district');
+            // Hàm tính phí vận chuyển qua API
+            function calculateShippingFee() {
+                const citySelect = document.getElementById('shipping_city');
+                const districtSelect = document.getElementById('shipping_district');
 
-                    if (!citySelect || !districtSelect) return;
+                if (!citySelect || !districtSelect) return;
 
-                    const cityOption = citySelect.options[citySelect.selectedIndex];
-                    const districtOption = districtSelect.options[districtSelect.selectedIndex];
+                const cityOption = citySelect.options[citySelect.selectedIndex];
+                const districtOption = districtSelect.options[districtSelect.selectedIndex];
 
-                    const cityName = cityOption ? cityOption.text : '';
-                    const districtName = districtOption ? districtOption.text : '';
+                const cityName = cityOption ? cityOption.text : '';
+                const districtName = districtOption ? districtOption.text : '';
 
-                    if (!cityName || cityName === '-- Chọn Tỉnh/Thành phố --' ||
-                        !districtName || districtName === '-- Chọn Quận/Huyện --') {
-                        document.getElementById('shipping-fee-text').textContent = 'Vui lòng chọn địa chỉ để tính phí vận chuyển';
-                        document.getElementById('shipping-fee-display').className = 'alert alert-info mb-0';
+                if (!cityName || cityName === '-- Chọn Tỉnh/Thành phố --' ||
+                    !districtName || districtName === '-- Chọn Quận/Huyện --') {
+                    document.getElementById('shipping-fee-text').textContent = 'Vui lòng chọn địa chỉ để tính phí vận chuyển';
+                    document.getElementById('shipping-fee-display').className = 'alert alert-info mb-0';
+                    currentShippingFee = 0; // Reset phí vận chuyển
+                    updateTotalDisplay();
+                    return;
+                }
+
+                // Gọi API tính phí vận chuyển
+                fetch('{{ route("client.checkout.calculateShipping") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        city: cityName,
+                        district: districtName,
+                        subtotal: subtotal
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentShippingFee = data.fee;
+                        document.getElementById('shipping_fee_input').value = data.fee;
+
+                        if (data.is_free_shipping) {
+                            document.getElementById('shipping-fee-text').innerHTML =
+                                '<strong class="text-success">🎉 Đơn hàng được MIỄN PHÍ vận chuyển!</strong>';
+                            document.getElementById('shipping-fee-display').className = 'alert alert-success mb-0';
+                        } else {
+                            document.getElementById('shipping-fee-text').innerHTML =
+                                'Phí vận chuyển của quý khách: <strong>' + data.fee_formatted + '</strong>';
+                            document.getElementById('shipping-fee-display').className = 'alert alert-warning mb-0';
+                        }
+                        updateTotalDisplay();
+                    } else if (data.error) {
+                         document.getElementById('shipping-fee-text').textContent = data.error;
+                         document.getElementById('shipping-fee-display').className = 'alert alert-danger mb-0';
+                         currentShippingFee = 0;
+                         document.getElementById('shipping_fee_input').value = 0;
+                         updateTotalDisplay();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error calculating shipping:', error);
+                    document.getElementById('shipping-fee-text').textContent = 'Lỗi tính phí vận chuyển.';
+                    document.getElementById('shipping-fee-display').className = 'alert alert-danger mb-0';
+                    currentShippingFee = 0;
+                    document.getElementById('shipping_fee_input').value = 0;
+                    updateTotalDisplay();
+                });
+            }
+
+            // Xử lý khi chọn tỉnh/thành phố
+            document.getElementById('shipping_city').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.dataset.code) {
+                    loadDistricts(selectedOption.dataset.code);
+                } else {
+                    // Reset nếu chọn option "-- Chọn Tỉnh/Thành phố --"
+                    document.getElementById('shipping_district').innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+                    document.getElementById('shipping_district').disabled = true;
+                    document.getElementById('shipping_ward').innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                    document.getElementById('shipping_ward').disabled = true;
+                }
+                setTimeout(calculateShippingFee, 200); // Đợi 1 chút để dữ liệu được tải
+            });
+
+            // Xử lý khi chọn quận/huyện
+            document.getElementById('shipping_district').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.dataset.code) {
+                    loadWards(selectedOption.dataset.code);
+                } else {
+                    // Reset nếu chọn option "-- Chọn Quận/Huyện --"
+                    document.getElementById('shipping_ward').innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                    document.getElementById('shipping_ward').disabled = true;
+                }
+                setTimeout(calculateShippingFee, 200); // Đợi 1 chút để dữ liệu được tải
+            });
+            
+            // Xử lý khi chọn phường/xã để tính lại phí vận chuyển (nếu cần thiết)
+            document.getElementById('shipping_ward').addEventListener('change', function() {
+                setTimeout(calculateShippingFee, 200); 
+            });
+
+
+            // --- Logic cho Mã Khuyến Mãi ---
+            let appliedCode = '';
+            const applyBtn = document.getElementById('apply-promotion-btn');
+            const codeInput = document.getElementById('promotion-code');
+            const discountRow = document.getElementById('discount-row');
+            const discountAmountEl = document.getElementById('discount-amount');
+            const appliedCodeEl = document.getElementById('applied-code');
+            const messageEl = document.getElementById('promotion-message');
+
+            function setMessage(text, type = 'info') {
+                if (!messageEl) return;
+                messageEl.className = 'small mt-2 text-' + (type === 'error' ? 'danger' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'muted');
+                messageEl.textContent = text;
+            }
+
+            function clearPromotion() {
+                currentDiscount = 0;
+                appliedCode = '';
+                if (discountRow) discountRow.style.display = 'none';
+                if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
+                if (appliedCodeEl) appliedCodeEl.textContent = '';
+                updateTotalDisplay();
+            }
+
+            if (applyBtn) {
+                applyBtn.addEventListener('click', async function() {
+                    const code = codeInput ? codeInput.value.trim() : '';
+                    if (!code) {
+                        setMessage('Vui lòng nhập mã khuyến mãi', 'error');
+                        clearPromotion();
                         return;
                     }
-
-                    // Gọi API tính phí vận chuyển
-                    fetch('{{ route("client.checkout.calculateShipping") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            city: cityName,
-                            district: districtName,
-                            subtotal: subtotal
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            currentShippingFee = data.fee;
-                            document.getElementById('shipping_fee_input').value = data.fee;
-
-                            if (data.is_free_shipping) {
-                                document.getElementById('shipping-fee-text').innerHTML =
-                                    '<strong class="text-success">🎉 Đơn hàng được MIỄN PHÍ vận chuyển!</strong>';
-                                document.getElementById('shipping-fee-display').className = 'alert alert-success mb-0';
-                            } else {
-                                document.getElementById('shipping-fee-text').innerHTML =
-                                    'Phí vận chuyển của quý khách: <strong>' + data.fee_formatted + '</strong>';
-                                document.getElementById('shipping-fee-display').className = 'alert alert-warning mb-0';
-                            }
-
-                            // Cập nhật tổng tiền
+                    setMessage('Đang kiểm tra mã...', 'info');
+                    applyBtn.disabled = true;
+                    try {
+                        const res = await fetch('{{ route('client.checkout.applyPromotion') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ code })
+                        });
+                        const data = await res.json();
+                        if (!res.ok || !data.ok) {
+                            const err = data.error || 'Mã không hợp lệ hoặc đã hết hạn sử dụng.';
+                            setMessage(err, 'error');
+                            clearPromotion();
+                        } else {
+                            currentDiscount = parseFloat(data.promotion.discount_amount) || 0;
+                            appliedCode = data.promotion.code;
+                            
+                            if (discountRow) discountRow.style.display = 'flex';
+                            if (discountAmountEl) discountAmountEl.textContent = '- ' + formatCurrency(currentDiscount);
+                            if (appliedCodeEl) appliedCodeEl.textContent = appliedCode;
+                            setMessage('Áp dụng mã thành công!', 'success');
                             updateTotalDisplay();
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                }
-
-                // Hàm cập nhật hiển thị tổng tiền
-                function updateTotalDisplay() {
-                    const total = subtotal + currentShippingFee;
-                    const shippingFeeEl = document.getElementById('shipping-fee');
-                    const totalAmountEl = document.getElementById('total-amount');
-
-                    if (shippingFeeEl) {
-                        shippingFeeEl.textContent = currentShippingFee === 0
-                            ? 'Miễn phí'
-                            : currentShippingFee.toLocaleString('vi-VN') + ' đ';
-                    }
-                    if (totalAmountEl) {
-                        totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
-                    }
-                }
-
-                // Xử lý khi chọn tỉnh/thành phố
-                document.getElementById('shipping_city').addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    if (selectedOption.dataset.code) {
-                        loadDistricts(selectedOption.dataset.code);
-                    }
-                    setTimeout(calculateShippingFee, 500);
-                });
-
-                // Xử lý khi chọn quận/huyện
-                document.getElementById('shipping_district').addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    if (selectedOption.dataset.code) {
-                        loadWards(selectedOption.dataset.code);
+                    } catch (e) {
+                        setMessage('Lỗi kết nối khi kiểm tra mã khuyến mãi.', 'error');
+                        clearPromotion();
+                        console.error('Promotion error:', e);
+                    } finally {
+                        applyBtn.disabled = false;
                     }
                 });
+            }
 
-                const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
-                const subtotal = {{ $subtotal }};
+            // Khởi tạo kiểm tra ví (Nếu có)
+            const totalAmountEl = document.getElementById('total-amount'); // Tổng tiền sau khi tính toán
+            const walletInput = document.getElementById('wallet');
+            const walletWarning = document.getElementById('wallet-warning');
+            const walletBalance = @json($walletBalance ?? 0);
+            
+            // Hàm kiểm tra số dư ví
+            function checkWalletBalance() {
+                if (!walletInput || !walletWarning || !totalAmountEl) return;
+                
+                // Cần tính lại tổng tiền từ tổng phụ + phí ship - giảm giá (giống logic updateTotalDisplay)
+                const finalTotal = Math.max(0, subtotal - currentDiscount + currentShippingFee);
 
-                let currentDiscount = 0;
-                let appliedCode = '';
-                const shippingFees = {
-                    'standard': 30000,
-                    'express': 50000,
-                    'fast': 70000
-                };
-
-                // Hàm cập nhật phí vận chuyển
-                function updateShippingFee() {
-                    const selected = document.querySelector('input[name="shipping_method"]:checked');
-                    if (!selected) return;
-
-                    let fee = shippingFees[selected.value] || 0;
-
-                    // Miễn phí ship cho đơn trên 500k
-                    if (subtotal >= 500000) {
-                        fee = 0;
+                if (walletInput.checked) {
+                    if (finalTotal > walletBalance) {
+                        walletWarning.classList.remove('d-none');
+                        // Bạn có thể vô hiệu hóa nút submit form tại đây nếu cần
+                    } else {
+                        walletWarning.classList.add('d-none');
                     }
-
-                    const total = Math.max(0, subtotal - currentDiscount + fee);
-                    const shippingFeeEl = document.getElementById('shipping-fee');
-                    const totalAmountEl = document.getElementById('total-amount');
-
-                    if (shippingFeeEl) {
-                        shippingFeeEl.textContent = fee === 0
-                            ? 'Miễn phí'
-                            : fee.toLocaleString('vi-VN') + ' đ';
-                    }
-                    if (totalAmountEl) {
-                        totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
-                    }
+                } else {
+                    walletWarning.classList.add('d-none');
                 }
-
-                // Khi thay đổi phương thức vận chuyển
-                shippingInputs.forEach(input => {
-                    input.addEventListener('change', function() {
-                        updateShippingFee();
-                    });
-                });
-
-                // Khởi tạo lần đầu
-                updateShippingFee();
-
-                // Áp dụng mã khuyến mãi
-                const applyBtn = document.getElementById('apply-promotion-btn');
-                const codeInput = document.getElementById('promotion-code');
-                const discountRow = document.getElementById('discount-row');
-                const discountAmountEl = document.getElementById('discount-amount');
-                const appliedCodeEl = document.getElementById('applied-code');
-                const messageEl = document.getElementById('promotion-message');
-
-                function setMessage(text, type = 'info') {
-                    if (!messageEl) return;
-                    messageEl.className = 'small mt-2 text-' + (type === 'error' ? 'danger' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'muted');
-                    messageEl.textContent = text;
-                }
-
-                function clearPromotion() {
-                    currentDiscount = 0;
-                    appliedCode = '';
-                    if (discountRow) discountRow.style.display = 'none';
-                    if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
-                    if (appliedCodeEl) appliedCodeEl.textContent = '';
-                    updateShippingFee();
-                }
-
-                if (applyBtn) {
-                    applyBtn.addEventListener('click', async function() {
-                        const code = codeInput ? codeInput.value.trim() : '';
-                        if (!code) {
-                            setMessage('Vui lòng nhập mã khuyến mãi', 'error');
-                            return;
-                        }
-                        setMessage('Đang kiểm tra mã...', 'info');
-                        applyBtn.disabled = true;
-                        try {
-                            const res = await fetch('{{ route('client.checkout.applyPromotion') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({ code })
-                            });
-                            const data = await res.json();
-                            if (!res.ok || !data.ok) {
-                                const err = data.error || 'Mã không hợp lệ';
-                                setMessage(err, 'error');
-                                clearPromotion();
-                            } else {
-                                currentDiscount = parseFloat(data.promotion.discount_amount) || 0;
-                                appliedCode = data.promotion.code || code;
-                                if (discountRow) discountRow.style.display = 'flex';
-                                if (discountAmountEl) discountAmountEl.textContent = '- ' + currentDiscount.toLocaleString('vi-VN') + ' đ';
-                                if (appliedCodeEl) appliedCodeEl.textContent = appliedCode;
-                                updateShippingFee();
-                                setMessage('Áp dụng mã thành công', 'success');
-                            }
-                        } catch (e) {
-                            setMessage('Lỗi kết nối. Vui lòng thử lại.', 'error');
-                            clearPromotion();
-                        } finally {
-                            applyBtn.disabled = false;
-                        }
-                    });
-                }
-                    setTimeout(calculateShippingFee, 300);
-                });
-
-                // Khởi tạo lần đầu - tính phí sau khi trang load
-                setTimeout(calculateShippingFee, 1000);
+            }
+            
+            // Lắng nghe thay đổi phương thức thanh toán
+            const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+            paymentMethods.forEach(input => {
+                input.addEventListener('change', checkWalletBalance);
             });
-        </script>
-    @endpush
+            
+            // Cập nhật tổng tiền và kiểm tra ví khi có sự thay đổi
+            const originalUpdateTotalDisplay = updateTotalDisplay;
+            updateTotalDisplay = function() {
+                originalUpdateTotalDisplay();
+                checkWalletBalance();
+            };
+            
+            // Khởi tạo lần cuối
+            updateTotalDisplay();
+        });
+    </script>
+@endpush
 @endsection
-

@@ -64,7 +64,7 @@ class CheckoutController extends Controller
         if ($type === 'cart') {
             $cartItems = [];
             $subtotal  = 0;
-            
+
             if (Auth::check()) {
 
                 // User đã đăng nhập: lấy từ DB Cart
@@ -261,20 +261,20 @@ class CheckoutController extends Controller
             'shipping_ward'    => 'required|string|max:255',
             'shipping_address' => 'required|string|max:500',
             'shipping_method'  => 'required|string|in:standard,express,fast',
-            'payment_method'   => 'required|string|in:cash,wallet',
+            'payment_method'   => 'required|string|in:cash,wallet', // 'cash' là phương thức COD
             'notes'            => 'nullable|string|max:1000',
             'quantity'         => 'nullable|integer|min:1',
         ], [
-            'customer_name.required'    => 'Vui lòng nhập họ tên',
-            'customer_name.regex'       => 'Họ tên chỉ được chứa chữ cái và khoảng trắng',
-            'customer_phone.required'   => 'Vui lòng nhập số điện thoại',
-            'customer_phone.regex'      => 'Số điện thoại phải có 10-11 chữ số',
-            'customer_email.required'   => 'Vui lòng nhập email',
-            'customer_email.email'      => 'Email không hợp lệ',
-            'shipping_city.required'    => 'Vui lòng chọn tỉnh/thành phố',
+            'customer_name.required'     => 'Vui lòng nhập họ tên',
+            'customer_name.regex'        => 'Họ tên chỉ được chứa chữ cái và khoảng trắng',
+            'customer_phone.required'    => 'Vui lòng nhập số điện thoại',
+            'customer_phone.regex'       => 'Số điện thoại phải có 10-11 chữ số',
+            'customer_email.required'    => 'Vui lòng nhập email',
+            'customer_email.email'       => 'Email không hợp lệ',
+            'shipping_city.required'     => 'Vui lòng chọn tỉnh/thành phố',
             'shipping_district.required' => 'Vui lòng chọn quận/huyện',
-            'shipping_ward.required'    => 'Vui lòng chọn phường/xã',
-            'shipping_address.required' => 'Vui lòng nhập địa chỉ chi tiết',
+            'shipping_ward.required'     => 'Vui lòng chọn phường/xã',
+            'shipping_address.required'  => 'Vui lòng nhập địa chỉ chi tiết',
         ]);
 
         // Lấy checkout session
@@ -312,8 +312,22 @@ class CheckoutController extends Controller
             $checkoutSession['subtotal'] = $checkoutSession['price'] * $newQuantity;
         }
 
+        // =========================================================================
+        // [YÊU CẦU 1] KIỂM TRA GIỚI HẠN COD TRÊN 10 TRIỆU
+        $paymentMethod = $request->payment_method;
+        $subtotal = $checkoutSession['subtotal'] ?? 0;
+
+        if ($paymentMethod === 'cash' && $subtotal > 10000000) {
+            // Nếu là COD VÀ tổng tiền > 10 triệu
+            return redirect()->back()
+                ->with('error', 'Đơn hàng có tổng giá trị trên 10.000.000 VNĐ không được phép thanh toán COD (Tiền mặt). Vui lòng chọn phương thức khác.')
+                ->withInput(); // Thêm withInput() để giữ lại dữ liệu form
+        }
+        // =========================================================================
+
         // Tính phí vận chuyển
-        $shippingFee = $this->calculateShippingFee(
+        // [ĐÃ SỬA LỖI TYPEERROR] Đổi tên hàm gọi nội bộ
+        $shippingFee = $this->_getShippingFeeLogic(
             $request->shipping_method,
             $request->shipping_city,
             $checkoutSession['subtotal']
@@ -356,7 +370,6 @@ class CheckoutController extends Controller
 
         return redirect()->route('client.checkout.confirm');
     }
-
     /**
      * ========================================
      * CLIENT: TRANG XÁC NHẬN ĐƠN HÀNG
@@ -711,14 +724,56 @@ class CheckoutController extends Controller
 
         return view('client.checkout.success', compact('order', 'relatedProducts'));
     }
+    /**
+     * CLIENT: Tính phí vận chuyển (AJAX endpoint)
+     * Hàm PUBLIC được gọi qua Route.
+     */
+    public function calculateShippingFee(Request $request)
+    {
+        // 1. Kiểm tra đăng nhập
+        if (!Auth::check()) {
+            return response()->json(['ok' => false, 'error' => 'Vui lòng đăng nhập để tính phí'], 401);
+        }
+
+        // 2. Validation đầu vào
+        $request->validate([
+            'shipping_method' => 'required|string|in:standard,express,fast',
+            'shipping_city'   => 'required|string|max:255',
+            'subtotal'        => 'required|numeric|min:0',
+        ]);
+
+        try {
+            // 3. Gọi hàm private để tính logic
+            $shippingFee = $this->_getShippingFeeLogic(
+                $request->shipping_method,
+                $request->shipping_city,
+                (float) $request->subtotal
+            );
+
+            // 4. Trả về JSON thành công
+            return response()->json([
+                'ok'            => true,
+                'shipping_fee'  => $shippingFee,
+                'message'       => 'Tính phí vận chuyển thành công'
+            ]);
+        } catch (\Exception $e) {
+            // Trả về JSON lỗi 500 nếu có lỗi không mong muốn
+            return response()->json([
+                'ok'    => false,
+                'error' => 'Lỗi tính phí server: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     /**
-     * Tính phí vận chuyển
+     * Logic tính phí vận chuyển cốt lõi (PRIVATE)
+     * PHẢI ĐẶT SAU HÀM calculateShippingFee
      */
-    private function calculateShippingFee($method, $city, $subtotal)
+    private function _getShippingFeeLogic($method, $city, $subtotal) // [ĐÃ ĐỔI TÊN]
     {
-        // Logic tính phí vận chuyển đơn giản
-        $baseFee = 30000; // Phí cơ bản
+        // 1. Xác định phí cơ bản
+        $baseFee = 30000;
 
         switch ($method) {
             case 'express':
@@ -733,11 +788,22 @@ class CheckoutController extends Controller
                 break;
         }
 
-        // Miễn phí ship cho đơn trên 10.000.000
-        if ($subtotal >= 10000000) {
+        // 2. Kiểm tra MIỄN PHÍ SHIP (Ngưỡng 1.000.000 VNĐ)
+        // Giả định logic của bạn là 1.000.000 VNĐ, không phải 500.000 VNĐ như trong snippet cũ
+        if ($subtotal >= 1000000) {
             return 0;
         }
 
-        return $baseFee;
+        $shippingFee = $baseFee;
+
+        // 3. Xử lý PHỤ PHÍ KHU VỰC: +10.000 VNĐ nếu không phải Hà Nội hoặc Hồ Chí Minh
+        $normalizedCity = Str::slug($city, ' ');
+        $isMajorCity = Str::contains($normalizedCity, ['ha noi', 'ho chi minh']);
+
+        if (!$isMajorCity) {
+            $shippingFee += 10000;
+        }
+
+        return $shippingFee;
     }
 }
