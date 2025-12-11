@@ -144,14 +144,14 @@
                                     <input class="form-check-input" type="radio" name="shipping_method"
                                         id="shipping_express" value="express">
                                     <label class="form-check-label" for="shipping_express">
-                                        Nhanh (2-3 ngày)
+                                        {{ $shippingSettings->express_label }}
                                     </label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="shipping_method"
                                         id="shipping_fast" value="fast">
                                     <label class="form-check-label" for="shipping_fast">
-                                        Hỏa tốc (Trong ngày tại nội thành)
+                                        {{ $shippingSettings->fast_label }}
                                     </label>
                                 </div>
                                 @error('shipping_method')
@@ -292,7 +292,7 @@
 
                         <div class="alert alert-info small mb-0">
                             <i class="bi bi-info-circle me-1"></i>
-                            Miễn phí vận chuyển cho đơn hàng từ 500.000đ
+                            Miễn phí vận chuyển cho đơn hàng từ {{ number_format($shippingSettings->free_shipping_threshold, 0, ',', '.') }}đ
                         </div>
                     </div>
                 </div>
@@ -458,6 +458,7 @@
                 function calculateShippingFee() {
                     const citySelect = document.getElementById('shipping_city');
                     const districtSelect = document.getElementById('shipping_district');
+                    const selectedMethod = document.querySelector('input[name="shipping_method"]:checked')?.value || 'standard';
 
                     if (!citySelect || !districtSelect) return;
 
@@ -485,7 +486,8 @@
                             body: JSON.stringify({
                                 city: cityName,
                                 district: districtName,
-                                subtotal: subtotal
+                            subtotal: subtotal,
+                            method: selectedMethod
                             })
                         })
                         .then(response => response.json())
@@ -493,6 +495,7 @@
                             if (data.success) {
                                 currentShippingFee = data.fee;
                                 document.getElementById('shipping_fee_input').value = data.fee;
+                                const label = data.method_label || 'Phí vận chuyển';
 
                                 if (data.is_free_shipping) {
                                     document.getElementById('shipping-fee-text').innerHTML =
@@ -501,7 +504,7 @@
                                         'alert alert-success mb-0';
                                 } else {
                                     document.getElementById('shipping-fee-text').innerHTML =
-                                        'Phí vận chuyển của quý khách: <strong>' + data.fee_formatted +
+                                        label + ': <strong>' + data.fee_formatted +
                                         '</strong>';
                                     document.getElementById('shipping-fee-display').className =
                                         'alert alert-warning mb-0';
@@ -551,6 +554,11 @@
                         loadWards(selectedOption.dataset.code);
                     }
                     setTimeout(calculateShippingFee, 300);
+                });
+
+                const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
+                shippingInputs.forEach(input => {
+                    input.addEventListener('change', () => setTimeout(calculateShippingFee, 200));
                 });
 
                 // Áp dụng mã khuyến mãi

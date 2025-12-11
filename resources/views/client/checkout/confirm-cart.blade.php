@@ -94,9 +94,9 @@
                             @if ($checkoutSession['shipping_method'] == 'standard')
                                 Giao hàng tiêu chuẩn
                             @elseif ($checkoutSession['shipping_method'] == 'express')
-                                Giao hàng nhanh
+                                {{ $shippingSettings->express_label }}
                             @else
-                                Giao hàng hỏa tốc
+                                {{ $shippingSettings->fast_label }}
                             @endif
                         </p>
                         <p class="mb-0">
