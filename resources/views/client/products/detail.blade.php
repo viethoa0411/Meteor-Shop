@@ -140,6 +140,9 @@
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
                     Còn: <span id="stock-display" style="font-weight:bold;">--</span>
                 </p>
+                <p style="font-size:14px; color:#555; margin-bottom:10px;">
+                    Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span> kg
+                </p>
 
                 {{-- Thông tin chung --}}
                 <div style="margin-bottom:16px; line-height:1.7; color:#444;">
@@ -406,7 +409,7 @@
                 {{-- Loaded via JavaScript from localStorage --}}
             </div>
         </div>
-        <<<<<<< HEAD @php
+        @php
             $variantOptions = $product->variants
                 ->map(function ($variant) {
                     return [
@@ -416,10 +419,14 @@
                         'width' => (int) $variant->width,
                         'height' => (int) $variant->height,
                         'stock' => (int) $variant->stock,
+                        'weight' => (float) ($variant->weight ?? 0),
                     ];
                 })
                 ->values();
-        @endphp {{-- Hiệu ứng hover --}} <script>
+        @endphp
+
+        {{-- Hiệu ứng hover --}}
+        <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const wishlistBtn = document.getElementById('wishlist-toggle');
 
@@ -496,6 +503,7 @@
                 const minus = document.querySelector('.minus');
                 const plus = document.querySelector('.plus');
                 const stockDisplay = document.getElementById('stock-display');
+                const weightDisplay = document.getElementById('weight-display');
                 const buyNowBtn = document.getElementById('buy-now-btn');
                 const addBtn = document.getElementById('add-to-cart');
                 const productId = {{ $product->id }};
@@ -567,6 +575,9 @@
                     currentMaxStock = baseProductStock;
                     qtyInput.setAttribute('max', baseProductStock);
                     clampQuantity();
+                    if (weightDisplay) {
+                        weightDisplay.textContent = '--';
+                    }
                     return;
                 }
 
@@ -576,14 +587,23 @@
                     currentMaxStock = selectedVariant.stock;
                     stockDisplay.textContent = currentMaxStock;
                     qtyInput.setAttribute('max', currentMaxStock);
+                    if (weightDisplay) {
+                        weightDisplay.textContent = selectedVariant.weight ? `${selectedVariant.weight} kg` : '0 kg';
+                    }
                 } else if (selectedVariant) {
                     currentMaxStock = 0;
                     stockDisplay.textContent = '0 (Hết hàng)';
                     qtyInput.setAttribute('max', 0);
+                    if (weightDisplay) {
+                        weightDisplay.textContent = selectedVariant.weight ? `${selectedVariant.weight} kg` : '0 kg';
+                    }
                 } else {
                     stockDisplay.textContent = '-- (Vui lòng chọn phân loại)';
                     currentMaxStock = 0;
                     qtyInput.removeAttribute('max');
+                    if (weightDisplay) {
+                        weightDisplay.textContent = '--';
+                    }
                 }
 
                 clampQuantity();
@@ -856,6 +876,7 @@
                         'length' => (int) $v->length,
                         'width' => (int) $v->width,
                         'height' => (int) $v->height,
+                        'weight' => (float) ($v->weight ?? 0),
                         'stock' => (int) $v->stock,
                         'price' => $v->price ?? $product->price,
                         'sku' => $v->sku ?? '',
