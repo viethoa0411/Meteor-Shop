@@ -78,18 +78,19 @@
                         @foreach ($product->images as $img)
                             <div class="col-3 col-md-2">
                                 <div style="
-                                        width:100%;
-                                        aspect-ratio: 1/1;
-                                        border:1px solid #e0e0e0;
-                                        border-radius:8px;
-                                        overflow:hidden;
-                                        cursor:pointer;
-                                        background:#fff;
-                                        box-shadow:0 2px 6px rgba(0,0,0,0.06);
-                                        transition:all 0.25s ease-in-out;"
+                                    width:100%;
+                                    aspect-ratio: 1/1;
+                                    border:1px solid #e0e0e0;
+                                    border-radius:8px;
+                                    overflow:hidden;
+                                    cursor:pointer;
+                                    background:#fff;
+                                    box-shadow:0 2px 6px rgba(0,0,0,0.06);
+                                    transition:all 0.25s ease-in-out;"
                                     onclick="document.getElementById('mainImage').src='{{ asset('storage/' . $img->image) }}'"
                                     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 6px 14px rgba(0,0,0,0.12)';"
                                     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.06)';">
+
                                     <img src="{{ asset('storage/' . $img->image) }}" alt="Ảnh phụ"
                                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease-in-out;"
                                         onmouseover="this.style.transform='scale(1.12)'"
@@ -117,11 +118,11 @@
                         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                             <div>
                                 <div class="fw-semibold">Tên sản phẩm</div>
-                                <div class="text-muted fw-semibold">{{ $product->name }}</div>
+                                <div class="text-muted small">{{ $product->name }}</div>
                             </div>
                             <div class="text-end">
                                 <div class="fw-semibold">Giá</div>
-                                <div class="text-muted fw-semibold red">{{ number_format($product->price, 0, ',', '.') }} đ</div>
+                                <div class="text-muted small">{{ number_format($product->price, 0, ',', '.') }} đ</div>
                             </div>
                         </div>
                         <hr>
@@ -152,7 +153,6 @@
                                             <th>Kích thước (D × R × C)</th>
                                             <th>Giá</th>
                                             <th>Tồn kho</th>
-                                            <th>Cân nặng</th>
                                         </tr>
                                     </thead>
                                     <tbody class="text-center">
@@ -178,7 +178,6 @@
                                                 </td>
                                                 <td>{{ number_format($v->price ?? $product->price, 0, ',', '.') }} đ</td>
                                                 <td>{{ $v->stock }}</td>
-                                                <td>{{ $v->weight }}{{ $v->weight_unit }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

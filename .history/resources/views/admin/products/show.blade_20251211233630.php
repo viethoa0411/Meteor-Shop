@@ -178,7 +178,7 @@
                                                 </td>
                                                 <td>{{ number_format($v->price ?? $product->price, 0, ',', '.') }} đ</td>
                                                 <td>{{ $v->stock }}</td>
-                                                <td>{{ $v->weight }}{{ $v->weight_unit }}</td>
+                                                  <td>{{ $v->weight }}{{ $v->weight_unit }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

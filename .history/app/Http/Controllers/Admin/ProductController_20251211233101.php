@@ -132,9 +132,9 @@ class ProductController extends Controller
                     'height'     => $variant['height'] ?? null,
                     'stock'      => $variant['stock'] ?? 0,
                     'price'      => $variant['price'] ?? $request->price,
-                    'weight_unit'=> $variant['weight_unit'] ?? 'kg',
-                    'weight'     => $variant['weight'] ?? null,
-
+                        'weight_unit'=> $varian['weight_unit'] ?? 'kg',
+                    'weight'     => $varian['weight'] ?? null,
+                /
                 ]);
             }
         }

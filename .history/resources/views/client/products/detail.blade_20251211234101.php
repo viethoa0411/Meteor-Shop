@@ -418,7 +418,7 @@
                 {{-- Loaded via JavaScript from localStorage --}}
             </div>
         </div>
-        @php
+        <<<<<<< HEAD @php
             $variantOptions = $product->variants
                 ->map(function ($variant) {
                     return [
@@ -432,7 +432,6 @@
                 })
                 ->values();
         @endphp {{-- Hiệu ứng hover --}} 
-        
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const wishlistBtn = document.getElementById('wishlist-toggle');
@@ -603,60 +602,6 @@
 
                 clampQuantity();
             };
-             
-            // Hàm cập nhật cân nặng dựa trên biến thể đã chọn
-    const updateWeightInfo = () => {
-        const activeColor = document.querySelector('.color-btn.active');
-        const activeSize = document.querySelector('.size-btn.active');
-
-        // Nếu chưa chọn màu hoặc kích thước, không cập nhật cân nặng
-        if (!activeColor || !activeSize) {
-            weightDisplay.innerHTML = 'Vui lòng chọn màu và kích cỡ';
-            return;
-        }
-
-        // Tìm biến thể phù hợp với màu và kích thước đã chọn
-        const selectedVariant = productVariants.find(variant =>
-            normalize(variant.color_name) === normalize(activeColor.dataset.color) &&
-            Number(variant.length) === Number(activeSize.dataset.size.split('x')[0]) &&
-            Number(variant.width) === Number(activeSize.dataset.size.split('x')[1]) &&
-            Number(variant.height) === Number(activeSize.dataset.size.split('x')[2])
-        );
-
-        // Nếu tìm thấy biến thể, hiển thị cân nặng
-        if (selectedVariant) {
-            weightDisplay.innerHTML = `${selectedVariant.weight} ${selectedVariant.weight_unit}`;
-        } else {
-            weightDisplay.innerHTML = 'Không tìm thấy cân nặng cho lựa chọn hiện tại';
-        }
-    };
-
-    // Cập nhật khi chọn màu và kích thước
-    document.querySelectorAll('.btn-variant').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const isColor = btn.classList.contains('color-btn');
-            const group = isColor ? '.color-btn' : '.size-btn';
-
-            // Deselect các phần tử khác
-            document.querySelectorAll(group).forEach(b => {
-                b.classList.remove('active');
-                b.style.background = isColor && b.dataset.color ? b.dataset.color : '#fff';
-                b.style.color = isColor && b.dataset.color ? '#fff' : '#111';
-            });
-
-            // Chọn nút hiện tại
-            btn.classList.add('active');
-            btn.style.background = '#111';
-            btn.style.color = '#fff';
-
-            // Cập nhật thông tin kho và cân nặng
-            updateStockInfo();
-            updateWeightInfo();
-        });
-    });
-
-
-
 
             updateStockInfo();
 

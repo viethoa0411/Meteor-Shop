@@ -249,18 +249,7 @@
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
                 document.getElementById('variant_stock').value = '';
-                if (weightEl) weightEl.value = '';
-                if (weightUnitEl) weightUnitEl.value = 'kg';
             });
-                 // helper để tránh XSS khi inject value vào HTML
-            function escapeHtml(text) {
-                if (typeof text !== 'string') return text;
-                return text.replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
-            }
         });
     </script>
 

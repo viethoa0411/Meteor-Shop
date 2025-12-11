@@ -121,7 +121,7 @@
                             </div>
                             <div class="text-end">
                                 <div class="fw-semibold">Giá</div>
-                                <div class="text-muted fw-semibold red">{{ number_format($product->price, 0, ',', '.') }} đ</div>
+                                <div class="text-muted small">{{ number_format($product->price, 0, ',', '.') }} đ</div>
                             </div>
                         </div>
                         <hr>
@@ -152,7 +152,6 @@
                                             <th>Kích thước (D × R × C)</th>
                                             <th>Giá</th>
                                             <th>Tồn kho</th>
-                                            <th>Cân nặng</th>
                                         </tr>
                                     </thead>
                                     <tbody class="text-center">
@@ -178,7 +177,6 @@
                                                 </td>
                                                 <td>{{ number_format($v->price ?? $product->price, 0, ',', '.') }} đ</td>
                                                 <td>{{ $v->stock }}</td>
-                                                <td>{{ $v->weight }}{{ $v->weight_unit }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

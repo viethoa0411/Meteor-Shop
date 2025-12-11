@@ -230,14 +230,12 @@
                 variantList.appendChild(row);
 
                 hiddenDiv.innerHTML = `
-                    <input type="hidden" name="variants[${idx}][color_name]" value="${colorName}">
-                    <input type="hidden" name="variants[${idx}][color_code]" value="${colorCode}">
-                    <input type="hidden" name="variants[${idx}][length]" value="${length}">
-                    <input type="hidden" name="variants[${idx}][width]" value="${width}">
-                    <input type="hidden" name="variants[${idx}][height]" value="${height}">
-                    <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
-                    <input type="hidden" name="variants[${idx}][weight]" value="${escapeHtml(weight)}">
-                    <input type="hidden" name="variants[${idx}][weight_unit]" value="${escapeHtml(weightUnit)}">
+            <input type="hidden" name="variants[${idx}][color_name]" value="${colorName}">
+            <input type="hidden" name="variants[${idx}][color_code]" value="${colorCode}">
+            <input type="hidden" name="variants[${idx}][length]" value="${length}">
+            <input type="hidden" name="variants[${idx}][width]" value="${width}">
+            <input type="hidden" name="variants[${idx}][height]" value="${height}">
+            <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
         `;
                 hiddenVariants.appendChild(hiddenDiv);
                 idx++;
@@ -249,18 +247,7 @@
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
                 document.getElementById('variant_stock').value = '';
-                if (weightEl) weightEl.value = '';
-                if (weightUnitEl) weightUnitEl.value = 'kg';
             });
-                 // helper để tránh XSS khi inject value vào HTML
-            function escapeHtml(text) {
-                if (typeof text !== 'string') return text;
-                return text.replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
-            }
         });
     </script>
 

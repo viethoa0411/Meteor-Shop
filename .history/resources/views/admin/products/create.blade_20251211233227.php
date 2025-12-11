@@ -163,7 +163,8 @@
                                         <option value="g">g</option>
                                         <option value="lb">lb</option>
                                     </select>
-                                </div>
+                                    
+                            </div>
                             <button type="button" class="btn btn-primary mt-2 mb-3" id="add_variant">Thêm biến
                                 thể</button>
 
@@ -200,23 +201,15 @@
                 const height = document.getElementById('height').value.trim();
                 const stock = document.getElementById('variant_stock').value.trim();
 
-                const weightEl = document.getElementById('weight'); // optional
-                const weightUnitEl = document.getElementById('weight_unit'); // optional
-                const weight = weightEl ? weightEl.value.trim() : ''; 
-                const weightUnit = weightUnitEl ? weightUnitEl.value : 'kg';
-
                 if (!length || !width || !height) return alert('Nhập đủ kích thước!');
                 if (!colorCode) return alert('Chọn màu!');
-                if (!stock) return alert('Nhập tồn kho cho biến thể!');      
-                if (weight !== '' && isNaN(parseFloat(weight))) return alert('Trọng lượng phải là số!');
-
+                if (!stock) return alert('Nhập tồn kho cho biến thể!');
 
                 const row = document.createElement('div');
                 row.className = 'variant-row';
                 row.innerHTML = `
             <div class="variant-swatch" style="background:${colorCode}"></div>
             <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp</span>
-            <small style="margin-right:12px;">${weight !== '' ? weight + ' ' + weightUnit : ''}</small>
             <button type="button" class="btn btn-sm btn-link text-danger">x</button>
         `;
 
@@ -230,14 +223,12 @@
                 variantList.appendChild(row);
 
                 hiddenDiv.innerHTML = `
-                    <input type="hidden" name="variants[${idx}][color_name]" value="${colorName}">
-                    <input type="hidden" name="variants[${idx}][color_code]" value="${colorCode}">
-                    <input type="hidden" name="variants[${idx}][length]" value="${length}">
-                    <input type="hidden" name="variants[${idx}][width]" value="${width}">
-                    <input type="hidden" name="variants[${idx}][height]" value="${height}">
-                    <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
-                    <input type="hidden" name="variants[${idx}][weight]" value="${escapeHtml(weight)}">
-                    <input type="hidden" name="variants[${idx}][weight_unit]" value="${escapeHtml(weightUnit)}">
+            <input type="hidden" name="variants[${idx}][color_name]" value="${colorName}">
+            <input type="hidden" name="variants[${idx}][color_code]" value="${colorCode}">
+            <input type="hidden" name="variants[${idx}][length]" value="${length}">
+            <input type="hidden" name="variants[${idx}][width]" value="${width}">
+            <input type="hidden" name="variants[${idx}][height]" value="${height}">
+            <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
         `;
                 hiddenVariants.appendChild(hiddenDiv);
                 idx++;
@@ -249,18 +240,7 @@
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
                 document.getElementById('variant_stock').value = '';
-                if (weightEl) weightEl.value = '';
-                if (weightUnitEl) weightUnitEl.value = 'kg';
             });
-                 // helper để tránh XSS khi inject value vào HTML
-            function escapeHtml(text) {
-                if (typeof text !== 'string') return text;
-                return text.replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
-            }
         });
     </script>
 
