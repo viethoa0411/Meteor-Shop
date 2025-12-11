@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -112,7 +111,26 @@ class AuthController extends Controller
         $remember = $request->boolean('remember', false);
 
         //  Lấy thông tin người dùng theo email
-        $user = DB::table('users')->where('email', $validated['email'])->first();
+        $user = User::where('email', $validated['email'])->first();
+
+        //  Chỉ cho phép tài khoản khách hàng đăng nhập giao diện client
+        if ($user && $user->role !== 'user') {
+            throw ValidationException::withMessages([
+                'email' => 'Chỉ tài khoản khách hàng mới được đăng nhập.',
+            ]);
+        }
+
+        //  Chặn tài khoản bị khóa hoặc chưa kích hoạt
+        if ($user && $user->status === 'banned') {
+            throw ValidationException::withMessages([
+                'email' => 'Tài khoản của bạn đã bị khóa.',
+            ]);
+        }
+        if ($user && $user->status === 'inactive') {
+            throw ValidationException::withMessages([
+                'email' => 'Tài khoản của bạn chưa được kích hoạt.',
+            ]);
+        }
 
         //  Nếu người dùng tồn tại nhưng mật khẩu sai
         if ($user && !Hash::check($validated['password'], $user->password)) {
