@@ -99,33 +99,114 @@
                             <div class="form-text">Đơn hàng từ mức này trở lên sẽ được miễn phí vận chuyển</div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Phí nội thành (cùng quận/huyện) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="number" name="inner_city_fee" class="form-control" 
-                                    value="{{ old('inner_city_fee', $settings->inner_city_fee) }}" 
-                                    min="0" required>
-                                <span class="input-group-text">đ</span>
+                        <hr>
+                        <h6 class="fw-bold">Phí kích thước (tính theo mét)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Chiều dài - Mét đầu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="first_length_price" class="form-control"
+                                        value="{{ old('first_length_price', $settings->first_length_price) }}" min="0" required>
+                                    <span class="input-group-text">đ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Chiều dài - Mét tiếp theo <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="next_length_price" class="form-control"
+                                        value="{{ old('next_length_price', $settings->next_length_price) }}" min="0" required>
+                                    <span class="input-group-text">đ</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Chiều rộng - Mét đầu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="first_width_price" class="form-control"
+                                        value="{{ old('first_width_price', $settings->first_width_price) }}" min="0" required>
+                                    <span class="input-group-text">đ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Chiều rộng - Mét tiếp theo <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="next_width_price" class="form-control"
+                                        value="{{ old('next_width_price', $settings->next_width_price) }}" min="0" required>
+                                    <span class="input-group-text">đ</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Chiều cao - Mét đầu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="first_height_price" class="form-control"
+                                        value="{{ old('first_height_price', $settings->first_height_price) }}" min="0" required>
+                                    <span class="input-group-text">đ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Chiều cao - Mét tiếp theo <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="next_height_price" class="form-control"
+                                        value="{{ old('next_height_price', $settings->next_height_price) }}" min="0" required>
+                                    <span class="input-group-text">đ</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Phí ngoại thành (khác quận/huyện, cùng tỉnh) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="number" name="outer_city_fee" class="form-control" 
-                                    value="{{ old('outer_city_fee', $settings->outer_city_fee) }}" 
-                                    min="0" required>
-                                <span class="input-group-text">đ</span>
+                        <hr>
+                        <h6 class="fw-bold">Phí theo cân nặng</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Cân nặng đầu tiên (kg) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="first_weight_price" class="form-control"
+                                        value="{{ old('first_weight_price', $settings->first_weight_price) }}" min="0" required>
+                                    <span class="input-group-text">đ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mỗi kg tiếp theo <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="next_weight_price" class="form-control"
+                                        value="{{ old('next_weight_price', $settings->next_weight_price) }}" min="0" required>
+                                    <span class="input-group-text">đ</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Phí tỉnh khác <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="number" name="other_province_fee" class="form-control"
-                                    value="{{ old('other_province_fee', $settings->other_province_fee) }}"
-                                    min="0" required>
-                                <span class="input-group-text">đ</span>
+                        <hr>
+                        <h6 class="fw-bold">Phụ phí theo phương thức</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tên hiển thị giao nhanh</label>
+                                <input type="text" name="express_label" class="form-control"
+                                    value="{{ old('express_label', $settings->express_label) }}" required>
+                                <div class="input-group mt-2">
+                                    <select name="express_surcharge_type" class="form-select" style="max-width: 120px;">
+                                        <option value="percent" {{ $settings->express_surcharge_type === 'percent' ? 'selected' : '' }}>%</option>
+                                        <option value="fixed" {{ $settings->express_surcharge_type === 'fixed' ? 'selected' : '' }}>đ</option>
+                                    </select>
+                                    <input type="number" name="express_surcharge_value" class="form-control"
+                                        value="{{ old('express_surcharge_value', $settings->express_surcharge_value) }}" min="0" required>
+                                </div>
+                                <div class="form-text">Áp dụng trên phí tiêu chuẩn</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tên hiển thị giao hỏa tốc</label>
+                                <input type="text" name="fast_label" class="form-control"
+                                    value="{{ old('fast_label', $settings->fast_label) }}" required>
+                                <div class="input-group mt-2">
+                                    <select name="fast_surcharge_type" class="form-select" style="max-width: 120px;">
+                                        <option value="percent" {{ $settings->fast_surcharge_type === 'percent' ? 'selected' : '' }}>%</option>
+                                        <option value="fixed" {{ $settings->fast_surcharge_type === 'fixed' ? 'selected' : '' }}>đ</option>
+                                    </select>
+                                    <input type="number" name="fast_surcharge_value" class="form-control"
+                                        value="{{ old('fast_surcharge_value', $settings->fast_surcharge_value) }}" min="0" required>
+                                </div>
+                                <div class="form-text">Áp dụng trên phí tiêu chuẩn</div>
                             </div>
                         </div>
 
@@ -147,10 +228,10 @@
                     <div class="col-md-6">
                         <p><strong>Quy tắc tính phí vận chuyển:</strong></p>
                         <ul>
-                            <li>Đơn hàng <strong>≥ {{ number_format($settings->free_shipping_threshold) }}đ</strong>: <span class="text-success fw-bold">Miễn phí vận chuyển</span></li>
-                            <li>Cùng quận/huyện: <strong>{{ number_format($settings->inner_city_fee) }}đ</strong></li>
-                            <li>Khác quận/huyện (cùng tỉnh): <strong>{{ number_format($settings->outer_city_fee) }}đ</strong></li>
-                            <li>Khác tỉnh/thành phố: <strong>{{ number_format($settings->other_province_fee) }}đ</strong></li>
+                            <li><strong>Tiêu chuẩn</strong> = (Dài + Rộng + Cao) theo mét đầu + mét tiếp theo + phí cân nặng đầu + mỗi kg tiếp theo, nhân với số lượng.</li>
+                            <li><strong>{{ $settings->express_label }}</strong>: Phụ phí {{ $settings->express_surcharge_type === 'percent' ? $settings->express_surcharge_value . '%' : number_format($settings->express_surcharge_value) . 'đ' }} trên phí tiêu chuẩn.</li>
+                            <li><strong>{{ $settings->fast_label }}</strong>: Phụ phí {{ $settings->fast_surcharge_type === 'percent' ? $settings->fast_surcharge_value . '%' : number_format($settings->fast_surcharge_value) . 'đ' }} trên phí tiêu chuẩn.</li>
+                            <li>Đơn hàng từ <strong>{{ number_format($settings->free_shipping_threshold) }}đ</strong> trở lên: <span class="text-success fw-bold">Miễn phí vận chuyển</span></li>
                         </ul>
                     </div>
                     <div class="col-md-6">
