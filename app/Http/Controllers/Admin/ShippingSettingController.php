@@ -60,7 +60,34 @@ class ShippingSettingController extends Controller
             'fast_label.required' => 'Vui lòng nhập tên hiển thị cho giao hỏa tốc',
         ]);
 
-        $settings = ShippingSetting::getSettings(); 
+        $settings = ShippingSetting::getSettings();
+        
+        $settings->update([
+            'origin_address' => $request->origin_address,
+            'origin_city' => $request->origin_city,
+            'origin_district' => $request->origin_district,
+            'origin_ward' => $request->origin_ward,
+            'base_fee' => $request->base_fee,
+            'fee_per_km' => $request->fee_per_km,
+            'free_shipping_threshold' => $request->free_shipping_threshold,
+            'inner_city_fee' => $request->inner_city_fee ?? 0,
+            'outer_city_fee' => $request->outer_city_fee ?? 0,
+            'other_province_fee' => $request->other_province_fee ?? 0,
+            'first_length_price' => $request->first_length_price,
+            'next_length_price' => $request->next_length_price,
+            'first_width_price' => $request->first_width_price,
+            'next_width_price' => $request->next_width_price,
+            'first_height_price' => $request->first_height_price,
+            'next_height_price' => $request->next_height_price,
+            'first_weight_price' => $request->first_weight_price,
+            'next_weight_price' => $request->next_weight_price,
+            'express_surcharge_type' => $request->express_surcharge_type,
+            'express_surcharge_value' => $request->express_surcharge_value,
+            'fast_surcharge_type' => $request->fast_surcharge_type,
+            'fast_surcharge_value' => $request->fast_surcharge_value,
+            'express_label' => $request->express_label,
+            'fast_label' => $request->fast_label,
+        ]);
 
         return redirect()->route('admin.shipping.index')
             ->with('success', 'Cập nhật cài đặt vận chuyển thành công!');
