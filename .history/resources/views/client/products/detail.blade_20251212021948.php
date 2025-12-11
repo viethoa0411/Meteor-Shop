@@ -508,10 +508,11 @@
                 const qtyInput = document.getElementById('product-quantity');
                 const minus = document.querySelector('.minus');
                 const plus = document.querySelector('.plus');
-                const stockDisplay = document.getElementById('stock-display');
+                // const stockDisplay = document.getElementById('stock-display');
                 const priceDisplay = document.getElementById('price-display');
                 const weightDisplay = document.getElementById('weight-display');
                 const weightUnitDisplay = document.getElementById('weight-unit-display');
+                const priceDisplay = document.getElementById('price-display');
                 const buyNowBtn = document.getElementById('buy-now-btn');
                 const addBtn = document.getElementById('add-to-cart');
                 const productId = {{ $product->id }};
@@ -671,10 +672,10 @@
                     }
                 };
 
-                // Cập nhật thông tin kho, cân nặng và giá
+            // Cập nhật thông tin kho, cân nặng và giá
                 updateStockInfo();
-                updateWeightInfo();
-                updatePriceInfo();
+            updateWeightInfo();
+            updatePriceInfo();
 
                 minus?.addEventListener('click', () => {
                     let val = parseInt(qtyInput.value, 10) || 1;
@@ -699,11 +700,8 @@
 
                 qtyInput.addEventListener('change', clampQuantity);
 
-                // Gắn event listener cho các button variant
                 document.querySelectorAll('.btn-variant').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
+                    btn.addEventListener('click', () => {
                         const isColor = btn.classList.contains('color-btn');
                         const group = isColor ? '.color-btn' : '.size-btn';
                         const wasActive = btn.classList.contains('active');
@@ -909,33 +907,24 @@
             /* Product Info Styles */
             #price-display {
                 color: #d41;
-                font-weight: 700;
-                font-size: 28px;
-                transition: all 0.3s ease;
+                font-weight: 600;
+                font-size: 24px;
             }
 
             #stock-display {
                 color: #28a745;
                 font-weight: 600;
-                font-size: 16px;
-                transition: all 0.3s ease;
-            }
-
-            #stock-display:empty::before {
-                content: '--';
             }
 
             #weight-display {
                 color: #555;
                 font-weight: 600;
-                font-size: 16px;
             }
 
             #weight-unit-display {
                 color: #555;
                 font-weight: 600;
                 margin-left: 4px;
-                font-size: 16px;
             }
 
             /* Product Action Buttons */
@@ -1053,8 +1042,70 @@
                 new bootstrap.Modal(document.getElementById('imageLightbox')).show();
             }
 
-            // Variant Selection - Code này đã được xử lý trong DOMContentLoaded ở trên
-            // Giữ lại các hàm helper nếu cần
+            // Variant Selection
+            document.querySelectorAll('.variant-color-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.variant-color-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedColor = this.dataset.color;
+                    loadSizesForColor(selectedColor);
+                    updateVariant();
+                });
+            });
+
+            function loadSizesForColor(color) {
+                const sizesContainer = document.getElementById('size-selection');
+                sizesContainer.innerHTML = '';
+
+                const sizes = [...new Set(productData.variants
+                    .filter(v => v.color_name === color)
+                    .map(v => `${v.length}x${v.width}x${v.height}`))];
+
+                sizes.forEach(size => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'btn btn-outline-secondary variant-size-btn';
+                    btn.textContent = size;
+                    btn.dataset.size = size;
+                    btn.style.minWidth = '80px';
+                    btn.style.borderRadius = '8px';
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.variant-size-btn').forEach(b => b.classList.remove(
+                            'active'));
+                        this.classList.add('active');
+                        selectedSize = this.dataset.size;
+                        updateVariant();
+                    });
+                    sizesContainer.appendChild(btn);
+                });
+            }
+
+            function updateVariant() {
+                if (!selectedColor || !selectedSize) {
+                    selectedVariantId = null;
+                    currentMaxStock = productData.stock;
+                    document.getElementById('stock-display').textContent = productData.stock || '--';
+                    return;
+                }
+
+                const [length, width, height] = selectedSize.split('x').map(Number);
+                const variant = productData.variants.find(v =>
+                    v.color_name === selectedColor &&
+                    v.length === length &&
+                    v.width === width &&
+                    v.height === height
+                );
+
+                if (variant) {
+                    selectedVariantId = variant.id;
+                    currentMaxStock = variant.stock;
+                    document.getElementById('stock-display').textContent = variant.stock > 0 ? variant.stock : '0 (Hết hàng)';
+                } else {
+                    selectedVariantId = null;
+                    currentMaxStock = 0;
+                    document.getElementById('stock-display').textContent = '--';
+                }
+            }
 
             // Quantity Controls
             document.querySelectorAll('.quantity-btn').forEach(btn => {

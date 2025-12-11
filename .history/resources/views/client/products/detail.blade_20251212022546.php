@@ -700,7 +700,10 @@
                 qtyInput.addEventListener('change', clampQuantity);
 
                 // Gắn event listener cho các button variant
-                document.querySelectorAll('.btn-variant').forEach(btn => {
+                const variantButtons = document.querySelectorAll('.btn-variant');
+                console.log('Found variant buttons:', variantButtons.length);
+                
+                variantButtons.forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();

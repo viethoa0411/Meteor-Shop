@@ -508,10 +508,11 @@
                 const qtyInput = document.getElementById('product-quantity');
                 const minus = document.querySelector('.minus');
                 const plus = document.querySelector('.plus');
-                const stockDisplay = document.getElementById('stock-display');
+                // const stockDisplay = document.getElementById('stock-display');
                 const priceDisplay = document.getElementById('price-display');
                 const weightDisplay = document.getElementById('weight-display');
                 const weightUnitDisplay = document.getElementById('weight-unit-display');
+                const priceDisplay = document.getElementById('price-display');
                 const buyNowBtn = document.getElementById('buy-now-btn');
                 const addBtn = document.getElementById('add-to-cart');
                 const productId = {{ $product->id }};
@@ -699,11 +700,8 @@
 
                 qtyInput.addEventListener('change', clampQuantity);
 
-                // Gắn event listener cho các button variant
                 document.querySelectorAll('.btn-variant').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
+                    btn.addEventListener('click', () => {
                         const isColor = btn.classList.contains('color-btn');
                         const group = isColor ? '.color-btn' : '.size-btn';
                         const wasActive = btn.classList.contains('active');
@@ -909,33 +907,24 @@
             /* Product Info Styles */
             #price-display {
                 color: #d41;
-                font-weight: 700;
-                font-size: 28px;
-                transition: all 0.3s ease;
+                font-weight: 600;
+                font-size: 24px;
             }
 
             #stock-display {
                 color: #28a745;
                 font-weight: 600;
-                font-size: 16px;
-                transition: all 0.3s ease;
-            }
-
-            #stock-display:empty::before {
-                content: '--';
             }
 
             #weight-display {
                 color: #555;
                 font-weight: 600;
-                font-size: 16px;
             }
 
             #weight-unit-display {
                 color: #555;
                 font-weight: 600;
                 margin-left: 4px;
-                font-size: 16px;
             }
 
             /* Product Action Buttons */
