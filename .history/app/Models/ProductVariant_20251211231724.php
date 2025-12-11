@@ -15,7 +15,7 @@ class ProductVariant extends Model
         'width',
         'height',
         'price',
-        'weight', 
+            'weight', 
         'weight_unit',
         'stock',
         'sku',

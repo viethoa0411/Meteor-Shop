@@ -86,7 +86,7 @@ class ProductController extends Controller
             'variants.*.price' => 'nullable|numeric|min:0',
             'variant_color.*' => 'required_with:variant_size.*',
             'variant_size.*'  => 'required_with:variant_color.*',
-             // weight: cho phép null hoặc số >= 0
+          // weight: cho phép null hoặc số >= 0
             'variants.*.weight' => 'nullable|numeric|min:0',
             'variants.*.weight_unit' => 'required_with:variants.*.weight|in:g,kg,lb',
        
