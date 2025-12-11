@@ -251,7 +251,7 @@
                                             {{-- Cân nặng --}}
                                                <div class="col-md-3 mt-3">
                                                 <label>Cân nặng</label>
-                                                <input type="number" step="1" 
+                                                <input type="number" step="0.01" 
                                                         name="variants[{{ $idx }}][weight]" class="form-control"
                                                        value="{{ old('variants.'.$idx.'.weight', $v->weight) }}" placeholder="0.00"
                                                        {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
@@ -353,21 +353,6 @@
                             <label>Tồn</label>
                             <input type="number" 
                                 name="variants[new_${newVariantIndex}][stock]" class="form-control">
-                        </div>
-
-                         <div class="col-md-3 mt-3">
-                            <label>Cân nặng</label>
-                            <input type="number" step="1" 
-                                name="variants[new_${newVariantIndex}][weight]" class="form-control" placeholder="0.00">
-                        </div>
-
-                        <div class="col-md-2 mt-3">
-                            <label>Đơn vị</label>
-                            <select name="variants[new_${newVariantIndex}][weight_unit]" class="form-select">
-                                <option value="kg" selected>kg</option>
-                                <option value="g">g</option>
-                                <option value="lb">lb</option>
-                            </select>
                         </div>
 
                     </div>

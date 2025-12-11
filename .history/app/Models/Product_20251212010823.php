@@ -88,8 +88,7 @@ class Product extends Model
         }
         return ($this->stock ?? 0) > 0;
     }
-
-    public function orderDetails()
+      public function orderDetails()
     {
         return $this->hasMany(\App\Models\OrderDetail::class, 'product_id');
     }
@@ -98,5 +97,5 @@ class Product extends Model
     {
         return $this->orderDetails()->exists();
     }
-
+}
 }

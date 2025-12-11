@@ -215,35 +215,24 @@ class ProductController extends Controller
             'variants.*.height.required' => 'Vui lòng nhập chiều cao.',
         ]);
 
-        // Xử lý ảnh đại diện - không cho phép thay đổi nếu có đơn hàng
-        $imagePath = $product->image;
-        if ($request->hasFile('image') && !$hasOrders) {
+ // Xử lý ảnh đại diện - không cho phép thay đổi nếu có đơn hàng        $imagePath = $product->image;
+        if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
         // Cập nhật thông tin sản phẩm
-        $updateData = [
+        $product->update([
             'name' => $request->name,
             'price' => $request->price,
             'stock' => $request->stock,
             'category_id' => $request->category_id,
-            'stock' => $request->stock ?? $product->stock,
             'description' => $request->description,
             'status' => $request->status,
             'image' => $imagePath,
-        ];
+        ]);
 
-         // Chỉ cho phép thay đổi tên và danh mục nếu chưa có đơn hàng
-        if (!$hasOrders) {
-            $updateData['name'] = $request->name;
-            $updateData['category_id'] = $request->category_id;
-        }
-
-        $product->update($updateData);
-
-        // Xử lý upload ảnh phụ (nếu có) - không cho phép thay đổi nếu có đơn hàng
-        if ($request->hasFile('images') && !$hasOrders) {
-
+        // Xử lý upload ảnh phụ (nếu có)
+        if ($request->hasFile('images')) {
 
             // 1. XÓA toàn bộ ảnh cũ (trong database + trong storage)
             foreach ($product->images as $img) {
@@ -277,45 +266,33 @@ class ProductController extends Controller
             $variant = $product->variants->firstWhere('id', $v['id']);
 
                 if ($variant) {
-                    $variantData = [
+                    $variant->update([
                         'product_version' => $version,
+                        'color_name' => $v['color_name'],
+                        'color_code' => $v['color_code'],
+                        'length'     => $v['length'] ?? null,
+                        'width'      => $v['width'] ?? null,
+                        'height'     => $v['height'] ?? null,
                         'stock'      => $v['stock'] ?? 0,
                         'price'      => $v['price'] ?? $product->price,
-                        'weight'     => $v['weight'] ?? null,
-                        'weight_unit'=> $v['weight_unit'] ?? 'kg',
-                    ];
-
-                    // Chỉ cho phép thay đổi màu sắc, kích thước, cân nặng nếu chưa có đơn hàng
-                    if (!$hasOrders || !$variant->hasOrders()) {
-                        $variantData['color_name'] = $v['color_name'] ?? $variant->color_name;
-                        $variantData['color_code'] = $v['color_code'] ?? $variant->color_code;
-                        $variantData['length'] = $v['length'] ?? $variant->length;
-                        $variantData['width'] = $v['width'] ?? $variant->width;
-                        $variantData['height'] = $v['height'] ?? $variant->height;
-                    }
-
-                    $variant->update($variantData);
+                    ]);
                 }
 
                 continue;
-                }
+                    }
 
-                   // Tạo biến thể mới - chỉ cho phép nếu chưa có đơn hàng
-                if (!$hasOrders) {
-                        $product->variants()->create([
+                // Tạo biến thể mới 
+                    $product->variants()->create([
                         'product_id'      => $product->id,
-                        'product_version' => $version,
-                        'color_name'      => $v['color_name'] ?? null,
-                        'color_code'      => $v['color_code'] ?? null,
+                        'product_version' => $version,   // 🔥 KHÔNG BAO GIỜ NULL
+                        'color_name'      => $v['color_name'],
+                        'color_code'      => $v['color_code'],
                         'length'          => $v['length'] ?? null,
                         'width'           => $v['width'] ?? null,
                         'height'          => $v['height'] ?? null,
                         'stock'           => $v['stock'] ?? 0,
                         'price'           => $v['price'] ?? $product->price,
-                        'weight'          => $v['weight'] ?? null,
-                        'weight_unit'     => $v['weight_unit'] ?? 'kg',
                     ]);
-                }
                 }
 
       

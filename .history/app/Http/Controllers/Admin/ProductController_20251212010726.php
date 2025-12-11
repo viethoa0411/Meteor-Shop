@@ -304,7 +304,8 @@ class ProductController extends Controller
                 if (!$hasOrders) {
                         $product->variants()->create([
                         'product_id'      => $product->id,
-                        'product_version' => $version,
+                
+                       'product_version' => $version,
                         'color_name'      => $v['color_name'] ?? null,
                         'color_code'      => $v['color_code'] ?? null,
                         'length'          => $v['length'] ?? null,
@@ -312,10 +313,7 @@ class ProductController extends Controller
                         'height'          => $v['height'] ?? null,
                         'stock'           => $v['stock'] ?? 0,
                         'price'           => $v['price'] ?? $product->price,
-                        'weight'          => $v['weight'] ?? null,
-                        'weight_unit'     => $v['weight_unit'] ?? 'kg',
                     ]);
-                }
                 }
 
       

@@ -298,24 +298,20 @@ class ProductController extends Controller
                 }
 
                 continue;
-                }
+                    }
 
-                   // Tạo biến thể mới - chỉ cho phép nếu chưa có đơn hàng
-                if (!$hasOrders) {
-                        $product->variants()->create([
+                // Tạo biến thể mới 
+                    $product->variants()->create([
                         'product_id'      => $product->id,
-                        'product_version' => $version,
-                        'color_name'      => $v['color_name'] ?? null,
-                        'color_code'      => $v['color_code'] ?? null,
+                        'product_version' => $version,   // 🔥 KHÔNG BAO GIỜ NULL
+                        'color_name'      => $v['color_name'],
+                        'color_code'      => $v['color_code'],
                         'length'          => $v['length'] ?? null,
                         'width'           => $v['width'] ?? null,
                         'height'          => $v['height'] ?? null,
                         'stock'           => $v['stock'] ?? 0,
                         'price'           => $v['price'] ?? $product->price,
-                        'weight'          => $v['weight'] ?? null,
-                        'weight_unit'     => $v['weight_unit'] ?? 'kg',
                     ]);
-                }
                 }
 
       

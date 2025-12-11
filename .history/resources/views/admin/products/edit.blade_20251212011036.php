@@ -133,12 +133,8 @@
                             <div class="row g-3 mb-3">
                                 <div class="col-lg-7">
                                     <label class="form-label">Ảnh đại diện</label>
-                                    <input type="file" name="image" accept="image/*" class="form-control"
-                                           {{ ($hasOrders ?? false) ? 'disabled' : '' }}>   
-                                             <div class="form-text">Hỗ trợ: jpg, jpeg, png, webp (≤ 4MB)</div>
-                                    @if($hasOrders ?? false)
-                                        <small class="text-muted">Không thể thay đổi ảnh khi sản phẩm đã có đơn hàng</small>
-                                    @endif
+                                    <input type="file" name="image" accept="image/*" class="form-control">
+                                    <div class="form-text">Hỗ trợ: jpg, jpeg, png, webp (≤ 4MB)</div>
                                 </div>
                                 <div class="col-lg-5">
                                     <label class="form-label d-block">Ảnh hiện tại</label>
@@ -155,12 +151,8 @@
                             {{-- Ảnh phụ --}}
                             <div class="mb-3">
                                 <label class="form-label">Ảnh phụ</label>
-                                <input type="file" name="images[]" accept="image/*" class="form-control" multiple
-                                       {{ ($hasOrders ?? false) ? 'disabled' : '' }}>
+                                <input type="file" name="images[]" accept="image/*" class="form-control" multiple>
                                 <div class="form-text">Chọn nhiều ảnh cùng lúc. Hỗ trợ: jpg, jpeg, png, webp (≤ 4MB)</div>
-                                @if($hasOrders ?? false)
-                                    <small class="text-muted">Không thể thay đổi ảnh phụ khi sản phẩm đã có đơn hàng</small>
-                                @endif
                             </div>
 
                             {{-- Hiển thị ảnh phụ hiện tại --}}
@@ -192,53 +184,44 @@
                                         <input type="hidden" name="variants[{{ $idx }}][id]" value="{{ $v->id }}">
 
                                         <div class="row g-3">
-                                            @php
-                                                $variantHasOrders = $v->hasOrders();
-                                            @endphp
+
                                             <div class="col-md-3">
                                                 <label class="form-label">Tên màu</label>
                                                 <input name="variants[{{ $idx }}][color_name]" 
                                                         class="form-control"
-                                                        value="{{ old('variants.'.$idx.'.color_name', $v->color_name) }}"
-                                                          {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
-                                                @if(($hasOrders ?? false) && $variantHasOrders)
-                                                    <small class="text-muted">Đã có đơn hàng</small>
-                                                @endif
+                                                        value="{{ old('variants.'.$idx.'.color_name', $v->color_name) }}">
                                             </div>
 
                                             <div class="col-md-3">
                                                 <label class="form-label">Mã màu</label>
                                                 <input type="color" name="variants[{{ $idx }}][color_code]"
                                                         class="form-control form-control-color" 
-                                                        value="{{ old('variants.'.$idx.'.color_code', $v->color_code) }}"
-                                                        {{ ($hasOrders ?? false) && $variantHasOrders ? 'disabled' : '' }}>
-                                                @if(($hasOrders ?? false) && $variantHasOrders)
-                                                    <input type="hidden" name="variants[{{ $idx }}][color_code]" value="{{ $v->color_code }}">
-                                                @endif
+                                                        value="{{ old('variants.'.$idx.'.color_code', $v->color_code) }}">
+
                                             </div>
 
                                             <div class="col-md-2">
                                                 <label>Dài</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][length]"
                                                         class="form-control" 
-                                                        value="{{ old('variants.'.$idx.'.length', $v->length) }}"
-                                                            {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
+                                                        value="{{ old('variants.'.$idx.'.length', $v->length) }}">
+
                                             </div>
 
                                             <div class="col-md-2">
                                                 <label>Rộng</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][width]"
                                                         class="form-control" 
-                                                        value="{{ old('variants.'.$idx.'.width', $v->width) }}"
-                                                            {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
+                                                        value="{{ old('variants.'.$idx.'.width', $v->width) }}">
+
                                             </div>
 
                                             <div class="col-md-2">
                                                 <label>Cao</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][height]"
                                                         class="form-control" 
-                                                        value="{{ old('variants.'.$idx.'.height', $v->height) }}"
-                                                            {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
+                                                        value="{{ old('variants.'.$idx.'.height', $v->height) }}">
+
                                             </div>
 
                                             <div class="col-md-2 mt-3">
@@ -246,28 +229,6 @@
                                                 <input type="number" 
                                                         name="variants[{{ $idx }}][stock]" class="form-control"
                                                        value="{{ old('variants.'.$idx.'.stock', $v->stock) }}">
-                                            </div>
-
-                                            {{-- Cân nặng --}}
-                                               <div class="col-md-3 mt-3">
-                                                <label>Cân nặng</label>
-                                                <input type="number" step="1" 
-                                                        name="variants[{{ $idx }}][weight]" class="form-control"
-                                                       value="{{ old('variants.'.$idx.'.weight', $v->weight) }}" placeholder="0.00"
-                                                       {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
-                                            </div>
-
-                                            <div class="col-md-2 mt-3">
-                                                <label>Đơn vị</label>
-                                                <select name="variants[{{ $idx }}][weight_unit]" class="form-select"
-                                                        {{ ($hasOrders ?? false) && $variantHasOrders ? 'disabled' : '' }}>
-                                                    <option value="kg" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'kg' ? 'selected' : '' }}>kg</option>
-                                                    <option value="g" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'g' ? 'selected' : '' }}>g</option>
-                                                    <option value="lb" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'lb' ? 'selected' : '' }}>lb</option>
-                                                </select>
-                                                @if(($hasOrders ?? false) && $variantHasOrders)
-                                                    <input type="hidden" name="variants[{{ $idx }}][weight_unit]" value="{{ $v->weight_unit ?? 'kg' }}">
-                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -278,13 +239,8 @@
                             <div id="new-variants"></div>
 
                             {{-- Nút thêm biến thể --}}
-                            <button type="button" id="addNewVariant" class="btn btn-primary mt-2" 
-                                    {{ ($hasOrders ?? false) ? 'disabled' : '' }}>
-                                + Thêm biến thể
-                            </button>
-                            @if($hasOrders ?? false)
-                                <small class="text-muted d-block mt-1">Không thể thêm biến thể mới khi sản phẩm đã có đơn hàng</small>
-                            @endif
+                            <button type="button" id="addNewVariant" class="btn btn-primary mt-2">+ Thêm biến thể</button>
+
                             <hr>
 
 
@@ -353,21 +309,6 @@
                             <label>Tồn</label>
                             <input type="number" 
                                 name="variants[new_${newVariantIndex}][stock]" class="form-control">
-                        </div>
-
-                         <div class="col-md-3 mt-3">
-                            <label>Cân nặng</label>
-                            <input type="number" step="1" 
-                                name="variants[new_${newVariantIndex}][weight]" class="form-control" placeholder="0.00">
-                        </div>
-
-                        <div class="col-md-2 mt-3">
-                            <label>Đơn vị</label>
-                            <select name="variants[new_${newVariantIndex}][weight_unit]" class="form-select">
-                                <option value="kg" selected>kg</option>
-                                <option value="g">g</option>
-                                <option value="lb">lb</option>
-                            </select>
                         </div>
 
                     </div>

@@ -88,15 +88,4 @@ class Product extends Model
         }
         return ($this->stock ?? 0) > 0;
     }
-
-    public function orderDetails()
-    {
-        return $this->hasMany(\App\Models\OrderDetail::class, 'product_id');
-    }
-
-    public function hasOrders()
-    {
-        return $this->orderDetails()->exists();
-    }
-
 }

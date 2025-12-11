@@ -357,7 +357,7 @@
 
                          <div class="col-md-3 mt-3">
                             <label>Cân nặng</label>
-                            <input type="number" step="1" 
+                            <input type="number" step="0.01" 
                                 name="variants[new_${newVariantIndex}][weight]" class="form-control" placeholder="0.00">
                         </div>
 

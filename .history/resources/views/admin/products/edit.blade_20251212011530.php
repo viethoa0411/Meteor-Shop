@@ -237,8 +237,8 @@
                                                 <label>Cao</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][height]"
                                                         class="form-control" 
-                                                        value="{{ old('variants.'.$idx.'.height', $v->height) }}"
-                                                            {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
+ value="{{ old('variants.'.$idx.'.height', $v->height) }}"
+                                                        {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
                                             </div>
 
                                             <div class="col-md-2 mt-3">
@@ -246,28 +246,6 @@
                                                 <input type="number" 
                                                         name="variants[{{ $idx }}][stock]" class="form-control"
                                                        value="{{ old('variants.'.$idx.'.stock', $v->stock) }}">
-                                            </div>
-
-                                            {{-- Cân nặng --}}
-                                               <div class="col-md-3 mt-3">
-                                                <label>Cân nặng</label>
-                                                <input type="number" step="1" 
-                                                        name="variants[{{ $idx }}][weight]" class="form-control"
-                                                       value="{{ old('variants.'.$idx.'.weight', $v->weight) }}" placeholder="0.00"
-                                                       {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
-                                            </div>
-
-                                            <div class="col-md-2 mt-3">
-                                                <label>Đơn vị</label>
-                                                <select name="variants[{{ $idx }}][weight_unit]" class="form-select"
-                                                        {{ ($hasOrders ?? false) && $variantHasOrders ? 'disabled' : '' }}>
-                                                    <option value="kg" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'kg' ? 'selected' : '' }}>kg</option>
-                                                    <option value="g" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'g' ? 'selected' : '' }}>g</option>
-                                                    <option value="lb" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'lb' ? 'selected' : '' }}>lb</option>
-                                                </select>
-                                                @if(($hasOrders ?? false) && $variantHasOrders)
-                                                    <input type="hidden" name="variants[{{ $idx }}][weight_unit]" value="{{ $v->weight_unit ?? 'kg' }}">
-                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -278,13 +256,8 @@
                             <div id="new-variants"></div>
 
                             {{-- Nút thêm biến thể --}}
-                            <button type="button" id="addNewVariant" class="btn btn-primary mt-2" 
-                                    {{ ($hasOrders ?? false) ? 'disabled' : '' }}>
-                                + Thêm biến thể
-                            </button>
-                            @if($hasOrders ?? false)
-                                <small class="text-muted d-block mt-1">Không thể thêm biến thể mới khi sản phẩm đã có đơn hàng</small>
-                            @endif
+                            <button type="button" id="addNewVariant" class="btn btn-primary mt-2">+ Thêm biến thể</button>
+
                             <hr>
 
 
@@ -353,21 +326,6 @@
                             <label>Tồn</label>
                             <input type="number" 
                                 name="variants[new_${newVariantIndex}][stock]" class="form-control">
-                        </div>
-
-                         <div class="col-md-3 mt-3">
-                            <label>Cân nặng</label>
-                            <input type="number" step="1" 
-                                name="variants[new_${newVariantIndex}][weight]" class="form-control" placeholder="0.00">
-                        </div>
-
-                        <div class="col-md-2 mt-3">
-                            <label>Đơn vị</label>
-                            <select name="variants[new_${newVariantIndex}][weight_unit]" class="form-select">
-                                <option value="kg" selected>kg</option>
-                                <option value="g">g</option>
-                                <option value="lb">lb</option>
-                            </select>
                         </div>
 
                     </div>
