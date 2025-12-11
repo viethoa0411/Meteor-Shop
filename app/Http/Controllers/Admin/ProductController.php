@@ -82,6 +82,7 @@ class ProductController extends Controller
             'variants.*.length' => 'nullable|numeric|min:0',
             'variants.*.width' => 'nullable|numeric|min:0',
             'variants.*.height' => 'nullable|numeric|min:0',
+            'variants.*.weight' => 'nullable|numeric|min:0',
             'variants.*.stock' => 'required|integer|min:0',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variant_color.*' => 'required_with:variant_size.*',
@@ -126,6 +127,7 @@ class ProductController extends Controller
                     'length'     => $variant['length'] ?? null,
                     'width'      => $variant['width'] ?? null,
                     'height'     => $variant['height'] ?? null,
+                    'weight'     => $variant['weight'] ?? 0,
                     'stock'      => $variant['stock'] ?? 0,
                     'price'      => $variant['price'] ?? $request->price,
                 ]);
@@ -182,6 +184,7 @@ class ProductController extends Controller
             'variants.*.length' => 'required|numeric|min:0',
             'variants.*.width' => 'required|numeric|min:0',
             'variants.*.height' => 'required|numeric|min:0',
+            'variants.*.weight' => 'required|numeric|min:0',
         ], [
             'variants.*.color_name.required' => 'Vui lòng nhập màu cho biến thể.',
             'variants.*.color_code.required' => 'Vui lòng chọn mã màu.',
@@ -189,6 +192,7 @@ class ProductController extends Controller
             'variants.*.length.required' => 'Vui lòng nhập chiều dài.',
             'variants.*.width.required' => 'Vui lòng nhập chiều rộng.',
             'variants.*.height.required' => 'Vui lòng nhập chiều cao.',
+            'variants.*.weight.required' => 'Vui lòng nhập cân nặng cho biến thể.',
         ]);
 
         // Xử lý ảnh đại diện
@@ -250,6 +254,7 @@ class ProductController extends Controller
                         'length'     => $v['length'] ?? null,
                         'width'      => $v['width'] ?? null,
                         'height'     => $v['height'] ?? null,
+                        'weight'     => $v['weight'] ?? 0,
                         'stock'      => $v['stock'] ?? 0,
                         'price'      => $v['price'] ?? $product->price,
                     ]);
@@ -267,6 +272,7 @@ class ProductController extends Controller
                         'length'          => $v['length'] ?? null,
                         'width'           => $v['width'] ?? null,
                         'height'          => $v['height'] ?? null,
+                        'weight'          => $v['weight'] ?? 0,
                         'stock'           => $v['stock'] ?? 0,
                         'price'           => $v['price'] ?? $product->price,
                     ]);
