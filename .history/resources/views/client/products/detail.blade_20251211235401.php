@@ -133,7 +133,7 @@
 
                 {{-- Giá --}}
                 <p style="font-size:24px; font-weight:600; color:#d41; margin-bottom:10px;">
-                    <span id="price-display">{{ number_format($product->price, 0, ',', '.') }} đ</span>
+                    {{ number_format($product->price, 0, ',', '.') }} đ
                 </p>
 
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
@@ -144,7 +144,6 @@
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
                     Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
                 </p>
-                
 
 
                 {{-- Thông tin chung --}}
@@ -433,7 +432,8 @@
         
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const wishlistBtn = document.getElementById('wishlist-toggle'); 
+                const wishlistBtn = document.getElementById('wishlist-toggle');
+                const weightDisplay = document.getElementById('weight-display'); 
 
                 wishlistBtn?.addEventListener('click', function() {
                     const productId = this.getAttribute('data-product-id');
@@ -508,14 +508,11 @@
                 const minus = document.querySelector('.minus');
                 const plus = document.querySelector('.plus');
                 const stockDisplay = document.getElementById('stock-display');
-                const weightDisplay = document.getElementById('weight-display');
-                const priceDisplay = document.getElementById('price-display');
                 const buyNowBtn = document.getElementById('buy-now-btn');
                 const addBtn = document.getElementById('add-to-cart');
                 const productId = {{ $product->id }};
                 const productVariants = @json($variantOptions);
                 const baseProductStock = {{ (int) ($product->stock ?? 0) }};
-                const baseProductPrice = {{ (float) $product->price }};
                 @auth
                 const isAuthenticated = true;
             @else
@@ -577,8 +574,6 @@
             };
 
             const updateStockInfo = () => {
-                if (!stockDisplay) return;
-                
                 if (productVariants.length === 0) {
                     stockDisplay.textContent = baseProductStock;
                     currentMaxStock = baseProductStock;
@@ -589,16 +584,14 @@
 
                 const selectedVariant = updateSelectedVariant();
 
-                if (selectedVariant && selectedVariant.stock !== undefined && selectedVariant.stock !== null) {
-                    if (selectedVariant.stock > 0) {
-                        currentMaxStock = selectedVariant.stock;
-                        stockDisplay.textContent = currentMaxStock;
-                        qtyInput.setAttribute('max', currentMaxStock);
-                    } else {
-                        currentMaxStock = 0;
-                        stockDisplay.textContent = '0 (Hết hàng)';
-                        qtyInput.setAttribute('max', 0);
-                    }
+                if (selectedVariant && selectedVariant.stock > 0) {
+                    currentMaxStock = selectedVariant.stock;
+                    stockDisplay.textContent = currentMaxStock;
+                    qtyInput.setAttribute('max', currentMaxStock);
+                } else if (selectedVariant) {
+                    currentMaxStock = 0;
+                    stockDisplay.textContent = '0 (Hết hàng)';
+                    qtyInput.setAttribute('max', 0);
                 } else {
                     stockDisplay.textContent = '-- (Vui lòng chọn phân loại)';
                     currentMaxStock = 0;
@@ -606,66 +599,57 @@
                 }
 
                 clampQuantity();
+                 // Cập nhật cân nặng khi cập nhật stock
+                updateWeightInfo();
             };
+             
+                  // Hàm cập nhật cân nặng dựa trên biến thể đã chọn
+                const updateWeightInfo = () => {
+                    if (productVariants.length === 0) {
+                        // Nếu không có variant, lấy cân nặng từ product (nếu có)
+                        weightDisplay.textContent = '--';
+                        return;
+                    }
 
-            // Hàm cập nhật cân nặng dựa trên biến thể đã chọn
-            const updateWeightInfo = () => {
-                if (!weightDisplay) return;
-                
-                if (productVariants.length === 0) {
-                    // Nếu không có variant, không hiển thị cân nặng
-                    weightDisplay.textContent = '--';
-                    return;
-                }
+                    const activeColor = document.querySelector('.color-btn.active');
+                    const activeSize = document.querySelector('.size-btn.active');
 
-                const selectedVariant = updateSelectedVariant();
+                    // Nếu chưa chọn màu hoặc kích thước
+                    if (!activeColor || !activeSize) {
+                        weightDisplay.textContent = '-- (Vui lòng chọn phân loại)';
+                        return;
+                    }
 
-                // Nếu chưa chọn đủ màu và kích thước
-                if (!selectedVariant) {
-                    weightDisplay.textContent = '-- (Vui lòng chọn phân loại)';
-                    return;
-                }
+                    // Tìm biến thể phù hợp với màu và kích thước đã chọn
+                    const {
+                        length,
+                        width,
+                        height
+                    } = parseSize(activeSize.dataset.size);
 
-                // Nếu tìm thấy biến thể, hiển thị cân nặng
-                if (selectedVariant.weight && selectedVariant.weight > 0) {
-                    // Format số để hiển thị đẹp hơn (loại bỏ số 0 thừa)
-                    const weightValue = parseFloat(selectedVariant.weight);
-                    const formattedWeight = weightValue % 1 === 0 ? weightValue.toString() : weightValue.toFixed(2);
-                    weightDisplay.textContent = `${formattedWeight} ${selectedVariant.weight_unit || 'kg'}`;
-                } else {
-                    weightDisplay.textContent = '--';
-                }
-            };
+                    const selectedVariant = productVariants.find(variant =>
+                        normalize(variant.color_name) === normalize(activeColor.dataset.color) &&
+                        Number(variant.length) === Number(length) &&
+                        Number(variant.width) === Number(width) &&
+                        Number(variant.height) === Number(height)
+                    );
 
-            // Hàm cập nhật giá dựa trên biến thể đã chọn
-            const updatePriceInfo = () => {
-                if (productVariants.length === 0) {
-                    // Nếu không có variant, hiển thị giá sản phẩm chính
-                    priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
-                    return;
-                }
+                 // Nếu tìm thấy biến thể, hiển thị cân nặng
+                    if (selectedVariant && selectedVariant.weight) {
+                        weightDisplay.textContent = `${selectedVariant.weight} ${selectedVariant.weight_unit}`;
+                    } else if (selectedVariant) {
+                        weightDisplay.textContent = '--';
+                    } else {
+                        weightDisplay.textContent = '-- (Không tìm thấy)';
+                    }
+                };
 
-                const selectedVariant = updateSelectedVariant();
-
-                // Nếu chưa chọn đủ màu và kích thước, hiển thị giá sản phẩm chính
-                if (!selectedVariant) {
-                    priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
-                    return;
-                }
-
-                // Nếu tìm thấy biến thể, hiển thị giá của biến thể
-                if (selectedVariant.price) {
-                    priceDisplay.textContent = selectedVariant.price.toLocaleString('vi-VN') + ' đ';
-                } else {
-                    // Nếu không có giá biến thể, dùng giá sản phẩm chính
-                    priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
-                }
-            };
-
-            // Cập nhật thông tin kho, cân nặng và giá
+            // Cập nhật thông tin kho và cân nặng
             updateStockInfo();
             updateWeightInfo();
-            updatePriceInfo();
+        });
+    
+
 
             minus?.addEventListener('click', () => {
                 let val = parseInt(qtyInput.value, 10) || 1;
@@ -746,8 +730,6 @@
                     }
 
                     updateStockInfo();
-                    updateWeightInfo();
-                    updatePriceInfo();
                 });
             });
 
@@ -864,7 +846,7 @@
                 });
             }
             @endauth
-        });
+            });
         </script>
         <style>
             .color-btn.active {

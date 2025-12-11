@@ -144,7 +144,9 @@
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
                     Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
                 </p>
-                
+                <p style="font-size:14px; color:#555; margin-bottom:10px;">
+                    Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
+                </p>
 
 
                 {{-- Thông tin chung --}}
@@ -666,6 +668,9 @@
             updateStockInfo();
             updateWeightInfo();
             updatePriceInfo();
+        });
+    
+
 
             minus?.addEventListener('click', () => {
                 let val = parseInt(qtyInput.value, 10) || 1;
@@ -864,7 +869,7 @@
                 });
             }
             @endauth
-        });
+            });
         </script>
         <style>
             .color-btn.active {

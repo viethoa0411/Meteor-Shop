@@ -144,7 +144,9 @@
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
                     Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
                 </p>
-                
+                <p style="font-size:14px; color:#555; margin-bottom:10px;">
+                    Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
+                </p>
 
 
                 {{-- Thông tin chung --}}

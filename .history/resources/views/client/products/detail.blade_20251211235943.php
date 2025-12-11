@@ -144,7 +144,9 @@
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
                     Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
                 </p>
-                
+                <p style="font-size:14px; color:#555; margin-bottom:10px;">
+                    Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
+                </p>
 
 
                 {{-- Thông tin chung --}}
@@ -577,8 +579,6 @@
             };
 
             const updateStockInfo = () => {
-                if (!stockDisplay) return;
-                
                 if (productVariants.length === 0) {
                     stockDisplay.textContent = baseProductStock;
                     currentMaxStock = baseProductStock;
@@ -589,16 +589,14 @@
 
                 const selectedVariant = updateSelectedVariant();
 
-                if (selectedVariant && selectedVariant.stock !== undefined && selectedVariant.stock !== null) {
-                    if (selectedVariant.stock > 0) {
-                        currentMaxStock = selectedVariant.stock;
-                        stockDisplay.textContent = currentMaxStock;
-                        qtyInput.setAttribute('max', currentMaxStock);
-                    } else {
-                        currentMaxStock = 0;
-                        stockDisplay.textContent = '0 (Hết hàng)';
-                        qtyInput.setAttribute('max', 0);
-                    }
+                if (selectedVariant && selectedVariant.stock > 0) {
+                    currentMaxStock = selectedVariant.stock;
+                    stockDisplay.textContent = currentMaxStock;
+                    qtyInput.setAttribute('max', currentMaxStock);
+                } else if (selectedVariant) {
+                    currentMaxStock = 0;
+                    stockDisplay.textContent = '0 (Hết hàng)';
+                    qtyInput.setAttribute('max', 0);
                 } else {
                     stockDisplay.textContent = '-- (Vui lòng chọn phân loại)';
                     currentMaxStock = 0;
@@ -610,8 +608,6 @@
 
             // Hàm cập nhật cân nặng dựa trên biến thể đã chọn
             const updateWeightInfo = () => {
-                if (!weightDisplay) return;
-                
                 if (productVariants.length === 0) {
                     // Nếu không có variant, không hiển thị cân nặng
                     weightDisplay.textContent = '--';
@@ -627,11 +623,8 @@
                 }
 
                 // Nếu tìm thấy biến thể, hiển thị cân nặng
-                if (selectedVariant.weight && selectedVariant.weight > 0) {
-                    // Format số để hiển thị đẹp hơn (loại bỏ số 0 thừa)
-                    const weightValue = parseFloat(selectedVariant.weight);
-                    const formattedWeight = weightValue % 1 === 0 ? weightValue.toString() : weightValue.toFixed(2);
-                    weightDisplay.textContent = `${formattedWeight} ${selectedVariant.weight_unit || 'kg'}`;
+                if (selectedVariant.weight) {
+                    weightDisplay.textContent = `${selectedVariant.weight} ${selectedVariant.weight_unit || 'kg'}`;
                 } else {
                     weightDisplay.textContent = '--';
                 }
@@ -666,6 +659,9 @@
             updateStockInfo();
             updateWeightInfo();
             updatePriceInfo();
+        });
+    
+
 
             minus?.addEventListener('click', () => {
                 let val = parseInt(qtyInput.value, 10) || 1;
@@ -864,7 +860,7 @@
                 });
             }
             @endauth
-        });
+            });
         </script>
         <style>
             .color-btn.active {
