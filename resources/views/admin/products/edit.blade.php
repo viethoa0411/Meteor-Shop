@@ -208,10 +208,17 @@
                                                         value="{{ old('variants.'.$idx.'.height', $v->height) }}">
 
                                             </div>
-
-                                            <div class="col-md-2 mt-3">
+                                        </div>
+                                        <div class="row g-3 mt-2">
+                                            <div class="col-md-2">
+                                                <label>Cân nặng (kg)</label>
+                                                <input type="number" step="0.01" name="variants[{{ $idx }}][weight]"
+                                                    class="form-control"
+                                                    value="{{ old('variants.'.$idx.'.weight', $v->weight) }}">
+                                            </div>
+                                            <div class="col-md-2">
                                                 <label>Tồn</label>
-                                                <input type="number" 
+                                                <input type="number"
                                                         name="variants[{{ $idx }}][stock]" class="form-control"
                                                        value="{{ old('variants.'.$idx.'.stock', $v->stock) }}">
                                             </div>
@@ -289,13 +296,18 @@
                             <input type="number" step="0.01"
                                 name="variants[new_${newVariantIndex}][height]" class="form-control">
                         </div>
-
-                        <div class="col-md-2 mt-3">
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3">
+                            <label>Cân nặng (kg)</label>
+                            <input type="number" step="0.01"
+                                name="variants[new_${newVariantIndex}][weight]" class="form-control">
+                        </div>
+                        <div class="col-md-3">
                             <label>Tồn</label>
                             <input type="number" 
                                 name="variants[new_${newVariantIndex}][stock]" class="form-control">
                         </div>
-
                     </div>
                 </div>`;
 

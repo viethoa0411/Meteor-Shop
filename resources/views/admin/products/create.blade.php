@@ -151,9 +151,15 @@
                                     <input type="number" id="height" step="0.01" class="form-control"
                                         placeholder="Chiều cao (cm)">
                                 </div>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-3">
+                                    <input type="number" id="weight" step="0.01" class="form-control"
+                                        placeholder="Cân nặng (kg)">
+                                </div>
                                 <div class="col-md-3">
                                     <input type="number" id="variant_stock" class="form-control"
-                                        placeholder="số lượng sản phẩm">
+                                        placeholder="Số lượng sản phẩm">
                                 </div>
                             </div>
                             <button type="button" class="btn btn-primary mt-2 mb-3" id="add_variant">Thêm biến
@@ -190,19 +196,21 @@
                 const length = document.getElementById('length').value.trim();
                 const width = document.getElementById('width').value.trim();
                 const height = document.getElementById('height').value.trim();
+                const weight = document.getElementById('weight').value.trim();
                 const stock = document.getElementById('variant_stock').value.trim();
 
                 if (!length || !width || !height) return alert('Nhập đủ kích thước!');
                 if (!colorCode) return alert('Chọn màu!');
+                if (!weight) return alert('Nhập cân nặng cho biến thể!');
                 if (!stock) return alert('Nhập tồn kho cho biến thể!');
 
                 const row = document.createElement('div');
                 row.className = 'variant-row';
                 row.innerHTML = `
-            <div class="variant-swatch" style="background:${colorCode}"></div>
-            <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp</span>
-            <button type="button" class="btn btn-sm btn-link text-danger">x</button>
-        `;
+                    <div class="variant-swatch" style="background:${colorCode}"></div>
+                    <span>${colorName || colorCode} - ${length}×${width}×${height} cm - ${weight} kg - <b>${stock}</b> sp</span>
+                    <button type="button" class="btn btn-sm btn-link text-danger">x</button>
+                `;
 
                 const delBtn = row.querySelector('button');
                 const hiddenDiv = document.createElement('div');
@@ -219,6 +227,7 @@
             <input type="hidden" name="variants[${idx}][length]" value="${length}">
             <input type="hidden" name="variants[${idx}][width]" value="${width}">
             <input type="hidden" name="variants[${idx}][height]" value="${height}">
+            <input type="hidden" name="variants[${idx}][weight]" value="${weight}">
             <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
         `;
                 hiddenVariants.appendChild(hiddenDiv);
@@ -230,6 +239,7 @@
                 document.getElementById('length').value = '';
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
+                document.getElementById('weight').value = '';
                 document.getElementById('variant_stock').value = '';
             });
         });
