@@ -719,87 +719,87 @@
             @endif
         </div>
     </div>
-    <footer id="footer" style="background:#0f1720;color:#e6eef5;padding:36px 16px 20px;margin-top:40px;">
-        <div style="max-width:1320px;margin:0 auto;display:flex;flex-wrap:wrap;gap:24px;">
-            <!-- Column 1: Brand -->
-            <div style="flex:1 1 240px;min-width:220px;">
-                <a href="{{ route('client.home') }}" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;">
-                    <img src="{{ asset('storage/images/meteor.jpg') }}" alt="Meteor" style="width:88px;height:auto;border-radius:8px;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,0.35);" />
-                    <div>
-                        <div style="font-size:20px;font-weight:700;letter-spacing:0.2px;">METEOR SHOP</div>
-                        <div style="font-size:13px;color:#9fb0bd;margin-top:4px;">Thiết kế & Nội thất</div>
-                    </div>
+ <footer id="footer" style="background:#0f1720;color:#e6eef5;padding:36px 16px 20px;margin-top:40px;">
+    <div style="max-width:1320px;margin:0 auto;display:flex;flex-wrap:wrap;gap:24px;">
+        <!-- Column 1: Brand -->
+        <div style="flex:1 1 240px;min-width:220px;">
+            <a href="{{ route('client.home') }}" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;">
+                <img src="{{ asset('storage/images/meteor.jpg') }}" alt="Meteor" style="width:88px;height:auto;border-radius:8px;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,0.35);" />
+                <div>
+                    <div style="font-size:20px;font-weight:700;letter-spacing:0.2px;">METEOR SHOP</div>
+                    <div style="font-size:13px;color:#9fb0bd;margin-top:4px;">Thiết kế & Nội thất</div>
+                </div>
+            </a>
+
+            <p style="color:#9fb0bd;font-size:14px;margin:16px 0 8px;max-width:420px;">
+                Cung cấp sản phẩm nội thất & phụ kiện chất lượng. Luôn cập nhật xu hướng, ưu đãi và ý tưởng trang trí cho không gian sống.
+            </p>
+
+            <div style="display:flex;gap:10px;margin-top:12px;">
+                <a href="#" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.06);color:#fff;text-decoration:none;">
+                    <i class="fab fa-instagram" aria-hidden="true"></i>
                 </a>
-
-                <p style="color:#9fb0bd;font-size:14px;margin:16px 0 8px;max-width:420px;">
-                    Cung cấp sản phẩm nội thất & phụ kiện chất lượng. Luôn cập nhật xu hướng, ưu đãi và ý tưởng trang trí cho không gian sống.
-                </p>
-
-                <div style="display:flex;gap:10px;margin-top:12px;">
-                    <a href="#" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.06);color:#fff;text-decoration:none;">
-                        <i class="fab fa-instagram" aria-hidden="true"></i>
-                    </a>
-                    <a href="#" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.06);color:#fff;text-decoration:none;">
-                        <i class="fab fa-youtube" aria-hidden="true"></i>
-                    </a>
-                    <a href="#" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.06);color:#fff;text-decoration:none;">
-                        <i class="fab fa-facebook" aria-hidden="true"></i>
-                    </a>
-                </div>
+                <a href="#" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.06);color:#fff;text-decoration:none;">
+                    <i class="fab fa-youtube" aria-hidden="true"></i>
+                </a>
+                <a href="#" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.06);color:#fff;text-decoration:none;">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
             </div>
+        </div>
 
-            <!-- Column 2: Quick Links -->
-            <div style="flex:0 1 200px;min-width:160px;">
-                <div style="font-weight:700;color:#fff;margin-bottom:12px;">Khám phá</div>
-                <ul style="list-style:none;padding:0;margin:0;color:#b9ccd4;line-height:2;">
-                    <li><a href="#" style="color:inherit;text-decoration:none;">Sản phẩm</a></li>
-                    <li><a href="#" style="color:inherit;text-decoration:none;">Bộ sưu tập</a></li>
-                    <li><a href="{{ route('client.blogs.list') }}" style="color:inherit;text-decoration:none;">Bài viết</a></li>
-                    <li><a href="{{ route('client.contact.list') }}" style="color:inherit;text-decoration:none;">Thiết kế nội thất</a></li>
-                    <li><a href="#" style="color:inherit;text-decoration:none;">Chia sẻ</a></li>
-                </ul>
-            </div>
+        <!-- Column 2: Quick Links -->
+        <div style="flex:0 1 200px;min-width:160px;">
+            <div style="font-weight:700;color:#fff;margin-bottom:12px;">Khám phá</div>
+            <ul style="list-style:none;padding:0;margin:0;color:#b9ccd4;line-height:2;">
+                <li><a href="#" style="color:inherit;text-decoration:none;">Sản phẩm</a></li>
+                <li><a href="#" style="color:inherit;text-decoration:none;">Bộ sưu tập</a></li>
+                <li><a href="{{ route('client.blogs.list') }}" style="color:inherit;text-decoration:none;">Bài viết</a></li>
+                <li><a href="{{ route('client.contact.list') }}" style="color:inherit;text-decoration:none;">Thiết kế nội thất</a></li>
+                <li><a href="#" style="color:inherit;text-decoration:none;">Chia sẻ</a></li>
+            </ul>
+        </div>
 
-            <!-- Column 3: Newsletter & Contact -->
-            <div style="flex:1 1 300px;min-width:220px;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
-                    <div style="flex:1 1 180px;">
-                        <div style="font-weight:700;color:#fff;margin-bottom:8px;">Newsletter</div>
-                        <div style="color:#9fb0bd;font-size:14px;margin-bottom:12px;">
-                            Đăng ký để nhận thông tin sản phẩm mới, khuyến mãi và ý tưởng trang trí.
-                        </div>
-                        <form action="" method="post" style="display:flex;gap:8px;">
-                            <input type="email" name="email" placeholder="Nhập email của bạn"
-                                style="flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;font-size:14px;outline:none;"
-                                required>
-                            <button type="submit" style="padding:10px 14px;border-radius:8px;border:none;background:#09f;color:#071126;font-weight:700;">Đăng ký</button>
-                        </form>
+        <!-- Column 3: Newsletter & Contact -->
+        <div style="flex:1 1 300px;min-width:220px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+                <div style="flex:1 1 180px;">
+                    <div style="font-weight:700;color:#fff;margin-bottom:8px;">Newsletter</div>
+                    <div style="color:#9fb0bd;font-size:14px;margin-bottom:12px;">
+                        Đăng ký để nhận thông tin sản phẩm mới, khuyến mãi và ý tưởng trang trí.
                     </div>
+                    <form action="" method="post" style="display:flex;gap:8px;">
+                        <input type="email" name="email" placeholder="Nhập email của bạn"
+                            style="flex:1;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;font-size:14px;outline:none;"
+                            required>
+                        <button type="submit" style="padding:10px 14px;border-radius:8px;border:none;background:#09f;color:#071126;font-weight:700;">Đăng ký</button>
+                    </form>
+                </div>
 
-                    <div style="flex:0 0 150px;">
-                        <div style="font-weight:700;color:#fff;margin-bottom:8px;">Liên hệ</div>
-                        <div style="color:#9fb0bd;font-size:14px;">
-                            Hotline: <strong style="color:#fff;display:block;margin-top:6px;">039 776 6836</strong>
-                            <div style="margin-top:10px;font-size:13px;color:#b9ccd4;">Email: <span style="color:#fff;">meteor@example.com</span></div>
-                            <a href="#" style="display:inline-block;margin-top:10px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);color:#fff;text-decoration:none;font-size:13px;">Hỗ trợ</a>
-                        </div>
+                <div style="flex:0 0 150px;">
+                    <div style="font-weight:700;color:#fff;margin-bottom:8px;">Liên hệ</div>
+                    <div style="color:#9fb0bd;font-size:14px;">
+                        Hotline: <strong style="color:#fff;display:block;margin-top:6px;">039 776 6836</strong>
+                        <div style="margin-top:10px;font-size:13px;color:#b9ccd4;">Email: <span style="color:#fff;">meteor@example.com</span></div>
+                        <a href="#" style="display:inline-block;margin-top:10px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);color:#fff;text-decoration:none;font-size:13px;">Hỗ trợ</a>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Divider -->
-        <div style="max-width:1320px;margin:18px auto 0;border-top:1px solid rgba(255,255,255,0.04);"></div>
+    <!-- Divider -->
+    <div style="max-width:1320px;margin:18px auto 0;border-top:1px solid rgba(255,255,255,0.04);"></div>
 
-        <!-- Copyright -->
-        <div style="max-width:1320px;margin:12px auto 0;padding:12px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;color:#9fb0bd;font-size:13px;">
-            <div>© {{ date('Y') }} METEOR SHOP. All rights reserved.</div>
-            <div style="display:flex;gap:12px;align-items:center;">
-                <a href="#" style="color:inherit;text-decoration:none;font-size:13px;">Chính sách bảo mật</a>
-                <a href="#" style="color:inherit;text-decoration:none;font-size:13px;">Điều khoản</a>
-            </div>
+    <!-- Copyright -->
+    <div style="max-width:1320px;margin:12px auto 0;padding:12px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;color:#9fb0bd;font-size:13px;">
+        <div>© {{ date('Y') }} METEOR SHOP. All rights reserved.</div>
+        <div style="display:flex;gap:12px;align-items:center;">
+            <a href="#" style="color:inherit;text-decoration:none;font-size:13px;">Chính sách bảo mật</a>
+            <a href="#" style="color:inherit;text-decoration:none;font-size:13px;">Điều khoản</a>
         </div>
-    </footer>
+    </div>
+</footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
