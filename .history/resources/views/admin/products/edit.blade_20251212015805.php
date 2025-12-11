@@ -371,7 +371,7 @@
                                 name="variants[new_${variantIndex}][price]" class="form-control" placeholder="Giá biến thể">
                             <small class="text-muted">Để trống = giá SP</small>
                         </div>
-
+git 
                          <div class="col-md-3 mt-3">
                             <label>Cân nặng</label>
                             <input type="number" step="1" 

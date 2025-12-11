@@ -365,12 +365,12 @@
                                 name="variants[new_${newVariantIndex}][stock]" class="form-control">
                         </div>
 
-                        <div class="col-md-2 mt-3">
-                            <label>Giá (VNĐ)</label>
-                            <input type="number" step="0.01" min="0"
-                                name="variants[new_${variantIndex}][price]" class="form-control" placeholder="Giá biến thể">
-                            <small class="text-muted">Để trống = giá SP</small>
-                        </div>
+                            <div class="col-md-2 mt-3">
+                                <label>Giá (VNĐ)</label>
+                                <input type="number" step="0.01" min="0"
+                                    name="variants[new_${variantIndex}][price]" class="form-control" placeholder="Giá biến thể">
+                                <small class="text-muted">Để trống = giá SP</small>
+                            </div>
 
                          <div class="col-md-3 mt-3">
                             <label>Cân nặng</label>

@@ -254,7 +254,6 @@
                     <input type="hidden" name="variants[${idx}][width]" value="${width}">
                     <input type="hidden" name="variants[${idx}][height]" value="${height}">
                     <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
-                    <input type="hidden" name="variants[${idx}][price]" value="${escapeHtml(price || '')}">
                     <input type="hidden" name="variants[${idx}][weight]" value="${escapeHtml(weight)}">
                     <input type="hidden" name="variants[${idx}][weight_unit]" value="${escapeHtml(weightUnit)}">
         `;
@@ -268,7 +267,6 @@
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
                 document.getElementById('variant_stock').value = '';
-                document.getElementById('variant_price').value = '';
                 if (weightEl) weightEl.value = '';
                 if (weightUnitEl) weightUnitEl.value = 'kg';
             });

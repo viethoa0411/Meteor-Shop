@@ -233,7 +233,7 @@
                 const priceDisplay = price !== '' ? `${parseFloat(price).toLocaleString('vi-VN')} đ` : '(dùng giá SP)';
                 row.innerHTML = `
             <div class="variant-swatch" style="background:${colorCode}"></div>
-            <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp - ${priceDisplay} - ${weightDisplay}</span>
+            <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp</span>
             <small style="margin-right:12px;">${weight !== '' ? weight + ' ' + weightUnit : ''}</small>
             <button type="button" class="btn btn-sm btn-link text-danger">x</button>
         `;
@@ -254,7 +254,6 @@
                     <input type="hidden" name="variants[${idx}][width]" value="${width}">
                     <input type="hidden" name="variants[${idx}][height]" value="${height}">
                     <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
-                    <input type="hidden" name="variants[${idx}][price]" value="${escapeHtml(price || '')}">
                     <input type="hidden" name="variants[${idx}][weight]" value="${escapeHtml(weight)}">
                     <input type="hidden" name="variants[${idx}][weight_unit]" value="${escapeHtml(weightUnit)}">
         `;
@@ -268,7 +267,6 @@
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
                 document.getElementById('variant_stock').value = '';
-                document.getElementById('variant_price').value = '';
                 if (weightEl) weightEl.value = '';
                 if (weightUnitEl) weightUnitEl.value = 'kg';
             });

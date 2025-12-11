@@ -152,7 +152,7 @@
                                         placeholder="Chiều cao (cm)">
                                 </div>
                                 <div class="col-md-3">
-                                     <label>Tồn kho</label>
+                                           <label>Tồn kho</label>
                                     <input type="number" min="0" id="variant_stock" class="form-control"
                                         placeholder="Số lượng">
                                 </div>
@@ -171,7 +171,6 @@
                                             <option value="lb">lb</option>
                                         </select>
                                     </div>
-                                    <small class="text-muted">Mặc định: kg</small>
                                 </div>
                             <button type="button" class="btn btn-primary mt-2 mb-3" id="add_variant">Thêm biến
                                 thể</button>
@@ -208,7 +207,6 @@
                 const width = document.getElementById('width').value.trim();
                 const height = document.getElementById('height').value.trim();
                 const stock = document.getElementById('variant_stock').value.trim();
-                 const price = document.getElementById('variant_price').value.trim();
 
                 const weightEl = document.getElementById('weight'); // optional
                 const weightUnitEl = document.getElementById('weight_unit'); // optional
@@ -218,22 +216,14 @@
                 if (!length || !width || !height) return alert('Nhập đủ kích thước!');
                 if (!colorCode) return alert('Chọn màu!');
                 if (!stock) return alert('Nhập tồn kho cho biến thể!');      
-                if (price !== '' && (isNaN(parseFloat(price)) || parseFloat(price) < 0)) {
-                    return alert('Giá phải là số và lớn hơn hoặc bằng 0!');
-                }
-                if (weight !== '' && (isNaN(parseFloat(weight)) || parseFloat(weight) < 0)) {
-                    return alert('Cân nặng phải là số và lớn hơn hoặc bằng 0!');
-                }
-
+                if (weight !== '' && isNaN(parseFloat(weight))) return alert('Trọng lượng phải là số!');
 
 
                 const row = document.createElement('div');
-                row.className = 'variant-row';   
-                const weightDisplay = weight !== '' ? `${weight} ${weightUnit}` : '(chưa nhập)';
-                const priceDisplay = price !== '' ? `${parseFloat(price).toLocaleString('vi-VN')} đ` : '(dùng giá SP)';
+                row.className = 'variant-row';
                 row.innerHTML = `
             <div class="variant-swatch" style="background:${colorCode}"></div>
-            <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp - ${priceDisplay} - ${weightDisplay}</span>
+            <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp</span>
             <small style="margin-right:12px;">${weight !== '' ? weight + ' ' + weightUnit : ''}</small>
             <button type="button" class="btn btn-sm btn-link text-danger">x</button>
         `;
@@ -254,7 +244,6 @@
                     <input type="hidden" name="variants[${idx}][width]" value="${width}">
                     <input type="hidden" name="variants[${idx}][height]" value="${height}">
                     <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
-                    <input type="hidden" name="variants[${idx}][price]" value="${escapeHtml(price || '')}">
                     <input type="hidden" name="variants[${idx}][weight]" value="${escapeHtml(weight)}">
                     <input type="hidden" name="variants[${idx}][weight_unit]" value="${escapeHtml(weightUnit)}">
         `;
@@ -268,7 +257,6 @@
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
                 document.getElementById('variant_stock').value = '';
-                document.getElementById('variant_price').value = '';
                 if (weightEl) weightEl.value = '';
                 if (weightUnitEl) weightUnitEl.value = 'kg';
             });

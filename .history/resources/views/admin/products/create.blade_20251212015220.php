@@ -268,7 +268,6 @@
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
                 document.getElementById('variant_stock').value = '';
-                document.getElementById('variant_price').value = '';
                 if (weightEl) weightEl.value = '';
                 if (weightUnitEl) weightUnitEl.value = 'kg';
             });
