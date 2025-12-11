@@ -15,7 +15,7 @@
             justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .register-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -26,27 +26,27 @@
             max-width: 450px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .register-header {
             text-align: center;
             margin-bottom: 2rem;
         }
-        
+
         .register-header h2 {
             color: #333;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
-        
+
         .register-header p {
             color: #666;
             margin: 0;
         }
-        
+
         .form-floating {
             margin-bottom: 1.5rem;
         }
-        
+
         .form-floating .form-control {
             border: 2px solid #e9ecef;
             border-radius: 12px;
@@ -54,17 +54,17 @@
             font-size: 1rem;
             transition: all 0.3s ease;
         }
-        
+
         .form-floating .form-control:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
-        
+
         .form-floating label {
             color: #666;
             font-weight: 500;
         }
-        
+
         .btn-register {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
@@ -77,59 +77,59 @@
             transition: all 0.3s ease;
             margin-bottom: 1.5rem;
         }
-        
+
         .btn-register:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
             color: white;
         }
-        
+
         .login-link {
             text-align: center;
             color: #666;
         }
-        
+
         .login-link a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.3s ease;
         }
-        
+
         .login-link a:hover {
             color: #764ba2;
         }
-        
+
         .alert {
             border-radius: 12px;
             border: none;
             margin-bottom: 1.5rem;
         }
-        
+
         .alert-danger {
             background: linear-gradient(135deg, #ff6b6b, #ee5a52);
             color: white;
         }
-        
+
         .alert-success {
             background: linear-gradient(135deg, #51cf66, #40c057);
             color: white;
         }
-        
+
         .invalid-feedback {
             font-size: 0.875rem;
             margin-top: 0.5rem;
         }
-        
+
         .form-control.is-invalid {
             border-color: #ff6b6b;
         }
-        
+
         .form-control.is-invalid:focus {
             border-color: #ff6b6b;
             box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
         }
-        
+
         @media (max-width: 576px) {
             .register-container {
                 margin: 1rem;
@@ -163,7 +163,17 @@
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
-            
+
+            <div class="form-floating">
+                <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                       id="name" name="name" value="{{ old('name') }}" 
+                       placeholder="Tên người dùng" required>
+                <label for="name"><i class="bi bi-person"></i> Tên người dùng</label>
+                @error('name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
             <div class="form-floating">
                 <input type="email" class="form-control @error('email') is-invalid @enderror" 
                        id="email" name="email" value="{{ old('email') }}" 
@@ -173,7 +183,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
+
             <div class="form-floating">
                 <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
                        id="phone" name="phone" value="{{ old('phone') }}" 
@@ -183,7 +193,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
+
             <div class="form-floating">
                 <input type="password" class="form-control @error('password') is-invalid @enderror" 
                        id="password" name="password" placeholder="Mật khẩu" required>
@@ -192,7 +202,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
+
             <div class="form-floating">
                 <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" 
                        id="password_confirmation" name="password_confirmation" 
@@ -202,14 +212,14 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
+
             <button type="submit" class="btn btn-register">
                 <i class="bi bi-person-check"></i> Đăng ký ngay
             </button>
         </form>
-        
+
         <div class="login-link">
-            <p>Đã có tài khoản? <a href="{{ route('login') }}">Đăng nhập ngay</a></p>
+            <p>Đã có tài khoản? <a href="{{ route('client.login') }}">Đăng nhập ngay</a></p>
         </div>
     </div>
 

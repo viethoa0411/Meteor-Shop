@@ -1,18 +1,32 @@
-@extends('admin.dashboard')
+@extends('admin.layouts.app')
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">Danh sách đơn hàng</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Danh sách đơn hàng</h2>
+        <div>
+            <a href="{{ route('admin.orders.returns.index') }}" class="btn btn-warning me-2">
+                <i class="bi bi-arrow-repeat me-1"></i>Quản lý trả hàng
+            </a>
+            <a href="{{ route('admin.orders.analytics', ['date_range' => 'all', 'start_date' => '2025-10-01', 'end_date' => '2025-11-29', 'status' => 'all']) }}" class="btn btn-primary">
+                <i class="bi bi-bar-chart me-1"></i>Thống kê
+            </a>
+        </div>
+    </div>
 
     {{-- BỘ LỌC TRẠNG THÁI + TÌM KIẾM --}}
-    <form method="GET" action="{{ route('admin.orders.index') }}" class="row g-2 mb-3 align-items-center">
+    <form method="GET" action="{{ route('admin.orders.list') }}" class="row g-2 mb-3 align-items-center">
         <div class="col-md-3">
             <select name="status" class="form-select" onchange="this.form.submit()">
                 <option value="all" {{ ($status == 'all' || $status == null) ? 'selected' : '' }}>Tất cả</option>
                 <option value="pending" {{ $status == 'pending' ? 'selected' : '' }}>Chờ xác nhận</option>
                 <option value="processing" {{ $status == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
+                <option value="shipping" {{ $status == 'shipping' ? 'selected' : '' }}>Đang giao hàng</option>
+                <option value="delivered" {{ $status == 'delivered' ? 'selected' : '' }}>Đã giao</option>
                 <option value="completed" {{ $status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
                 <option value="cancelled" {{ $status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                <option value="return_requested" {{ $status == 'return_requested' ? 'selected' : '' }}>Yêu cầu trả hàng</option>
+                <option value="returned" {{ $status == 'returned' ? 'selected' : '' }}>Đã trả hàng</option>
             </select>
         </div>
 
@@ -47,29 +61,22 @@
                 <td>{{ $order->customer_name }}</td>
                 <td>{{ number_format($order->final_total, 0, ',', '.') }}₫</td>
 
-                {{-- Badge màu trạng thái --}}
                 <td>
     @php
-        $colors = [
-            'pending' => 'secondary',
-            'processing' => 'primary',
-            'completed' => 'success',
-            'cancelled' => 'danger'
+        $statusConfig = [
+            'pending' => ['label' => 'Chờ xác nhận', 'color' => 'dark', 'icon' => 'bi-hourglass-split'],
+            'processing' => ['label' => 'Đang xử lý', 'color' => 'primary', 'icon' => 'bi-gear'],
+            'shipping' => ['label' => 'Đang giao hàng', 'color' => 'info', 'icon' => 'bi-truck'],
+            'delivered' => ['label' => 'Đã giao', 'color' => 'success', 'icon' => 'bi-box-seam'],
+            'completed' => ['label' => 'Hoàn thành', 'color' => 'success', 'icon' => 'bi-check-circle'],
+            'cancelled' => ['label' => 'Đã hủy', 'color' => 'danger', 'icon' => 'bi-x-circle'],
+            'return_requested' => ['label' => 'Yêu cầu trả hàng', 'color' => 'warning', 'icon' => 'bi-arrow-repeat'],
+            'returned' => ['label' => 'Đã trả hàng', 'color' => 'secondary', 'icon' => 'bi-arrow-counterclockwise'],
         ];
-
-        $labels = [
-            'pending' => 'Chờ xác nhận',
-            'processing' => 'Đang xử lý',
-            'completed' => 'Hoàn thành',
-            'cancelled' => 'Đã hủy'
-        ];
-
-        $color = $colors[$order->order_status] ?? 'light';
-        $label = $labels[$order->order_status] ?? ucfirst($order->order_status);
+        $cfg = $statusConfig[$order->order_status] ?? ['label' => ucfirst($order->order_status), 'color' => 'secondary', 'icon' => 'bi-question-circle'];
     @endphp
-
-    <span class="badge bg-{{ $color }}">{{ $label }}</span>
-</td>
+    <span class="badge bg-{{ $cfg['color'] }} px-3 py-2"><i class="bi {{ $cfg['icon'] }} me-1"></i>{{ $cfg['label'] }}</span>
+                </td>
 
                 <td>{{ date('d/m/Y', strtotime($order->created_at)) }}</td>
                 <td>

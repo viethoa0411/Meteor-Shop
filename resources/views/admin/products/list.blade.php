@@ -1,224 +1,154 @@
 @extends('admin.layouts.app')
-
 @section('title', 'Danh sách sản phẩm')
 
 @section('content')
-    <div class="container mt-4">
+    <div class="container-fluid py-4">
+
         {{-- Thông báo --}}
         @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
-            </div>
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-
         @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
-            </div>
+            <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        {{-- Tiêu đề + nút thêm --}}
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="mb-0">Danh sách sản phẩm</h2>
-            <a href="{{ route('admin.products.create') }}" class="btn btn-success">
-                <i class="bi bi-plus-circle"></i> Thêm sản phẩm
-            </a>
+        {{-- Tiêu đề --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <h3 class="fw-bold text-primary mb-0">
+                        <i class="bi bi-box-seam me-2"></i>Danh sách sản phẩm
+                    </h3>
+                </div>
+            </div>
         </div>
 
-        {{-- Ô tìm kiếm --}}
-        <form action="{{ route('admin.products.list') }}" method="GET" class="mb-3 d-flex" role="search">
-            <input type="text" name="search" class="form-control me-2" placeholder="Nhập tên sản phẩm cần tìm..."
-                value="{{ request('search') }}">
-            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-            @if (request('search'))
-                <a href="{{ route('admin.products.list') }}" class="btn btn-secondary ms-2">Xóa tìm</a>
-            @endif
-        </form>
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+                    {{-- Bộ lọc trạng thái --}}
+                    <div class="d-flex gap-1 align-items-center">
+                        <a href="{{ route('admin.products.list', ['status' => 'all'] + request()->except('status')) }}"
+                            class="btn {{ request('status', 'active') == 'all' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm px-2 py-1">
+                            <i class="bi bi-list-ul"></i> Tất cả
+                        </a>
+
+                        <a href="{{ route('admin.products.list', ['status' => 'active'] + request()->except('status')) }}"
+                            class="btn {{ request('status', 'active') == 'active' ? 'btn-success' : 'btn-outline-success' }} btn-sm px-2 py-1">
+                            <i class="bi bi-check-circle-fill"></i> Hoạt động
+                        </a>
+
+                        <a href="{{ route('admin.products.list', ['status' => 'inactive'] + request()->except('status')) }}"
+                            class="btn {{ request('status', 'active') == 'inactive' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm px-2 py-1">
+                            <i class="bi bi-pause-circle-fill"></i> Tạm ẩn
+                        </a>
+                    </div>
+
+                    {{-- Ô tìm kiếm --}}
+                    <form action="{{ route('admin.products.list') }}" method="GET" class="d-flex flex-grow-1 mx-md-4"
+                        style="max-width: 500px;">
+                        <input type="hidden" name="status" value="{{ request('status', 'active') }}">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="Nhập tên sản phẩm..."
+                                value="{{ request('search') }}">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+
+                            @if (request('search'))
+                                <a href="{{ route('admin.products.list', ['status' => request('status', 'active')]) }}"
+                                    class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                            @endif
+                        </div>
+                    </form>
+
+                    {{-- Nút thêm sản phẩm --}}
+                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Thêm sản phẩm
+                    </a>
+
+                </div>
+            </div>
+        </div>
 
         {{-- Bảng sản phẩm --}}
-        <table class="table table-bordered table-striped align-middle">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Ảnh bìa</th>
-                    <th>Slug</th>
-                    <th>Giá</th>
-                    <th>Tồn kho</th>
-                    <th>Danh mục</th>
-                    <th>Trạng thái</th>
-                    <th width="150">Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($products as $product)
-                    <tr class="text-center">
-                        <td>{{ $product->id }}</td>
-                        <td class="text-start">
-                            <a href="{{ route('admin.products.show', $product) }}"
-                                style="text-decoration:none;color:#0d6efd;"
-                                onmouseover="this.style.textDecoration='underline'"
-                                onmouseout="this.style.textDecoration='none'">
-                                {{ $product->name }}
-                            </a>
-                        </td>
-                        <td>
-                            @if ($product->image)
-                                <img src="{{ Storage::url($product->image) }}" alt="Ảnh sản phẩm"
-                                    style="width:70px;height:70px;object-fit:cover;border-radius:5px;border:1px solid #dee2e6;">
-                            @else
-                                <span class="text-muted">—</span>
-                            @endif
-                        </td>
-                        <td class="text-muted">{{ $product->slug }}</td>
-                        <td>{{ number_format($product->price, 0, ',', '.') }}₫</td>
-                        <td>{{ $product->stock }}</td>
-                        <td>{{ $product->category->name ?? '—' }}</td>
-                        <td>
-                            <span class="badge {{ $product->status == 'active' ? 'bg-success' : 'bg-secondary' }}">
-                                {{ $product->status == 'active' ? 'Hoạt động' : 'Tạm ẩn' }}
-                            </span>
-                        </td>
-                        <td>
-                            {{-- Nút sửa --}}
-                            <a href="{{ route('admin.products.edit', $product->id) }}"
-                                class="btn btn-primary btn-sm">Sửa</a>
+        @if ($products->isEmpty())
+            <p class="text-center py-4">Không tìm thấy sản phẩm nào.</p>
+        @else
+            <div class="table-responsive shadow-sm rounded">
+                <table class="table table-striped table-hover align-middle text-center mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên</th>
+                            <th>Ảnh</th>
+                            <th>Giá</th>
+                            <th>Danh mục</th>
+                            <th>Trạng thái</th>
+                            <th width="150">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($products as $product)
+                            <tr>
+                                <td>{{ $product->id }}</td>
 
-                            {{-- Form xóa --}}
-                            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
-                                class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xoá sản phẩm này không?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
-                            </form>
-                        </td>
+                                <td class="text-center">
+                                    <a href="{{ route('admin.products.show', $product) }}" class="text-dark"
+                                        style="text-decoration:none;">
+                                        {{ $product->name }}
+                                    </a>
+                                </td>
 
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="10" class="text-center text-muted">Không tìm thấy sản phẩm nào</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                                <td>
+                                    <a href="{{ route('admin.products.show', $product) }}"
+                                        style="text-decoration:none;color:#0d6efd;"
+                                        onmouseover="this.style.textDecoration='underline'"
+                                        onmouseout="this.style.textDecoration='none'">
+                                        @if ($product->image)
+                                            <img src="{{ Storage::url($product->image) }}"
+                                                style="width:60px;height:60px;object-fit:cover;border-radius:5px;">
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </a>
 
-        {{-- Phân trang --}}
-        <div class="d-flex justify-content-center mt-4">
-            {{ $products->withQueryString()->onEachSide(1)->links('pagination::bootstrap-5') }}
-        </div>
-    </div>
-@endsection
-@section('title', 'Danh sách sản phẩm')
+                                </td>
 
-@section('content')
-    @if (@session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label='Close'></button>
-        </div>
-    @endif
+                                <td>{{ number_format($product->price, 0, ',', '.') }}₫</td>
 
-    @if (@session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="CLose"></button>
-        </div>
-    @endif
+                                <td>{{ $product->category->name ?? '—' }}</td>
 
-    @extends('admin.layouts.app')
+                                <td>
+                                    <span
+                                        class="badge {{ $product->status == 'active' ? 'bg-success' : 'bg-warning text-dark' }}">
+                                        {{ $product->status == 'active' ? 'Hoạt động' : 'Tạm ẩn' }}
+                                    </span>
+                                </td>
 
-    <div class="px-4 py6">
-        <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl font-semibold">Danh sách sản phẩm</h1>
-            <div class="space-x-2">
-                <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Thêm sản phẩm
-                </a>
+                                <td>
+                                    <a href="{{ route('admin.products.edit', $product->id) }}"
+                                        class="btn btn-info btn-sm">Sửa</a>
+
+                                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
+                                        onsubmit="return confirm('Xoá sản phẩm này?')" class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-danger btn-sm">Xóa</button>
+                                    </form>
+                                </td>
+
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-        </div>
 
-        @if (@session('success'))
-            <div class="mb-4 p-3 rounded bg-green-100 text-green-800">{{ session('success') }}</div>
+            <div class="d-flex justify-content-center mt-4">
+                {{ $products->withQueryString()->links('pagination::bootstrap-5') }}
+            </div>
         @endif
 
-        {{-- Ô tìm kiếm  --}}
-        <form method="GET" class="mb-4">
-            <div class="flex gap-2">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm theo tên..."
-                    class="border rounded px-3 py-2 w-full">
-                <button class="border rounded px-4 py-2">Tìm</button>
-            </div>
-        </form>
-
-        <div class="overflow-x-auto bg-white border rounded">
-            <table class="min-w-full text-sm">
-                <thead class="bg-gray-50">
-                    <tr class="text-left">
-                        <th class="px-3 py-3">#</th>
-                        <th class="px-3 py-3">Ảnh</th>
-                        <th class="px-3 py-3">Tên </th>
-                        <th class="px-3 py-3">Slug</th>
-                        <th class="px-3 py-3">Giá</th>
-                        <th class="px-3 py-3">Kho</th>
-                        <th class="px-3 py-3">Danh mục</th>
-                        <th class="px-3 py-3">Thương hiệu</th>
-                        <th class="px-3 py2 text-right">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($products as $i => $p)
-                        <tr class="border-t">
-                            <td class="px-3 py-2">{{ $products->firstItem() + $i }}</td>
-                            <td class="px-3 py-2">
-                                @if ($p->image)
-                                    {{-- <img src="{{ asset('storage/'.$p->image) }}" alt="" style="width:100px;height:100px;object-fit:cover;border-radius:6px;border:1px solid #e5e7eb;" /> --}}
-                                    {{-- trước đây: asset('storage/'.$p->image) --}}
-                                    <img src="{{ Storage::url($p->image) }}" alt=""
-                                        style="width:100px;height:100px;object-fit:cover;border-radius:6px;border:1px solid #e5e7eb;" />
-                                @else
-                                    <span class="text-gray-400">—</span>
-                                @endif
-                            </td>
-                            <td class="px-3 py-2 font-medium">
-                                <a href="{{ route('admin.products.show', $p) }}"
-                                    style="text-decoration: none; color:#0d6efd;"
-                                    onmouseover="this.style.textDecoration='underline'"
-                                    onmouseout="this.style.textDecoration='none'">
-                                    {{ $p->name }}
-                                </a>
-                            </td>
-
-                            <td class="px-3 py-2 text-gray-600">{{ $p->slug }}</td>
-                            <td class="px-3 py-2">{{ number_format($p->price, 0, ',', '.') }}đ</td>
-                            <td class="px-3 py-2">{{ number_format($p->stock, 0, ',', '.') }}</td>
-                            <td class="px-3 py-2">{{ $p->category->name ?? '_' }}</td>
-                            <td class="px-3 py-2">{{ $p->brand->name ?? '_' }}</td>
-                            <td class="px-3 py-2">
-                                <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.products.edit', $p) }}"
-                                        class="px-3 py-1 btn btn-warning rounded border mb-2">Sửa</a>
-                                    <form action="{{ route('admin.products.destroy', $p) }}" method="POST"
-                                        onsubmit="return confirm('Bạn có chắc chắn muốn xoá sản phẩm này không?')">
-                                        @csrf @method('DELETE')
-                                        <button class="px-3 py-1 rounded bg-red-600 btn btn-danger">Xoá</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td class="px-3 py-6 text-center text-gray-500">Chưa có sản phẩm.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <div class="mt-4">
-            {{ $products->withQueryString()->onEachSide(1)->links('pagination::bootstrap-5') }}
-        </div>
     </div>
-
 @endsection

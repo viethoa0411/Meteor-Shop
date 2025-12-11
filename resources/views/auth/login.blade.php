@@ -240,9 +240,8 @@
 
         .role-info {
             background-color: #e7f3ff;
-            <<<<<<< HEAD border-left: 4px solid #667eea;
-            =======border-left: 4px solid #667eea;
-            >>>>>>>login padding: 12px 15px;
+            border-left: 4px solid #667eea;
+            padding: 12px 15px;
             border-radius: 4px;
             margin-bottom: 20px;
             font-size: 13px;
@@ -279,7 +278,7 @@
         <div class="login-card">
             <!-- Header -->
             <div class="login-header">
-                <h1><i class="bi bi-shield-lock"></i> Meteor Shop</h1>
+                <h1><i class="bi bi-shield-lock"></i>Admin Meteor Shop</h1>
             </div>
 
             <!-- Body -->
@@ -325,7 +324,7 @@
 
                     <!-- Password -->
                     <div class="form-group">
-                        <label for="password" class="form-label"><i class="bi bi-lock"></i> Mật khẩu
+                        <label for="password" class="form-label">
                                 <i class="bi bi-lock"></i> Mật khẩu
                         </label>
                         <div class="input-group">
@@ -349,7 +348,6 @@
                                 Ghi nhớ tôi
                             </label>
                         </div>
-                            <a href="{{ route('register') }}" class="forgot-password">Bạn chưa có tài khoản?</a>
                             <a href="{{ route('password.request') }}" class="forgot-password">Quên mật khẩu?</a>
                     </div>
 
@@ -363,7 +361,7 @@
 
             <!-- Footer -->
             <div class="login-footer">
-                © 2025 <strong>Meteor Shop</strong>
+                © 2025 <strong>Admin Meteor Shop</strong>
             </div>
         </div>
     </div>

@@ -32,11 +32,6 @@
             </div>
 
             <div class="mb-3">
-                <label for="description" class="form-label">Mô tả</label>
-                <textarea name="description" class="form-control" rows="3">{{ old('description', $category->description) }}</textarea>
-            </div>
-
-            <div class="mb-3">
                 <label for="parent_id" class="form-label">Danh mục cha</label>
                 <select name="parent_id" class="form-select">
                     <option value="">— Không có —</option>

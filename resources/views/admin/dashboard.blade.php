@@ -1,19 +1,1236 @@
 @extends('admin.layouts.app')
 
-
-@if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
-
-@if (session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
-
-@section('title','Admin Dashboard')
+@section('title', 'Admin Dashboard')
 @section('content')
-    <h1 class="text-center mb-4">Trang quản trị</h1>
+
+    {{-- ========== 1. HEADER DASHBOARD ========== --}}
+    <section class="mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h4 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                    <i class="bi bi-speedometer2 text-primary"></i>
+                    <span>Dashboard quản trị</span>
+                </h4>
+                <p class="text-muted small mb-0">
+                    Tổng quan real-time về doanh thu, đơn hàng, sản phẩm và người dùng trong hệ thống Meteor-Shop.
+                </p>
+            </div>
+
+            {{-- (Đã ẩn cụm search / language / notification theo yêu cầu) --}}
+        </div>
+    </section>
+
+    {{-- ========== 2. KPI SUMMARY SECTION (TOP KPIs) ========== --}}
+    <section class="mb-4">
+        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3">
+            {{-- Doanh thu tổng & tháng hiện tại --}}
+            <div class="col">
+                <a href="{{ route('admin.revenue.filter') ?? '#' }}" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm"
+                         style="background: linear-gradient(135deg,#667eea,#764ba2); border-radius: 18px;">
+                        <div class="card-body text-white d-flex flex-column justify-content-between">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-white-50 small mb-1">Tổng doanh thu (đã hoàn thành)</p>
+                                    <h3 class="fw-bold mb-0 stat-number">
+                                        {{ number_format($totalCompletedRevenue) }} ₫
+                                    </h3>
+                                </div>
+                                <span class="badge bg-white text-primary">
+                                    <i class="bi bi-cash-coin"></i>
+                                </span>
+                            </div>
+                            <p class="small mb-0 mt-2">
+                                Tháng {{ now()->month }}/{{ now()->year }}: 
+                                <strong>{{ number_format($currentMonthRevenue) }} ₫</strong> · 
+                                Mục tiêu: {{ number_format($monthlyTarget) }} ₫
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            {{-- Tổng đơn hàng --}}
+            <div class="col">
+                <a href="{{ route('admin.orders.list') }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0 kpi-card"
+                         style="border-left: 4px solid #22c55e;">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted small mb-1">Tổng đơn hàng (tháng này)</p>
+                                <h3 class="fw-bold mb-0 stat-number">{{ number_format($totalOrders) }}</h3>
+                                <small class="text-muted">Tất cả: {{ number_format($totalAllOrders) }} đơn</small>
+                            </div>
+                            <div class="kpi-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-cart-check-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            {{-- Người dùng hệ thống --}}
+            <div class="col">
+                <a href="{{ route('admin.account.users.list') }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0 kpi-card"
+                         style="border-left: 4px solid #f59e0b;">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted small mb-1">Người dùng hệ thống</p>
+                                <h3 class="fw-bold mb-0 stat-number">{{ number_format($totalUsers) }}</h3>
+                                <div class="d-flex flex-wrap align-items-center gap-1 small mt-1">
+                                    <span class="text-muted">
+                                        Tháng {{ now()->month }}/{{ now()->year }}: +{{ number_format($thisMonthUsers) }} user
+                                    </span>
+                                    @if($userGrowth !== null)
+                                        <span class="badge {{ $userGrowth > 0 ? 'bg-success' : ($userGrowth < 0 ? 'bg-danger' : 'bg-secondary') }}">
+                                            {{ $userGrowth > 0 ? '+' : '' }}{{ $userGrowth }}% so với tháng trước
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="kpi-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            {{-- Sản phẩm --}}
+            <div class="col">
+                <a href="{{ route('admin.products.list') }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0 kpi-card"
+                         style="border-left: 4px solid #0ea5e9;">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted small mb-1">Sản phẩm</p>
+                                <h3 class="fw-bold mb-0 stat-number">{{ number_format($totalProducts) }}</h3>
+                                <div class="d-flex flex-wrap align-items-center gap-1 small mt-1">
+                                    <span class="text-muted">
+                                        Bán trong 30 ngày: <strong>{{ number_format($soldProductsLast30Days) }}</strong> sản phẩm
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="kpi-icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            {{-- Tỷ lệ hoàn thành đơn --}}
+            <div class="col">
+                @php
+                    $completed = $orderStatsByStatus['completed'] ?? 0;
+                    // $orderStatsByStatus là Collection, cần sum() thay vì array_sum
+                    $totalForRate = $orderStatsByStatus instanceof \Illuminate\Support\Collection
+                        ? $orderStatsByStatus->sum()
+                        : (is_array($orderStatsByStatus) ? array_sum($orderStatsByStatus) : 0);
+                    $completeRate = $totalForRate > 0 ? round(($completed / $totalForRate) * 100, 1) : 0;
+                @endphp
+                <a href="{{ route('admin.orders.analytics') }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0 kpi-card"
+                         style="border-left: 4px solid #8b5cf6;">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted small mb-1">Tỷ lệ hoàn thành đơn</p>
+                                <h3 class="fw-bold mb-0">{{ $completeRate }}%</h3>
+                                <small class="text-muted">Hoàn thành: {{ $completed }} đơn</small>
+                            </div>
+                            <div class="kpi-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {{-- ========== 3. CHARTS & ANALYTICS AREA ========== --}}
+    <section class="mb-4">
+        <div class="row g-3">
+            {{-- Control chart doanh thu theo thời gian (ApexCharts) - Bên trái --}}
+            <div class="col-lg-8">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <h6 class="fw-semibold mb-0">Doanh thu theo thời gian (Control Chart)</h6>
+                            <small class="text-muted">
+                                Actual · Mean · UCL · LCL – phát hiện ngày doanh thu bất thường.
+                            </small>
+                        </div>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Revenue range">
+                                <button type="button" class="btn btn-outline-primary active" data-range="7">7 ngày</button>
+                                <button type="button" class="btn btn-outline-primary" data-range="30">30 ngày</button>
+                                <button type="button" class="btn btn-outline-primary" data-range="90">90 ngày</button>
+                                <button type="button" class="btn btn-outline-primary" data-range="month">Tháng này</button>
+                                <button type="button" class="btn btn-outline-secondary" data-range="custom">Tùy chọn</button>
+                            </div>
+                            <div class="d-flex align-items-center gap-1 control-chart-custom-range" style="display:none;">
+                                <input type="date" id="revenueControlFrom" class="form-control form-control-sm" placeholder="dd/mm/yyyy">
+                                <span class="small text-muted">→</span>
+                                <input type="date" id="revenueControlTo" class="form-control form-control-sm" placeholder="dd/mm/yyyy">
+                                <button type="button" class="btn btn-sm btn-primary" id="revenueControlApply">
+                                    Áp dụng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="revenueControlChart" style="min-height: 380px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Cột phải: Trạng thái đơn hàng + Top 5 sản phẩm bán chạy --}}
+            <div class="col-lg-4">
+                {{-- Biểu đồ trạng thái đơn hàng (donut) --}}
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-semibold mb-0">Tỷ lệ trạng thái đơn hàng</h6>
+                            <small class="text-muted">pending / processing / shipping / completed / cancelled</small>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 200px;">
+                            <canvas id="orderStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Top 5 sản phẩm bán chạy --}}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="fw-semibold mb-0">Top 5 Sản Phẩm bán chạy</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            @php
+                                $topSellingProducts = array_slice($topProductsLabels, 0, 5);
+                                $topSellingRevenue = array_slice($topProductsRevenue, 0, 5);
+                            @endphp
+                            @forelse($topSellingProducts as $index => $productName)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-primary rounded-pill">{{ $index + 1 }}</span>
+                                        <span class="text-truncate" style="max-width: 150px;" title="{{ $productName }}">{{ $productName }}</span>
+                                    </div>
+                                    <span class="text-muted small">{{ number_format($topSellingRevenue[$index] ?? 0) }} ₫</span>
+                                </li>
+                            @empty
+                                <li class="list-group-item text-center text-muted">Chưa có dữ liệu</li>
+                            @endforelse
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        /* Stat Card Styles */
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        body.dark .stat-card {
+            background: linear-gradient(135deg, #1f1f1f 0%, #2b2b2b 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        body.dark .stat-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .stat-card-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(74, 108, 247, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-card-bg {
+            transform: translate(20px, -20px) scale(1.2);
+        }
+
+        .stat-icon-wrapper {
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-card:hover .stat-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        /* KPI cards */
+        .kpi-card {
+            border-radius: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .kpi-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        body.dark .stat-number {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card:hover .stat-number {
+            transform: scale(1.05);
+        }
+
+        .stat-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .stat-action {
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+
+        .stat-card:hover .stat-action {
+            opacity: 1;
+            transform: translateX(5px);
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        /* Animation khi load */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .stat-icon-wrapper {
+                padding: 0.75rem !important;
+            }
+
+            .stat-icon-wrapper i {
+                font-size: 1.25rem !important;
+            }
+        }
+
+        .half-gauge-wrapper {
+            position: relative;
+            width: 250px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .half-gauge {
+            overflow: visible;
+        }
+
+        .half-gauge-bg {
+            stroke: #e5e5e5;
+            stroke-width: 14;
+            fill: none;
+        }
+
+        .half-gauge-value {
+            stroke: #4A6CF7;
+            stroke-width: 14;
+            fill: none;
+            stroke-linecap: round;
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: stroke-dashoffset 1.2s ease;
+        }
+
+
+        .half-gauge-text {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Order Statistics Component Styles */
+        .order-filter-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        body.dark .order-filter-section {
+            background: linear-gradient(135deg, #2b2b2b 0%, #1f1f1f 100%);
+            border-color: #444;
+        }
+
+        .order-filter-section:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-mini-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-mini-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-mini-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-mini-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        body.dark .stat-mini-card {
+            background-color: #1f1f1f !important;
+            border-color: #444 !important;
+        }
+
+        .stat-mini-icon {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-mini-card:hover .stat-mini-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .stat-mini-number {
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.dark .stat-mini-number {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bg-gradient-primary {
+            border-radius: 12px !important;
+            overflow: hidden;
+        }
+
+        .chart-container {
+            min-height: 250px;
+        }
+
+        .stat-overview-item {
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .stat-overview-item:hover {
+            background-color: #e9ecef !important;
+            border-color: #dee2e6;
+            transform: translateX(5px);
+        }
+
+        body.dark .stat-overview-item {
+            background-color: #2b2b2b !important;
+        }
+
+        body.dark .stat-overview-item:hover {
+            background-color: #333 !important;
+            border-color: #555;
+        }
+
+        .order-table-row {
+            transition: all 0.2s ease;
+        }
+
+        .order-table-row:hover {
+            background-color: #f8f9fa !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .order-table-row:hover {
+            background-color: #2b2b2b !important;
+        }
+
+        .order-mobile-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .order-mobile-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.dark .order-mobile-card {
+            background-color: #1f1f1f;
+            border-color: #444;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .order-filter-section,
+        .stat-mini-card {
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .stat-mini-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-mini-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-mini-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-mini-card:nth-child(4) { animation-delay: 0.4s; }
+        .stat-mini-card:nth-child(5) { animation-delay: 0.5s; }
+
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            .stat-mini-card {
+                padding: 1rem !important;
+            }
+
+            .stat-mini-number {
+                font-size: 1.5rem;
+            }
+
+            .stat-mini-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .stat-mini-icon i {
+                font-size: 1rem !important;
+            }
+
+            .chart-container {
+                height: 200px !important;
+            }
+
+            .order-filter-section {
+                padding: 1rem !important;
+            }
+
+            .card-header h5 {
+                font-size: 1.1rem;
+            }
+
+            .card-header .badge {
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stat-mini-card {
+                padding: 0.75rem !important;
+            }
+
+            .stat-mini-number {
+                font-size: 1.25rem;
+            }
+
+            .stat-mini-icon {
+                width: 35px;
+                height: 35px;
+            }
+
+            .chart-container {
+                height: 180px !important;
+            }
+
+            .bg-gradient-primary .card-body {
+                padding: 1rem !important;
+            }
+
+            .stat-overview-item {
+                padding: 0.75rem !important;
+            }
+        }
+
+        /* Card Header Improvements */
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+        }
+
+        /* Form Select & Input Improvements */
+        .form-select:focus,
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* Badge Improvements */
+        .badge {
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Button Improvements */
+        .btn {
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Sticky Pagination */
+        .sticky-pagination-wrapper {
+            position: relative;
+            margin-top: 2rem;
+        }
+
+        .sticky-pagination {
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px 12px 0 0;
+            margin-top: 1rem;
+        }
+
+        body.dark .sticky-pagination {
+            background: rgba(31, 31, 31, 0.98);
+        }
+
+        .sticky-pagination .pagination {
+            margin-bottom: 0;
+        }
+
+        .sticky-pagination .page-link {
+            border-radius: 8px;
+            margin: 0 2px;
+            border: 1px solid #dee2e6;
+            color: #667eea;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .sticky-pagination .page-link:hover {
+            background-color: #667eea;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .sticky-pagination .page-item.active .page-link {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: #fff;
+        }
+
+        body.dark .sticky-pagination .page-link {
+            background-color: #2b2b2b;
+            border-color: #444;
+            color: #4facfe;
+        }
+
+        body.dark .sticky-pagination .page-link:hover {
+            background-color: #4facfe;
+            color: #fff;
+        }
+
+        body.dark .sticky-pagination .page-item.active .page-link {
+            background-color: #4facfe;
+            border-color: #4facfe;
+        }
+
+        @media (max-width: 768px) {
+            .sticky-pagination {
+                position: relative;
+                margin-top: 1rem;
+            }
+
+            .sticky-pagination .d-flex {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .sticky-pagination .pagination {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Counter Animation cho số liệu thống kê
+            function animateCounter(element, target, duration = 2000) {
+                const start = 0;
+                const increment = target / (duration / 16);
+                let current = start;
+
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(current).toLocaleString('vi-VN');
+                }, 16);
+            }
+
+            // Áp dụng animation cho các số liệu
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const originalText = stat.textContent.replace(/\D/g, '');
+                const target = parseInt(originalText) || 0;
+                stat.textContent = '0';
+                setTimeout(() => {
+                    animateCounter(stat, target, 1500);
+                }, 300);
+            });
+
+            // Gauge Animation
+            const percent = {{ round(($currentMonthRevenue / max($monthlyTarget, 1)) * 100, 2) }};
+            const gauge = document.querySelector('.half-gauge-value');
+            const text = document.getElementById('halfPercent');
+
+            if (gauge && text) {
+                const totalLength = 314;
+                const offset = totalLength - (percent / 100) * totalLength;
+
+                gauge.style.strokeDashoffset = offset;
+                text.innerText = percent + "%";
+            }
+        });
+
+        let isDark = document.documentElement.classList.contains("dark");
+
+        const textColor = () => isDark ? '#ffffff' : '#000000';
+        const bgColor = () => isDark ? 'rgba(59,130,246,0.4)' : 'rgba(59,130,246,0.6)';
+        const borderCol = 'rgb(59,130,246)';
+
+        window.addEventListener("theme-changed", () => {
+            isDark = document.documentElement.classList.contains("dark");
+            
+            // Update order growth chart
+            if (orderGrowthChart) {
+                orderGrowthChart.options.scales.x.ticks.color = textColor();
+                orderGrowthChart.options.scales.y.ticks.color = textColor();
+                orderGrowthChart.update();
+            }
+        });
+
+        // Biểu đồ tăng trưởng đơn hàng
+        const orderGrowthCtx = document.getElementById('orderGrowthChart');
+        let orderGrowthChart = null;
+
+        if (orderGrowthCtx) {
+            const orderGrowthData = @json($growthChartData);
+            const orderGrowthLabels = @json($growthChartLabels);
+
+            // Responsive chart configuration
+            const isMobile = window.innerWidth < 768;
+            const isTablet = window.innerWidth >= 768 && window.innerWidth < 992;
+
+            orderGrowthChart = new Chart(orderGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: orderGrowthLabels,
+                    datasets: [{
+                        label: 'Số đơn hàng',
+                        data: orderGrowthData,
+                        borderColor: 'rgba(255, 255, 255, 0.9)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: isMobile ? 2 : 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: isMobile ? 3 : 5,
+                        pointHoverRadius: isMobile ? 5 : 7,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                            borderWidth: 1,
+                            padding: isMobile ? 8 : 12,
+                            titleFont: {
+                                size: isMobile ? 12 : 14
+                            },
+                            bodyFont: {
+                                size: isMobile ? 11 : 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Đơn hàng: ' + context.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: isMobile ? 9 : 11
+                                },
+                                maxRotation: isMobile ? 45 : 0,
+                                minRotation: 0
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                display: !isMobile
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: isMobile ? 9 : 11
+                                },
+                                stepSize: 1
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Handle window resize
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    if (orderGrowthChart) {
+                        orderGrowthChart.resize();
+                    }
+                }, 250);
+            });
+        }
+
+        // Control chart doanh thu 30 ngày
+        // Control chart doanh thu theo thời gian (ApexCharts)
+        let revenueControlChart = null;
+        const controlChartEl = document.querySelector('#revenueControlChart');
+        const controlRangeButtons = document.querySelectorAll('[data-range]');
+        const controlCustomWrapper = document.querySelector('.control-chart-custom-range');
+        const controlFromInput = document.getElementById('revenueControlFrom');
+        const controlToInput = document.getElementById('revenueControlTo');
+        const controlApplyBtn = document.getElementById('revenueControlApply');
+
+        function formatCurrencyVN(value) {
+            return Math.round(value).toLocaleString('vi-VN') + ' VND';
+        }
+
+        async function loadRevenueControlChart(range = '7') {
+            if (!controlChartEl) return;
+
+            try {
+                const baseUrl = "{{ url('/admin/api/dashboard/revenue/control-chart') }}";
+                const params = new URLSearchParams({ range });
+
+                if (range === 'custom') {
+                    const from = controlFromInput.value;
+                    const to = controlToInput.value;
+                    if (from) params.append('from', from);
+                    if (to) params.append('to', to);
+                }
+
+                const response = await fetch(`${baseUrl}?${params.toString()}`);
+                const data = await response.json();
+
+                const { dates, actual, mean, ucl, lcl } = data;
+
+                const meanSeries = dates.map(() => mean);
+                const uclSeries = dates.map(() => ucl);
+                const lclSeries = dates.map(() => lcl);
+
+                const options = {
+                    chart: {
+                        type: 'line',
+                        height: 320,
+                        toolbar: {
+                            show: true,
+                            tools: {
+                                download: true,
+                                selection: true,
+                                zoom: true,
+                                zoomin: true,
+                                zoomout: true,
+                                pan: true,
+                                reset: true,
+                            }
+                        },
+                        animations: {
+                            enabled: true,
+                            easing: 'easeinout',
+                            speed: 700,
+                        },
+                        zoom: {
+                            enabled: true,
+                            type: 'x',
+                            autoScaleYaxis: true,
+                        },
+                    },
+                    stroke: {
+                        width: [3, 2, 1.5, 1.5],
+                        curve: 'smooth',
+                        dashArray: [0, 5, 4, 4],
+                    },
+                    colors: [
+                        '#3b82f6', // Actual
+                        '#facc15', // Mean
+                        '#ef4444', // UCL
+                        '#fb923c', // LCL
+                    ],
+                    series: [
+                        {
+                            name: 'Doanh thu thực tế',
+                            data: actual,
+                        },
+                        {
+                            name: 'Trung bình (Mean)',
+                            data: meanSeries,
+                        },
+                        {
+                            name: 'UCL',
+                            data: uclSeries,
+                        },
+                        {
+                            name: 'LCL',
+                            data: lclSeries,
+                        },
+                    ],
+                    xaxis: {
+                        categories: dates,
+                        labels: {
+                            rotate: -45,
+                            style: {
+                                colors: '#6b7280',
+                                fontSize: '11px',
+                            },
+                        },
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function (value) {
+                                return Math.round(value).toLocaleString('vi-VN') + ' ₫';
+                            },
+                        },
+                    },
+                    tooltip: {
+                        shared: true,
+                        intersect: false,
+                        x: {
+                            format: 'dd/MM/yyyy',
+                        },
+                        custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                            const date = w.globals.categoryLabels[dataPointIndex];
+                            const actualValue = series[0][dataPointIndex] ?? 0;
+                            const meanValue = series[1][dataPointIndex] ?? 0;
+                            const uclValue = series[2][dataPointIndex] ?? 0;
+                            const lclValue = series[3][dataPointIndex] ?? 0;
+
+                            let status = '';
+                            if (actualValue > uclValue) {
+                                status = '<div class="text-danger small mt-1">❗ Giao dịch xuất sắc (vượt UCL)</div>';
+                            } else if (actualValue < lclValue) {
+                                status = '<div class="text-warning small mt-1">⚠ Doanh thu thấp (dưới LCL)</div>';
+                            }
+
+                            return `
+                                <div class="px-2 py-1">
+                                    <div class="fw-semibold mb-1">${date}</div>
+                                    <div class="small">Actual: <strong>${formatCurrencyVN(actualValue)}</strong></div>
+                                    <div class="small text-muted">Mean: ${formatCurrencyVN(meanValue)}</div>
+                                    <div class="small text-muted">UCL: ${formatCurrencyVN(uclValue)}</div>
+                                    <div class="small text-muted">LCL: ${formatCurrencyVN(lclValue)}</div>
+                                    ${status}
+                                </div>
+                            `;
+                        },
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'left',
+                    },
+                    grid: {
+                        borderColor: '#e5e7eb',
+                        strokeDashArray: 4,
+                    },
+                };
+
+                if (revenueControlChart) {
+                    revenueControlChart.updateOptions(options, true, true);
+                } else {
+                    revenueControlChart = new ApexCharts(controlChartEl, options);
+                    revenueControlChart.render();
+                }
+            } catch (e) {
+                console.error('Failed to load revenue control chart', e);
+            }
+        }
+
+        if (controlChartEl) {
+            // Khởi tạo mặc định 7 ngày
+            loadRevenueControlChart('7');
+
+            controlRangeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    controlRangeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const range = btn.getAttribute('data-range');
+
+                    if (range === 'custom') {
+                        controlCustomWrapper.style.display = 'flex';
+                    } else {
+                        controlCustomWrapper.style.display = 'none';
+                        loadRevenueControlChart(range);
+                    }
+                });
+            });
+
+            if (controlApplyBtn) {
+                controlApplyBtn.addEventListener('click', () => {
+                    loadRevenueControlChart('custom');
+                });
+            }
+        }
+
+        // Biểu đồ tỷ lệ trạng thái đơn hàng (donut)
+        const orderStatusCtx = document.getElementById('orderStatusChart');
+        if (orderStatusCtx) {
+            const rawStatusData = @json($orderStatsByStatus);
+            const statusLabelsMap = {
+                pending: 'Chờ xử lý',
+                processing: 'Đang xử lý',
+                shipping: 'Đang giao hàng',
+                completed: 'Hoàn thành',
+                cancelled: 'Đã hủy',
+            };
+            const statusColors = {
+                pending: '#ffc107',
+                processing: '#0dcaf0',
+                shipping: '#0d6efd',
+                completed: '#198754',
+                cancelled: '#dc3545',
+            };
+
+            const labels = [];
+            const data = [];
+            const colors = [];
+
+            Object.keys(rawStatusData).forEach((key) => {
+                const value = rawStatusData[key] ?? 0;
+                if (value > 0) {
+                    labels.push(statusLabelsMap[key] ?? key);
+                    data.push(value);
+                    colors.push(statusColors[key] ?? '#6c757d');
+                }
+            });
+
+            if (data.length > 0) {
+                new Chart(orderStatusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data,
+                            backgroundColor: colors,
+                            borderWidth: 1,
+                            borderColor: '#ffffff',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 14,
+                                    boxHeight: 14,
+                                    usePointStyle: true,
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((sum, v) => sum + v, 0);
+                                        const value = context.raw ?? 0;
+                                        const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return `${context.label}: ${value} đơn (${percent}%)`;
+                                    }
+                                }
+                            }
+                        },
+                    }
+                });
+            } else {
+                orderStatusCtx.parentElement.style.display = 'none';
+            }
+        }
+
+        // Toggle filter options based on filter type
+        function toggleFilterOptions() {
+            const filterType = document.getElementById('order_filter_type').value;
+            const monthGroup = document.getElementById('filter_month_group');
+            const dateRangeGroup = document.getElementById('filter_date_range_group');
+            
+            // Hide all groups first
+            monthGroup.style.display = 'none';
+            dateRangeGroup.style.display = 'none';
+            
+            // Show relevant group
+            if (filterType === 'month') {
+                monthGroup.style.display = 'flex';
+            } else if (filterType === 'date_range') {
+                dateRangeGroup.style.display = 'flex';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleFilterOptions();
+        });
+
+        // Reset filter function
+        function resetOrderFilter() {
+            document.getElementById('order_filter_type').value = 'last_30_days';
+            document.getElementById('order_month').value = '';
+            document.getElementById('order_year').value = '';
+            document.getElementById('order_start_date').value = '';
+            document.getElementById('order_end_date').value = '';
+            document.getElementById('order_status').value = 'all';
+            
+            // Toggle filter options
+            toggleFilterOptions();
+            
+            // Xóa các hidden input filter doanh thu
+            const form = document.getElementById('orderFilterForm');
+            const hiddenInputs = form.querySelectorAll('input[type="hidden"]');
+            hiddenInputs.forEach(input => {
+                if (input.name === 'start_date' || input.name === 'end_date') {
+                    input.remove();
+                }
+            });
+            form.submit();
+        }
+    </script>
+    @endpush
 @endsection

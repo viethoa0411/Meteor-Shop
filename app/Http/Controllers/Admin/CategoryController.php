@@ -14,16 +14,26 @@ class CategoryController extends Controller
     {
         $query = Category::with('parent');
 
-        // Nếu có từ khóa tìm kiếm
+        $status = $request->get('status', 'active');
+
+        // Filter theo trạng thái
+       if ($status !== 'all') {
+            // Nếu không phải 'all' thì lọc theo status cụ thể
+            $query->where('status', $status);
+        }
+
+        // Tìm kiếm theo từ khóa
         if ($request->filled('keyword')) {
             $query->where('name', 'like', '%' . $request->keyword . '%');
         }
 
-        // Lấy toàn bộ danh mục
-        $categories = $query->orderBy('id', 'desc')->get();
+        // Phân trang
+        $categories = $query->orderBy('id', 'desc')->paginate(10);
 
         return view('admin.categories.list', compact('categories'));
     }
+
+
 
 
 
@@ -41,7 +51,6 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:categories,slug',
-            'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
             'status' => 'required|in:active,inactive',
         ]);
@@ -52,7 +61,6 @@ class CategoryController extends Controller
         Category::create([
             'name' => $request->name,
             'slug' => $slug,
-            'description' => $request->description,
             'parent_id' => $request->parent_id,
             'status' => $request->status,
         ]);
@@ -81,7 +89,6 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:categories,slug,' . $category->id,
-            'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
             'status' => 'required|in:active,inactive',
         ]);
@@ -89,7 +96,6 @@ class CategoryController extends Controller
         $category->update([
             'name' => $request->name,
             'slug' => $request->slug ?: \Illuminate\Support\Str::slug($request->name),
-            'description' => $request->description,
             'parent_id' => $request->parent_id,
             'status' => $request->status,
         ]);

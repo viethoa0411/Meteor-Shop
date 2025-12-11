@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use App\Models\Category;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // ✅ Chia sẻ danh mục con cho tất cả view (menu)
+        View::share(
+            'childCategories',
+            Category::whereNotNull('parent_id')
+                ->where('status', 1)
+                ->get()
+        );
     }
 }

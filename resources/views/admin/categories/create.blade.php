@@ -30,11 +30,6 @@
         </div>
 
         <div class="mb-3">
-            <label for="description" class="form-label">Mô tả</label>
-            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Mô tả danh mục"></textarea>
-        </div>
-
-        <div class="mb-3">
             <label for="parent_id" class="form-label">Danh mục cha</label>
             <select class="form-select" name="parent_id">
                 <option value="">— Không có —</option>
