@@ -634,15 +634,11 @@
                         Number(variant.height) === Number(height)
                     );
 
-                 // Nếu tìm thấy biến thể, hiển thị cân nặng
-                    if (selectedVariant && selectedVariant.weight) {
-                        weightDisplay.textContent = `${selectedVariant.weight} ${selectedVariant.weight_unit}`;
-                    } else if (selectedVariant) {
-                        weightDisplay.textContent = '--';
-                    } else {
-                        weightDisplay.textContent = '-- (Không tìm thấy)';
-                    }
-                };
+
+            // Chọn nút hiện tại
+            btn.classList.add('active');
+            btn.style.background = '#111';
+            btn.style.color = '#fff';
 
             // Cập nhật thông tin kho và cân nặng
             updateStockInfo();

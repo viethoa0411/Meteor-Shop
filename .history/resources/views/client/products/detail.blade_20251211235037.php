@@ -634,6 +634,8 @@
                         Number(variant.height) === Number(height)
                     );
 
+
+            // Chọn nút hiện tại
                  // Nếu tìm thấy biến thể, hiển thị cân nặng
                     if (selectedVariant && selectedVariant.weight) {
                         weightDisplay.textContent = `${selectedVariant.weight} ${selectedVariant.weight_unit}`;
@@ -643,7 +645,6 @@
                         weightDisplay.textContent = '-- (Không tìm thấy)';
                     }
                 };
-
             // Cập nhật thông tin kho và cân nặng
             updateStockInfo();
             updateWeightInfo();

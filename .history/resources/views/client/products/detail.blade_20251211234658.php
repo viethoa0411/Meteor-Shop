@@ -140,7 +140,6 @@
                     Còn: <span id="stock-display" style="font-weight:bold;">--</span>
                 </p>
                 
-                {{--  Cân nặng --}}
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
                     Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
                 </p>
@@ -196,7 +195,17 @@
                         </div>
                     </div>
                        
-                
+                    {{-- CÂN NẶNG --}}
+                    <div style="margin-bottom:20px;">
+                        <label style="font-weight:600; display:block; margin-bottom:6px;">Cân nặng:</label>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            @foreach ($product->variants->unique('weight') as $variant)  {{ $variant->weight }}{{ $variant->weight_unit }}
+                                <h6>
+                                   
+                                </h6>
+                            @endforeach
+                               
+                    </div>
                 @else
                     {{-- fallback nếu sản phẩm không có variant --}}
                     <div style="margin-bottom:20px;">
@@ -212,6 +221,7 @@
                         <button type="button" class="btn-variant"
                             style="border:1px solid #111; background:#fff; color:#111; padding:6px 12px; border-radius:6px;">
                             {{ $product->length ?? '?' }}x{{ $product->width ?? '?' }}x{{ $product->height ?? '?' }}
+                            <p>Weight: {{ $variant->weight }} {{ $variant->weight_unit }}</p>
                         </button>
                     </div>
                 @endif
@@ -423,8 +433,6 @@
                         'width' => (int) $variant->width,
                         'height' => (int) $variant->height,
                         'stock' => (int) $variant->stock,
-                        'weight' => $variant->weight ? (float) $variant->weight : null,
-                        'weight_unit' => $variant->weight_unit ?? 'kg',
                     ];
                 })
                 ->values();
@@ -599,56 +607,58 @@
                 }
 
                 clampQuantity();
-                 // Cập nhật cân nặng khi cập nhật stock
-                updateWeightInfo();
             };
              
-                  // Hàm cập nhật cân nặng dựa trên biến thể đã chọn
-                const updateWeightInfo = () => {
-                    if (productVariants.length === 0) {
-                        // Nếu không có variant, lấy cân nặng từ product (nếu có)
-                        weightDisplay.textContent = '--';
-                        return;
-                    }
+            // Hàm cập nhật cân nặng dựa trên biến thể đã chọn
+    const updateWeightInfo = () => {
+        const activeColor = document.querySelector('.color-btn.active');
+        const activeSize = document.querySelector('.size-btn.active');
 
-                    const activeColor = document.querySelector('.color-btn.active');
-                    const activeSize = document.querySelector('.size-btn.active');
+        // Nếu chưa chọn màu hoặc kích thước, không cập nhật cân nặng
+        if (!activeColor || !activeSize) {
+            weightDisplay.innerHTML = 'Vui lòng chọn màu và kích cỡ';
+            return;
+        }
 
-                    // Nếu chưa chọn màu hoặc kích thước
-                    if (!activeColor || !activeSize) {
-                        weightDisplay.textContent = '-- (Vui lòng chọn phân loại)';
-                        return;
-                    }
+        // Tìm biến thể phù hợp với màu và kích thước đã chọn
+        const selectedVariant = productVariants.find(variant =>
+            normalize(variant.color_name) === normalize(activeColor.dataset.color) &&
+            Number(variant.length) === Number(activeSize.dataset.size.split('x')[0]) &&
+            Number(variant.width) === Number(activeSize.dataset.size.split('x')[1]) &&
+            Number(variant.height) === Number(activeSize.dataset.size.split('x')[2])
+        );
 
-                    // Tìm biến thể phù hợp với màu và kích thước đã chọn
-                    const {
-                        length,
-                        width,
-                        height
-                    } = parseSize(activeSize.dataset.size);
+        // Nếu tìm thấy biến thể, hiển thị cân nặng
+        if (selectedVariant) {
+            weightDisplay.innerHTML = `${selectedVariant.weight} ${selectedVariant.weight_unit}`;
+        } else {
+            weightDisplay.innerHTML = 'Không tìm thấy cân nặng cho lựa chọn hiện tại';
+        }
+    };
 
-                    const selectedVariant = productVariants.find(variant =>
-                        normalize(variant.color_name) === normalize(activeColor.dataset.color) &&
-                        Number(variant.length) === Number(length) &&
-                        Number(variant.width) === Number(width) &&
-                        Number(variant.height) === Number(height)
-                    );
+    // Cập nhật khi chọn màu và kích thước
+    document.querySelectorAll('.btn-variant').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const isColor = btn.classList.contains('color-btn');
+            const group = isColor ? '.color-btn' : '.size-btn';
 
-                 // Nếu tìm thấy biến thể, hiển thị cân nặng
-                    if (selectedVariant && selectedVariant.weight) {
-                        weightDisplay.textContent = `${selectedVariant.weight} ${selectedVariant.weight_unit}`;
-                    } else if (selectedVariant) {
-                        weightDisplay.textContent = '--';
-                    } else {
-                        weightDisplay.textContent = '-- (Không tìm thấy)';
-                    }
-                };
+            // Deselect các phần tử khác
+            document.querySelectorAll(group).forEach(b => {
+                b.classList.remove('active');
+                b.style.background = isColor && b.dataset.color ? b.dataset.color : '#fff';
+                b.style.color = isColor && b.dataset.color ? '#fff' : '#111';
+            });
+
+            // Chọn nút hiện tại
+            btn.classList.add('active');
+            btn.style.background = '#111';
+            btn.style.color = '#fff';
 
             // Cập nhật thông tin kho và cân nặng
             updateStockInfo();
             updateWeightInfo();
         });
-    
+    });
 
 
 
