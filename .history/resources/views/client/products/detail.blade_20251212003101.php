@@ -78,13 +78,13 @@
                     <div class="main-image-wrapper position-relative mb-3"
                         style="aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #f8f9fa;">
                         <img id="mainProductImage"
-                        src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/600x600?text=No+Image' }}"
+                            src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/600x600?text=No+Image' }}"
                             alt="{{ $product->name }}" class="w-100 h-100" style="object-fit: cover; cursor: zoom-in;"
                             onclick="openLightbox(this.src)">
-                </div>
+                    </div>
 
                     {{-- Thumbnails --}}
-                @if ($product->images && $product->images->count() > 0)
+                    @if ($product->images && $product->images->count() > 0)
                         <div class="thumbnails d-flex gap-2 flex-wrap justify-content-center">
                             <div class="thumbnail-item {{ !$product->image ? 'active' : '' }}"
                                 style="width: 80px; height: 80px; border: 2px solid #ddd; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.3s;"
@@ -92,16 +92,16 @@
                                 <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/80x80?text=No+Image' }}"
                                     alt="Main" class="w-100 h-100" style="object-fit: cover;">
                             </div>
-                        @foreach ($product->images as $img)
+                            @foreach ($product->images as $img)
                                 <div class="thumbnail-item"
                                     style="width: 80px; height: 80px; border: 2px solid #ddd; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.3s;"
                                     onclick="changeMainImage('{{ asset('storage/' . $img->image) }}', this)">
                                     <img src="{{ asset('storage/' . $img->image) }}" alt="Gallery" class="w-100 h-100"
                                         style="object-fit: cover;">
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -139,10 +139,14 @@
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
                     Còn: <span id="stock-display" style="font-weight:bold;">--</span>
                 </p>
-
+                
                 {{--  Cân nặng --}}
                 <p style="font-size:14px; color:#555; margin-bottom:10px;">
-                    Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span> <span id="weight-unit-display" style="font-weight:bold;"></span>
+                    Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span>
+                </p>
+                
+                <p style="font-size:14px; color:#555; margin-bottom:10px;">
+                    Đơn vị: <span id="weight-unit-display" style="font-weight:bold;">--</span>
                 </p>
 
 
@@ -164,7 +168,7 @@
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             @foreach ($product->variants->unique('color_name') as $variant)
                                 <button type="button" class="btn-variant color-btn"
-                                    data-color="{{ $variant->color_name }}"
+                                    data-color="{{ $variant->color_name }}" 
                                     data-color-code="{{ $variant->color_code ?? '#fff' }}"
                                     style="border:1px solid #ccc;
                                             background-color: {{ $variant->color_code ?? '#fff' }};
@@ -300,8 +304,8 @@
                                 <p class="mb-0">Chưa có mô tả chi tiết cho sản phẩm này.</p>
                             </div>
                         @endif
-            </div>
-        </div>
+                    </div>
+                </div>
 
                 {{-- Specs Tab --}}
                 <div class="tab-pane fade" id="specs" role="tabpanel" aria-labelledby="specs-tab">
@@ -389,7 +393,7 @@
                                         <img src="{{ $related->image ? asset('storage/' . $related->image) : 'https://via.placeholder.com/400x400?text=No+Image' }}"
                                             alt="{{ $related->name }}" class="card-img-top w-100 h-100"
                                             style="object-fit: cover; transition: transform 0.3s;">
-                            </div>
+                                    </div>
                                     <div class="card-body">
                                         <h6 class="card-title text-dark mb-2"
                                             style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
@@ -398,13 +402,13 @@
                                         <p class="card-text text-danger fw-bold mb-0">
                                             {{ number_format($related->display_price, 0, ',', '.') }} đ
                                         </p>
-                            </div>
-                            </div>
-                        </a>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     @endforeach
                 </div>
-        </div>
+            </div>
         @endif
 
         {{-- G. RECENTLY VIEWED PRODUCTS --}}
@@ -430,10 +434,10 @@
                 })
                 ->values();
         @endphp {{-- Hiệu ứng hover --}} 
-
+        
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const wishlistBtn = document.getElementById('wishlist-toggle');
+                const wishlistBtn = document.getElementById('wishlist-toggle'); 
 
                 wishlistBtn?.addEventListener('click', function() {
                     const productId = this.getAttribute('data-product-id');
@@ -508,9 +512,8 @@
                 const minus = document.querySelector('.minus');
                 const plus = document.querySelector('.plus');
                 const stockDisplay = document.getElementById('stock-display');
-                const weightDisplay = document.getElementById('weight-display');
-                const weightUnitDisplay = document.getElementById('weight-unit-display');
-                const priceDisplay = document.getElementById('price-display');
+                const weightDisplay = document.getElementById('weight-display');        
+                const weightUnitDisplay = document.getElementById('weight-unit-display');                 const priceDisplay = document.getElementById('price-display');
                 const buyNowBtn = document.getElementById('buy-now-btn');
                 const addBtn = document.getElementById('add-to-cart');
                 const productId = {{ $product->id }};
@@ -522,280 +525,281 @@
             @else
                 const isAuthenticated = false;
             @endauth
-                let selectedVariantId = null;
-                let currentMaxStock = productVariants.length > 0 ? 0 : baseProductStock;
+            let selectedVariantId = null;
+            let currentMaxStock = productVariants.length > 0 ? 0 : baseProductStock;
 
-                const normalize = (value) => (value || '').toString().trim().toLowerCase();
-                const parseSize = (size) => {
-                    if (!size) {
-                        return {
-                            length: null,
-                            width: null,
-                            height: null
-                        };
-                    }
-                    const parts = size.split('x').map(num => parseInt(num, 10) || null);
+            const normalize = (value) => (value || '').toString().trim().toLowerCase();
+            const parseSize = (size) => {
+                if (!size) {
                     return {
-                        length: parts[0] ?? null,
-                        width: parts[1] ?? null,
-                        height: parts[2] ?? null,
+                        length: null,
+                        width: null,
+                        height: null
                     };
+                }
+                const parts = size.split('x').map(num => parseInt(num, 10) || null);
+                return {
+                    length: parts[0] ?? null,
+                    width: parts[1] ?? null,
+                    height: parts[2] ?? null,
                 };
+            };
 
-                const clampQuantity = () => {
-                    let val = parseInt(qtyInput.value, 10) || 1;
-                    if (val < 1) val = 1;
-                    if (currentMaxStock > 0 && val > currentMaxStock) {
-                        val = currentMaxStock;
-                    }
-                    qtyInput.value = val;
-                };
+            const clampQuantity = () => {
+                let val = parseInt(qtyInput.value, 10) || 1;
+                if (val < 1) val = 1;
+                if (currentMaxStock > 0 && val > currentMaxStock) {
+                    val = currentMaxStock;
+                }
+                qtyInput.value = val;
+            };
 
-                const updateSelectedVariant = () => {
-                    const activeColor = document.querySelector('.color-btn.active');
-                    const activeSize = document.querySelector('.size-btn.active');
+            const updateSelectedVariant = () => {
+                const activeColor = document.querySelector('.color-btn.active');
+                const activeSize = document.querySelector('.size-btn.active');
 
-                    if (!activeColor || !activeSize) {
-                        selectedVariantId = null;
-                        return null;
-                    }
+                if (!activeColor || !activeSize) {
+                    selectedVariantId = null;
+                    return null;
+                }
 
-                    const {
-                        length,
-                        width,
-                        height
-                    } = parseSize(activeSize.dataset.size);
+                const {
+                    length,
+                    width,
+                    height
+                } = parseSize(activeSize.dataset.size);
 
-                    const matchedVariant = productVariants.find(variant =>
-                        normalize(variant.color_name) === normalize(activeColor.dataset.color) &&
-                        Number(variant.length) === Number(length) &&
-                        Number(variant.width) === Number(width) &&
-                        Number(variant.height) === Number(height)
-                    );
+                const matchedVariant = productVariants.find(variant =>
+                    normalize(variant.color_name) === normalize(activeColor.dataset.color) &&
+                    Number(variant.length) === Number(length) &&
+                    Number(variant.width) === Number(width) &&
+                    Number(variant.height) === Number(height)
+                );
 
-                    selectedVariantId = matchedVariant ? matchedVariant.id : null;
-                    return matchedVariant;
-                };
+                selectedVariantId = matchedVariant ? matchedVariant.id : null;
+                return matchedVariant;
+            };
 
-                const updateStockInfo = () => {
-                    if (!stockDisplay) return;
-                    
-                    if (productVariants.length === 0) {
-                        stockDisplay.textContent = baseProductStock;
-                        currentMaxStock = baseProductStock;
-                        qtyInput.setAttribute('max', baseProductStock);
-                        clampQuantity();
-                        return;
-                    }
-
-                    const selectedVariant = updateSelectedVariant();
-
-                    if (selectedVariant && selectedVariant.stock !== undefined && selectedVariant.stock !== null) {
-                        if (selectedVariant.stock > 0) {
-                            currentMaxStock = selectedVariant.stock;
-                            stockDisplay.textContent = currentMaxStock;
-                            qtyInput.setAttribute('max', currentMaxStock);
-                        } else {
-                            currentMaxStock = 0;
-                            stockDisplay.textContent = '0 (Hết hàng)';
-                            qtyInput.setAttribute('max', 0);
-                        }
-                    } else {
-                        stockDisplay.textContent = '-- (Vui lòng chọn phân loại)';
-                        currentMaxStock = 0;
-                        qtyInput.removeAttribute('max');
-                    }
-
+            const updateStockInfo = () => {
+                if (!stockDisplay) return;
+                
+                if (productVariants.length === 0) {
+                    stockDisplay.textContent = baseProductStock;
+                    currentMaxStock = baseProductStock;
+                    qtyInput.setAttribute('max', baseProductStock);
                     clampQuantity();
-                };
+                    return;
+                }
 
-                // Hàm cập nhật cân nặng dựa trên biến thể đã chọn
-                const updateWeightInfo = () => {
-                    if (!weightDisplay || !weightUnitDisplay) return;
-                    
-                    if (productVariants.length === 0) {
-                        // Nếu không có variant, không hiển thị cân nặng
-                        weightDisplay.textContent = '--';
-                        weightUnitDisplay.textContent = '';
-                        return;
+                const selectedVariant = updateSelectedVariant();
+
+                if (selectedVariant && selectedVariant.stock !== undefined && selectedVariant.stock !== null) {
+                    if (selectedVariant.stock > 0) {
+                        currentMaxStock = selectedVariant.stock;
+                        stockDisplay.textContent = currentMaxStock;
+                        qtyInput.setAttribute('max', currentMaxStock);
+                    } else {
+                        currentMaxStock = 0;
+                        stockDisplay.textContent = '0 (Hết hàng)';
+                        qtyInput.setAttribute('max', 0);
                     }
+                } else {
+                    stockDisplay.textContent = '-- (Vui lòng chọn phân loại)';
+                    currentMaxStock = 0;
+                    qtyInput.removeAttribute('max');
+                }
 
-                    const selectedVariant = updateSelectedVariant();
+                clampQuantity();
+            };
 
-                    // Nếu chưa chọn đủ màu và kích thước
-                    if (!selectedVariant) {
-                        weightDisplay.textContent = '-- (Vui lòng chọn phân loại)';
-                        weightUnitDisplay.textContent = '';
-                        return;
-                    }
+            // Hàm cập nhật cân nặng dựa trên biến thể đã chọn
+            const updateWeightInfo = () => {
+                if (!weightDisplay) return;
+                
+                if (productVariants.length === 0) {
+                    // Nếu không có variant, không hiển thị cân nặng
+                    weightDisplay.textContent = '--';
+                    weightUnitDisplay.textContent = '--';
+                    return;
+                }
 
-                    // Nếu tìm thấy biến thể, hiển thị cân nặng
+                const selectedVariant = updateSelectedVariant();
+
+                // Nếu chưa chọn đủ màu và kích thước
+                if (!selectedVariant) {
+                    weightDisplay.textContent = '-- (Vui lòng chọn phân loại)';
+                     weightUnitDisplay.textContent = '-- (Vui lòng chọn phân loại)';
+                    return;
+                }
+
+                // Nếu tìm thấy biến thể, hiển thị cân nặng
                     if (selectedVariant.weight && selectedVariant.weight > 0) {
                         // Format số để hiển thị đẹp hơn (loại bỏ số 0 thừa)
                         const weightValue = parseFloat(selectedVariant.weight);
                         const formattedWeight = weightValue % 1 === 0 ? weightValue.toString() : weightValue.toFixed(2);
-                        weightDisplay.textContent = formattedWeight;
-                        weightUnitDisplay.textContent = selectedVariant.weight_unit || 'kg';
-                    } else {
+                        weightDisplay.textContent = selectedVariant.weight;
+                        weightUnitDisplay.textContent = selectedVariant.weight_unit || 'kg';                } else {
+                    } else if (selectedVariant) {
                         weightDisplay.textContent = '--';
-                        weightUnitDisplay.textContent = '';
-                    }
-                };
-
-                // Hàm cập nhật giá dựa trên biến thể đã chọn
-                const updatePriceInfo = () => {
-                    if (!priceDisplay) return;
-                    
-                    if (productVariants.length === 0) {
-                        // Nếu không có variant, hiển thị giá sản phẩm chính
-                        priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
-                        return;
-                    }
-
-                    const selectedVariant = updateSelectedVariant();
-
-                    // Nếu chưa chọn đủ màu và kích thước, hiển thị giá sản phẩm chính
-                    if (!selectedVariant) {
-                        priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
-                        return;
-                    }
-
-                    // Nếu tìm thấy biến thể, hiển thị giá của biến thể
-                    if (selectedVariant.price) {
-                        priceDisplay.textContent = selectedVariant.price.toLocaleString('vi-VN') + ' đ';
+                        weightUnitDisplay.textContent = '--';
                     } else {
-                        // Nếu không có giá biến thể, dùng giá sản phẩm chính
-                        priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
+                        weightDisplay.textContent = '-- (Không tìm thấy)';
+                        weightUnitDisplay.textContent = '-- (Không tìm thấy)';
                     }
-                };
+                }
+            };
+
+            // Hàm cập nhật giá dựa trên biến thể đã chọn
+            const updatePriceInfo = () => {
+                if (productVariants.length === 0) {
+                    // Nếu không có variant, hiển thị giá sản phẩm chính
+                    priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
+                    return;
+                }
+
+                const selectedVariant = updateSelectedVariant();
+
+                // Nếu chưa chọn đủ màu và kích thước, hiển thị giá sản phẩm chính
+                if (!selectedVariant) {
+                    priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
+                    return;
+                }
+
+                // Nếu tìm thấy biến thể, hiển thị giá của biến thể
+                if (selectedVariant.price) {
+                    priceDisplay.textContent = selectedVariant.price.toLocaleString('vi-VN') + ' đ';
+                } else {
+                    // Nếu không có giá biến thể, dùng giá sản phẩm chính
+                    priceDisplay.textContent = baseProductPrice.toLocaleString('vi-VN') + ' đ';
+                }
+            };
 
             // Cập nhật thông tin kho, cân nặng và giá
             updateStockInfo();
             updateWeightInfo();
             updatePriceInfo();
 
-                minus?.addEventListener('click', () => {
-                    let val = parseInt(qtyInput.value, 10) || 1;
-                    if (val > 1) {
-                        qtyInput.value = val - 1;
-                    }
-                });
+            minus?.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value, 10) || 1;
+                if (val > 1) {
+                    qtyInput.value = val - 1;
+                }
+            });
 
-                plus?.addEventListener('click', () => {
-                    let val = parseInt(qtyInput.value, 10) || 1;
-                    if (productVariants.length > 0 && currentMaxStock === 0) {
+            plus?.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value, 10) || 1;
+                if (productVariants.length > 0 && currentMaxStock === 0) {
                     alert('Vui lòng chọn Màu và Kích cỡ trước! 590');
-                        return;
-                    }
+                    return;
+                }
 
-                    if (currentMaxStock === 0 || val < currentMaxStock) {
-                        qtyInput.value = val + 1;
-                    } else {
-                        alert('Đã đạt giới hạn tồn kho (' + currentMaxStock + ')');
-                    }
-                });
+                if (currentMaxStock === 0 || val < currentMaxStock) {
+                    qtyInput.value = val + 1;
+                } else {
+                    alert('Đã đạt giới hạn tồn kho (' + currentMaxStock + ')');
+                }
+            });
 
-                qtyInput.addEventListener('change', clampQuantity);
+            qtyInput.addEventListener('change', clampQuantity);
 
-                document.querySelectorAll('.btn-variant').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const isColor = btn.classList.contains('color-btn');
-                        const group = isColor ? '.color-btn' : '.size-btn';
-                        const wasActive = btn.classList.contains('active');
+            document.querySelectorAll('.btn-variant').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const isColor = btn.classList.contains('color-btn');
+                    const group = isColor ? '.color-btn' : '.size-btn';                        
+                    const isActive = btn.classList.contains('active');
+                    const wasActive = btn.classList.contains('active');
 
-                        if (wasActive) {
-                            // Nếu đã active, hủy chọn
-                            btn.classList.remove('active');
-                            if (isColor) {
-                                const code = btn.dataset.colorCode || '#fff';
-                                btn.style.background = code;
-                                btn.style.border = '1px solid #ccc';
-                                btn.style.boxShadow = 'none';
-                                const name = (btn.dataset.color || '').toLowerCase();
-                                btn.style.color = name === 'trắng' ? '#000' : '#fff';
-                            } else {
-                                btn.style.background = '#fff';
-                                btn.style.color = '#111';
-                                btn.style.border = '1px solid #111';
-                                btn.style.boxShadow = 'none';
-                            }
+                    
+                    if (wasActive) {
+                        btn.classList.remove('active');
+                        if (isColor) {
+                            const code = btn.dataset.colorCode || '#fff';
+                            btn.style.background = code;
+                            btn.style.border = '1px solid #ccc';
+                            btn.style.boxShadow = 'none';
+                            const name = (btn.dataset.color || '').toLowerCase();
+                            btn.style.color = name === 'trắng' ? '#000' : '#fff';
                         } else {
-                            // Hủy chọn tất cả button cùng nhóm
-                            document.querySelectorAll(group).forEach(b => {
-                                b.classList.remove('active');
-                                if (isColor) {
-                                    const code = b.dataset.colorCode || '#fff';
-                                    b.style.background = code;
-                                    b.style.border = '1px solid #ccc';
-                                    b.style.boxShadow = 'none';
-                                    const name = (b.dataset.color || '').toLowerCase();
-                                    b.style.color = name === 'trắng' ? '#000' : '#fff';
-                                } else {
-                                    b.style.background = '#fff';
-                                    b.style.color = '#111';
-                                    b.style.border = '1px solid #111';
-                                    b.style.boxShadow = 'none';
-                                }
-                            });
-
-                            // Chọn button hiện tại
-                            btn.classList.add('active');
-                            if (isColor) {
-                                const code = btn.dataset.colorCode || '#fff';
-                                btn.style.background = code;
-                                btn.style.border = '2px solid #0d6efd';
-                                btn.style.boxShadow = '0 0 0 3px rgba(13,110,253,.2)';
-                                const name = (btn.dataset.color || '').toLowerCase();
-                                btn.style.color = name === 'trắng' ? '#000' : '#fff';
-                            } else {
-                                btn.style.background = '#eef5ff';
-                                btn.style.color = '#0d6efd';
-                                btn.style.border = '2px solid #0d6efd';
-                                btn.style.boxShadow = '0 2px 6px rgba(13,110,253,.15)';
-                            }
+                            btn.style.background = '#fff';
+                            btn.style.color = '#111';
+                            btn.style.border = '1px solid #111';
+                            btn.style.boxShadow = 'none';
                         }
+                    } else {
+                        document.querySelectorAll(group).forEach(b => {
+                            b.classList.remove('active');
+                            if (isColor) {
+                                const code = b.dataset.colorCode || '#fff';
+                                b.style.background = code;
+                                b.style.border = '1px solid #ccc';
+                                b.style.boxShadow = 'none';
+                                const name = (b.dataset.color || '').toLowerCase();
+                                b.style.color = name === 'trắng' ? '#000' : '#fff';
+                            } else {
+                                b.style.background = '#fff';
+                                b.style.color = '#111';
+                                b.style.border = '1px solid #111';
+                                b.style.boxShadow = 'none';
+                            }
+                        });
 
-                        updateStockInfo();
-                        updateWeightInfo();
-                        updatePriceInfo();
-                    });
+                        btn.classList.add('active');
+                        if (isColor) {
+                            const code = btn.dataset.colorCode || '#fff';
+                            btn.style.background = code;
+                            btn.style.border = '2px solid #0d6efd';
+                            btn.style.boxShadow = '0 0 0 3px rgba(13,110,253,.2)';
+                            const name = (btn.dataset.color || '').toLowerCase();
+                            btn.style.color = name === 'trắng' ? '#000' : '#fff';
+                        } else {
+                            btn.style.background = '#eef5ff';
+                            btn.style.color = '#0d6efd';
+                            btn.style.border = '2px solid #0d6efd';
+                            btn.style.boxShadow = '0 2px 6px rgba(13,110,253,.15)';
+                        }
+                    }
+
+                    updateStockInfo();
+                    updateWeightInfo();
+                    updatePriceInfo();
                 });
+            });
 
             if (buyNowBtn && !buyNowBtn.dataset.bound) {
                 buyNowBtn.dataset.bound = 'true';
                 buyNowBtn.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        const quantity = parseInt(qtyInput.value, 10) || 1;
-                        const colorBtn = document.querySelector('.color-btn.active');
-                        const sizeBtn = document.querySelector('.size-btn.active');
+                    event.preventDefault();
+                    const quantity = parseInt(qtyInput.value, 10) || 1;
+                    const colorBtn = document.querySelector('.color-btn.active');
+                    const sizeBtn = document.querySelector('.size-btn.active');
 
-                        @if ($product->variants->count() > 0)
-                            if (!colorBtn || !sizeBtn) {
+                    @if ($product->variants->count() > 0)
+                        if (!colorBtn || !sizeBtn) {
                             alert('Vui lòng chọn màu và kích cỡ 637');
-                                return;
-                            }
-                            const selectedVariant = updateSelectedVariant();
-                            if (!selectedVariant || !selectedVariant.id) {
-                                alert('Không tìm thấy biến thể phù hợp cho lựa chọn hiện tại.');
-                                return;
-                            }
-                        @endif
+                            return;
+                        }
+                        const selectedVariant = updateSelectedVariant();
+                        if (!selectedVariant || !selectedVariant.id) {
+                            alert('Không tìm thấy biến thể phù hợp cho lựa chọn hiện tại.');
+                            return;
+                        }
+                    @endif
 
-                        const params = new URLSearchParams({
-                            product_id: productId,
-                            qty: quantity,
-                            type: 'buy_now'
-                        });
+                    const params = new URLSearchParams({
+                        product_id: productId,
+                        qty: quantity,
+                        type: 'buy_now'
+                    });
 
-                        if (selectedVariantId) {
-                            params.append('variant_id', selectedVariantId);
-                        }
-                        if (colorBtn) {
-                            params.append('color', colorBtn.dataset.color);
-                        }
-                        if (sizeBtn) {
-                            params.append('size', sizeBtn.dataset.size);
-                        }
+                    if (selectedVariantId) {
+                        params.append('variant_id', selectedVariantId);
+                    }
+                    if (colorBtn) {
+                        params.append('color', colorBtn.dataset.color);
+                    }
+                    if (sizeBtn) {
+                        params.append('size', sizeBtn.dataset.size);
+                    }
 
                     if (isAuthenticated) {
                         window.location.href = '{{ route('client.checkout.index') }}' + '?' + params
@@ -874,7 +878,7 @@
                 });
             }
             @endauth
-            });
+        });
         </script>
         <style>
             .color-btn.active {

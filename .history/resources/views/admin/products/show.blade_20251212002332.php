@@ -77,14 +77,28 @@
                     <div class="row g-2 mt-3">
                         @foreach ($product->images as $img)
                             <div class="col-3 col-md-2">
-                                <div class="thumbnail-img" 
-                                    style="width:100%; aspect-ratio: 1/1; border:2px solid #e0e0e0; border-radius:8px; overflow:hidden; cursor:pointer; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.06); transition:all 0.25s ease-in-out;"
-                                    onclick="changeMainImage('{{ asset('storage/' . $img->image) }}', this)">
-                                    <img src="{{ asset('storage/' . $img->image) }}" alt="Ảnh phụ"
+                                    <div class="thumbnail-img" style="
+                                            width:100%;
+                                            aspect-ratio: 1/1;
+                                            border:1px solid #e0e0e0;
+                                            border-radius:8px;
+                                            overflow:hidden;
+                                            cursor:pointer;
+                                            background:#fff;
+                                            box-shadow:0 2px 6px rgba(0,0,0,0.06);
+                                            transition:all 0.25s ease-in-out;"
+                                        onclick="
+                                        document.getElementById('mainImage').src='{{ asset('storage/' . $img->image) }}';
+                                        document.querySelectorAll('.thumbnail-img').forEach(el => el.style.borderColor = '#e0e0e0');
+                                        this.style.borderColor = '#0d6efd';
+                                    "                                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 6px 14px rgba(0,0,0,0.12)';"
+      onmouseout="if(this.style.borderColor !== 'rgb(13, 110, 253)') { this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.06)'; }">                                    <img src="{{ asset('storage/' . $img->image) }}" alt="Ảnh phụ"
                                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease-in-out;"
                                         onmouseover="this.style.transform='scale(1.12)'"
                                         onmouseout="this.style.transform='scale(1)'">
+
                                 </div>
+
                             </div>
                         @endforeach
                     </div>
@@ -166,13 +180,7 @@
                                                 </td>
                                                 <td>{{ number_format($v->price ?? $product->price, 0, ',', '.') }} đ</td>
                                                 <td>{{ $v->stock }}</td>
-                                                <td>
-                                                    @if ($v->weight)
-                                                        {{ $v->weight }} {{ $v->weight_unit ?? 'kg' }}
-                                                    @else
-                                                        —
-                                                    @endif
-                                                </td>
+                                                <td>{{ $v->weight }}{{ $v->weight_unit }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -207,25 +215,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function changeMainImage(imageSrc, clickedElement) {
-            const mainImage = document.getElementById('mainImage');
-            if (mainImage) {
-                mainImage.src = imageSrc;
-            }
-            
-            // Reset tất cả thumbnail về border mặc định
-            document.querySelectorAll('.thumbnail-img').forEach(el => {
-                el.style.borderColor = '#e0e0e0';
-                el.style.borderWidth = '1px';
-            });
-            
-            // Highlight thumbnail được click
-            if (clickedElement) {
-                clickedElement.style.borderColor = '#0d6efd';
-                clickedElement.style.borderWidth = '2px';
-            }
-        }
-    </script>
 @endsection

@@ -1599,7 +1599,7 @@
 
                     // Bind quick reply events
                     document.querySelectorAll('.chatbox-quick-reply').forEach(btn => {
-                        btn.addEventListener('click', function() {
+                    btn.addEventListener('click', function() {
                             sendMessage(this.dataset.message);
                         });
                     });
@@ -1723,13 +1723,13 @@
                     } else {
                         // Send as JSON for text only
                         response = await fetch('/chat/send', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
                                 'Accept': 'application/json',
                                 'X-CSRF-TOKEN': csrfToken
-                            },
-                            body: JSON.stringify({
+                                },
+                                body: JSON.stringify({
                                 message: message,
                                 session_token: sessionToken,
                                 page_url: window.location.href
@@ -1827,7 +1827,7 @@
                 if (count > 0) {
                     chatBadge.textContent = count > 99 ? '99+' : count;
                     chatBadge.style.display = 'flex';
-                } else {
+                    } else {
                     chatBadge.style.display = 'none';
                 }
             }
