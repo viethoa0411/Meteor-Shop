@@ -104,6 +104,34 @@ Route::middleware(['admin'])
         Route::get('/revenue/filter', [DashboardController::class, 'index'])->name('revenue.filter');
         Route::get('/api/dashboard/revenue/control-chart', [DashboardController::class, 'revenueControlChartApi'])
             ->name('dashboard.revenue.control-chart');
+        Route::get('/api/dashboard/revenue-orders-chart', [DashboardController::class, 'revenueOrdersChartApi'])
+            ->name('dashboard.revenue-orders-chart');
+        Route::get('/api/dashboard/order-status-ratio', [DashboardController::class, 'orderStatusRatioApi'])
+            ->name('dashboard.order-status-ratio');
+        Route::get('/api/dashboard/category-revenue', [DashboardController::class, 'categoryRevenueApi'])
+            ->name('dashboard.category-revenue');
+        Route::get('/api/dashboard/top-customers', [DashboardController::class, 'topCustomersApi'])
+            ->name('dashboard.top-customers');
+        Route::get('/api/dashboard/top-products', [DashboardController::class, 'topProductsApi'])
+            ->name('dashboard.top-products');
+        Route::get('/api/dashboard/inventory', [DashboardController::class, 'inventoryApi'])
+            ->name('dashboard.inventory');
+        Route::get('/api/dashboard/comments', [DashboardController::class, 'commentsApi'])
+            ->name('dashboard.comments');
+        Route::post('/api/dashboard/comments/{id}/approve', [DashboardController::class, 'approveComment'])
+            ->name('dashboard.comments.approve');
+        Route::post('/api/dashboard/comments/{id}/reject', [DashboardController::class, 'rejectComment'])
+            ->name('dashboard.comments.reject');
+        Route::delete('/api/dashboard/comments/{id}', [DashboardController::class, 'deleteComment'])
+            ->name('dashboard.comments.delete');
+        Route::post('/api/dashboard/comments/{id}/undo', [DashboardController::class, 'undoCommentAction'])
+            ->name('dashboard.comments.undo');
+        Route::get('/api/dashboard/users', [DashboardController::class, 'usersApi'])
+            ->name('dashboard.users');
+        Route::post('/api/dashboard/users/{id}/ban', [DashboardController::class, 'banUser'])
+            ->name('dashboard.users.ban');
+        Route::post('/api/dashboard/users/{id}/unban', [DashboardController::class, 'unbanUser'])
+            ->name('dashboard.users.unban');
 
         // Monthly Target
         Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])
