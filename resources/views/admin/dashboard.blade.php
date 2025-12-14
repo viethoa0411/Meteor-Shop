@@ -22,34 +22,34 @@
 
     {{-- ========== 2. KPI SUMMARY SECTION (TOP KPIs) ========== --}}
     <section class="mb-4">
-        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
             {{-- 🔵 1. KPI Tổng Doanh Thu (Premium Design) --}}
             <div class="col">
                 <a href="{{ route('admin.revenue.filter') ?? '#' }}" class="text-decoration-none kpi-card-link">
                     <div class="card h-100 border-0 shadow-sm kpi-card-premium kpi-revenue"
                          style="background: linear-gradient(135deg, #6C47FF 0%, #3A86FF 100%); border-radius: 20px; position: relative; overflow: hidden;">
-                        <div class="card-body text-white d-flex flex-column justify-content-between p-4" style="min-height: 180px;">
+                        <div class="card-body text-white d-flex flex-column justify-content-between p-4 kpi-card-body-responsive">
                             {{-- Header với Icon --}}
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div>
-                                    <p class="text-white-50 small mb-1" style="font-size: 0.75rem; opacity: 0.9;">
+                                    <p class="text-white-50 small mb-0" style="font-size: 0.65rem; opacity: 0.9; line-height: 1.2;">
                                         Tổng doanh thu (đã hoàn thành)
                                     </p>
                                 </div>
                                 <div class="kpi-icon-glow kpi-icon-revenue">
-                                    <i class="bi bi-cash-coin" style="font-size: 1.8rem;"></i>
+                                    <i class="bi bi-cash-coin" style="font-size: 1.3rem;"></i>
                                 </div>
                             </div>
                             
                             {{-- Main Value --}}
-                            <div class="mb-3">
-                                <h2 class="fw-bold mb-0 kpi-main-value" style="font-size: 2rem; line-height: 1.2;">
+                            <div class="mb-2">
+                                <h2 class="fw-bold mb-0 kpi-main-value">
                                         {{ number_format($totalCompletedRevenue) }} ₫
                                 </h2>
                                 </div>
                             
                             {{-- Sub Info --}}
-                            <div class="d-flex flex-column gap-1" style="font-size: 0.7rem;">
+                            <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-white-50">Tháng {{ now()->month }}/{{ now()->year }}:</span>
                                     <strong>{{ number_format($currentMonthRevenue) }} ₫</strong>
@@ -63,7 +63,7 @@
                             {{-- Tooltip trigger --}}
                             <div class="kpi-tooltip-trigger" data-bs-toggle="tooltip" data-bs-placement="top" 
                                  title="Doanh thu đã hoàn thành từ tất cả đơn hàng có trạng thái 'completed'">
-                                <i class="bi bi-info-circle" style="font-size: 0.7rem; opacity: 0.7;"></i>
+                                <i class="bi bi-info-circle" style="font-size: 0.65rem; opacity: 0.7;"></i>
                             </div>
                         </div>
                     </div>
@@ -75,28 +75,28 @@
                 <a href="{{ route('admin.orders.list') }}" class="text-decoration-none kpi-card-link">
                     <div class="card h-100 shadow-sm border-0 kpi-card-premium kpi-orders"
                          style="border-radius: 20px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); position: relative; overflow: hidden;">
-                        <div class="card-body text-white d-flex flex-column justify-content-between p-4" style="min-height: 180px;">
+                        <div class="card-body text-white d-flex flex-column justify-content-between p-4 kpi-card-body-responsive">
                             {{-- Header với Icon Circle Glow --}}
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                    <p class="text-white small mb-1" style="font-size: 0.75rem; opacity: 0.95;">
+                                    <p class="text-white small mb-0" style="font-size: 0.65rem; opacity: 0.95; line-height: 1.2;">
                                         Tổng đơn hàng (tháng này)
                                     </p>
                             </div>
                                 <div class="kpi-icon-circle-glow kpi-icon-orders">
-                                    <i class="bi bi-cart-check-fill" style="font-size: 1.5rem;"></i>
+                                    <i class="bi bi-cart-check-fill" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
                             
                             {{-- Main Value --}}
                             <div class="mb-2">
-                                <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 2rem; line-height: 1.2;">
+                                <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 1.5rem; line-height: 1.2;">
                                     {{ number_format($totalOrders) }}
                                 </h2>
                             </div>
                             
                             {{-- Sub Info --}}
-                            <div class="d-flex flex-column gap-1" style="font-size: 0.7rem;">
+                            <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-white" style="opacity: 0.9;">Tất cả:</span>
                                     <strong class="text-white">{{ number_format($totalAllOrders) }} đơn</strong>
@@ -104,7 +104,7 @@
                                 @if(isset($orderGrowth))
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-white" style="opacity: 0.9;">Thay đổi:</span>
-                                    <span class="badge bg-white text-success" style="font-size: 0.65rem; font-weight: 600;">
+                                    <span class="badge bg-white text-success" style="font-size: 0.6rem; font-weight: 600; padding: 0.2rem 0.4rem;">
                                         {{ $orderGrowth > 0 ? '+' : '' }}{{ $orderGrowth }}% so với tháng trước
                                     </span>
                                 </div>
@@ -120,28 +120,28 @@
                 <a href="{{ route('admin.account.users.list') }}" class="text-decoration-none kpi-card-link">
                     <div class="card h-100 shadow-sm border-0 kpi-card-premium kpi-users"
                          style="border-radius: 20px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); position: relative; overflow: hidden;">
-                        <div class="card-body text-white d-flex flex-column justify-content-between p-4" style="min-height: 180px;">
+                        <div class="card-body text-white d-flex flex-column justify-content-between p-4 kpi-card-body-responsive">
                             {{-- Header với Icon Animation --}}
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                    <p class="text-white small mb-1" style="font-size: 0.75rem; opacity: 0.95;">
+                                    <p class="text-white small mb-0" style="font-size: 0.65rem; opacity: 0.95; line-height: 1.2;">
                                         Người dùng hệ thống
                                     </p>
                                 </div>
                                 <div class="kpi-icon-animated kpi-icon-users">
-                                    <i class="bi bi-people-fill" style="font-size: 1.5rem;"></i>
+                                    <i class="bi bi-people-fill" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
                             
                             {{-- Main Value --}}
                             <div class="mb-2">
-                                <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 2rem; line-height: 1.2;">
+                                <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 1.5rem; line-height: 1.2;">
                                     {{ number_format($totalUsers) }}
                                 </h2>
                             </div>
                             
                             {{-- Sub Info với Badge Gradient --}}
-                            <div class="d-flex flex-column gap-1" style="font-size: 0.7rem;">
+                            <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-white" style="opacity: 0.9;">Tháng {{ now()->month }}/{{ now()->year }}:</span>
                                     <strong class="text-white">+{{ number_format($thisMonthUsers) }} user</strong>
@@ -150,7 +150,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-white" style="opacity: 0.9;">Thay đổi:</span>
                                     <span class="badge bg-white {{ $userGrowth > 0 ? 'text-success' : ($userGrowth < 0 ? 'text-danger' : 'text-secondary') }}" 
-                                          style="font-size: 0.65rem; font-weight: 600;"
+                                          style="font-size: 0.6rem; font-weight: 600; padding: 0.2rem 0.4rem;"
                                           data-bs-toggle="tooltip" 
                                           data-bs-placement="top" 
                                           title="Người dùng mới trong tháng này">
@@ -169,30 +169,30 @@
                 <a href="{{ route('admin.products.list') }}" class="text-decoration-none kpi-card-link">
                     <div class="card h-100 shadow-sm border-0 kpi-card-premium kpi-products"
                          style="border-radius: 20px; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); position: relative; overflow: hidden;">
-                        <div class="card-body text-white d-flex flex-column justify-content-between p-4" style="min-height: 180px;">
+                        <div class="card-body text-white d-flex flex-column justify-content-between p-4 kpi-card-body-responsive">
                             {{-- Header với Icon Neon --}}
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                    <p class="text-white small mb-1" style="font-size: 0.75rem; opacity: 0.95;">
+                                    <p class="text-white small mb-0" style="font-size: 0.65rem; opacity: 0.95; line-height: 1.2;">
                                         Sản phẩm
                                     </p>
                                 </div>
                                 <div class="kpi-icon-neon kpi-icon-products">
-                                    <i class="bi bi-box-seam" style="font-size: 1.5rem;"></i>
+                                    <i class="bi bi-box-seam" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
                             
                             {{-- Main Value --}}
                             <div class="mb-2">
-                                <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 2rem; line-height: 1.2;">
+                                <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 1.5rem; line-height: 1.2;">
                                     {{ number_format($totalProducts) }}
                                 </h2>
                             </div>
                             
                             {{-- Sub Info với Badge Xanh --}}
-                            <div class="d-flex flex-column gap-1" style="font-size: 0.7rem;">
+                            <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge bg-white text-info" style="font-size: 0.65rem; font-weight: 600;">
+                                    <span class="badge bg-white text-info" style="font-size: 0.6rem; font-weight: 600; padding: 0.2rem 0.4rem;">
                                         Bán 30 ngày qua
                                     </span>
                                     <strong class="text-white">{{ number_format($soldProductsLast30Days) }} sản phẩm</strong>
@@ -223,42 +223,42 @@
                 <a href="{{ route('admin.orders.analytics') }}" class="text-decoration-none kpi-card-link">
                     <div class="card h-100 shadow-sm border-0 kpi-card-premium kpi-completion"
                          style="border-radius: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); position: relative; overflow: hidden;">
-                        <div class="card-body text-white d-flex flex-column justify-content-between p-4" style="min-height: 180px;">
+                        <div class="card-body text-white d-flex flex-column justify-content-between p-4 kpi-card-body-responsive">
                             {{-- Header với Icon Check trong Circle --}}
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                    <p class="text-white small mb-1" style="font-size: 0.75rem; opacity: 0.95;">
+                                    <p class="text-white small mb-0" style="font-size: 0.65rem; opacity: 0.95; line-height: 1.2;">
                                         Tỷ lệ hoàn thành đơn
                                     </p>
                             </div>
                                 <div class="kpi-icon-check-circle kpi-icon-completion">
-                                    <i class="bi bi-check-circle-fill" style="font-size: 1.5rem;"></i>
+                                    <i class="bi bi-check-circle-fill" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
                             
                             {{-- Main Value với Progress Donut Mini --}}
-                            <div class="d-flex align-items-center gap-3 mb-2">
-                                <div class="kpi-donut-mini" style="width: 60px; height: 60px; position: relative;">
-                                    <svg width="60" height="60" style="transform: rotate(-90deg);">
-                                        <circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="6"></circle>
-                                        <circle cx="30" cy="30" r="25" fill="none" stroke="#fff" stroke-width="6" 
-                                                stroke-dasharray="{{ 2 * 3.14159 * 25 }}" 
-                                                stroke-dashoffset="{{ 2 * 3.14159 * 25 * (1 - $completeRate / 100) }}"
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="kpi-donut-mini" style="width: 45px; height: 45px; position: relative;">
+                                    <svg width="45" height="45" style="transform: rotate(-90deg);">
+                                        <circle cx="22.5" cy="22.5" r="18" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="4"></circle>
+                                        <circle cx="22.5" cy="22.5" r="18" fill="none" stroke="#fff" stroke-width="4" 
+                                                stroke-dasharray="{{ 2 * 3.14159 * 18 }}" 
+                                                stroke-dashoffset="{{ 2 * 3.14159 * 18 * (1 - $completeRate / 100) }}"
                                                 style="transition: stroke-dashoffset 0.5s ease;"></circle>
                                     </svg>
-                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.7rem; font-weight: bold; color: #fff;">
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.6rem; font-weight: bold; color: #fff;">
                                         {{ $completeRate }}%
                                     </div>
                                 </div>
                                 <div>
-                                    <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 2rem; line-height: 1.2;">
+                                    <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 1.5rem; line-height: 1.2;">
                                         {{ $completeRate }}%
                                     </h2>
                                 </div>
                             </div>
                             
                             {{-- Sub Info --}}
-                            <div class="d-flex flex-column gap-1" style="font-size: 0.7rem;">
+                            <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-white" style="opacity: 0.9;">Hoàn thành:</span>
                                     <strong class="text-white">{{ $completed }} đơn</strong>
@@ -282,7 +282,7 @@
                 <h5 class="text-white fw-bold mb-4" style="font-size: 1.1rem;">Thao tác nhanh</h5>
                 <div class="row g-3">
                     {{-- 1. Tạo sản phẩm --}}
-                    <div class="col-6 col-md-4 col-lg-2">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                         <a href="{{ route('admin.products.create') }}" 
                            class="quick-action-card text-decoration-none"
                            data-bs-toggle="tooltip" 
@@ -297,7 +297,7 @@
                     </div>
 
                     {{-- 2. Tạo danh mục --}}
-                    <div class="col-6 col-md-4 col-lg-2">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                         <a href="{{ route('admin.categories.create') }}" 
                            class="quick-action-card text-decoration-none"
                            data-bs-toggle="tooltip" 
@@ -312,7 +312,7 @@
                     </div>
 
                     {{-- 3. Thêm người dùng --}}
-                    <div class="col-6 col-md-4 col-lg-2">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                         <a href="{{ route('admin.account.users.create') }}" 
                            class="quick-action-card text-decoration-none"
                            data-bs-toggle="tooltip" 
@@ -327,7 +327,7 @@
                     </div>
 
                     {{-- 4. Quản lý bình luận --}}
-                    <div class="col-6 col-md-4 col-lg-2">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                         <a href="{{ route('admin.comments.index') }}" 
                            class="quick-action-card text-decoration-none"
                            data-bs-toggle="tooltip" 
@@ -342,7 +342,7 @@
                     </div>
 
                     {{-- 5. Quản lý voucher --}}
-                    <div class="col-6 col-md-4 col-lg-2">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                         <a href="{{ route('admin.promotions.list') }}" 
                            class="quick-action-card text-decoration-none"
                            data-bs-toggle="tooltip" 
@@ -357,7 +357,7 @@
                     </div>
 
                     {{-- 6. Quản lý ví --}}
-                    <div class="col-6 col-md-4 col-lg-2">
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                         <a href="{{ route('admin.wallet.index') }}" 
                            class="quick-action-card text-decoration-none"
                            data-bs-toggle="tooltip" 
@@ -379,18 +379,18 @@
     <section class="mb-4">
         <div class="row g-3">
             {{-- Combined Chart: Doanh thu & Đơn hàng theo thời gian --}}
-            <div class="col-lg-8">
+            <div class="col-12 col-lg-8">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-white">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
                         <div>
                                 <h6 class="fw-semibold mb-0">Doanh thu & Đơn hàng theo thời gian</h6>
                                 <small class="text-muted">Biểu đồ kết hợp doanh thu (line) và số lượng đơn hàng (bar)</small>
-                            </div>
                         </div>
-                        <div class="d-flex flex-wrap align-items-center gap-2">
+                        </div>
+                        <div class="d-flex flex-wrap align-items-center gap-2 revenue-orders-filters">
                             {{-- Date Range Picker --}}
-                            <div class="btn-group btn-group-sm" role="group" aria-label="Date range">
+                            <div class="btn-group btn-group-sm revenue-orders-btn-group" role="group" aria-label="Date range">
                                 <button type="button" class="btn btn-outline-primary" data-range="today">Hôm nay</button>
                                 <button type="button" class="btn btn-outline-primary" data-range="7">7 ngày</button>
                                 <button type="button" class="btn btn-outline-primary active" data-range="30">30 ngày</button>
@@ -401,17 +401,17 @@
                             {{-- Granularity Dropdown --}}
                             <div class="d-flex align-items-center gap-2">
                                 <label for="revenueOrdersGroupBy" class="small text-muted mb-0">Step:</label>
-                                <select id="revenueOrdersGroupBy" class="form-select form-select-sm" style="width: auto; min-width: 100px;">
+                                <select id="revenueOrdersGroupBy" class="form-select form-select-sm revenue-orders-select">
                                     <option value="day" selected>Ngày</option>
                                     <option value="week">Tuần</option>
                                     <option value="month">Tháng</option>
                                 </select>
                             </div>
                             {{-- Custom Date Range --}}
-                            <div class="d-flex align-items-center gap-1 revenue-orders-custom-range" style="display:none; visibility: hidden;">
-                                <input type="date" id="revenueOrdersFrom" class="form-control form-control-sm" placeholder="Từ ngày" style="width: auto;">
-                                <span class="small text-muted">→</span>
-                                <input type="date" id="revenueOrdersTo" class="form-control form-control-sm" placeholder="Đến ngày" style="width: auto;">
+                            <div class="d-flex align-items-center gap-1 revenue-orders-custom-range custom-date-range-picker" style="display:none; visibility: hidden;">
+                                <input type="date" id="revenueOrdersFrom" class="form-control form-control-sm custom-date-input" placeholder="Từ ngày">
+                                <span class="small text-muted custom-date-separator">→</span>
+                                <input type="date" id="revenueOrdersTo" class="form-control form-control-sm custom-date-input" placeholder="Đến ngày">
                                 <button type="button" class="btn btn-sm btn-primary" id="revenueOrdersApply">
                                     Áp dụng
                                 </button>
@@ -419,7 +419,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div id="revenueOrdersChart" style="min-height: 380px;"></div>
+                        <div id="revenueOrdersChart" class="chart-responsive"></div>
                     </div>
                     {{-- Footer Summary --}}
                     <div class="card-footer bg-white border-top">
@@ -458,7 +458,7 @@
             </div>
 
             {{-- Cột phải: Trạng thái đơn hàng + Top 5 sản phẩm bán chạy --}}
-            <div class="col-lg-4">
+            <div class="col-12 col-lg-4">
                 {{-- Tỷ lệ trạng thái đơn hàng --}}
                 <div class="card shadow-sm mb-3">
                     <div class="card-header bg-white">
@@ -467,7 +467,7 @@
                             <h6 class="fw-semibold mb-0">Tỷ lệ trạng thái đơn hàng</h6>
                                 <small class="text-muted" id="orderStatusDateRange">(30 ngày gần nhất)</small>
                             </div>
-                            <div class="btn-group btn-group-sm" role="group" aria-label="Status date range">
+                            <div class="btn-group btn-group-sm order-status-btn-group" role="group" aria-label="Status date range">
                                 <button type="button" class="btn btn-outline-secondary btn-sm" data-status-range="today">Hôm nay</button>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" data-status-range="7">7 ngày</button>
                                 <button type="button" class="btn btn-outline-secondary btn-sm active" data-status-range="30">30 ngày</button>
@@ -525,11 +525,11 @@
                             <h6 class="fw-semibold mb-0">Thống kê tồn kho</h6>
                             <div class="d-flex gap-2 align-items-center">
                                 {{-- Search --}}
-                                <div class="input-group input-group-sm" style="width: 200px;">
+                                <div class="input-group input-group-sm table-search-input">
                                     <input type="text" class="form-control" id="inventorySearch" placeholder="Tìm kiếm sản phẩm...">
                                 </div>
                                 {{-- Filter trạng thái tồn kho --}}
-                                <select class="form-select form-select-sm" id="inventoryStatusFilter" style="width: auto;">
+                                <select class="form-select form-select-sm table-filter-select" id="inventoryStatusFilter">
                                     <option value="">Tất cả</option>
                                     <option value="in_stock">🟢 Còn hàng</option>
                                     <option value="low">🟡 Sắp hết</option>
@@ -588,8 +588,8 @@
         <div class="row g-3">
             {{-- Card A: Biểu đồ Doanh thu theo Danh mục --}}
             <div class="col-12 col-lg-6">
-                <div class="card shadow-sm category-revenue-card" style="height: 420px; border-radius: 16px;">
-                    <div class="card-header bg-white" style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">
+                <div class="card shadow-sm category-revenue-card category-revenue-card-responsive" style="border-radius: 16px;">
+                    <div class="card-header bg-white card-header-responsive" style="border-bottom: 1px solid #e5e7eb;">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <h6 class="fw-semibold mb-0">Doanh thu theo danh mục</h6>
                             <div class="btn-group btn-group-sm" role="group" aria-label="Category date range">
@@ -600,15 +600,15 @@
                             </div>
                         </div>
                         {{-- Custom date range picker (ẩn mặc định) --}}
-                        <div id="categoryDateRangePicker" class="mt-3" style="display: none;">
-                            <div class="d-flex gap-2 align-items-end">
+                        <div id="categoryDateRangePicker" class="mt-3 custom-date-range-picker" style="display: none;">
+                            <div class="d-flex gap-2 align-items-end custom-date-range-wrapper">
                                 <div class="flex-grow-1">
                                     <label class="form-label small mb-1">Từ ngày</label>
-                                    <input type="date" class="form-control form-control-sm" id="categoryDateFrom">
+                                    <input type="date" class="form-control form-control-sm custom-date-input" id="categoryDateFrom">
                                 </div>
                                 <div class="flex-grow-1">
                                     <label class="form-label small mb-1">Đến ngày</label>
-                                    <input type="date" class="form-control form-control-sm" id="categoryDateTo">
+                                    <input type="date" class="form-control form-control-sm custom-date-input" id="categoryDateTo">
                                 </div>
                                 <button type="button" class="btn btn-primary btn-sm" id="categoryDateRangeApply">Áp dụng</button>
                             </div>
@@ -646,8 +646,8 @@
 
             {{-- Card B: Bảng Top người dùng mua nhiều nhất --}}
             <div class="col-12 col-lg-6">
-                <div class="card shadow-sm top-customers-card" style="height: 420px; border-radius: 16px;">
-                    <div class="card-header bg-white" style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">
+                <div class="card shadow-sm top-customers-card top-customers-card-responsive" style="border-radius: 16px;">
+                    <div class="card-header bg-white card-header-responsive" style="border-bottom: 1px solid #e5e7eb;">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <h6 class="fw-semibold mb-0">Top khách hàng mua nhiều nhất</h6>
                             <div class="btn-group btn-group-sm" role="group" aria-label="Customers date range">
@@ -658,15 +658,15 @@
                             </div>
                         </div>
                         {{-- Custom date range picker (ẩn mặc định) --}}
-                        <div id="customersDateRangePicker" class="mt-3" style="display: none;">
-                            <div class="d-flex gap-2 align-items-end">
+                        <div id="customersDateRangePicker" class="mt-3 custom-date-range-picker" style="display: none;">
+                            <div class="d-flex gap-2 align-items-end custom-date-range-wrapper">
                                 <div class="flex-grow-1">
                                     <label class="form-label small mb-1">Từ ngày</label>
-                                    <input type="date" class="form-control form-control-sm" id="customersDateFrom">
+                                    <input type="date" class="form-control form-control-sm custom-date-input" id="customersDateFrom">
                                 </div>
                                 <div class="flex-grow-1">
                                     <label class="form-label small mb-1">Đến ngày</label>
-                                    <input type="date" class="form-control form-control-sm" id="customersDateTo">
+                                    <input type="date" class="form-control form-control-sm custom-date-input" id="customersDateTo">
                                 </div>
                                 <button type="button" class="btn btn-primary btn-sm" id="customersDateRangeApply">Áp dụng</button>
                             </div>
@@ -714,7 +714,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm" style="border-radius: 16px;">
-                    <div class="card-header bg-white" style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">
+                    <div class="card-header bg-white card-header-responsive" style="border-bottom: 1px solid #e5e7eb;">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                             <h6 class="fw-semibold mb-0">Top sản phẩm bán chạy</h6>
                             <div class="d-flex gap-2 align-items-center">
@@ -726,10 +726,10 @@
                                     <button type="button" class="btn btn-outline-primary" id="topProductsCustomRangeBtn">Tùy chọn</button>
                                 </div>
                                 {{-- Custom Date Range (ẩn mặc định) --}}
-                                <div id="topProductsDateRangeGroup" class="d-none d-flex align-items-center gap-2">
-                                    <input type="date" class="form-control form-control-sm" id="topProductsDateFrom" style="width: 150px;">
-                                    <span class="text-muted">đến</span>
-                                    <input type="date" class="form-control form-control-sm" id="topProductsDateTo" style="width: 150px;">
+                                <div id="topProductsDateRangeGroup" class="d-none d-flex align-items-center gap-2 custom-date-range-picker">
+                                    <input type="date" class="form-control form-control-sm custom-date-input" id="topProductsDateFrom">
+                                    <span class="text-muted custom-date-separator">đến</span>
+                                    <input type="date" class="form-control form-control-sm custom-date-input" id="topProductsDateTo">
                                     <button type="button" class="btn btn-sm btn-primary" id="topProductsDateRangeApply">Áp dụng</button>
                                 </div>
                             </div>
@@ -737,25 +737,25 @@
                     </div>
                     <div class="card-body p-0">
                         {{-- Bảng dữ liệu --}}
-                        <div class="top-products-table-wrapper" style="overflow-x: auto;">
-                            <table class="table table-sm table-hover mb-0" id="topProductsTable">
+                        <div class="top-products-table-wrapper">
+                            <table class="table table-sm table-hover mb-0 top-products-table-compact" id="topProductsTable">
                                 <thead style="position: sticky; top: 0; background: white; z-index: 10;">
                                     <tr>
-                                        <th rowspan="2" style="min-width: 80px; vertical-align: middle;">Hình ảnh</th>
-                                        <th rowspan="2" style="min-width: 200px; vertical-align: middle;">Tên sản phẩm & danh mục</th>
-                                        <th colspan="2" class="text-center" style="min-width: 200px;">Số lượng</th>
-                                        <th colspan="2" class="text-end" style="min-width: 240px;">Doanh thu</th>
-                                        <th colspan="2" class="text-center" style="min-width: 300px;">Tỷ lệ đóng góp</th>
-                                        <th rowspan="2" class="text-center" style="min-width: 100px; vertical-align: middle;">Tỷ lệ chuyển đổi</th>
-                                        <th rowspan="2" class="text-center" style="min-width: 100px; vertical-align: middle;">Tồn kho</th>
+                                        <th rowspan="2" class="top-products-th-image" style="vertical-align: middle;">Hình ảnh</th>
+                                        <th rowspan="2" class="top-products-th-name" style="vertical-align: middle;">Tên sản phẩm & danh mục</th>
+                                        <th colspan="2" class="text-center top-products-th-quantity">Số lượng</th>
+                                        <th colspan="2" class="text-end top-products-th-revenue">Doanh thu</th>
+                                        <th colspan="2" class="text-center top-products-th-contribution">Tỷ lệ đóng góp</th>
+                                        <th rowspan="2" class="text-center top-products-th-conversion" style="vertical-align: middle;">Tỷ lệ chuyển đổi</th>
+                                        <th rowspan="2" class="text-center top-products-th-stock" style="vertical-align: middle;">Tồn kho</th>
                                     </tr>
                                     <tr>
-                                        <th class="text-center" style="min-width: 100px; font-weight: 500; color: #6b7280;">Dự tính</th>
-                                        <th class="text-center" style="min-width: 100px; font-weight: 500; color: #6b7280;">Thực tế</th>
-                                        <th class="text-end" style="min-width: 120px; font-weight: 500; color: #6b7280;">Dự tính</th>
-                                        <th class="text-end" style="min-width: 120px; font-weight: 500; color: #6b7280;">Thực tế</th>
-                                        <th class="text-center" style="min-width: 150px; font-weight: 500; color: #6b7280;">Dự tính</th>
-                                        <th class="text-center" style="min-width: 150px; font-weight: 500; color: #6b7280;">Thực tế</th>
+                                        <th class="text-center top-products-th-sub" style="font-weight: 500; color: #6b7280;">Dự tính</th>
+                                        <th class="text-center top-products-th-sub" style="font-weight: 500; color: #6b7280;">Thực tế</th>
+                                        <th class="text-end top-products-th-sub" style="font-weight: 500; color: #6b7280;">Dự tính</th>
+                                        <th class="text-end top-products-th-sub" style="font-weight: 500; color: #6b7280;">Thực tế</th>
+                                        <th class="text-center top-products-th-sub" style="font-weight: 500; color: #6b7280;">Dự tính</th>
+                                        <th class="text-center top-products-th-sub" style="font-weight: 500; color: #6b7280;">Thực tế</th>
                                     </tr>
                                 </thead>
                                 <tbody id="topProductsTableBody">
@@ -794,12 +794,12 @@
             {{-- Card A: Bảng Bình luận (Comments Table) --}}
             <div class="col-12 col-lg-6">
                 <div class="card shadow-sm comments-table-card" style="border-radius: 16px;">
-                    <div class="card-header bg-white" style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">
+                    <div class="card-header bg-white card-header-responsive" style="border-bottom: 1px solid #e5e7eb;">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                             <h6 class="fw-semibold mb-0">Bình luận mới nhất</h6>
                             <div class="d-flex gap-2">
                                 {{-- Filter trạng thái --}}
-                                <select class="form-select form-select-sm" id="commentsStatusFilter" style="width: auto;">
+                                <select class="form-select form-select-sm table-filter-select" id="commentsStatusFilter">
                                     <option value="">Tất cả</option>
                                     <option value="approved">Đã duyệt</option>
                                     <option value="pending">Chờ duyệt</option>
@@ -807,7 +807,7 @@
                                     <option value="hidden">Đã ẩn</option>
                                 </select>
                                 {{-- Tìm kiếm --}}
-                                <div class="input-group input-group-sm" style="width: 200px;">
+                                <div class="input-group input-group-sm table-search-input">
                                     <input type="text" class="form-control" id="commentsSearch" placeholder="Tìm kiếm...">
                                     <button class="btn btn-outline-secondary" type="button" id="commentsSearchBtn">
                                         <i class="bi bi-search"></i>
@@ -822,12 +822,12 @@
                             <table class="table table-sm table-hover mb-0" id="commentsTable">
                                 <thead style="position: sticky; top: 0; background: white; z-index: 10;">
                                     <tr>
-                                        <th style="min-width: 180px; white-space: nowrap;">User</th>
-                                        <th style="min-width: 200px; white-space: nowrap;">Nội dung</th>
-                                        <th style="min-width: 150px; white-space: nowrap;">Sản phẩm</th>
-                                        <th style="min-width: 120px; white-space: nowrap;">Ngày</th>
-                                        <th style="min-width: 100px; white-space: nowrap;">Trạng thái</th>
-                                        <th style="min-width: 120px; white-space: nowrap;">Hành động</th>
+                                        <th style="min-width: 180px; white-space: nowrap;"><i class="bi bi-person me-1"></i>User</th>
+                                        <th style="min-width: 200px; white-space: nowrap;"><i class="bi bi-chat-text me-1"></i>Nội dung</th>
+                                        <th style="min-width: 150px; white-space: nowrap;"><i class="bi bi-box-seam me-1"></i>Sản phẩm</th>
+                                        <th style="min-width: 120px; white-space: nowrap;"><i class="bi bi-clock me-1"></i>Ngày</th>
+                                        <th style="min-width: 100px; white-space: nowrap;"><i class="bi bi-info-circle me-1"></i>Trạng thái</th>
+                                        <th style="min-width: 120px; white-space: nowrap;"><i class="bi bi-gear me-1"></i>Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody id="commentsTableBody">
@@ -858,19 +858,19 @@
             {{-- Card B: Bảng Users (Users Table) --}}
             <div class="col-12 col-lg-6">
                 <div class="card shadow-sm users-table-card" style="border-radius: 16px;">
-                    <div class="card-header bg-white" style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">
+                    <div class="card-header bg-white card-header-responsive" style="border-bottom: 1px solid #e5e7eb;">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                             <h6 class="fw-semibold mb-0">Người dùng mới nhất</h6>
                             <div class="d-flex gap-2">
                                 {{-- Filter trạng thái --}}
-                                <select class="form-select form-select-sm" id="usersStatusFilter" style="width: auto;">
+                                <select class="form-select form-select-sm table-filter-select" id="usersStatusFilter">
                                     <option value="">Tất cả</option>
                                     <option value="active">Hoạt động</option>
                                     <option value="banned">Đã khóa</option>
                                     <option value="unverified">Chưa xác thực</option>
                                 </select>
                                 {{-- Tìm kiếm --}}
-                                <div class="input-group input-group-sm" style="width: 200px;">
+                                <div class="input-group input-group-sm table-search-input">
                                     <input type="text" class="form-control" id="usersSearch" placeholder="Tìm kiếm...">
                                     <button class="btn btn-outline-secondary" type="button" id="usersSearchBtn">
                                         <i class="bi bi-search"></i>
@@ -885,14 +885,14 @@
                             <table class="table table-sm table-hover mb-0" id="usersTable" style="min-width: 100%;">
                                 <thead style="position: sticky; top: 0; background: white; z-index: 10;">
                                     <tr>
-                                        <th style="min-width: 50px;">Avatar</th>
-                                        <th style="min-width: 150px;">Tên</th>
-                                        <th style="min-width: 150px;">Email</th>
-                                        <th class="text-center" style="min-width: 80px;">Số đơn</th>
-                                        <th class="text-end" style="min-width: 120px;">Tổng chi tiêu</th>
-                                        <th style="min-width: 120px;">Ngày tạo</th>
-                                        <th style="min-width: 100px;">Trạng thái</th>
-                                        <th style="min-width: 120px;">Hành động</th>
+                                        <th style="min-width: 50px;"><i class="bi bi-person-circle me-1"></i>Avatar</th>
+                                        <th style="min-width: 150px;"><i class="bi bi-person me-1"></i>Tên</th>
+                                        <th style="min-width: 150px;"><i class="bi bi-envelope me-1"></i>Email</th>
+                                        <th class="text-center" style="min-width: 80px;"><i class="bi bi-cart me-1"></i>Số đơn</th>
+                                        <th class="text-end" style="min-width: 120px;"><i class="bi bi-cash-coin me-1"></i>Tổng chi tiêu</th>
+                                        <th style="min-width: 120px;"><i class="bi bi-calendar me-1"></i>Ngày tạo</th>
+                                        <th style="min-width: 100px;"><i class="bi bi-info-circle me-1"></i>Trạng thái</th>
+                                        <th style="min-width: 120px;"><i class="bi bi-gear me-1"></i>Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody id="usersTableBody">
@@ -923,6 +923,335 @@
     </section>
 
     <style>
+        /* ========== RESPONSIVE FOUNDATION - PROFESSIONAL SYSTEM ========== */
+        
+        /* Root Variables for Responsive Design */
+        :root {
+            --base-font-size: 16px;
+            --scale-factor: 1;
+            --container-padding: clamp(12px, 2vw, 24px);
+            --section-spacing: clamp(1rem, 2vw, 2rem);
+            --card-padding: clamp(12px, 1.5vw, 24px);
+            --border-radius: clamp(12px, 1.5vw, 20px);
+            --kpi-card-min-height: 150px;
+            --chart-min-height: clamp(250px, 40vw, 380px);
+        }
+        
+        /* Fluid Typography System */
+        .kpi-main-value {
+            font-size: clamp(1rem, 2vw + 0.3rem, 1.5rem) !important;
+        }
+        
+        .card-header-responsive h6 {
+            font-size: clamp(0.9rem, 1.2vw + 0.5rem, 1.1rem);
+        }
+        
+        .card-header-responsive small {
+            font-size: clamp(0.7rem, 0.8vw + 0.3rem, 0.875rem);
+        }
+        
+        /* Fluid Spacing */
+        section.mb-4 {
+            margin-bottom: var(--section-spacing) !important;
+        }
+        
+        .card-header-responsive {
+            padding: var(--card-padding) !important;
+        }
+        
+        /* Zoom-Aware Responsive Design */
+        @media (min-resolution: 1.5dppx) {
+            /* High DPI displays */
+            :root {
+                --base-font-size: 15px;
+            }
+        }
+        
+        @media (min-resolution: 2dppx) {
+            /* Retina displays */
+            :root {
+                --base-font-size: 14px;
+            }
+        }
+        
+        /* Container Queries Support (Progressive Enhancement) */
+        /* Note: Container queries are experimental, using media queries as fallback */
+        .kpi-cards-container {
+            /* Future: container-type: inline-size; */
+        }
+        
+        /* Comprehensive Breakpoint System */
+        
+        /* Extra Extra Small (xxs) - < 320px - Very small phones */
+        @media (max-width: 319.98px) {
+            :root {
+                --container-padding: 8px;
+                --section-spacing: 0.75rem;
+                --card-padding: 10px;
+            }
+            
+            .kpi-main-value {
+                font-size: 0.9rem !important;
+            }
+            
+            .kpi-card-premium .card-body {
+                padding: 0.75rem !important;
+                min-height: 130px !important;
+                max-height: 130px !important;
+            }
+            
+            .card-header-responsive {
+                padding: 10px !important;
+            }
+            
+            .btn-group-sm .btn {
+                font-size: 0.55rem;
+                padding: 0.1rem 0.2rem;
+            }
+            
+            #revenueOrdersChart {
+                min-height: 200px !important;
+            }
+        }
+        
+        /* Extra Small (xs) - 320px - 374px - Small phones */
+        @media (min-width: 320px) and (max-width: 374.98px) {
+            :root {
+                --container-padding: 10px;
+                --section-spacing: 0.875rem;
+                --card-padding: 12px;
+            }
+        }
+        
+        /* Small (sm) - 375px - 575px - Phones */
+        @media (min-width: 375px) and (max-width: 575.98px) {
+            :root {
+                --container-padding: 12px;
+                --section-spacing: 1rem;
+                --card-padding: 14px;
+            }
+        }
+        
+        /* Medium (md) - 576px - 767px - Large phones / Small tablets portrait */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            :root {
+                --container-padding: 16px;
+                --section-spacing: 1.25rem;
+                --card-padding: 18px;
+            }
+        }
+        
+        /* Large (lg) - 768px - 991px - Tablets */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            :root {
+                --container-padding: 20px;
+                --section-spacing: 1.5rem;
+                --card-padding: 20px;
+            }
+        }
+        
+        /* Extra Large (xl) - 992px - 1199px - Small desktops */
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            :root {
+                --container-padding: 22px;
+                --section-spacing: 1.75rem;
+                --card-padding: 22px;
+            }
+        }
+        
+        /* Extra Extra Large (xxl) - >= 1200px - Large desktops */
+        @media (min-width: 1200px) {
+            :root {
+                --container-padding: 24px;
+                --section-spacing: 2rem;
+                --card-padding: 24px;
+            }
+        }
+        
+        /* Ultra Wide - >= 1400px - Ultra wide monitors */
+        @media (min-width: 1400px) {
+            :root {
+                --container-padding: 28px;
+                --section-spacing: 2.25rem;
+                --card-padding: 28px;
+            }
+            
+            .container-fluid,
+            main {
+                max-width: 1600px;
+                margin: 0 auto;
+            }
+        }
+        
+        /* Zoom Level Responsive Design */
+        
+        /* Zoom Out Scenarios */
+        @media (min-width: 1400px) {
+            /* Large screens with zoom out */
+            .kpi-card-premium .card-body {
+                min-height: 150px;
+                max-height: 150px;
+            }
+            
+            #revenueOrdersChart {
+                min-height: 420px;
+            }
+        }
+        
+        /* Zoom In Scenarios - Smaller effective viewport */
+        @media (max-width: 991.98px) {
+            /* When zoomed in, ensure content doesn't break */
+            .kpi-card-premium {
+                min-width: 0;
+                flex: 1 1 auto;
+            }
+            
+            .table {
+                font-size: clamp(0.75rem, 1vw + 0.5rem, 0.875rem);
+            }
+        }
+        
+        /* Height-based Media Queries for Landscape */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .category-revenue-card-responsive,
+            .top-customers-card-responsive {
+                height: auto !important;
+                min-height: 280px;
+            }
+            
+            #revenueOrdersChart {
+                min-height: 220px !important;
+            }
+            
+            .comments-table-wrapper,
+            .users-table-wrapper {
+                max-height: 200px;
+                height: 200px;
+            }
+        }
+        
+        @media (max-height: 500px) and (orientation: landscape) {
+            .kpi-card-premium .card-body {
+                min-height: 100px !important;
+                padding: 0.75rem !important;
+            }
+            
+            .card-header-responsive {
+                padding: 10px !important;
+            }
+        }
+        
+        /* Aspect Ratio Based Queries */
+        @media (aspect-ratio: 16/9) {
+            /* Wide screens */
+            .row-cols-xl-5 > * {
+                flex: 0 0 auto;
+                width: 20%;
+            }
+        }
+        
+        @media (aspect-ratio: 4/3) {
+            /* Traditional monitors */
+            .row-cols-lg-4 > * {
+                flex: 0 0 auto;
+                width: 25%;
+            }
+        }
+        
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Touch devices */
+            .btn,
+            .form-control,
+            .form-select,
+            .dropdown-toggle {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .btn-sm {
+                min-height: 36px;
+            }
+            
+            .kpi-card-premium:hover {
+                transform: none;
+            }
+            
+            /* Larger touch targets */
+            .table th,
+            .table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+        
+        /* Mouse Device Optimizations */
+        @media (hover: hover) and (pointer: fine) {
+            /* Mouse devices - enable hover effects */
+            .kpi-card-premium:hover {
+                transform: translateY(-5px) scale(1.02);
+            }
+        }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            .kpi-card-premium {
+                border: 2px solid currentColor;
+            }
+            
+            .btn-outline-primary,
+            .btn-outline-secondary {
+                border-width: 2px;
+            }
+            
+            .table {
+                border: 1px solid;
+            }
+        }
+        
+        /* Dark Mode with Reduced Motion */
+        @media (prefers-color-scheme: dark) and (prefers-reduced-motion: reduce) {
+            body.dark .kpi-card-premium {
+                transition: none;
+            }
+        }
+        
+        /* Print Optimizations */
+        @media print {
+            * {
+                background: white !important;
+                color: black !important;
+                box-shadow: none !important;
+            }
+            
+            .kpi-card-premium {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            .card {
+                border: 1px solid #000;
+            }
+            
+            .btn-group,
+            .dropdown,
+            .table-search-input,
+            .table-filter-select {
+                display: none;
+            }
+        }
+        
         /* Stat Card Styles */
         .stat-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1015,33 +1344,40 @@
             opacity: 1;
         }
 
-        /* Main Value Styling */
+        /* Main Value Styling - Using Fluid Typography */
         .kpi-main-value {
-            font-size: 2rem;
+            font-size: clamp(1rem, 2vw + 0.3rem, 1.5rem);
             line-height: 1.2;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
 
-        @media (max-width: 576px) {
-            .kpi-main-value {
-                font-size: 1.5rem;
-            }
+        /* ========== KPI CARD BODY RESPONSIVE ========== */
+        .kpi-card-body-responsive {
+            min-height: var(--kpi-card-min-height);
+            max-height: var(--kpi-card-min-height);
+            height: var(--kpi-card-min-height);
+            padding: 1rem 1.25rem !important;
+            overflow: hidden;
         }
-
+        
         /* ========== ICON STYLES ========== */
-        /* Icon Glow cho Revenue */
+        /* Icon Glow cho Revenue - Fluid Sizing */
         .kpi-icon-glow {
-            width: 50px;
-            height: 50px;
+            width: clamp(28px, 3vw + 15px, 38px);
+            height: clamp(28px, 3vw + 15px, 38px);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
+        }
+        
+        .kpi-icon-glow i {
+            font-size: clamp(0.9rem, 1.2vw + 0.3rem, 1.3rem) !important;
         }
 
         .kpi-card-premium:hover .kpi-icon-glow {
@@ -1049,18 +1385,22 @@
             transform: scale(1.1);
         }
 
-        /* Icon Circle Glow cho Orders */
+        /* Icon Circle Glow cho Orders - Fluid Sizing */
         .kpi-icon-circle-glow {
-            width: 50px;
-            height: 50px;
+            width: clamp(28px, 3vw + 15px, 38px);
+            height: clamp(28px, 3vw + 15px, 38px);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
+        }
+        
+        .kpi-icon-circle-glow i {
+            font-size: clamp(0.85rem, 1.1vw + 0.3rem, 1.2rem) !important;
         }
 
         .kpi-card-premium:hover .kpi-icon-circle-glow {
@@ -1068,19 +1408,23 @@
             transform: scale(1.1) rotate(5deg);
         }
 
-        /* Icon Animated cho Users */
+        /* Icon Animated cho Users - Fluid Sizing */
         .kpi-icon-animated {
-            width: 50px;
-            height: 50px;
+            width: clamp(28px, 3vw + 15px, 38px);
+            height: clamp(28px, 3vw + 15px, 38px);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
             animation: kpi-icon-pulse 2s ease-in-out infinite;
+        }
+        
+        .kpi-icon-animated i {
+            font-size: clamp(0.85rem, 1.1vw + 0.3rem, 1.2rem) !important;
         }
 
         @keyframes kpi-icon-pulse {
@@ -1098,18 +1442,22 @@
             box-shadow: 0 0 35px rgba(255, 255, 255, 0.6);
         }
 
-        /* Icon Neon cho Products */
+        /* Icon Neon cho Products - Fluid Sizing */
         .kpi-icon-neon {
-            width: 50px;
-            height: 50px;
+            width: clamp(28px, 3vw + 15px, 38px);
+            height: clamp(28px, 3vw + 15px, 38px);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
+        }
+        
+        .kpi-icon-neon i {
+            font-size: clamp(0.85rem, 1.1vw + 0.3rem, 1.2rem) !important;
         }
 
         .kpi-card-premium:hover .kpi-icon-neon {
@@ -1117,18 +1465,22 @@
             transform: scale(1.1);
         }
 
-        /* Icon Check Circle cho Completion */
+        /* Icon Check Circle cho Completion - Fluid Sizing */
         .kpi-icon-check-circle {
-            width: 50px;
-            height: 50px;
+            width: clamp(28px, 3vw + 15px, 38px);
+            height: clamp(28px, 3vw + 15px, 38px);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
+        }
+        
+        .kpi-icon-check-circle i {
+            font-size: clamp(0.85rem, 1.1vw + 0.3rem, 1.2rem) !important;
         }
 
         .kpi-card-premium:hover .kpi-icon-check-circle {
@@ -1905,68 +2257,345 @@
             background: #a8a8a8;
         }
 
-        #topProductsTable {
-            min-width: 100%;
+        /* Top Products Table Compact - Giảm font và kích thước */
+        .top-products-table-compact {
+            width: 100% !important;
+            min-width: 100% !important;
+            font-size: 0.8rem;
         }
-
-        #topProductsTable th,
-        #topProductsTable td {
+        
+        .top-products-table-compact th {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .top-products-table-compact th,
+        .top-products-table-compact td {
             vertical-align: middle;
-            padding: 12px 16px;
+            padding: 10px 12px;
+            white-space: nowrap;
         }
-
+        
+        /* Xử lý text quá dài trong Top Products Table */
+        .top-products-table-compact td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Cột tên sản phẩm - cho phép wrap nhưng có max-width */
+        .top-products-table-compact td:nth-child(2) {
+            white-space: normal;
+            max-width: 200px;
+        }
+        
+        .product-name-top {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        .product-category-top {
+            max-width: 200px;
+        }
+        
+        /* Các cột số - đảm bảo không bị overflow */
+        .top-products-table-compact td:nth-child(n+3) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Row styling với better visual hierarchy */
+        .top-products-table-compact tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        
+        .top-products-table-compact tbody tr:hover {
+            background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
+            transform: translateX(2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .top-products-table-compact tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        body.dark .top-products-table-compact th {
+            background: linear-gradient(135deg, #2b2b2b 0%, #1f1f1f 100%);
+            color: #e9ecef;
+            border-bottom-color: #444;
+        }
+        
+        body.dark .top-products-table-compact tbody tr {
+            border-bottom-color: #333;
+        }
+        
+        body.dark .top-products-table-compact tbody tr:hover {
+            background: linear-gradient(90deg, #2b2b2b 0%, #1f1f1f 100%);
+        }
+        
+        /* Giảm min-width cho các cột */
+        .top-products-th-image {
+            min-width: 90px !important;
+            width: 90px;
+        }
+        
+        .top-products-th-name {
+            min-width: 150px !important;
+            max-width: 200px;
+        }
+        
+        .top-products-th-quantity {
+            min-width: 140px !important;
+        }
+        
+        .top-products-th-revenue {
+            min-width: 160px !important;
+        }
+        
+        .top-products-th-contribution {
+            min-width: 180px !important;
+        }
+        
+        .top-products-th-conversion {
+            min-width: 80px !important;
+        }
+        
+        .top-products-th-stock {
+            min-width: 70px !important;
+        }
+        
+        .top-products-th-sub {
+            min-width: 70px !important;
+        }
+        
+        /* Ranking Badge */
+        .product-rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.75rem;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        
+        .product-rank-badge.rank-1 {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #92400e;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+        
+        .product-rank-badge.rank-2 {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            color: #374151;
+            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
+        }
+        
+        .product-rank-badge.rank-3 {
+            background: linear-gradient(135deg, #cd7f32 0%, #e6a057 100%);
+            color: #78350f;
+            box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+        }
+        
+        .product-rank-badge.rank-other {
+            background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
+            color: #6b7280;
+        }
+        
+        /* Product Image với better styling */
         .product-thumbnail-top {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             object-fit: cover;
             border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
+        
         .product-thumbnail-top:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
-
+        
+        /* Product Name với better typography */
         .product-name-top {
             font-weight: 600;
             color: #1f2937;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin-bottom: 4px;
         }
-
+        
         .product-name-top:hover {
             color: #3b82f6;
+            text-decoration: underline;
         }
-
+        
         .product-category-top {
-            font-size: 0.875rem;
+            font-size: 0.7rem;
             color: #6b7280;
-            margin-top: 4px;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .product-category-top::before {
+            content: "📁";
+            font-size: 0.65rem;
+        }
+        
+        /* Product Info Container */
+        .product-info-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .product-info-text {
+            flex: 1;
+            min-width: 0;
         }
 
 
+        /* Stock Badge với better styling */
         .stock-badge {
-            display: inline-block;
-            padding: 4px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
 
         .stock-badge.high {
-            background-color: #d1fae5;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
             color: #065f46;
+            border: 1px solid #10b981;
         }
 
         .stock-badge.medium {
-            background-color: #fef3c7;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             color: #92400e;
+            border: 1px solid #f59e0b;
         }
 
         .stock-badge.low {
-            background-color: #fee2e2;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
             color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        /* Conversion Badge */
+        .conversion-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .conversion-badge.high {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        
+        .conversion-badge.medium {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .conversion-badge.low {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        /* Progress Bar cho Tỷ lệ đóng góp */
+        .contribution-progress {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 80px;
+        }
+        
+        .contribution-progress-bar-wrapper {
+            flex: 1;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .contribution-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .contribution-progress-bar.estimated {
+            background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+        }
+        
+        .contribution-progress-bar.completed {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+        }
+        
+        .contribution-progress-text {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #495057;
+            min-width: 35px;
+            text-align: right;
+        }
+        
+        /* Revenue với better styling */
+        .revenue-value {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #059669;
+        }
+        
+        .revenue-value.estimated {
+            color: #2563eb;
+        }
+        
+        /* Quantity với icons */
+        .quantity-value {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .quantity-value::before {
+            content: "📦";
+            font-size: 0.7rem;
         }
 
         body.dark .product-name-top {
@@ -1979,6 +2608,79 @@
 
         body.dark .product-category-top {
             color: #9ca3af;
+        }
+        
+        body.dark .top-products-table-compact tbody tr:hover {
+            background: linear-gradient(90deg, #2b2b2b 0%, #1f1f1f 100%);
+        }
+        
+        body.dark .revenue-value {
+            color: #34d399;
+        }
+        
+        body.dark .revenue-value.estimated {
+            color: #60a5fa;
+        }
+        
+        body.dark .contribution-progress-bar-wrapper {
+            background: #374151;
+        }
+        
+        body.dark .contribution-progress-text {
+            color: #d1d5db;
+        }
+        
+        body.dark .quantity-value {
+            color: #e9ecef;
+        }
+        
+        /* Responsive adjustments cho ranking badge */
+        @media (max-width: 1199.98px) {
+            .product-rank-badge {
+                width: 24px;
+                height: 24px;
+                font-size: 0.7rem;
+                margin-right: 6px;
+            }
+            
+            .product-thumbnail-top {
+                width: 45px;
+                height: 45px;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .product-rank-badge {
+                width: 22px;
+                height: 22px;
+                font-size: 0.65rem;
+                margin-right: 4px;
+            }
+            
+            .product-thumbnail-top {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .contribution-progress {
+                min-width: 60px;
+            }
+            
+            .contribution-progress-text {
+                min-width: 30px;
+                font-size: 0.7rem;
+            }
+        }
+        
+        /* Animation cho progress bars */
+        @keyframes progressBarAnimation {
+            from {
+                width: 0;
+            }
+        }
+        
+        .contribution-progress-bar {
+            animation: progressBarAnimation 0.8s ease-out;
         }
 
         /* Inventory Table Styles */
@@ -2267,57 +2969,45 @@
             min-width: 900px; /* Tổng min-width của các cột */
         }
 
+        /* ========== XỬ LÝ TEXT QUÁ DÀI TRONG CÁC BẢNG ========== */
+        
+        /* Comments & Users Tables - Xử lý text overflow */
         #commentsTable th,
         #commentsTable td,
         #usersTable th,
         #usersTable td {
             white-space: nowrap;
         }
-
-        /* Cho phép wrap một số cột dài */
-        #commentsTable td:nth-child(2), /* Nội dung */
-        #commentsTable td:nth-child(3) { /* Sản phẩm */
+        
+        /* Comments Table - Cột User (cột 1) */
+        #commentsTable td:nth-child(1) {
+            max-width: 180px;
+            min-width: 180px;
+        }
+        
+        .comment-user-name {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        .comment-user-email {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        /* Comments Table - Cột Nội dung (cột 2) */
+        #commentsTable td:nth-child(2) {
+            max-width: 200px;
+            min-width: 200px;
             white-space: normal;
-            word-wrap: break-word;
         }
-
-        .comment-row,
-        .user-row {
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .comment-row:hover,
-        .user-row:hover {
-            background-color: #f8f9fa !important;
-        }
-
-        body.dark .comment-row:hover,
-        body.dark .user-row:hover {
-            background-color: #2b2b2b !important;
-        }
-
-        .comment-avatar,
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            font-size: 14px;
-        }
-
+        
         .comment-content-preview {
             max-width: 200px;
             overflow: hidden;
@@ -2325,22 +3015,602 @@
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            cursor: pointer;
+            word-wrap: break-word;
         }
-
-        .product-thumbnail {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 4px;
+        
+        /* Comments Table - Cột Sản phẩm (cột 3) */
+        #commentsTable td:nth-child(3) {
+            max-width: 150px;
+            min-width: 150px;
         }
-
+        
+        .product-name-comment {
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        /* Users Table - Cột Tên (cột 2) */
+        #usersTable td:nth-child(2) {
+            max-width: 150px;
+            min-width: 150px;
+        }
+        
+        .user-name {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        /* Users Table - Cột Email (cột 3) */
+        #usersTable td:nth-child(3) {
+            max-width: 150px;
+            min-width: 150px;
+        }
+        
+        .user-email {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        /* Top Products Table - Xử lý tên sản phẩm */
+        .top-products-th-name {
+            max-width: 200px;
+        }
+        
+        .product-name-top {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        /* Top Customers Table - Xử lý tên khách hàng */
+        #topCustomersTable td:nth-child(1) {
+            max-width: 200px;
+            min-width: 200px;
+        }
+        
+        .customer-name,
+        .customer-email {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        .customer-info-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        
+        .customer-info-text {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        /* Inventory Table - Đã có xử lý, nhưng cải thiện thêm */
+        #inventoryTable td:first-child {
+            max-width: 300px;
+            min-width: 300px;
+        }
+        
+        #inventoryTable td:first-child .fw-bold {
+            max-width: 280px;
+        }
+        
+        /* Revenue values - Xử lý số quá dài */
+        .revenue-value {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        
+        /* Quantity values */
+        .quantity-value {
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        
+        /* Status badges - Đảm bảo không bị overflow */
         .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Product category - Xử lý text dài */
+        .product-category-top {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        /* SKU trong Inventory */
+        #inventoryTable td:first-child .small {
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        /* Top Customers - Revenue và Percent */
+        #topCustomersTable td:nth-child(3) {
+            max-width: 120px;
+        }
+        
+        #topCustomersTable td:nth-child(4) {
+            max-width: 80px;
+        }
+        
+        /* Đảm bảo tất cả các ô có tooltip khi text bị truncate */
+        [title] {
+            cursor: help;
+        }
+        
+        /* Responsive cho Top Customers */
+        @media (max-width: 767.98px) {
+            #topCustomersTable td:nth-child(1) {
+                max-width: 150px;
+                min-width: 150px;
+            }
+            
+            .customer-name,
+            .customer-email {
+                max-width: 100px;
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            #topCustomersTable td:nth-child(1) {
+                max-width: 120px;
+                min-width: 120px;
+            }
+            
+            .customer-name,
+            .customer-email {
+                max-width: 80px;
+            }
+        }
+
+        /* Action Button Styling */
+        .table-action-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .table-action-btn:hover {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            transform: scale(1.05);
+        }
+        
+        /* Dark mode adjustments */
+        body.dark .user-name,
+        body.dark .comment-user-name {
+            color: #f3f4f6;
+        }
+        
+        body.dark .user-email,
+        body.dark .comment-user-email {
+            color: #9ca3af;
+        }
+        
+        body.dark .comment-content-preview {
+            color: #d1d5db;
+        }
+        
+        body.dark .comment-content-preview:hover {
+            color: #60a5fa;
+        }
+        
+        body.dark .product-name-comment {
+            color: #e9ecef;
+        }
+        
+        body.dark .product-name-comment:hover {
+            color: #60a5fa;
+        }
+        
+        body.dark .table-action-btn:hover {
+            background-color: #2b2b2b;
+            border-color: #444;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .comment-avatar,
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+            
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+            
+            /* Giảm max-width cho mobile */
+            #commentsTable td:nth-child(1) {
+                max-width: 120px;
+                min-width: 120px;
+            }
+            
+            .comment-user-name,
+            .comment-user-email {
+                max-width: 80px;
+            }
+            
+            #commentsTable td:nth-child(2) {
+                max-width: 150px;
+                min-width: 150px;
+            }
+            
+            .comment-content-preview {
+                max-width: 150px;
+                font-size: 0.75rem;
+            }
+            
+            #commentsTable td:nth-child(3) {
+                max-width: 120px;
+                min-width: 120px;
+            }
+            
+            .product-name-comment {
+                max-width: 80px;
+            }
+            
+            #usersTable td:nth-child(2) {
+                max-width: 120px;
+                min-width: 120px;
+            }
+            
+            .user-name {
+                max-width: 120px;
+            }
+            
+            #usersTable td:nth-child(3) {
+                max-width: 120px;
+                min-width: 120px;
+            }
+            
+            .user-email {
+                max-width: 120px;
+            }
+            
+            .product-thumbnail {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .status-badge {
+                font-size: 0.65rem;
+                padding: 4px 8px;
+                max-width: 80px;
+            }
+            
+            .revenue-value {
+                max-width: 90px;
+                font-size: 0.75rem;
+            }
+            
+            .quantity-value {
+                max-width: 70px;
+                font-size: 0.75rem;
+            }
+        }
+        
+        /* Small Mobile */
+        @media (max-width: 575.98px) {
+            .comment-user-name,
+            .comment-user-email {
+                max-width: 60px;
+            }
+            
+            .comment-content-preview {
+                max-width: 120px;
+            }
+            
+            .product-name-comment {
+                max-width: 60px;
+            }
+            
+            .user-name,
+            .user-email {
+                max-width: 100px;
+            }
+            
+            .revenue-value {
+                max-width: 70px;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* ========== COMMENTS & USERS TABLES UI/UX IMPROVEMENTS ========== */
+        
+        /* Table Headers với better styling */
+        #commentsTable thead th,
+        #usersTable thead th {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #dee2e6;
+            padding: 12px 10px;
+        }
+        
+        #commentsTable thead th i,
+        #usersTable thead th i {
+            color: #6b7280;
+            font-size: 0.7rem;
+        }
+        
+        body.dark #commentsTable thead th,
+        body.dark #usersTable thead th {
+            background: linear-gradient(135deg, #2b2b2b 0%, #1f1f1f 100%);
+            color: #e9ecef;
+            border-bottom-color: #444;
+        }
+        
+        body.dark #commentsTable thead th i,
+        body.dark #usersTable thead th i {
+            color: #9ca3af;
+        }
+        
+        /* Row styling với better visual hierarchy */
+        #commentsTable tbody tr,
+        #usersTable tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        
+        #commentsTable tbody tr:hover,
+        #usersTable tbody tr:hover {
+            background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
+            transform: translateX(2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        body.dark #commentsTable tbody tr:hover,
+        body.dark #usersTable tbody tr:hover {
+            background: linear-gradient(90deg, #2b2b2b 0%, #1f1f1f 100%);
+        }
+        
+        /* Avatar với better styling */
+        .comment-avatar,
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .comment-avatar:hover,
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            font-size: 15px;
+        }
+        
+        /* User Info Container */
+        .user-info-container,
+        .comment-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info-text,
+        .comment-user-text {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .user-name,
+        .comment-user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #1f2937;
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+        
+        .user-email,
+        .comment-user-email {
+            font-size: 0.7rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .user-email::before,
+        .comment-user-email::before {
+            content: "✉";
+            font-size: 0.65rem;
+        }
+
+        /* Comment Content Preview với better styling */
+        .comment-content-preview {
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            cursor: pointer;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #374151;
+            transition: color 0.2s ease;
+        }
+        
+        .comment-content-preview:hover {
+            color: #3b82f6;
+        }
+        
+        /* Product Thumbnail trong Comments */
+        .product-thumbnail {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-thumbnail:hover {
+            transform: scale(1.1);
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Product Info trong Comments */
+        .product-info-comment {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .product-name-comment {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1f2937;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            line-height: 1.3;
+        }
+        
+        .product-name-comment:hover {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+
+        /* Status Badge với icons và better styling */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        
+        .status-badge::before {
+            font-size: 0.65rem;
+        }
+
+        .status-approved {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .status-approved::before {
+            content: "✓";
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .status-pending::before {
+            content: "⏱";
+        }
+
+        .status-rejected {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .status-rejected::before {
+            content: "✗";
+        }
+
+        .status-hidden {
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+            color: #374151;
+            border: 1px solid #9ca3af;
+        }
+        
+        .status-hidden::before {
+            content: "👁";
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .status-active::before {
+            content: "✓";
+        }
+
+        .status-banned {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .status-banned::before {
+            content: "🚫";
+        }
+        
+        .status-unverified {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .status-unverified::before {
+            content: "⚠";
         }
 
         .status-approved {
@@ -2579,6 +3849,1189 @@
 
         body.dark .order-status-count {
             color: #d1d5db;
+        }
+
+        /* ========== RESPONSIVE IMPROVEMENTS - COMPREHENSIVE UI/UX ========== */
+        
+        /* Tablet (768px - 991px) */
+        @media (max-width: 991.98px) {
+            /* KPI Cards - Tablet */
+            .kpi-card-premium .card-body {
+                padding: 1.25rem !important;
+                min-height: 160px !important;
+            }
+            
+            .kpi-main-value {
+                font-size: 1.75rem !important;
+            }
+            
+            .kpi-icon-glow,
+            .kpi-icon-circle-glow,
+            .kpi-icon-animated,
+            .kpi-icon-neon,
+            .kpi-icon-check-circle {
+                width: 45px;
+                height: 45px;
+                font-size: 1.4rem !important;
+            }
+            
+            /* Charts - Tablet */
+            #revenueOrdersChart {
+                min-height: 300px !important;
+            }
+            
+            .chart-container {
+                min-height: 250px !important;
+            }
+            
+            /* Button Groups - Tablet */
+            .btn-group-sm .btn {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            /* Card Headers - Tablet */
+            .card-header h6 {
+                font-size: 1rem;
+            }
+            
+            .card-header small {
+                font-size: 0.75rem;
+            }
+            
+            /* Quick Actions - Tablet */
+            .quick-action-card {
+                padding: 1.25rem 0.75rem;
+            }
+            
+            .quick-action-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 1.6rem;
+            }
+            
+            /* Tables - Tablet */
+            .comments-table-wrapper,
+            .users-table-wrapper {
+                max-height: 320px;
+                height: 320px;
+            }
+            
+            .inventory-table-wrapper {
+                max-height: 280px;
+            }
+        }
+        
+        /* Mobile (576px - 767px) */
+        @media (max-width: 767.98px) {
+            /* Section Spacing - Mobile */
+            section.mb-4 {
+                margin-bottom: 1.5rem !important;
+            }
+            
+            /* Header - Mobile */
+            section.mb-4 h4 {
+                font-size: 1.25rem;
+            }
+            
+            section.mb-4 p {
+                font-size: 0.875rem;
+            }
+            
+            /* KPI Cards - Mobile */
+            .row-cols-2 .col {
+                margin-bottom: 0.75rem;
+            }
+            
+            .kpi-card-premium .card-body {
+                padding: 1rem !important;
+                min-height: 140px !important;
+            }
+            
+            .kpi-main-value {
+                font-size: 1.5rem !important;
+                line-height: 1.1 !important;
+            }
+            
+            .kpi-card-premium .card-body p {
+                font-size: 0.7rem !important;
+            }
+            
+            .kpi-card-premium .card-body .d-flex.flex-column.gap-1 {
+                font-size: 0.65rem !important;
+            }
+            
+            .kpi-icon-glow,
+            .kpi-icon-circle-glow,
+            .kpi-icon-animated,
+            .kpi-icon-neon,
+            .kpi-icon-check-circle {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem !important;
+            }
+            
+            .kpi-donut-mini {
+                width: 45px !important;
+                height: 45px !important;
+            }
+            
+            .kpi-donut-mini svg {
+                width: 45px;
+                height: 45px;
+            }
+            
+            /* Charts - Mobile */
+            .col-lg-8,
+            .col-lg-4 {
+                margin-bottom: 1rem;
+            }
+            
+            #revenueOrdersChart {
+                min-height: 280px !important;
+            }
+            
+            .chart-container {
+                min-height: 220px !important;
+            }
+            
+            /* Card Headers - Mobile */
+            .card-header {
+                padding: 1rem !important;
+            }
+            
+            .card-header h6 {
+                font-size: 0.95rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .card-header small {
+                font-size: 0.7rem;
+                display: block;
+                margin-top: 0.25rem;
+            }
+            
+            /* Button Groups - Mobile */
+            .revenue-orders-btn-group,
+            .order-status-btn-group {
+                flex-wrap: wrap;
+                width: 100%;
+                display: flex;
+                gap: 0.25rem;
+            }
+            
+            .revenue-orders-btn-group .btn,
+            .order-status-btn-group .btn {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.4rem;
+                flex: 1 1 auto;
+                min-width: calc(50% - 0.125rem);
+                border-radius: 0.375rem !important;
+            }
+            
+            .revenue-orders-btn-group .btn:last-child,
+            .order-status-btn-group .btn:last-child {
+                min-width: 100%;
+                margin-top: 0.25rem;
+            }
+            
+            /* Revenue Orders Filters - Mobile */
+            .revenue-orders-filters {
+                flex-direction: column;
+                align-items: stretch !important;
+                width: 100%;
+            }
+            
+            .revenue-orders-filters > * {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .revenue-orders-filters > *:last-child {
+                margin-bottom: 0;
+            }
+            
+            /* Date Range Picker - Mobile */
+            .revenue-orders-custom-range {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+            
+            .revenue-orders-custom-range input,
+            .revenue-orders-custom-range button {
+                width: 100% !important;
+                margin-bottom: 0.5rem;
+            }
+            
+            .revenue-orders-custom-range span {
+                display: none;
+            }
+            
+            /* Form Selects - Mobile */
+            .form-select-sm {
+                width: 100% !important;
+                margin-top: 0.5rem;
+            }
+            
+            /* Quick Actions - Mobile */
+            .quick-action-card {
+                padding: 1rem 0.5rem;
+            }
+            
+            .quick-action-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .quick-action-title {
+                font-size: 0.75rem;
+                margin-bottom: 0.15rem;
+            }
+            
+            .quick-action-subtitle {
+                font-size: 0.6rem;
+            }
+            
+            /* Tables - Mobile */
+            .card-body.p-0 {
+                padding: 0 !important;
+            }
+            
+            .comments-table-wrapper,
+            .users-table-wrapper {
+                max-height: 300px;
+                height: 300px;
+            }
+            
+            .inventory-table-wrapper {
+                max-height: 240px;
+            }
+            
+            /* Table Headers - Mobile */
+            .card-header .d-flex.flex-wrap {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .card-header .d-flex.gap-2 {
+                width: 100%;
+                margin-top: 0.75rem;
+            }
+            
+            .card-header .form-select-sm,
+            .card-header .input-group {
+                width: 100% !important;
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Card Footer - Mobile */
+            .card-footer .row {
+                margin: 0;
+            }
+            
+            .card-footer .col-md-6 {
+                margin-bottom: 0.75rem;
+            }
+            
+            .card-footer .col-md-6:last-child {
+                margin-bottom: 0;
+            }
+            
+            /* Inventory Table - Mobile */
+            .inventory-table-wrapper {
+                font-size: 0.875rem;
+            }
+            
+            .inventory-table-wrapper td {
+                padding: 0.5rem 0.25rem !important;
+            }
+            
+            /* Top Products/Customers - Mobile */
+            .product-thumbnail-top {
+                width: 35px;
+                height: 35px;
+            }
+            
+            /* Order Status Table - Mobile */
+            .order-status-table-wrapper {
+                font-size: 0.8rem;
+            }
+            
+            .order-status-table th,
+            .order-status-table td {
+                padding: 0.5rem 0.25rem !important;
+            }
+        }
+        
+        /* Small Mobile (max-width: 575px) */
+        @media (max-width: 575.98px) {
+            /* KPI Cards - Small Mobile */
+            .kpi-card-premium .card-body {
+                padding: 0.875rem !important;
+                min-height: 130px !important;
+            }
+            
+            .kpi-main-value {
+                font-size: 1.25rem !important;
+            }
+            
+            .kpi-icon-glow,
+            .kpi-icon-circle-glow,
+            .kpi-icon-animated,
+            .kpi-icon-neon,
+            .kpi-icon-check-circle {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem !important;
+            }
+            
+            /* Charts - Small Mobile */
+            #revenueOrdersChart {
+                min-height: 250px !important;
+            }
+            
+            .chart-container {
+                min-height: 200px !important;
+            }
+            
+            /* Button Groups - Small Mobile */
+            .revenue-orders-btn-group .btn,
+            .order-status-btn-group .btn {
+                font-size: 0.65rem;
+                padding: 0.15rem 0.3rem;
+                min-width: calc(33.333% - 0.1rem);
+            }
+            
+            .revenue-orders-btn-group .btn:last-child,
+            .order-status-btn-group .btn:last-child {
+                min-width: 100%;
+            }
+            
+            /* Quick Actions - Small Mobile */
+            .quick-action-card {
+                padding: 0.875rem 0.375rem;
+            }
+            
+            .quick-action-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 1.2rem;
+            }
+            
+            .quick-action-title {
+                font-size: 0.7rem;
+            }
+            
+            .quick-action-subtitle {
+                font-size: 0.55rem;
+            }
+            
+            /* Tables - Small Mobile */
+            .comments-table-wrapper,
+            .users-table-wrapper {
+                max-height: 280px;
+                height: 280px;
+            }
+            
+            .inventory-table-wrapper {
+                max-height: 220px;
+            }
+            
+            /* Card Headers - Small Mobile */
+            .card-header {
+                padding: 0.875rem !important;
+            }
+            
+            .card-header h6 {
+                font-size: 0.9rem;
+            }
+            
+            /* Footer - Small Mobile */
+            .card-footer {
+                padding: 0.75rem !important;
+            }
+            
+            .card-footer small {
+                font-size: 0.7rem;
+            }
+            
+            .card-footer strong {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Extra Small Mobile (max-width: 375px) */
+        @media (max-width: 374.98px) {
+            /* KPI Cards - Extra Small */
+            .kpi-main-value {
+                font-size: 1.1rem !important;
+            }
+            
+            .kpi-card-premium .card-body {
+                padding: 0.75rem !important;
+                min-height: 120px !important;
+            }
+            
+            /* Charts - Extra Small */
+            #revenueOrdersChart {
+                min-height: 220px !important;
+            }
+            
+            /* Button Groups - Extra Small */
+            .btn-group-sm .btn {
+                font-size: 0.6rem;
+                padding: 0.1rem 0.25rem;
+            }
+        }
+        
+        /* Landscape Mobile (max-width: 767px and orientation: landscape) */
+        @media (max-width: 767.98px) and (orientation: landscape) {
+            .kpi-card-premium .card-body {
+                min-height: 120px !important;
+            }
+            
+            #revenueOrdersChart {
+                min-height: 200px !important;
+            }
+            
+            .comments-table-wrapper,
+            .users-table-wrapper {
+                max-height: 200px;
+                height: 200px;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .kpi-card-premium,
+            .quick-action-card,
+            .card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            .btn-group,
+            .dropdown {
+                display: none;
+            }
+        }
+        
+        /* Accessibility Improvements */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            .kpi-card-premium {
+                border: 2px solid currentColor;
+            }
+            
+            .btn-outline-primary,
+            .btn-outline-secondary {
+                border-width: 2px;
+            }
+        }
+        
+        /* Dark Mode Responsive Adjustments */
+        @media (max-width: 767.98px) {
+            body.dark .kpi-card-premium {
+                background: linear-gradient(135deg, #2b2b2b 0%, #1f1f1f 100%);
+            }
+            
+            body.dark .card {
+                background-color: #1f1f1f;
+                border-color: #444;
+            }
+            
+            body.dark .card-header {
+                background-color: #2b2b2b !important;
+                border-bottom-color: #444;
+            }
+        }
+        
+        /* Additional UI/UX Improvements */
+        
+        /* Smooth Transitions */
+        .card,
+        .kpi-card-premium,
+        .quick-action-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Focus States for Accessibility */
+        .btn:focus-visible,
+        .form-select:focus-visible,
+        .form-control:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        
+        /* Loading States */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
+        }
+        
+        /* Better Touch Targets for Mobile */
+        @media (max-width: 767.98px) {
+            .btn,
+            .dropdown-toggle,
+            .form-select,
+            .form-control {
+                min-height: 44px; /* iOS recommended touch target */
+            }
+            
+            .btn-sm {
+                min-height: 36px;
+            }
+        }
+        
+        /* Improved Scrollbar for Better UX */
+        .inventory-table-wrapper::-webkit-scrollbar,
+        .comments-table-wrapper::-webkit-scrollbar,
+        .users-table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .inventory-table-wrapper::-webkit-scrollbar-thumb,
+        .comments-table-wrapper::-webkit-scrollbar-thumb,
+        .users-table-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
+            border-radius: 3px;
+        }
+        
+        .inventory-table-wrapper::-webkit-scrollbar-thumb:hover,
+        .comments-table-wrapper::-webkit-scrollbar-thumb:hover,
+        .users-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
+        }
+        
+        /* Card Shadows - Subtle but Effective */
+        .card {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Better Text Contrast */
+        .text-muted {
+            color: #6b7280 !important;
+        }
+        
+        body.dark .text-muted {
+            color: #9ca3af !important;
+        }
+        
+        /* Improved Badge Styling */
+        .badge {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+        }
+        
+        /* Section Spacing Consistency */
+        section {
+            scroll-margin-top: 80px; /* Account for sticky navbar */
+        }
+        
+        /* Improved Form Controls */
+        .form-select-sm,
+        .form-control-sm {
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .form-select-sm:focus,
+        .form-control-sm:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+        
+        body.dark .form-select-sm,
+        body.dark .form-control-sm {
+            background-color: #1f1f1f;
+            border-color: #444;
+            color: #e9ecef;
+        }
+        
+        body.dark .form-select-sm:focus,
+        body.dark .form-control-sm:focus {
+            border-color: #3b82f6;
+            background-color: #1f1f1f;
+        }
+        
+        /* ========== RESPONSIVE PROFESSIONAL IMPROVEMENTS ========== */
+        
+        /* Card Headers Responsive */
+        .card-header-responsive {
+            padding: 20px 24px;
+        }
+        
+        /* Category Revenue & Top Customers Cards */
+        .category-revenue-card-responsive,
+        .top-customers-card-responsive {
+            height: 420px;
+        }
+        
+        /* Form Selects & Inputs Responsive */
+        .revenue-orders-select {
+            width: auto;
+            min-width: 100px;
+        }
+        
+        .table-filter-select {
+            width: auto;
+            min-width: 120px;
+        }
+        
+        .table-search-input {
+            width: 200px;
+        }
+        
+        /* Responsive Breakpoints - Mobile First Approach */
+        
+        /* Extra Small Devices (phones, < 576px) */
+        @media (max-width: 575.98px) {
+            /* Card Headers */
+            .card-header-responsive {
+                padding: 12px 16px !important;
+            }
+            
+            .card-header-responsive h6 {
+                font-size: 0.95rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            /* Category & Customers Cards */
+            .category-revenue-card-responsive,
+            .top-customers-card-responsive {
+                height: auto !important;
+                min-height: 350px;
+            }
+            
+            /* Form Controls */
+            .revenue-orders-select,
+            .table-filter-select {
+                width: 100% !important;
+                min-width: 100% !important;
+                margin-top: 0.5rem;
+            }
+            
+            .table-search-input {
+                width: 100% !important;
+                margin-top: 0.5rem;
+            }
+            
+            /* Button Groups - Stack vertically */
+            .revenue-orders-btn-group,
+            .order-status-btn-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .revenue-orders-btn-group .btn,
+            .order-status-btn-group .btn {
+                width: 100%;
+                margin-bottom: 0.25rem;
+                border-radius: 0.375rem !important;
+            }
+            
+            .revenue-orders-btn-group .btn:last-child,
+            .order-status-btn-group .btn:last-child {
+                margin-bottom: 0;
+            }
+            
+            /* Charts */
+            #revenueOrdersChart {
+                min-height: 250px !important;
+            }
+            
+            /* Card Footer */
+            .card-footer {
+                padding: 0.75rem !important;
+                font-size: 0.8rem;
+            }
+            
+            .card-footer .row {
+                flex-direction: column;
+            }
+            
+            .card-footer .col-md-6 {
+                margin-bottom: 0.75rem;
+            }
+            
+            .card-footer .col-md-6:last-child {
+                margin-bottom: 0;
+            }
+        }
+        
+        /* ========== CHARTS RESPONSIVE ========== */
+        .chart-responsive {
+            min-height: var(--chart-min-height);
+            width: 100%;
+            position: relative;
+        }
+        
+        /* Chart responsive adjustments for different zoom levels */
+        @media (min-width: 1400px) {
+            .chart-responsive {
+                min-height: 420px;
+            }
+        }
+        
+        @media (max-width: 991.98px) {
+            .chart-responsive {
+                min-height: clamp(250px, 35vw, 320px);
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .chart-responsive {
+                min-height: clamp(220px, 40vw, 280px);
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            .chart-responsive {
+                min-height: clamp(200px, 45vw, 250px);
+            }
+        }
+        
+        /* ========== CUSTOM DATE RANGE PICKERS RESPONSIVE ========== */
+        
+        .custom-date-range-picker {
+            width: 100%;
+        }
+        
+        .custom-date-range-wrapper {
+            flex-wrap: wrap;
+        }
+        
+        .custom-date-input {
+            width: auto;
+            min-width: 140px;
+        }
+        
+        .custom-date-separator {
+            white-space: nowrap;
+        }
+        
+        /* Mobile */
+        @media (max-width: 767.98px) {
+            .custom-date-range-wrapper {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+            
+            .custom-date-range-wrapper > * {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .custom-date-range-wrapper > *:last-child {
+                margin-bottom: 0;
+            }
+            
+            .custom-date-input {
+                width: 100% !important;
+                min-width: 100% !important;
+            }
+            
+            .custom-date-separator {
+                display: none;
+            }
+        }
+        
+        /* Small Mobile */
+        @media (max-width: 575.98px) {
+            .custom-date-range-picker {
+                margin-top: 0.75rem !important;
+            }
+            
+            .custom-date-range-wrapper {
+                gap: 0.5rem;
+            }
+        }
+        
+        /* Small Devices (landscape phones, >= 576px) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .card-header-responsive {
+                padding: 16px 20px;
+            }
+            
+            .category-revenue-card-responsive,
+            .top-customers-card-responsive {
+                height: auto !important;
+                min-height: 380px;
+            }
+            
+            .revenue-orders-select {
+                min-width: 90px;
+            }
+            
+            .table-filter-select {
+                min-width: 110px;
+            }
+            
+            .table-search-input {
+                width: 180px;
+            }
+        }
+        
+        /* Medium Devices (tablets, >= 768px) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .card-header-responsive {
+                padding: 18px 22px;
+            }
+            
+            .category-revenue-card-responsive,
+            .top-customers-card-responsive {
+                height: 400px;
+            }
+            
+            /* KPI Cards - 4 columns on tablet */
+            .row-cols-md-3 > * {
+                flex: 0 0 auto;
+                width: 25%;
+            }
+        }
+        
+        /* Large Devices (desktops, >= 992px) */
+        @media (min-width: 992px) {
+            .category-revenue-card-responsive,
+            .top-customers-card-responsive {
+                height: 420px;
+            }
+        }
+        
+        /* Extra Large Devices (large desktops, >= 1200px) */
+        @media (min-width: 1200px) {
+            /* KPI Cards - 5 columns on xl */
+            .row-cols-xl-5 > * {
+                flex: 0 0 auto;
+                width: 20%;
+            }
+        }
+        
+        /* Landscape Orientation */
+        @media (max-width: 991.98px) and (orientation: landscape) {
+            .category-revenue-card-responsive,
+            .top-customers-card-responsive {
+                height: auto !important;
+                min-height: 300px;
+            }
+            
+            #revenueOrdersChart {
+                min-height: 250px !important;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .card-header-responsive {
+                padding: 12px;
+            }
+            
+            .btn-group,
+            .dropdown,
+            .table-search-input,
+            .table-filter-select {
+                display: none;
+            }
+            
+            .category-revenue-card-responsive,
+            .top-customers-card-responsive {
+                height: auto !important;
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* ========== TABLES RESPONSIVE IMPROVEMENTS ========== */
+        
+        /* Top Products Table */
+        .top-products-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+            width: 100%;
+        }
+        
+        .top-products-table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .top-products-table-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        .top-products-table-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
+            border-radius: 3px;
+        }
+        
+        .top-products-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
+        }
+        
+        /* Đảm bảo bảng vừa với container - không scroll ngang nếu có thể */
+        @media (min-width: 1200px) {
+            .top-products-table-compact {
+                table-layout: auto;
+            }
+            
+            .top-products-th-name {
+                max-width: none;
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1199.98px) {
+            .top-products-table-compact {
+                font-size: 0.75rem;
+            }
+            
+            .top-products-table-compact th,
+            .top-products-table-compact td {
+                padding: 6px 8px;
+            }
+            
+            .product-thumbnail-top {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .top-products-th-image {
+                min-width: 50px !important;
+                width: 50px;
+            }
+            
+            .top-products-th-name {
+                min-width: 120px !important;
+                max-width: 180px;
+            }
+            
+            .top-products-th-quantity {
+                min-width: 120px !important;
+            }
+            
+            .top-products-th-revenue {
+                min-width: 140px !important;
+            }
+            
+            .top-products-th-contribution {
+                min-width: 160px !important;
+            }
+            
+            .top-products-th-conversion {
+                min-width: 70px !important;
+            }
+            
+            .top-products-th-stock {
+                min-width: 60px !important;
+            }
+            
+            .top-products-th-sub {
+                min-width: 60px !important;
+            }
+        }
+        
+        /* Inventory Table */
+        .inventory-table-wrapper {
+            overflow-x: auto;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            max-height: 320px;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        
+        .inventory-table-wrapper::-webkit-scrollbar {
+            height: 8px;
+            width: 0;
+        }
+        
+        .inventory-table-wrapper::-webkit-scrollbar:horizontal {
+            height: 8px;
+        }
+        
+        .inventory-table-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .inventory-table-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
+            border-radius: 4px;
+        }
+        
+        .inventory-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
+        }
+        
+        /* Comments & Users Tables */
+        .comments-table-wrapper,
+        .users-table-wrapper {
+            overflow-x: auto !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+        
+        .comments-table-wrapper::-webkit-scrollbar,
+        .users-table-wrapper::-webkit-scrollbar {
+            height: 8px;
+            width: 0;
+        }
+        
+        .comments-table-wrapper::-webkit-scrollbar:horizontal,
+        .users-table-wrapper::-webkit-scrollbar:horizontal {
+            height: 8px;
+        }
+        
+        .comments-table-wrapper::-webkit-scrollbar-track,
+        .users-table-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .comments-table-wrapper::-webkit-scrollbar-thumb,
+        .users-table-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
+            border-radius: 4px;
+        }
+        
+        .comments-table-wrapper::-webkit-scrollbar-thumb:hover,
+        .users-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
+        }
+        
+        /* Table Responsive - Mobile */
+        @media (max-width: 767.98px) {
+            /* Hide some columns on mobile for better UX */
+            #topProductsTable th:nth-child(5),
+            #topProductsTable td:nth-child(5),
+            #topProductsTable th:nth-child(6),
+            #topProductsTable td:nth-child(6),
+            #topProductsTable th:nth-child(7),
+            #topProductsTable td:nth-child(7),
+            #topProductsTable th:nth-child(8),
+            #topProductsTable td:nth-child(8) {
+                display: none;
+            }
+            
+            /* Adjust table min-widths for mobile */
+            .top-products-table-compact {
+                min-width: 600px;
+                font-size: 0.7rem;
+            }
+            
+            .top-products-table-compact th,
+            .top-products-table-compact td {
+                padding: 5px 6px;
+            }
+            
+            #inventoryTable {
+                min-width: 500px;
+            }
+            
+            #commentsTable {
+                min-width: 700px;
+            }
+            
+            #usersTable {
+                min-width: 800px;
+            }
+            
+            /* Table font sizes */
+            .table {
+                font-size: 0.875rem;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem 0.375rem;
+            }
+            
+            /* Sticky headers */
+            .table thead th {
+                position: sticky;
+                top: 0;
+                background: white;
+                z-index: 10;
+                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+            }
+            
+            body.dark .table thead th {
+                background: #1f1f1f;
+            }
+        }
+        
+        /* Table Responsive - Small Mobile */
+        @media (max-width: 575.98px) {
+            .top-products-table-compact {
+                min-width: 500px;
+                font-size: 0.65rem;
+            }
+            
+            .top-products-table-compact th,
+            .top-products-table-compact td {
+                padding: 4px 5px;
+            }
+            
+            .product-thumbnail-top {
+                width: 35px;
+                height: 35px;
+            }
+            
+            #inventoryTable {
+                min-width: 400px;
+            }
+            
+            #commentsTable {
+                min-width: 600px;
+            }
+            
+            #usersTable {
+                min-width: 700px;
+            }
+            
+            .table {
+                font-size: 0.8rem;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.4rem 0.25rem;
+            }
+        }
+        
+        /* Table Footer Responsive */
+        @media (max-width: 767.98px) {
+            .card-footer .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 0.5rem;
+            }
+            
+            .card-footer .d-flex > * {
+                width: 100%;
+            }
         }
     </style>
 
@@ -3661,11 +6114,11 @@
                         return `
                             <tr class="customer-row" data-user-id="${user.id || ''}">
                                 <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="customer-avatar">${avatarInitial}</div>
-                                        <div>
-                                            <div class="fw-semibold">${user.name || 'N/A'}</div>
-                                            <small class="text-muted">${user.email || ''}</small>
+                                    <div class="customer-info-container">
+                                        <div class="customer-avatar" title="${user.name || 'N/A'}">${avatarInitial}</div>
+                                        <div class="customer-info-text">
+                                            <div class="customer-name fw-semibold" title="${user.name || 'N/A'}">${user.name || 'N/A'}</div>
+                                            <small class="customer-email text-muted" title="${user.email || ''}">${user.email || ''}</small>
                                         </div>
                                     </div>
                                 </td>
@@ -3831,11 +6284,12 @@
                         return div.innerHTML;
                     }
 
-                    // Render table
-                    topProductsTableBody.innerHTML = products.map(product => {
+                    // Render table với UI/UX improvements
+                    topProductsTableBody.innerHTML = products.map((product, index) => {
                         const productNameEscaped = escapeHtml(product.name);
                         const categoryEscaped = escapeHtml(product.category);
                         const imageUrl = product.image || '/images/placeholder.png';
+                        const rank = index + 1;
                         
                         // Dự tính
                         const soldEstimated = product.sold_estimated || 0;
@@ -3853,6 +6307,12 @@
                         // Stock
                         const stock = product.stock || 0;
                         
+                        // Ranking badge
+                        let rankBadgeClass = 'product-rank-badge rank-other';
+                        if (rank === 1) rankBadgeClass = 'product-rank-badge rank-1';
+                        else if (rank === 2) rankBadgeClass = 'product-rank-badge rank-2';
+                        else if (rank === 3) rankBadgeClass = 'product-rank-badge rank-3';
+                        
                         // Stock badge class
                         let stockBadgeClass = 'stock-badge ';
                         let stockBadgeText = '';
@@ -3867,52 +6327,71 @@
                             stockBadgeText = '🔴 ' + stock;
                         }
                         
-                        // Format revenue
-                        const revenueEstimatedFormatted = new Intl.NumberFormat('vi-VN').format(revenueEstimated) + ' đ';
-                        const revenueCompletedFormatted = new Intl.NumberFormat('vi-VN').format(revenueCompleted) + ' đ';
+                        // Format revenue (không có đ ở cuối, sẽ thêm trong HTML)
+                        const revenueEstimatedFormatted = new Intl.NumberFormat('vi-VN').format(revenueEstimated);
+                        const revenueCompletedFormatted = new Intl.NumberFormat('vi-VN').format(revenueCompleted);
                         
-                        // Conversion rate badge color
-                        let conversionBadgeClass = 'badge ';
-                        if (conversionRate >= 80) {
-                            conversionBadgeClass += 'bg-success';
-                        } else if (conversionRate >= 50) {
-                            conversionBadgeClass += 'bg-warning';
+                        // Conversion badge
+                        let conversionBadgeClass = 'conversion-badge ';
+                        if (conversionRate >= 5) {
+                            conversionBadgeClass += 'high';
+                        } else if (conversionRate >= 2) {
+                            conversionBadgeClass += 'medium';
                         } else {
-                            conversionBadgeClass += 'bg-danger';
+                            conversionBadgeClass += 'low';
                         }
+                        
+                        // Progress bar width (max 100%)
+                        const progressEstimatedWidth = Math.min(percentEstimated, 100);
+                        const progressCompletedWidth = Math.min(percentCompleted, 100);
                         
                         return `
                             <tr class="product-row" data-product-id="${product.id}" style="cursor: pointer;" onclick="window.location.href='{{ url('/admin/products/show') }}/${product.id}'">
                                 <td>
-                                    <img src="${escapeHtml(imageUrl)}" alt="${productNameEscaped}" class="product-thumbnail-top" onerror="this.onerror=null; this.src='/images/placeholder.png';" title="Xem chi tiết sản phẩm">
+                                    <div class="product-info-container">
+                                        <span class="${rankBadgeClass}" title="Xếp hạng #${rank}">${rank}</span>
+                                        <img src="${escapeHtml(imageUrl)}" alt="${productNameEscaped}" class="product-thumbnail-top" onerror="this.onerror=null; this.src='/images/placeholder.png';" title="Xem chi tiết sản phẩm">
+                                    </div>
                                 </td>
                                 <td>
-                                    <div class="product-name-top" title="Xem chi tiết sản phẩm">${productNameEscaped}</div>
-                                    <div class="product-category-top">Danh mục: ${categoryEscaped}</div>
+                                    <div class="product-info-text">
+                                        <div class="product-name-top" title="Xem chi tiết sản phẩm">${productNameEscaped}</div>
+                                        <div class="product-category-top">${categoryEscaped}</div>
+                                    </div>
                                 </td>
                                 <td class="text-center">
-                                    <strong>${soldEstimated}</strong> <small class="text-muted">cái</small>
+                                    <div class="quantity-value" title="Số lượng dự tính">${soldEstimated}</div>
                                 </td>
                                 <td class="text-center">
-                                    <strong>${soldCompleted}</strong> <small class="text-muted">cái</small>
+                                    <div class="quantity-value" title="Số lượng thực tế">${soldCompleted}</div>
                                 </td>
                                 <td class="text-end">
-                                    <strong>${revenueEstimatedFormatted}</strong>
+                                    <div class="revenue-value estimated" title="Doanh thu dự tính">${revenueEstimatedFormatted} ₫</div>
                                 </td>
                                 <td class="text-end">
-                                    <strong>${revenueCompletedFormatted}</strong>
+                                    <div class="revenue-value" title="Doanh thu thực tế">${revenueCompletedFormatted} ₫</div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="small fw-semibold">${percentEstimated}%</span>
+                                    <div class="contribution-progress" title="Tỷ lệ đóng góp dự tính: ${percentEstimated}%">
+                                        <div class="contribution-progress-bar-wrapper">
+                                            <div class="contribution-progress-bar estimated" style="width: ${progressEstimatedWidth}%"></div>
+                                        </div>
+                                        <span class="contribution-progress-text">${percentEstimated}%</span>
+                                    </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="small fw-semibold">${percentCompleted}%</span>
+                                    <div class="contribution-progress" title="Tỷ lệ đóng góp thực tế: ${percentCompleted}%">
+                                        <div class="contribution-progress-bar-wrapper">
+                                            <div class="contribution-progress-bar completed" style="width: ${progressCompletedWidth}%"></div>
+                                        </div>
+                                        <span class="contribution-progress-text">${percentCompleted}%</span>
+                                    </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="${conversionBadgeClass}">${conversionRate}%</span>
+                                    <span class="${conversionBadgeClass}" title="Tỷ lệ chuyển đổi: ${conversionRate}%">${conversionRate}%</span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="${stockBadgeClass}">${stockBadgeText}</span>
+                                    <span class="${stockBadgeClass}" title="Tồn kho: ${stock} sản phẩm">${stockBadgeText}</span>
                                 </td>
                             </tr>
                         `;
@@ -4158,11 +6637,11 @@
                         return `
                             <tr class="comment-row" data-comment-id="${comment.id}">
                                 <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="comment-avatar">${escapeHtml(avatarInitial)}</div>
-                                        <div>
-                                            <div class="fw-semibold small">${userNameEscaped}</div>
-                                            <small class="text-muted" style="font-size: 11px;">${userEmailEscaped}</small>
+                                    <div class="comment-user-info">
+                                        <div class="comment-avatar" title="${userNameEscaped}">${escapeHtml(avatarInitial)}</div>
+                                        <div class="comment-user-text">
+                                            <div class="comment-user-name" title="${userNameEscaped}">${userNameEscaped}</div>
+                                            <div class="comment-user-email" title="${userEmailEscaped}">${userEmailEscaped}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -4172,22 +6651,23 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <img src="${escapeHtml(productThumbnail)}" alt="${productNameEscaped}" class="product-thumbnail" onerror="this.onerror=null; this.src='/images/placeholder.png';" style="cursor: pointer;" onclick="window.location.href='{{ url('/admin/products/show') }}/${comment.product_id}'" title="Xem sản phẩm">
-                                        <div>
-                                            <div class="small fw-semibold" style="cursor: pointer;" onclick="window.location.href='{{ url('/admin/products/show') }}/${comment.product_id}'" title="Xem sản phẩm">${productNameEscaped}</div>
-                                        </div>
+                                    <div class="product-info-comment">
+                                        <img src="${escapeHtml(productThumbnail)}" alt="${productNameEscaped}" class="product-thumbnail" onerror="this.onerror=null; this.src='/images/placeholder.png';" onclick="event.stopPropagation(); window.location.href='{{ url('/admin/products/show') }}/${comment.product_id}'" title="Xem sản phẩm">
+                                        <div class="product-name-comment" onclick="event.stopPropagation(); window.location.href='{{ url('/admin/products/show') }}/${comment.product_id}'" title="Xem sản phẩm">${productNameEscaped}</div>
                                     </div>
                                 </td>
                                 <td>
-                                    <small class="text-muted">${timeAgo}</small>
+                                    <div class="d-flex align-items-center gap-1" title="${timeAgo}">
+                                        <i class="bi bi-clock text-muted" style="font-size: 0.7rem;"></i>
+                                        <small class="text-muted">${timeAgo}</small>
+                                    </div>
                                 </td>
                                 <td>
-                                    <span class="status-badge ${statusClass}">${statusLabels[comment.status] || comment.status}</span>
+                                    <span class="status-badge ${statusClass}" title="Trạng thái: ${statusLabels[comment.status] || comment.status}">${statusLabels[comment.status] || comment.status}</span>
                                 </td>
                                 <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="actionDropdown${comment.id}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="dropdown" onclick="event.stopPropagation();">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle table-action-btn" type="button" id="actionDropdown${comment.id}" data-bs-toggle="dropdown" aria-expanded="false" title="Thao tác">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionDropdown${comment.id}">
@@ -4686,25 +7166,40 @@
                         return `
                             <tr class="user-row" data-user-id="${user.id}">
                                 <td>
-                                    <div class="user-avatar">${avatarInitial}</div>
+                                    <div class="user-avatar" title="${user.name || 'N/A'}">${avatarInitial}</div>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">${user.name || 'N/A'}</div>
+                                    <div class="user-info-text">
+                                        <div class="user-name" title="${user.name || 'N/A'}">${user.name || 'N/A'}</div>
+                                    </div>
                                 </td>
                                 <td>
-                                    <small class="text-muted">${user.email || ''}</small>
+                                    <div class="user-email" title="${user.email || ''}">${user.email || ''}</div>
                                 </td>
-                                <td class="text-center">${user.orders_count || 0}</td>
-                                <td class="text-end fw-semibold">${totalSpentFormatted} ₫</td>
-                                <td>
-                                    <small class="text-muted">${createdAt}</small>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-1" title="Số đơn hàng">
+                                        <i class="bi bi-cart text-primary" style="font-size: 0.75rem;"></i>
+                                        <strong>${user.orders_count || 0}</strong>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex align-items-center justify-content-end gap-1 revenue-value" title="Tổng chi tiêu">
+                                        <i class="bi bi-cash-coin text-success" style="font-size: 0.75rem;"></i>
+                                        <strong>${totalSpentFormatted} ₫</strong>
+                                    </div>
                                 </td>
                                 <td>
-                                    <span class="status-badge ${statusClass}">${statusLabels[user.status] || user.status || 'Active'}</span>
+                                    <div class="d-flex align-items-center gap-1" title="${createdAt}">
+                                        <i class="bi bi-calendar text-muted" style="font-size: 0.7rem;"></i>
+                                        <small class="text-muted">${createdAt}</small>
+                                    </div>
                                 </td>
                                 <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="userActionDropdown${user.id}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="status-badge ${statusClass}" title="Trạng thái: ${statusLabels[user.status] || user.status || 'Active'}">${statusLabels[user.status] || user.status || 'Active'}</span>
+                                </td>
+                                <td>
+                                    <div class="dropdown" onclick="event.stopPropagation();">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle table-action-btn" type="button" id="userActionDropdown${user.id}" data-bs-toggle="dropdown" aria-expanded="false" title="Thao tác">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userActionDropdown${user.id}">

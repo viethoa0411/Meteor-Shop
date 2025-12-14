@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
     <title>Meteor Admin</title>
 
 
@@ -111,10 +111,26 @@
 
         main {
             flex: 1;
-            padding: 20px;
+            padding: clamp(12px, 2vw, 20px);
             background-color: #f8f9fa;
             color: #333;
             transition: background 0.3s, color 0.3s;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* Responsive main padding */
+        @media (max-width: 767.98px) {
+            main {
+                padding: clamp(8px, 2vw, 16px);
+            }
+        }
+        
+        @media (min-width: 1400px) {
+            main {
+                padding: clamp(20px, 2.5vw, 28px);
+            }
         }
 
         /* Footer */
