@@ -520,16 +520,16 @@
 
                 {{-- Thống kê tồn kho --}}
                 <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                            <h6 class="fw-semibold mb-0">Thống kê tồn kho</h6>
-                            <div class="d-flex gap-2 align-items-center">
+                    <div class="card-header bg-white" style="overflow: hidden;">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2" style="width: 100%;">
+                            <h6 class="fw-semibold mb-0" style="flex: 0 0 auto;">Thống kê tồn kho</h6>
+                            <div class="d-flex gap-2 align-items-center inventory-filter-wrapper" style="flex: 1 1 auto; min-width: 0; flex-wrap: nowrap; max-width: 100%;">
                                 {{-- Search --}}
-                                <div class="input-group input-group-sm table-search-input">
-                                    <input type="text" class="form-control" id="inventorySearch" placeholder="Tìm kiếm sản phẩm...">
+                                <div class="input-group input-group-sm table-search-input" style="flex: 1 1 auto; min-width: 0; max-width: 100%;">
+                                    <input type="text" class="form-control" id="inventorySearch" placeholder="Tìm kiếm sản phẩm..." style="min-width: 0;">
                                 </div>
                                 {{-- Filter trạng thái tồn kho --}}
-                                <select class="form-select form-select-sm table-filter-select" id="inventoryStatusFilter">
+                                <select class="form-select form-select-sm table-filter-select" id="inventoryStatusFilter" style="flex: 0 0 auto; min-width: 120px; max-width: 180px; white-space: nowrap;">
                                     <option value="">Tất cả</option>
                                     <option value="in_stock">🟢 Còn hàng</option>
                                     <option value="low">🟡 Sắp hết</option>
@@ -2690,11 +2690,13 @@
             max-height: 240px; /* Đủ để hiển thị 4 dòng sản phẩm (mỗi dòng ~60px) */
             height: 240px; /* Cố định chiều cao cho 4 dòng */
             width: 100%;
+            max-width: 100%;
             position: relative;
             -webkit-overflow-scrolling: touch;
             /* Ẩn scrollbar dọc cho Firefox */
             scrollbar-width: thin;
             scrollbar-color: #3b82f6 transparent;
+            box-sizing: border-box;
         }
 
         /* Thiết kế thanh kéo ngang đẹp - WebKit browsers (Chrome, Safari, Edge) */
@@ -2745,7 +2747,9 @@
         #inventoryTable {
             min-width: 900px !important;
             width: 100%;
+            max-width: 100%;
             table-layout: auto;
+            box-sizing: border-box;
         }
 
         #inventoryTable th,
@@ -4143,10 +4147,55 @@
             /* Inventory Table - Mobile */
             .inventory-table-wrapper {
                 font-size: 0.875rem;
+                max-width: 100% !important;
+                overflow-x: auto !important;
+                overflow-y: auto !important;
+            }
+            
+            #inventoryTable {
+                min-width: 600px !important;
             }
             
             .inventory-table-wrapper td {
                 padding: 0.5rem 0.25rem !important;
+            }
+            
+            /* Inventory filter - Mobile */
+            .inventory-filter-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-top: 0.75rem !important;
+                flex-wrap: nowrap !important;
+                overflow: hidden;
+            }
+            
+            .inventory-filter-wrapper .table-search-input {
+                flex: 1 1 auto !important;
+                min-width: 0 !important;
+                max-width: calc(100% - 140px) !important;
+            }
+            
+            .inventory-filter-wrapper .table-search-input .form-control {
+                min-width: 0 !important;
+                font-size: 0.875rem !important;
+            }
+            
+            .inventory-filter-wrapper .table-filter-select {
+                flex: 0 0 auto !important;
+                min-width: 120px !important;
+                max-width: 140px !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Card header - Mobile */
+            .card-header {
+                padding: 12px 16px !important;
+                overflow: hidden !important;
+            }
+            
+            .card-header > div {
+                width: 100% !important;
+                max-width: 100% !important;
             }
             
             /* Top Products/Customers - Mobile */
@@ -4501,6 +4550,46 @@
             width: 200px;
         }
         
+        /* Inventory filter wrapper - luôn giữ trên cùng một dòng */
+        .inventory-filter-wrapper {
+            flex-wrap: nowrap !important;
+            display: flex !important;
+            max-width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        .inventory-filter-wrapper .table-search-input {
+            flex: 1 1 auto;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .inventory-filter-wrapper .table-search-input .form-control {
+            min-width: 0;
+            width: 100%;
+        }
+        
+        .inventory-filter-wrapper .table-filter-select {
+            flex: 0 0 auto;
+            min-width: 120px;
+            max-width: 180px;
+            white-space: nowrap;
+        }
+        
+        /* Card header - đảm bảo không tràn */
+        .card-header {
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        .card-header > div {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
         /* Responsive Breakpoints - Mobile First Approach */
         
         /* Extra Small Devices (phones, < 576px) */
@@ -4532,7 +4621,50 @@
             
             .table-search-input {
                 width: 100% !important;
+                max-width: 100% !important;
                 margin-top: 0.5rem;
+            }
+            
+            /* Inventory filter wrapper - responsive - luôn giữ trên cùng một dòng */
+            .inventory-filter-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-top: 0.75rem;
+                flex-wrap: nowrap !important;
+                overflow: hidden;
+                box-sizing: border-box;
+            }
+            
+            .inventory-filter-wrapper .table-search-input {
+                flex: 1 1 auto !important;
+                min-width: 0 !important;
+                max-width: calc(100% - 160px) !important;
+                margin-top: 0 !important;
+                overflow: hidden;
+            }
+            
+            .inventory-filter-wrapper .table-search-input .form-control {
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+            
+            .inventory-filter-wrapper .table-filter-select {
+                flex: 0 0 auto !important;
+                min-width: 120px !important;
+                max-width: 160px !important;
+                margin-top: 0 !important;
+            }
+            
+            /* Card header responsive */
+            .card-header {
+                overflow: hidden !important;
+                box-sizing: border-box;
+            }
+            
+            .card-header > div {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box;
             }
             
             /* Button Groups - Stack vertically */
@@ -4676,6 +4808,44 @@
             .top-customers-card-responsive {
                 height: auto !important;
                 min-height: 380px;
+            }
+            
+            /* Inventory filter responsive - luôn giữ trên cùng một dòng */
+            .inventory-filter-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-top: 0.75rem;
+                flex-wrap: nowrap !important;
+                overflow: hidden;
+                box-sizing: border-box;
+            }
+            
+            .inventory-filter-wrapper .table-search-input {
+                flex: 1 1 auto !important;
+                min-width: 0 !important;
+                max-width: calc(100% - 170px) !important;
+                overflow: hidden;
+            }
+            
+            .inventory-filter-wrapper .table-search-input .form-control {
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+            
+            .inventory-filter-wrapper .table-filter-select {
+                flex: 0 0 auto !important;
+                min-width: 120px !important;
+                max-width: 170px !important;
+            }
+            
+            /* Inventory table responsive */
+            #inventoryTable {
+                min-width: 700px !important;
+            }
+            
+            .inventory-table-wrapper {
+                max-width: 100% !important;
+                overflow-x: auto !important;
             }
             
             .revenue-orders-select {
@@ -5032,6 +5202,61 @@
             .card-footer .d-flex > * {
                 width: 100%;
             }
+        }
+        
+        /* ========== APEXCHARTS MENU STYLES ========== */
+        /* Fix menu background và text color để không bị trùng */
+        .apexcharts-menu {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            padding: 4px 0 !important;
+            min-width: 160px !important;
+            z-index: 10000 !important;
+        }
+        
+        .apexcharts-menu-item {
+            color: #374151 !important;
+            background: transparent !important;
+            padding: 8px 16px !important;
+            font-size: 13px !important;
+            font-weight: 400 !important;
+            cursor: pointer !important;
+            transition: background-color 0.2s ease !important;
+            border: none !important;
+            text-align: left !important;
+            width: 100% !important;
+            display: block !important;
+        }
+        
+        .apexcharts-menu-item:hover {
+            background: #f3f4f6 !important;
+            color: #111827 !important;
+        }
+        
+        .apexcharts-menu-item:active {
+            background: #e5e7eb !important;
+        }
+        
+        /* Dark mode support */
+        body.dark .apexcharts-menu {
+            background: #1f2937 !important;
+            border-color: #374151 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        body.dark .apexcharts-menu-item {
+            color: #e5e7eb !important;
+        }
+        
+        body.dark .apexcharts-menu-item:hover {
+            background: #374151 !important;
+            color: #ffffff !important;
+        }
+        
+        body.dark .apexcharts-menu-item:active {
+            background: #4b5563 !important;
         }
     </style>
 
@@ -5581,6 +5806,7 @@
         
         let orderStatusChart = null;
         let currentStatusRange = '30';
+        let chartEventListenersAdded = false; // Flag để tránh duplicate event listeners
 
         async function loadOrderStatusRatio(range = '7') {
             if (!orderStatusCtx || !orderStatusTableBody) return;
@@ -5604,47 +5830,193 @@
                 }
                 
                 const result = await response.json();
+                
+                // Kiểm tra dữ liệu hợp lệ
+                if (!result || typeof result !== 'object') {
+                    throw new Error('Invalid response format');
+                }
+                
                 const { total_orders, from, to, data } = result;
 
+                // Kiểm tra data có tồn tại và là array
+                if (!Array.isArray(data)) {
+                    throw new Error('Data is not an array');
+                }
+
                 // Update footer
-                orderStatusTotalEl.textContent = total_orders.toLocaleString('vi-VN');
-                const fromDate = new Date(from).toLocaleDateString('vi-VN');
-                const toDate = new Date(to).toLocaleDateString('vi-VN');
-                orderStatusPeriodEl.textContent = `${fromDate} - ${toDate}`;
+                if (orderStatusTotalEl) {
+                    orderStatusTotalEl.textContent = (total_orders || 0).toLocaleString('vi-VN');
+                }
+                if (orderStatusPeriodEl && from && to) {
+                    const fromDate = new Date(from).toLocaleDateString('vi-VN');
+                    const toDate = new Date(to).toLocaleDateString('vi-VN');
+                    orderStatusPeriodEl.textContent = `${fromDate} - ${toDate}`;
+                }
                 
                 // Update date range text
-                const rangeTexts = {
-                    'today': 'Hôm nay',
-                    '7': '7 ngày gần nhất',
-                    '30': '30 ngày gần nhất',
-                    '90': '90 ngày gần nhất',
-                    'month': 'Tháng này',
-                };
-                orderStatusDateRangeEl.textContent = `(${rangeTexts[range] || '7 ngày gần nhất'})`;
-
-                if (data.length === 0) {
-                    orderStatusTableBody.innerHTML = `
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-3">Không có dữ liệu</td>
-                        </tr>
-                    `;
-                    return;
+                if (orderStatusDateRangeEl) {
+                    const rangeTexts = {
+                        'today': 'Hôm nay',
+                        '7': '7 ngày gần nhất',
+                        '30': '30 ngày gần nhất',
+                        '90': '90 ngày gần nhất',
+                        'month': 'Tháng này',
+                    };
+                    orderStatusDateRangeEl.textContent = `(${rangeTexts[range] || '7 ngày gần nhất'})`;
                 }
 
                 // Render bảng (có cột xu hướng)
+                if (data.length === 0) {
+                    orderStatusTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">Không có đơn hàng phát sinh</td>
+                        </tr>
+                    `;
+                    
+                    // Render biểu đồ trắng toàn vẹn khi không có dữ liệu
+                    const emptyChartOptions = {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Không có dữ liệu'],
+                            datasets: [{
+                                data: [1],
+                                backgroundColor: ['#F3F4F6'],
+                                borderWidth: 2,
+                                borderColor: '#ffffff',
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '65%',
+                            plugins: {
+                                legend: {
+                                    display: false,
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                    titleColor: '#ffffff',
+                                    bodyColor: '#ffffff',
+                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                    borderWidth: 1,
+                                    padding: {
+                                        top: 12,
+                                        right: 16,
+                                        bottom: 12,
+                                        left: 16
+                                    },
+                                    titleFont: {
+                                        size: 14,
+                                        weight: '600',
+                                        family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                                    },
+                                    bodyFont: {
+                                        size: 13,
+                                        weight: '400',
+                                        family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                                    },
+                                    cornerRadius: 8,
+                                    displayColors: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return 'Không có đơn hàng';
+                                        },
+                                        title: function() {
+                                            return '';
+                                        }
+                                    }
+                                }
+                            },
+                            interaction: {
+                                intersect: true,
+                                mode: 'point'
+                            }
+                        }
+                    };
+                    
+                    if (orderStatusChart) {
+                        // Đảm bảo đồng bộ dữ liệu
+                        orderStatusChart.data.labels = ['Không có dữ liệu'];
+                        if (orderStatusChart.data.datasets && orderStatusChart.data.datasets[0]) {
+                            orderStatusChart.data.datasets[0].data = [1];
+                            orderStatusChart.data.datasets[0].backgroundColor = ['#F3F4F6'];
+                        }
+                        // Xóa statusData khi không có dữ liệu
+                        orderStatusChart.data._statusData = [];
+                        // Cập nhật tooltip options để hiển thị "Không có đơn hàng"
+                        if (orderStatusChart.options && orderStatusChart.options.plugins && orderStatusChart.options.plugins.tooltip) {
+                            orderStatusChart.options.plugins.tooltip.enabled = true;
+                            orderStatusChart.options.plugins.tooltip.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                            orderStatusChart.options.plugins.tooltip.titleColor = '#ffffff';
+                            orderStatusChart.options.plugins.tooltip.bodyColor = '#ffffff';
+                            orderStatusChart.options.plugins.tooltip.borderColor = 'rgba(255, 255, 255, 0.2)';
+                            orderStatusChart.options.plugins.tooltip.borderWidth = 1;
+                            orderStatusChart.options.plugins.tooltip.padding = {
+                                top: 12,
+                                right: 16,
+                                bottom: 12,
+                                left: 16
+                            };
+                            orderStatusChart.options.plugins.tooltip.titleFont = {
+                                size: 14,
+                                weight: '600',
+                                family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                            };
+                            orderStatusChart.options.plugins.tooltip.bodyFont = {
+                                size: 13,
+                                weight: '400',
+                                family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                            };
+                            orderStatusChart.options.plugins.tooltip.cornerRadius = 8;
+                            orderStatusChart.options.plugins.tooltip.displayColors = false;
+                            orderStatusChart.options.plugins.tooltip.callbacks = {
+                                label: function(context) {
+                                    return 'Không có đơn hàng';
+                                },
+                                title: function() {
+                                    return '';
+                                }
+                            };
+                        }
+                        orderStatusChart.update();
+                    } else {
+                        if (orderStatusCtx) {
+                            orderStatusChart = new Chart(orderStatusCtx, emptyChartOptions);
+                            orderStatusChart.data._statusData = [];
+                            
+                            // Thêm event listener cho hover trên canvas (chỉ thêm 1 lần)
+                            if (!chartEventListenersAdded) {
+                                orderStatusCtx.addEventListener('mousemove', handleChartHover);
+                                orderStatusCtx.addEventListener('mouseleave', handleChartLeave);
+                                chartEventListenersAdded = true;
+                            }
+                        }
+                    }
+                    return;
+                }
+
                 orderStatusTableBody.innerHTML = data.map(item => {
-                    const trendIcon = item.trend > 0 ? '↑' : item.trend < 0 ? '↓' : '→';
-                    const trendColor = item.trend > 0 ? '#10B981' : item.trend < 0 ? '#EF4444' : '#6B7280';
-                    const trendText = item.trend !== 0 ? `${trendIcon} ${Math.abs(item.trend)}%` : '→ 0%';
+                    // Validate và set giá trị mặc định cho các trường
+                    const status = item.status || '';
+                    const label = item.label || 'N/A';
+                    const color = item.color || '#6B7280';
+                    const count = item.count || 0;
+                    const ratio = item.ratio || 0;
+                    const trend = item.trend || 0;
+                    
+                    const trendIcon = trend > 0 ? '↑' : trend < 0 ? '↓' : '→';
+                    const trendColor = trend > 0 ? '#10B981' : trend < 0 ? '#EF4444' : '#6B7280';
+                    const trendText = trend !== 0 ? `${trendIcon} ${Math.abs(trend)}%` : '→ 0%';
                     
                     return `
-                        <tr class="order-status-row" data-status="${item.status}">
+                        <tr class="order-status-row" data-status="${status}">
                             <td class="order-status-color">
-                                <span class="order-status-dot" style="background-color: ${item.color};"></span>
+                                <span class="order-status-dot" style="background-color: ${color};"></span>
                             </td>
-                            <td class="order-status-label">${item.label}</td>
-                            <td class="order-status-count text-end">${item.count.toLocaleString('vi-VN')}</td>
-                            <td class="order-status-ratio text-end">${item.ratio}%</td>
+                            <td class="order-status-label">${label}</td>
+                            <td class="order-status-count text-end">${count.toLocaleString('vi-VN')}</td>
+                            <td class="order-status-ratio text-end">${ratio}%</td>
                             <td class="order-status-trend text-end">
                                 <span style="color: ${trendColor}; font-weight: 500;">${trendText}</span>
                             </td>
@@ -5653,9 +6025,9 @@
                 }).join('');
 
                 // Render donut chart
-                const labels = data.map(item => item.label);
-                const chartData = data.map(item => item.count);
-                const colors = data.map(item => item.color);
+                const labels = data.map(item => item.label || 'N/A');
+                const chartData = data.map(item => item.count || 0);
+                const colors = data.map(item => item.color || '#6B7280');
 
                 const chartOptions = {
                     type: 'doughnut',
@@ -5678,12 +6050,48 @@
                             },
                             tooltip: {
                                 enabled: true,
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                borderWidth: 1,
+                                padding: {
+                                    top: 12,
+                                    right: 16,
+                                    bottom: 12,
+                                    left: 16
+                                },
+                                titleFont: {
+                                    size: 14,
+                                    weight: '600',
+                                    family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                                },
+                                bodyFont: {
+                                    size: 13,
+                                    weight: '400',
+                                    family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                                },
+                                cornerRadius: 8,
+                                displayColors: true,
+                                boxPadding: 8,
+                                boxWidth: 12,
+                                boxHeight: 12,
+                                usePointStyle: true,
                                 callbacks: {
+                                    title: function(context) {
+                                        return context[0].label || '';
+                                    },
                                     label: function(context) {
                                         const total = context.dataset.data.reduce((sum, v) => sum + v, 0);
                                         const value = context.raw ?? 0;
                                         const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                        return `${context.label}: ${value} đơn (${percent}%)`;
+                                        return `Số lượng: ${value.toLocaleString('vi-VN')} đơn`;
+                                    },
+                                    afterLabel: function(context) {
+                                        const total = context.dataset.data.reduce((sum, v) => sum + v, 0);
+                                        const value = context.raw ?? 0;
+                                        const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return `Tỷ lệ: ${percent}%`;
                                     }
                                 }
                             }
@@ -5695,8 +6103,8 @@
                     }
                 };
 
-                // Lưu data vào biến để dùng trong hover
-                const statusDataForHover = data;
+                // Lưu data vào biến để dùng trong hover (đảm bảo đồng bộ)
+                const statusDataForHover = [...data]; // Tạo copy để tránh reference issues
                 
                 // Hàm xử lý hover trên chart
                 function handleChartHover(e) {
@@ -5704,7 +6112,8 @@
                     if (!chart) return;
                     
                     const activeElements = chart.getElementsAtEventForMode(e, 'point', { intersect: true }, false);
-                    const statusData = chart.data._statusData || statusDataForHover;
+                    // Luôn sử dụng data từ chart để đảm bảo đồng bộ
+                    const statusData = chart.data._statusData || [];
                     
                     if (activeElements.length > 0) {
                         const index = activeElements[0].index;
@@ -5723,7 +6132,7 @@
                                 }
                             });
                         }
-            } else {
+                    } else {
                         // Reset tất cả rows
                         document.querySelectorAll('.order-status-row').forEach(row => {
                             row.style.backgroundColor = '';
@@ -5741,18 +6150,77 @@
                 }
                 
                 if (orderStatusChart) {
-                    orderStatusChart.data.labels = labels;
-                    orderStatusChart.data.datasets[0].data = chartData;
-                    orderStatusChart.data.datasets[0].backgroundColor = colors;
-                    orderStatusChart.data._statusData = statusDataForHover;
+                    // Đảm bảo đồng bộ dữ liệu giữa chart và table
+                    orderStatusChart.data.labels = [...labels]; // Tạo copy
+                    if (orderStatusChart.data.datasets && orderStatusChart.data.datasets[0]) {
+                        orderStatusChart.data.datasets[0].data = [...chartData]; // Tạo copy
+                        orderStatusChart.data.datasets[0].backgroundColor = [...colors]; // Tạo copy
+                    }
+                    // Cập nhật statusData để đồng bộ với chart data
+                    orderStatusChart.data._statusData = [...statusDataForHover];
+                    
+                    // Cập nhật tooltip options để hiển thị đúng khi có dữ liệu
+                    if (orderStatusChart.options && orderStatusChart.options.plugins && orderStatusChart.options.plugins.tooltip) {
+                        orderStatusChart.options.plugins.tooltip.enabled = true;
+                        orderStatusChart.options.plugins.tooltip.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                        orderStatusChart.options.plugins.tooltip.titleColor = '#ffffff';
+                        orderStatusChart.options.plugins.tooltip.bodyColor = '#ffffff';
+                        orderStatusChart.options.plugins.tooltip.borderColor = 'rgba(255, 255, 255, 0.2)';
+                        orderStatusChart.options.plugins.tooltip.borderWidth = 1;
+                        orderStatusChart.options.plugins.tooltip.padding = {
+                            top: 12,
+                            right: 16,
+                            bottom: 12,
+                            left: 16
+                        };
+                        orderStatusChart.options.plugins.tooltip.titleFont = {
+                            size: 14,
+                            weight: '600',
+                            family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                        };
+                        orderStatusChart.options.plugins.tooltip.bodyFont = {
+                            size: 13,
+                            weight: '400',
+                            family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                        };
+                        orderStatusChart.options.plugins.tooltip.cornerRadius = 8;
+                        orderStatusChart.options.plugins.tooltip.displayColors = true;
+                        orderStatusChart.options.plugins.tooltip.boxPadding = 8;
+                        orderStatusChart.options.plugins.tooltip.boxWidth = 12;
+                        orderStatusChart.options.plugins.tooltip.boxHeight = 12;
+                        orderStatusChart.options.plugins.tooltip.usePointStyle = true;
+                        orderStatusChart.options.plugins.tooltip.callbacks = {
+                            title: function(context) {
+                                return context[0].label || '';
+                            },
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((sum, v) => sum + v, 0);
+                                const value = context.raw ?? 0;
+                                const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `Số lượng: ${value.toLocaleString('vi-VN')} đơn`;
+                            },
+                            afterLabel: function(context) {
+                                const total = context.dataset.data.reduce((sum, v) => sum + v, 0);
+                                const value = context.raw ?? 0;
+                                const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `Tỷ lệ: ${percent}%`;
+                            }
+                        };
+                    }
+                    
                     orderStatusChart.update();
                 } else {
-                    orderStatusChart = new Chart(orderStatusCtx, chartOptions);
-                    orderStatusChart.data._statusData = statusDataForHover;
-                    
-                    // Thêm event listener cho hover trên canvas (chỉ thêm 1 lần)
-                    orderStatusCtx.addEventListener('mousemove', handleChartHover);
-                    orderStatusCtx.addEventListener('mouseleave', handleChartLeave);
+                    if (orderStatusCtx && labels.length > 0 && chartData.length > 0) {
+                        orderStatusChart = new Chart(orderStatusCtx, chartOptions);
+                        orderStatusChart.data._statusData = [...statusDataForHover]; // Tạo copy để đồng bộ
+                        
+                        // Thêm event listener cho hover trên canvas (chỉ thêm 1 lần)
+                        if (!chartEventListenersAdded) {
+                            orderStatusCtx.addEventListener('mousemove', handleChartHover);
+                            orderStatusCtx.addEventListener('mouseleave', handleChartLeave);
+                            chartEventListenersAdded = true;
+                        }
+                    }
                 }
 
                 // Custom tooltip implementation
@@ -5764,31 +6232,64 @@
                         tooltipElement.className = 'order-status-tooltip';
                         tooltipElement.style.cssText = `
                             position: absolute;
-                            background: rgba(0, 0, 0, 0.85);
+                            background: rgba(0, 0, 0, 0.95);
                             color: white;
-                            padding: 8px 12px;
-                            border-radius: 6px;
-                            font-size: 0.75rem;
+                            padding: 14px 18px;
+                            border-radius: 10px;
+                            font-size: 13px;
+                            font-weight: 400;
+                            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                             pointer-events: none;
                             z-index: 1000;
-                            white-space: nowrap;
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                            white-space: normal;
+                            max-width: 300px;
+                            min-width: 150px;
+                            word-wrap: break-word;
+                            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+                            border: 1px solid rgba(255, 255, 255, 0.15);
+                            line-height: 1.5;
+                            backdrop-filter: blur(10px);
+                            transition: opacity 0.2s ease, transform 0.2s ease;
                         `;
                         document.body.appendChild(tooltipElement);
                     }
-                    tooltipElement.textContent = text;
-                    tooltipElement.style.left = (x + 10) + 'px';
-                    tooltipElement.style.top = (y - 10) + 'px';
+                    tooltipElement.innerHTML = text;
+                    tooltipElement.style.left = (x + 15) + 'px';
+                    tooltipElement.style.top = (y - tooltipElement.offsetHeight / 2) + 'px';
                     tooltipElement.style.display = 'block';
+                    tooltipElement.style.opacity = '0';
+                    tooltipElement.style.transform = 'translateY(-5px)';
+                    
+                    // Trigger animation
+                    setTimeout(() => {
+                        if (tooltipElement) {
+                            tooltipElement.style.opacity = '1';
+                            tooltipElement.style.transform = 'translateY(0)';
+                        }
+                    }, 10);
                 }
                 
                 function hideTooltip() {
                     if (tooltipElement) {
-                        tooltipElement.style.display = 'none';
+                        tooltipElement.style.opacity = '0';
+                        tooltipElement.style.transform = 'translateY(-5px)';
+                        setTimeout(() => {
+                            if (tooltipElement) {
+                                tooltipElement.style.display = 'none';
+                            }
+                        }, 200);
                     }
                 }
 
                 // Click vào row để navigate và hover effect
+                // Xóa event listeners cũ trước khi thêm mới để tránh duplicate
+                const existingRows = document.querySelectorAll('.order-status-row');
+                existingRows.forEach(row => {
+                    // Clone node để xóa tất cả event listeners
+                    const newRow = row.cloneNode(true);
+                    row.parentNode.replaceChild(newRow, row);
+                });
+                
                 document.querySelectorAll('.order-status-row').forEach((row, index) => {
                     // Click để navigate
                     row.addEventListener('click', function() {
@@ -5805,10 +6306,10 @@
                             createTooltip(tooltipText, rect.right, rect.top + rect.height / 2);
                         }
                         
-                        // Highlight segment trên chart
-                        if (orderStatusChart) {
+                        // Highlight segment trên chart - sử dụng data từ chart để đảm bảo đồng bộ
+                        if (orderStatusChart && orderStatusChart.data._statusData) {
                             const status = this.dataset.status;
-                            const dataIndex = statusDataForHover.findIndex(item => item.status === status);
+                            const dataIndex = orderStatusChart.data._statusData.findIndex(item => item && item.status === status);
                             if (dataIndex !== -1) {
                                 orderStatusChart.setActiveElements([{ datasetIndex: 0, index: dataIndex }]);
                                 orderStatusChart.update('none');
@@ -5820,8 +6321,30 @@
                         const tooltipText = this.dataset.tooltipText;
                         if (tooltipText && tooltipElement) {
                             const rect = this.getBoundingClientRect();
-                            tooltipElement.style.left = (rect.right + 10) + 'px';
-                            tooltipElement.style.top = (rect.top + rect.height / 2 - tooltipElement.offsetHeight / 2) + 'px';
+                            const tooltipWidth = tooltipElement.offsetWidth || 200;
+                            const tooltipHeight = tooltipElement.offsetHeight || 50;
+                            
+                            // Đảm bảo tooltip không bị tràn ra ngoài màn hình
+                            let left = rect.right + 15;
+                            let top = rect.top + rect.height / 2 - tooltipHeight / 2;
+                            
+                            // Kiểm tra nếu tooltip tràn ra bên phải
+                            if (left + tooltipWidth > window.innerWidth) {
+                                left = rect.left - tooltipWidth - 15;
+                            }
+                            
+                            // Kiểm tra nếu tooltip tràn ra phía trên
+                            if (top < 0) {
+                                top = 10;
+                            }
+                            
+                            // Kiểm tra nếu tooltip tràn ra phía dưới
+                            if (top + tooltipHeight > window.innerHeight) {
+                                top = window.innerHeight - tooltipHeight - 10;
+                            }
+                            
+                            tooltipElement.style.left = left + 'px';
+                            tooltipElement.style.top = top + 'px';
                         }
                     });
                     
@@ -5838,11 +6361,13 @@
 
             } catch (e) {
                 console.error('Failed to load order status ratio', e);
+                const errorMessage = e.message || 'Đã xảy ra lỗi khi tải dữ liệu';
                 orderStatusTableBody.innerHTML = `
                     <tr>
                         <td colspan="5" class="text-center text-danger py-3">
-                            Đã xảy ra lỗi khi tải dữ liệu
-                            <button class="btn btn-sm btn-primary ms-2" onclick="loadOrderStatusRatio(currentStatusRange)">Thử lại</button>
+                            ${errorMessage}
+                            <br>
+                            <button class="btn btn-sm btn-primary mt-2" onclick="loadOrderStatusRatio('${range}')">Thử lại</button>
                         </td>
                     </tr>
                 `;
