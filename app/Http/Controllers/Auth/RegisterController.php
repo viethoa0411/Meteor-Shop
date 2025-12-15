@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use App\Services\NotificationService;
 
 class RegisterController extends Controller
 {
@@ -39,7 +41,7 @@ class RegisterController extends Controller
         ]);
 
         try {
-            User::create([
+            $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
@@ -48,6 +50,20 @@ class RegisterController extends Controller
                 'role' => 'user',
                 'status' => 'active',
             ]);
+
+            // Tạo thông báo cho admin về khách hàng mới
+            try {
+                NotificationService::createForAdmins([
+                    'type' => 'user',
+                    'level' => 'info',
+                    'title' => 'Khách hàng mới',
+                    'message' => $user->name . ' vừa đăng ký tài khoản',
+                    'url' => route('admin.account.users.show', $user->id) ?? route('admin.account.users.index'),
+                    'metadata' => ['user_id' => $user->id, 'email' => $user->email]
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Error creating new user notification: ' . $e->getMessage());
+            }
 
             return redirect()->route('client.login') 
                 ->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');

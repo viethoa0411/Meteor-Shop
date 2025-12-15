@@ -8,7 +8,9 @@ use App\Models\ChatSession;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\NotificationService;
 
 class ChatController extends Controller
 {
@@ -130,6 +132,23 @@ class ChatController extends Controller
                 'unread_count' => $session->unread_count + 1,
                 'page_url' => $request->input('page_url'),
             ]);
+            
+            // Tạo thông báo cho admin về tin nhắn mới (chỉ khi client gửi, không phải bot)
+            if ($message->sender_type === 'client') {
+                try {
+                    $senderName = $session->user ? $session->user->name : ($session->guest_name ?? 'Khách');
+                    NotificationService::createForAdmins([
+                        'type' => 'chat',
+                        'level' => 'info',
+                        'title' => 'Tin nhắn mới',
+                        'message' => $senderName . ' đã gửi tin nhắn: ' . \Illuminate\Support\Str::limit($messageText, 50),
+                        'url' => route('admin.chatbox.show', $session->id),
+                        'metadata' => ['session_id' => $session->id, 'message_id' => $message->id]
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error creating chat notification: ' . $e->getMessage());
+                }
+            }
 
             $responseMessages = [[
                 'id' => $message->id,

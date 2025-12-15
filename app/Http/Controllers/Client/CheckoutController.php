@@ -12,9 +12,11 @@ use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Services\PromotionService;
+use App\Services\NotificationService;
 
 class CheckoutController extends Controller
 {
@@ -594,6 +596,14 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // Tạo thông báo cho admin về đơn hàng mới
+            try {
+                NotificationService::notifyNewOrder($order);
+            } catch (\Exception $e) {
+                // Không dừng flow nếu tạo notification thất bại
+                Log::error('Error creating order notification: ' . $e->getMessage());
+            }
 
             // Xóa checkout session
             session()->forget('checkout_session');

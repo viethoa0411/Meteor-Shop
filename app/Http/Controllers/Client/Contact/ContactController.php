@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Services\NotificationService;
 
 class ContactController extends Controller
 {
@@ -76,6 +77,14 @@ class ContactController extends Controller
             } catch (\Exception $e) {
                 // Nếu gửi email thất bại, vẫn lưu liên hệ
                 \Log::error('Lỗi gửi email liên hệ: ' . $e->getMessage());
+            }
+
+            // Tạo thông báo cho admin về liên hệ mới
+            try {
+                NotificationService::notifyNewContact($contact);
+            } catch (\Exception $e) {
+                // Không dừng flow nếu tạo notification thất bại
+                \Log::error('Error creating contact notification: ' . $e->getMessage());
             }
 
             return redirect()->route('client.contact.list')->with('success', 'Gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.');
