@@ -29,6 +29,7 @@ class Order extends Model
         'shipping_phone',
         'shipping_method',
         'shipping_fee',
+        'installation_fee',
         'voucher_code',
         'shipping_city',
         'shipping_district',
