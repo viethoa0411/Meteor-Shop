@@ -218,15 +218,16 @@
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Dài</label>
+                                                <label>Dài (m)</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][length]"
                                                         class="form-control" 
                                                         value="{{ old('variants.'.$idx.'.length', $v->length) }}"
                                                             {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
+
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Rộng</label>
+                                                <label>Rộng (m)</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][width]"
                                                         class="form-control" 
                                                         value="{{ old('variants.'.$idx.'.width', $v->width) }}"
@@ -234,16 +235,24 @@
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Cao</label>
+                                                <label>Cao (m)</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][height]"
-                                                        class="form-control" 
+                                                        class="form-control"
                                                         value="{{ old('variants.'.$idx.'.height', $v->height) }}"
-                                                            {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
-                                            </div>
+                                                        placeholder="VD: 0.8">
 
-                                            <div class="col-md-2 mt-3">
-                                                <label>Tồn kho</label>
-                                                <input type="number" min="0"
+                                            </div>
+                                        </div>
+                                        <div class="row g-3 mt-2">
+                                            <div class="col-md-2">
+                                                <label>Cân nặng (kg)</label>
+                                                <input type="number" step="0.01" name="variants[{{ $idx }}][weight]"
+                                                    class="form-control"
+                                                    value="{{ old('variants.'.$idx.'.weight', $v->weight) }}">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label>Tồn</label>
+                                                <input type="number"
                                                         name="variants[{{ $idx }}][stock]" class="form-control"
                                                        value="{{ old('variants.'.$idx.'.stock', $v->stock) }}">
                                             </div>
@@ -342,24 +351,30 @@
                         </div>
 
                         <div class="col-md-2">
-                            <label>Dài</label>
+                            <label>Dài (m)</label>
                             <input type="number" step="0.01"
-                                name="variants[new_${newVariantIndex}][length]" class="form-control">
+                                name="variants[new_${newVariantIndex}][length]" class="form-control" placeholder="VD: 2.5">
                         </div>
 
                         <div class="col-md-2">
-                            <label>Rộng</label>
+                            <label>Rộng (m)</label>
                             <input type="number" step="0.01"
-                                name="variants[new_${newVariantIndex}][width]" class="form-control">
+                                name="variants[new_${newVariantIndex}][width]" class="form-control" placeholder="VD: 1.8">
                         </div>
 
                         <div class="col-md-2">
-                            <label>Cao</label>
+                            <label>Cao (m)</label>
                             <input type="number" step="0.01"
-                                name="variants[new_${newVariantIndex}][height]" class="form-control">
+                                name="variants[new_${newVariantIndex}][height]" class="form-control" placeholder="VD: 0.8">
                         </div>
-
-                        <div class="col-md-2 mt-3">
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3">
+                            <label>Cân nặng (kg)</label>
+                            <input type="number" step="0.01"
+                                name="variants[new_${newVariantIndex}][weight]" class="form-control">
+                        </div>
+                        <div class="col-md-3">
                             <label>Tồn</label>
                             <input type="number" 
                                 name="variants[new_${newVariantIndex}][stock]" class="form-control">

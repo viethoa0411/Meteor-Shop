@@ -338,6 +338,20 @@ Route::middleware(['admin'])
             Route::get('/', [ShippingSettingController::class, 'index'])->name('index');
             Route::put('/', [ShippingSettingController::class, 'update'])->name('update');
             Route::post('/calculate-fee', [ShippingSettingController::class, 'calculateFee'])->name('calculate-fee');
+            
+            // Shipping Distances CRUD
+            Route::get('/distances', [ShippingSettingController::class, 'distancesIndex'])->name('distances.index');
+            Route::get('/distances/data', [ShippingSettingController::class, 'distancesData'])->name('distances.data');
+            Route::post('/distances', [ShippingSettingController::class, 'distancesStore'])->name('distances.store');
+
+            // Trang chi tiết (xem/sửa/xóa)
+            Route::get('/distances/{id}/detail', [ShippingSettingController::class, 'showDetail'])->name('distances.detail');
+            Route::put('/distances/{id}/update-detail', [ShippingSettingController::class, 'updateDetail'])->name('distances.update-detail');
+            Route::delete('/distances/{id}', [ShippingSettingController::class, 'distancesDestroy'])->name('distances.destroy');
+
+            // Import/Export Excel
+            Route::get('/distances/template/download', [ShippingSettingController::class, 'downloadTemplate'])->name('distances.template');
+            Route::post('/distances/import', [ShippingSettingController::class, 'importExcel'])->name('distances.import');
         });
     });
 

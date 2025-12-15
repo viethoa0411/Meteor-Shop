@@ -14,11 +14,16 @@ class ProductVariant extends Model
         'length',
         'width',
         'height',
+        'weight',
         'price',
         'weight', 
         'weight_unit',
         'stock',
         'sku',
+    ];
+
+    protected $casts = [
+        'weight' => 'decimal:2',
     ];
 
     public function product()

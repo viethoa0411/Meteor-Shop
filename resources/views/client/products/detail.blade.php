@@ -85,7 +85,6 @@
 
                     {{-- Thumbnails --}}
                     @if ($product->images && $product->images->count() > 0)
-
                         <div class="thumbnails d-flex gap-2 flex-wrap justify-content-center">
                             <div class="thumbnail-item {{ !$product->image ? 'active' : '' }}"
                                 style="width: 80px; height: 80px; border: 2px solid #ddd; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.3s;"
@@ -93,7 +92,8 @@
                                 <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/80x80?text=No+Image' }}"
                                     alt="Main" class="w-100 h-100" style="object-fit: cover;">
                             </div>
-                        @foreach ($product->images as $img)
+                            @foreach ($product->images as $img)
+
                                 <div class="thumbnail-item"
                                     style="width: 80px; height: 80px; border: 2px solid #ddd; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.3s;"
                                     onclick="changeMainImage('{{ asset('storage/' . $img->image) }}', this)">
@@ -516,7 +516,6 @@
                 const productVariants = @json($variantOptions);
                 const baseProductStock = {{ (int) ($product->stock ?? 0) }};
                 const baseProductPrice = {{ (float) $product->price }};
-
                 @auth
                 const isAuthenticated = true;
             @else
@@ -952,12 +951,12 @@
             }
 
             /* Quantity Input */
-
             input[type=number]::-webkit-inner-spin-button,
             input[type=number]::-webkit-outer-spin-button {
                 -webkit-appearance: none;
                 margin: 0;
             }
+
 
             /* Product Image Gallery */
             .thumbnail-item {
@@ -1051,7 +1050,6 @@
                 document.getElementById('lightboxImage').src = src;
                 new bootstrap.Modal(document.getElementById('imageLightbox')).show();
             }
-
             // Variant Selection
             document.querySelectorAll('.variant-color-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1116,9 +1114,6 @@
                     document.getElementById('stock-display').textContent = '--';
                 }
             }
-            // Variant Selection - Code này đã được xử lý trong DOMContentLoaded ở trên
-            // Giữ lại các hàm helper nếu cần
-
 
             // Quantity Controls
             document.querySelectorAll('.quantity-btn').forEach(btn => {

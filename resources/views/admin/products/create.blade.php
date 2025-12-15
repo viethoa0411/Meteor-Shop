@@ -141,15 +141,21 @@
                             <div class="row g-3 mt-2">
                                 <div class="col-md-3">
                                     <input type="number" id="length" step="0.01" class="form-control"
-                                        placeholder="Chiều dài (cm)">
+                                        placeholder="Chiều dài (m) - VD: 2.5">
                                 </div>
                                 <div class="col-md-3">
                                     <input type="number" id="width" step="0.01" class="form-control"
-                                        placeholder="Chiều rộng (cm)">
+                                        placeholder="Chiều rộng (m) - VD: 1.8">
                                 </div>
                                 <div class="col-md-3">
                                     <input type="number" id="height" step="0.01" class="form-control"
-                                        placeholder="Chiều cao (cm)">
+                                        placeholder="Chiều cao (m) - VD: 0.8">
+                                </div>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-3">
+                                    <input type="number" id="weight" step="0.01" class="form-control"
+                                        placeholder="Cân nặng (kg)">
                                 </div>
                                 <div class="col-md-3">
                                      <label>Tồn kho</label>
@@ -207,6 +213,7 @@
                 const length = document.getElementById('length').value.trim();
                 const width = document.getElementById('width').value.trim();
                 const height = document.getElementById('height').value.trim();
+                const weight = document.getElementById('weight').value.trim();
                 const stock = document.getElementById('variant_stock').value.trim();
                  const price = document.getElementById('variant_price').value.trim();
 
@@ -257,6 +264,7 @@
                     <input type="hidden" name="variants[${idx}][price]" value="${escapeHtml(price || '')}">
                     <input type="hidden" name="variants[${idx}][weight]" value="${escapeHtml(weight)}">
                     <input type="hidden" name="variants[${idx}][weight_unit]" value="${escapeHtml(weightUnit)}">
+
         `;
                 hiddenVariants.appendChild(hiddenDiv);
                 idx++;
@@ -266,6 +274,7 @@
                 document.getElementById('length').value = '';
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
+                document.getElementById('weight').value = '';
                 document.getElementById('variant_stock').value = '';
                 document.getElementById('variant_price').value = '';
                 if (weightEl) weightEl.value = '';

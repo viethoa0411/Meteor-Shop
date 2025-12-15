@@ -128,6 +128,7 @@
                                     <span id="shipping-fee-text">Vui lòng chọn địa chỉ để tính phí vận chuyển</span>
                                 </div>
                                 <input type="hidden" name="shipping_fee" id="shipping_fee_input" value="0">
+                                <input type="hidden" name="installation_fee" id="installation_fee_input" value="0">
                             </div>
 
                             <div class="mb-3">
@@ -144,14 +145,14 @@
                                     <input class="form-check-input" type="radio" name="shipping_method"
                                         id="shipping_express" value="express">
                                     <label class="form-check-label" for="shipping_express">
-                                        Nhanh (2-3 ngày)
+                                        {{ $shippingSettings->express_label }}
                                     </label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="shipping_method"
                                         id="shipping_fast" value="fast">
                                     <label class="form-check-label" for="shipping_fast">
-                                        Hỏa tốc (Trong ngày tại nội thành)
+                                        {{ $shippingSettings->fast_label }}
                                     </label>
                                 </div>
                                 @error('shipping_method')
@@ -264,11 +265,24 @@
                             <span>Giảm giá (<span id="applied-code"></span>):</span>
                             <strong class="text-success" id="discount-amount">- 0 đ</strong>
                         </div>
+                        <div class="mb-2 d-flex justify-content-between" id="installation-row" style="display:none;">
+                            <span>Phí lắp đặt:</span>
+                            <strong id="installation-fee">0 đ</strong>
+                        </div>
                         <div class="mb-3 pt-2 border-top d-flex justify-content-between">
                             <span class="fs-5 fw-bold">Tổng cộng:</span>
                             <span class="fs-5 fw-bold text-danger" id="total-amount">
                                 {{ number_format($subtotal, 0, ',', '.') }} đ
                             </span>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="installation-checkbox" name="installation">
+                                <label class="form-check-label" for="installation-checkbox">
+                                    <strong>Dịch vụ lắp đặt</strong>
+                                </label>
+                            </div>
+                            <small class="text-muted d-block mt-1">Phí lắp đặt sẽ được cộng thêm vào tổng tiền</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mã khuyến mãi</label>
@@ -284,7 +298,7 @@
 
                         <div class="alert alert-info small mb-0">
                             <i class="bi bi-info-circle me-1"></i>
-                            Miễn phí vận chuyển cho đơn hàng từ 500.000đ
+                            Miễn phí vận chuyển cho đơn hàng từ {{ number_format($shippingSettings->free_shipping_threshold, 0, ',', '.') }}đ
                         </div>
                     </div>
                 </div>
@@ -299,7 +313,69 @@
             let districts = [];
             let wards = [];
 
-            // Load tỉnh/thành phố
+            // Danh sách tỉnh/thành phố miền Bắc (Set lower-case để so khớp chắc chắn)
+            // Bao gồm cả các biến thể tên (có dấu, không dấu, viết hoa/thường)
+            const northernProvincesSet = new Set([
+                'hà nội', 'ha noi', 'hanoi',
+                'hải phòng', 'hai phong', 'haiphong',
+                'hải dương', 'hai duong', 'haiduong',
+                'hưng yên', 'hung yen', 'hungyen',
+                'hà nam', 'ha nam', 'hanam',
+                'nam định', 'nam dinh', 'namdinh',
+                'thái bình', 'thai binh', 'thaibinh',
+                'ninh bình', 'ninh binh', 'ninhbinh',
+                'bắc ninh', 'bac ninh', 'bacninh',
+                'bắc giang', 'bac giang', 'bacgiang',
+                'quảng ninh', 'quang ninh', 'quangninh',
+                'lào cai', 'lao cai', 'laocai',
+                'yên bái', 'yen bai', 'yenbai',
+                'tuyên quang', 'tuyen quang', 'tuyenquang',
+                'lạng sơn', 'lang son', 'langson',
+                'cao bằng', 'cao bang', 'caobang',
+                'bắc kạn', 'bac kan', 'backan',
+                'thái nguyên', 'thai nguyen', 'thainguyen',
+                'phú thọ', 'phu tho', 'phutho',
+                'vĩnh phúc', 'vinh phuc', 'vinhphuc',
+                'điện biên', 'dien bien', 'dienbien',
+                'lai châu', 'lai chau', 'laichau',
+                'sơn la', 'son la', 'sonla',
+                'hòa bình', 'hoa binh', 'hoabinh'
+            ]);
+
+            // Hàm normalize tên tỉnh để so sánh (loại bỏ dấu, khoảng trắng, chuyển lowercase)
+            function normalizeProvinceName(name) {
+                if (!name) return '';
+                return name.toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '') // Loại bỏ dấu
+                    .replace(/^(tinh|thanh pho|tp\.?)\s+/i, '') // Loại bỏ prefix "Tỉnh", "Thành phố", "TP."
+                    .replace(/\s+/g, ' ') // Chuẩn hóa khoảng trắng
+                    .trim();
+            }
+
+            // Hàm kiểm tra xem tên tỉnh có chứa tên tỉnh miền Bắc không
+            function isNorthernProvince(name) {
+                if (!name) return false;
+
+                const normalized = normalizeProvinceName(name);
+                const normalizedNoSpace = normalized.replace(/\s+/g, '');
+
+                // Check trực tiếp
+                if (northernProvincesSet.has(normalized) || northernProvincesSet.has(normalizedNoSpace)) {
+                    return true;
+                }
+
+                // Check nếu tên tỉnh chứa tên tỉnh miền Bắc (cho trường hợp "Tỉnh Hà Nội")
+                for (const provinceName of northernProvincesSet) {
+                    if (normalized.includes(provinceName) || normalizedNoSpace.includes(provinceName.replace(/\s+/g, ''))) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            // Load tỉnh/thành phố - Chỉ hiển thị miền Bắc
             async function loadProvinces() {
                 try {
                     const response = await fetch('https://esgoo.net/api-tinhthanh/1/0.htm');
@@ -313,13 +389,29 @@
                         if (!citySelect) return;
 
                         citySelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
+                        
+                        let addedCount = 0;
                         provinces.forEach(province => {
-                            const option = document.createElement('option');
-                            option.value = province.full_name;
-                            option.textContent = province.full_name;
-                            option.dataset.code = province.id;
-                            citySelect.appendChild(option);
+                            // Lấy tên tỉnh từ nhiều nguồn có thể
+                            const provinceName = province.full_name || province.name || province.title || '';
+                            
+                            // Chỉ thêm các tỉnh miền Bắc
+                            if (isNorthernProvince(provinceName)) {
+                                const option = document.createElement('option');
+                                option.value = provinceName; // Giữ nguyên tên gốc hiển thị
+                                option.textContent = provinceName;
+                                option.dataset.code = province.id || province.code || province.province_id;
+                                citySelect.appendChild(option);
+                                addedCount++;
+                            }
                         });
+
+                        if (addedCount === 0) {
+                            const errorOption = document.createElement('option');
+                            errorOption.value = '';
+                            errorOption.textContent = '⚠ Không tìm thấy tỉnh miền Bắc (API changed?)';
+                            citySelect.appendChild(errorOption);
+                        }
                     }
                 } catch (error) {
                     console.error('Lỗi khi tải danh sách tỉnh/thành phố:', error);
@@ -445,11 +537,14 @@
 
                 const subtotal = {{ $subtotal }};
                 let currentShippingFee = 0;
+                let installationFee = 0;
+                let isInstallationSelected = false;
 
                 // Hàm tính phí vận chuyển qua API
                 function calculateShippingFee() {
                     const citySelect = document.getElementById('shipping_city');
                     const districtSelect = document.getElementById('shipping_district');
+                    const selectedMethod = document.querySelector('input[name="shipping_method"]:checked')?.value || 'standard';
 
                     if (!citySelect || !districtSelect) return;
 
@@ -477,7 +572,8 @@
                             body: JSON.stringify({
                                 city: cityName,
                                 district: districtName,
-                                subtotal: subtotal
+                            subtotal: subtotal,
+                            method: selectedMethod
                             })
                         })
                         .then(response => response.json())
@@ -485,6 +581,7 @@
                             if (data.success) {
                                 currentShippingFee = data.fee;
                                 document.getElementById('shipping_fee_input').value = data.fee;
+                                const label = data.method_label || 'Phí vận chuyển';
 
                                 if (data.is_free_shipping) {
                                     document.getElementById('shipping-fee-text').innerHTML =
@@ -493,7 +590,7 @@
                                         'alert alert-success mb-0';
                                 } else {
                                     document.getElementById('shipping-fee-text').innerHTML =
-                                        'Phí vận chuyển của quý khách: <strong>' + data.fee_formatted +
+                                        label + ': <strong>' + data.fee_formatted +
                                         '</strong>';
                                     document.getElementById('shipping-fee-display').className =
                                         'alert alert-warning mb-0';
@@ -513,18 +610,47 @@
 
                 // Hàm cập nhật hiển thị tổng tiền
                 function updateTotalDisplay() {
-                    const total = Math.max(0, subtotal - currentDiscount + currentShippingFee);
+                    const total = Math.max(0, subtotal - currentDiscount + currentShippingFee + installationFee);
                     const shippingFeeEl = document.getElementById('shipping-fee');
                     const totalAmountEl = document.getElementById('total-amount');
+                    const installationRow = document.getElementById('installation-row');
+                    const installationFeeEl = document.getElementById('installation-fee');
 
                     if (shippingFeeEl) {
                         shippingFeeEl.textContent = currentShippingFee === 0 ?
                             'Miễn phí' :
                             currentShippingFee.toLocaleString('vi-VN') + ' đ';
                     }
+                    if (installationRow && installationFeeEl) {
+                        if (isInstallationSelected && installationFee > 0) {
+                            installationRow.style.display = 'flex';
+                            installationFeeEl.textContent = installationFee.toLocaleString('vi-VN') + ' đ';
+                        } else {
+                            installationRow.style.display = 'none';
+                        }
+                    }
                     if (totalAmountEl) {
                         totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
                     }
+                }
+
+                // Xử lý checkbox lắp đặt
+                const installationCheckbox = document.getElementById('installation-checkbox');
+                if (installationCheckbox) {
+                    installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+
+                    installationCheckbox.addEventListener('change', function() {
+                        isInstallationSelected = this.checked;
+                        const installationFeeInput = document.getElementById('installation_fee_input');
+                        if (!isInstallationSelected) {
+                            installationFee = 0;
+                            if (installationFeeInput) installationFeeInput.value = 0;
+                        } else {
+                            installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                            if (installationFeeInput) installationFeeInput.value = installationFee;
+                        }
+                        updateTotalDisplay();
+                    });
                 }
 
                 // Xử lý khi chọn tỉnh/thành phố
@@ -543,6 +669,11 @@
                         loadWards(selectedOption.dataset.code);
                     }
                     setTimeout(calculateShippingFee, 300);
+                });
+
+                const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
+                shippingInputs.forEach(input => {
+                    input.addEventListener('change', () => setTimeout(calculateShippingFee, 200));
                 });
 
                 // Áp dụng mã khuyến mãi

@@ -159,7 +159,7 @@
                                                 <td>
                                                     @if ($v->length || $v->width || $v->height)
                                                         {{ $v->length ?? '—' }} × {{ $v->width ?? '—' }} ×
-                                                        {{ $v->height ?? '—' }} cm
+                                                        {{ $v->height ?? '—' }} m
                                                     @else
                                                         —
                                                     @endif

@@ -9,16 +9,17 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ClientWallet;
 use App\Models\WalletTransaction;
-
 use App\Models\OrderPayment;
 use App\Models\MomoPayment;
-
+use App\Models\ShippingSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Services\PromotionService;
+use App\Helpers\ShippingHelper;
 
 class CheckoutController extends Controller
 {
@@ -50,6 +51,7 @@ class CheckoutController extends Controller
 
         $type = $request->get('type', 'buy_now');
         $user = Auth::user();
+        $shippingSettings = ShippingSetting::getSettings();
 
         // Xử lý checkout từ mua lại đơn hàng (reorder)
         $checkoutSession = session('checkout_session');
@@ -62,7 +64,7 @@ class CheckoutController extends Controller
             $subtotal     = $checkoutSession['subtotal'];
             $checkoutData = $checkoutSession;
 
-            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData'));
+            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData', 'shippingSettings'));
         }
 
         // Xử lý checkout từ giỏ hàng
@@ -172,7 +174,7 @@ class CheckoutController extends Controller
 
             session(['checkout_session' => $checkoutData]);
 
-            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData'));
+            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData', 'shippingSettings'));
         }
 
         // Xử lý checkout mua ngay (1 sản phẩm)
@@ -228,7 +230,7 @@ class CheckoutController extends Controller
 
         session(['checkout_session' => $checkoutData]);
 
-        return view('client.checkout.index', compact('product', 'variant', 'qty', 'price', 'stock', 'user', 'checkoutData'));
+        return view('client.checkout.index', compact('product', 'variant', 'qty', 'price', 'stock', 'user', 'checkoutData', 'shippingSettings'));
     }
 
     /**
@@ -257,6 +259,8 @@ class CheckoutController extends Controller
 
             'notes'            => 'nullable|string|max:1000',
             'quantity'         => 'nullable|integer|min:1',
+            'installation'     => 'nullable|boolean',
+            'installation_fee' => 'nullable|numeric|min:0',
         ], [
             'customer_name.required'    => 'Vui lòng nhập họ tên',
             'customer_name.regex'       => 'Họ tên chỉ được chứa chữ cái và khoảng trắng',
@@ -271,6 +275,13 @@ class CheckoutController extends Controller
             'shipping_ward.required'    => 'Vui lòng chọn phường/xã',
             'shipping_address.required' => 'Vui lòng nhập địa chỉ chi tiết',
         ]);
+
+        // Kiểm tra tỉnh/thành phố phải là miền Bắc
+        if (!ShippingHelper::isNorthernProvince($request->shipping_city)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Hệ thống chỉ hỗ trợ giao hàng tại khu vực miền Bắc. Vui lòng chọn tỉnh/thành phố miền Bắc.');
+        }
 
         // Lấy checkout session
         $checkoutSession = session('checkout_session');
@@ -308,11 +319,18 @@ class CheckoutController extends Controller
         }
 
         // Tính phí vận chuyển
-        $shippingFee = $this->getShippingFeeValue(
+        $shippingCalculation = $this->calculateShippingTotal(
             $request->shipping_method,
-            $request->shipping_city,
-            $checkoutSession['subtotal']
+            $checkoutSession
         );
+        $shippingFee = $shippingCalculation['fee'];
+
+        // Lấy phí lắp đặt
+        $installationFee = 0;
+        if ($request->has('installation') && $request->installation) {
+            $shippingSettings = ShippingSetting::getSettings();
+            $installationFee = (float)($request->installation_fee ?? $shippingSettings->installation_fee ?? 0);
+        }
 
         // Lấy số tiền giảm (nếu đã áp dụng promotion trước đó)
         $discountAmount = isset($checkoutSession['discount_amount'])
@@ -334,13 +352,15 @@ class CheckoutController extends Controller
 
 
         $checkoutSession['shipping_fee']      = $shippingFee;
+        $checkoutSession['installation_fee']  = $installationFee;
+        $checkoutSession['has_installation']  = $request->has('installation') && $request->installation;
         $checkoutSession['notes']             = $request->notes;
         $checkoutSession['discount_amount']   = $discountAmount;
 
-        // Tổng cuối cùng sau giảm giá + phí ship
+        // Tổng cuối cùng sau giảm giá + phí ship + phí lắp đặt
         $checkoutSession['final_total'] = max(
             0,
-            $checkoutSession['subtotal'] - $discountAmount + $shippingFee
+            $checkoutSession['subtotal'] - $discountAmount + $shippingFee + $installationFee
         );
 
         session(['checkout_session' => $checkoutSession]);
@@ -365,6 +385,8 @@ class CheckoutController extends Controller
         
         \Illuminate\Support\Facades\Log::info('Confirm: Checkout Session', ['payment_method' => $checkoutSession['payment_method'] ?? 'N/A']);
 
+        $shippingSettings = ShippingSetting::getSettings();
+
 
         if (!$checkoutSession) {
             return redirect()->route('client.home')
@@ -380,7 +402,7 @@ class CheckoutController extends Controller
 
         // Nếu là checkout từ cart hoặc reorder
         if (in_array($checkoutSession['type'], ['cart', 'reorder'])) {
-            return view('client.checkout.confirm-cart', compact('checkoutSession'));
+            return view('client.checkout.confirm-cart', compact('checkoutSession', 'shippingSettings'));
         }
 
         // Lấy lại sản phẩm và variant cho buy_now
@@ -391,7 +413,7 @@ class CheckoutController extends Controller
             $variant = ProductVariant::find($checkoutSession['variant_id']);
         }
 
-        return view('client.checkout.confirm', compact('checkoutSession', 'product', 'variant'));
+        return view('client.checkout.confirm', compact('checkoutSession', 'product', 'variant', 'shippingSettings'));
     }
 
     /**
@@ -433,9 +455,10 @@ class CheckoutController extends Controller
                 'shipping_address' => $checkoutSession['shipping_address'],
                 'shipping_method'  => $checkoutSession['shipping_method'],
                 'shipping_fee'     => $checkoutSession['shipping_fee'],
+                'installation_fee' => $checkoutSession['installation_fee'] ?? 0,
                 'payment_method'   => $checkoutSession['payment_method'],
                 'sub_total'        => $checkoutSession['subtotal'],
-                // tổng cuối cùng khách phải trả (sau giảm giá + phí ship)
+                // tổng cuối cùng khách phải trả (sau giảm giá + phí ship + phí lắp đặt)
                 'total_price'      => $checkoutSession['final_total'],
                 'discount_amount'  => $checkoutSession['discount_amount'] ?? 0,
                 'promotion_id'     => $checkoutSession['promotion']['promotion_id'] ?? null,
@@ -698,9 +721,10 @@ class CheckoutController extends Controller
         $checkoutSession['discount_amount'] = $promotionData['discount_amount'];
 
         $shippingFee = $checkoutSession['shipping_fee'] ?? 0;
+        $installationFee = $checkoutSession['installation_fee'] ?? 0;
         $checkoutSession['final_total'] = max(
             0,
-            $checkoutSession['subtotal'] - $promotionData['discount_amount'] + $shippingFee
+            $checkoutSession['subtotal'] - $promotionData['discount_amount'] + $shippingFee + $installationFee
         );
 
         session(['checkout_session' => $checkoutSession]);
@@ -841,10 +865,76 @@ class CheckoutController extends Controller
      */
     public function calculateShippingFee(Request $request)
     {
+        $request->validate([
+            'method' => 'nullable|in:standard,express,fast',
+            'quantity' => 'nullable|integer|min:1',
+            'city' => 'nullable|string',
+            'district' => 'nullable|string',
+            'ward' => 'nullable|string',
+            'address' => 'nullable|string',
+        ]);
+
         $city = $request->input('city');
         $district = $request->input('district');
-        $subtotal = $request->input('subtotal', 0);
+        $ward = $request->input('ward');
+        $address = $request->input('address');
         $method = $request->input('method', 'standard');
+        $quantity = $request->input('quantity');
+
+        $checkoutSession = session('checkout_session');
+        if (!$checkoutSession) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Phiên tính phí đã hết hạn. Vui lòng tải lại trang.'
+            ], 400);
+        }
+
+        // Cập nhật thông tin địa chỉ đích vào session nếu có
+        if ($city) {
+            $checkoutSession['shipping_city'] = trim($city);
+        }
+        if ($district) {
+            $checkoutSession['shipping_district'] = trim($district);
+        }
+        if ($ward) {
+            $checkoutSession['shipping_ward'] = trim($ward);
+        }
+        if ($address) {
+            $checkoutSession['shipping_address'] = trim($address);
+        }
+        session(['checkout_session' => $checkoutSession]);
+
+        // Log để debug
+        Log::info('Checkout: Tính phí vận chuyển', [
+            'city' => $checkoutSession['shipping_city'] ?? null,
+            'district' => $checkoutSession['shipping_district'] ?? null,
+            'ward' => $checkoutSession['shipping_ward'] ?? null,
+            'address' => $checkoutSession['shipping_address'] ?? null,
+            'method' => $method,
+            'quantity' => $quantity,
+        ]);
+
+        $shippingCalculation = $this->calculateShippingTotal(
+            $method,
+            $checkoutSession,
+            $quantity ? (int) $quantity : null
+        );
+
+        $fee = $shippingCalculation['fee'];
+        $settings = $shippingCalculation['settings'];
+
+        // Kiểm tra xem có phải miễn phí vận chuyển do đạt ngưỡng không
+        $isFreeShipping = false;
+        if ($fee === 0 && $shippingCalculation['standard_fee'] > 0) {
+            // Nếu fee = 0 nhưng standard_fee > 0, có nghĩa là được miễn phí do đạt ngưỡng
+            $isFreeShipping = true;
+        } elseif ($fee === 0 && $shippingCalculation['standard_fee'] === 0) {
+            // Nếu cả fee và standard_fee đều = 0, có thể do không có dữ liệu kích thước/cân nặng
+            Log::warning('Checkout: Phí vận chuyển = 0, có thể do thiếu dữ liệu kích thước/cân nặng', [
+                'standard_fee' => $shippingCalculation['standard_fee'],
+                'surcharge' => $shippingCalculation['surcharge'],
+            ]);
+        }
 
         // Gọi hàm tính phí nội bộ
         $fee = $this->getShippingFeeValue($method, $city, $subtotal);
@@ -853,37 +943,126 @@ class CheckoutController extends Controller
             'success' => true,
             'fee' => $fee,
             'fee_formatted' => number_format($fee, 0, ',', '.') . ' đ',
-            'is_free_shipping' => ($fee === 0)
+            'is_free_shipping' => $isFreeShipping,
+            'standard_fee' => $shippingCalculation['standard_fee'],
+            'surcharge' => $shippingCalculation['surcharge'],
+            'method_label' => $this->getMethodLabel($method, $settings),
         ]);
     }
 
     /**
      * Helper tính phí vận chuyển (Internal)
      */
-    private function getShippingFeeValue($method, $city, $subtotal)
+    private function calculateShippingTotal(string $method, array $checkoutSession, ?int $quantityOverride = null): array
     {
-        // Logic tính phí vận chuyển đơn giản
-        $baseFee = 30000; // Phí cơ bản
+        $settings = ShippingSetting::getSettings();
+        $items = $this->buildShippingItems($checkoutSession, $quantityOverride);
+        $subtotal = $this->resolveSubtotal($checkoutSession, $quantityOverride);
 
-        switch ($method) {
-            case 'express':
-                $baseFee = 50000;
-                break;
-            case 'fast':
-                $baseFee = 70000;
-                break;
-            case 'standard':
-            default:
-                $baseFee = 30000;
-                break;
+        // Lấy thông tin địa chỉ đích từ checkout session
+        $destinationCity = isset($checkoutSession['shipping_city']) ? trim($checkoutSession['shipping_city']) : null;
+        $destinationDistrict = isset($checkoutSession['shipping_district']) ? trim($checkoutSession['shipping_district']) : null;
+        $destinationWard = isset($checkoutSession['shipping_ward']) ? trim($checkoutSession['shipping_ward']) : null;
+        $destinationAddress = isset($checkoutSession['shipping_address']) ? trim($checkoutSession['shipping_address']) : null;
+
+        // Log để debug
+        Log::info('Checkout: Thông tin tính phí', [
+            'origin' => [
+                'city' => $settings->origin_city,
+                'district' => $settings->origin_district,
+                'ward' => $settings->origin_ward,
+                'address' => $settings->origin_address,
+            ],
+            'destination' => [
+                'city' => $destinationCity,
+                'district' => $destinationDistrict,
+                'ward' => $destinationWard,
+                'address' => $destinationAddress,
+            ],
+            'items_count' => count($items),
+            'subtotal' => $subtotal,
+        ]);
+
+        $feeData = $settings->calculateShippingFee(
+            $items, 
+            $method, 
+            $subtotal, 
+            $destinationCity, 
+            $destinationDistrict,
+            $destinationWard,
+            $destinationAddress
+        );
+
+        return [
+            'fee' => $feeData['total'],
+            'standard_fee' => $feeData['standard_fee'],
+            'surcharge' => $feeData['surcharge'],
+            'settings' => $settings,
+            'subtotal' => $subtotal,
+        ];
+    }
+
+    private function buildShippingItems(array $checkoutSession, ?int $quantityOverride = null): array
+    {
+        $items = [];
+
+        if (in_array($checkoutSession['type'] ?? '', ['cart', 'reorder']) && isset($checkoutSession['items'])) {
+            foreach ($checkoutSession['items'] as $item) {
+                $product = Product::find($item['product_id'] ?? null);
+                $variant = !empty($item['variant_id']) ? ProductVariant::find($item['variant_id']) : null;
+                $items[] = $this->mapShippingItem($product, $variant, (int)($item['quantity'] ?? 1));
+            }
+        } elseif (!empty($checkoutSession['product_id'])) {
+            $product = Product::find($checkoutSession['product_id']);
+            $variant = !empty($checkoutSession['variant_id'])
+                ? ProductVariant::where('id', $checkoutSession['variant_id'])
+                    ->where('product_id', $checkoutSession['product_id'])
+                    ->first()
+                : null;
+            $qty = $quantityOverride ?? (int)($checkoutSession['quantity'] ?? 1);
+            $items[] = $this->mapShippingItem($product, $variant, $qty);
         }
 
-        // Miễn phí ship cho đơn trên 10.000.000
-        if ($subtotal >= 10000000) {
-            return 0;
+        return array_values(array_filter($items));
+    }
+
+    private function mapShippingItem(?Product $product, ?ProductVariant $variant, int $quantity): ?array
+    {
+        if (!$product) {
+            return null;
         }
 
-        return $baseFee;
+        $length = $variant->length ?? $product->length ?? 0;
+        $width = $variant->width ?? $product->width ?? 0;
+        $height = $variant->height ?? $product->height ?? 0;
+        $weight = $variant->weight ?? $product->weight ?? 0;
+
+        return [
+            'length_cm' => (float) $length,
+            'width_cm' => (float) $width,
+            'height_cm' => (float) $height,
+            'weight_kg' => (float) $weight,
+            'quantity' => max(1, $quantity),
+        ];
+    }
+
+    private function resolveSubtotal(array $checkoutSession, ?int $quantityOverride = null): float
+    {
+        if (($checkoutSession['type'] ?? '') === 'buy_now' && $quantityOverride) {
+            $price = (float) ($checkoutSession['price'] ?? 0);
+            return $price * $quantityOverride;
+        }
+
+        return (float) ($checkoutSession['subtotal'] ?? 0);
+    }
+
+    private function getMethodLabel(string $method, ShippingSetting $settings): string
+    {
+        return match ($method) {
+            'express' => $settings->express_label,
+            'fast' => $settings->fast_label,
+            default => 'Giao tiêu chuẩn',
+        };
     }
 
     private function execPostRequest($url, $data)

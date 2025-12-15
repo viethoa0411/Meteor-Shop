@@ -86,15 +86,15 @@
                             @if ($checkoutSession['shipping_method'] == 'standard')
                                 Giao hàng tiêu chuẩn
                             @elseif ($checkoutSession['shipping_method'] == 'express')
-                                Giao hàng nhanh
+                                {{ $shippingSettings->express_label }}
                             @else
-                                Giao hàng hỏa tốc
+                                {{ $shippingSettings->fast_label }}
                             @endif
                         </p>
                         <p class="mb-0">
                             <strong>Thanh toán:</strong>
                             @if ($checkoutSession['payment_method'] == 'cash')
-                                Thanh toán khi nhận hàng (COD)
+                                Thanh toán khi nhận hàng
                             @elseif ($checkoutSession['payment_method'] == 'momo')
                                 <span class="text-primary" style="color: #a50064 !important;"><i class="bi bi-credit-card me-1"></i>Thanh toán bằng Momo</span>
 
@@ -138,6 +138,16 @@
                                 @endif
                             </strong>
                         </div>
+                        @php 
+                            $installationFee = $checkoutSession['installation_fee'] ?? 0;
+                            $hasInstallation = $checkoutSession['has_installation'] ?? false;
+                        @endphp
+                        @if ($hasInstallation && $installationFee > 0)
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span>Phí lắp đặt:</span>
+                                <strong>{{ number_format($installationFee, 0, ',', '.') }} đ</strong>
+                            </div>
+                        @endif
                         @php $discount = $checkoutSession['discount_amount'] ?? 0; @endphp
                         @if ($discount > 0)
                             <div class="mb-2 d-flex justify-content-between">

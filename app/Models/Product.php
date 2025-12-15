@@ -24,6 +24,7 @@ class Product extends Model
         'length',
         'width',
         'height',
+        'weight',
         'color_code',
         'category_id',
         'status',
