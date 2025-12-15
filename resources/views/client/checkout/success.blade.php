@@ -1,19 +1,47 @@
 @extends('client.layouts.app')
 
-@section('title', 'Đặt hàng thành công')
+@section('title')
+    @if (isset($order) && $order->payment_method == 'momo' && $order->payment_status != 'paid')
+        Đơn hàng chưa hoàn thành
+    @else
+        Đặt hàng thành công
+    @endif
+@endsection
 
 @section('content')
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                {{-- Thông báo thành công --}}
+                {{-- Thông báo --}}
                 <div class="text-center mb-4">
-                    <div class="mb-3" style="font-size: 80px; color: #28a745;">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </div>
-                    <h2 class="mb-2">Đặt hàng thành công!</h2>
-                    <p class="text-muted">Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ xử lý đơn hàng của bạn sớm nhất có thể.</p>
+                    @if (isset($order) && $order->payment_method == 'momo' && $order->payment_status != 'paid')
+                        <div class="mb-3" style="font-size: 80px; color: #ffc107;">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                        </div>
+                        <h2 class="mb-2">Đơn hàng chưa hoàn thành!</h2>
+                        <p class="text-muted mb-3">Bạn đã đặt hàng nhưng quá trình thanh toán Momo chưa hoàn tất.</p>
+                        
+                        <form action="{{ route('client.checkout.momo_payment.process', $order->order_code) }}" method="POST" class="d-inline-block">
+                            @csrf
+                            <button type="submit" class="btn btn-primary px-4 py-2" style="background-color: #a50064; border-color: #a50064;">
+                                <i class="bi bi-qr-code me-2"></i> Tiếp tục thanh toán Momo
+                            </button>
+                        </form>
+                    @else
+                        <div class="mb-3" style="font-size: 80px; color: #28a745;">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <h2 class="mb-2">Đặt hàng thành công!</h2>
+                        <p class="text-muted">Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ xử lý đơn hàng của bạn sớm nhất có thể.</p>
+                    @endif
                 </div>
+
+                {{-- MOMO QR CODE SECTION (CHỈ HIỆN KHI THANH TOÁN MOMO) - Giữ lại alert nhưng sửa nội dung --}}
+                @if (isset($order) && $order->payment_method == 'momo' && $order->payment_status != 'paid')
+                    <div class="alert alert-warning mb-4 text-center">
+                        <p class="mb-0">Nếu bạn đã thanh toán và bị trừ tiền, vui lòng liên hệ bộ phận CSKH để được hỗ trợ.</p>
+                    </div>
+                @endif
 
                 {{-- Mã đơn hàng --}}
                 <div class="card shadow-sm mb-4">
