@@ -11,10 +11,16 @@ use App\Models\Category;
 use App\Models\Review;
 use App\Models\ReviewAuditLog;
 use App\Models\MonthlyTarget;
+use App\Models\Contact;
+use App\Models\ChatSession;
+use App\Models\DepositRequest;
+use App\Models\WithdrawRequest;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -1815,6 +1821,75 @@ class DashboardController extends Controller
                     'items' => [],
                     'total' => 0,
                 ],
+            ], 500);
+        }
+    }
+
+    /**
+     * Get notifications for admin panel
+     */
+    public function notificationsApi(Request $request)
+    {
+        try {
+            $badgeOnly = $request->has('badge_only') && $request->badge_only == '1';
+            $userId = Auth::id();
+
+            // Get notifications from database
+            $dbNotifications = Notification::where('user_id', $userId)
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
+
+            // If badge only, return count
+            if ($badgeOnly) {
+                $totalUnread = Notification::where('user_id', $userId)
+                    ->where('is_read', false)
+                    ->count();
+                
+                return response()->json([
+                    'success' => true,
+                    'totalUnread' => $totalUnread,
+                ]);
+            }
+
+            // Convert to array format for frontend
+            $notifications = [];
+            foreach ($dbNotifications as $notif) {
+                $notifications[] = [
+                    'id' => $notif->id,
+                    'type' => $notif->type,
+                    'level' => $notif->level,
+                    'icon' => $notif->icon,
+                    'iconColor' => $notif->icon_color,
+                    'title' => $notif->title,
+                    'message' => $notif->message,
+                    'link' => $notif->url,
+                    'time' => $notif->created_at->diffForHumans(),
+                    'timestamp' => $notif->created_at->timestamp,
+                    'unread' => !$notif->is_read,
+                ];
+            }
+
+            $totalUnread = Notification::where('user_id', $userId)
+                ->where('is_read', false)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'notifications' => $notifications,
+                'totalUnread' => $totalUnread,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error loading notifications:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi tải thông báo',
+                'notifications' => [],
+                'totalUnread' => 0,
             ], 500);
         }
     }

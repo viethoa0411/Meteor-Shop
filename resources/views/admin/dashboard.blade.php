@@ -5482,7 +5482,6 @@
                 }
                 
                 const data = await response.json();
-                console.log('Revenue Orders Chart Data:', data);
 
                 // Validate data
                 if (!data) {
@@ -5713,7 +5712,6 @@
                 } else {
                     revenueOrdersChart = new ApexCharts(revenueOrdersChartEl, options);
                     revenueOrdersChart.render().then(() => {
-                        console.log('Revenue Orders Chart rendered successfully');
                     }).catch((err) => {
                         console.error('Chart render error:', err);
                         revenueOrdersChartEl.innerHTML = '<div class="alert alert-danger m-3">Lỗi khi render biểu đồ. Vui lòng thử lại.</div>';
@@ -5848,21 +5846,21 @@
                     orderStatusTotalEl.textContent = (total_orders || 0).toLocaleString('vi-VN');
                 }
                 if (orderStatusPeriodEl && from && to) {
-                    const fromDate = new Date(from).toLocaleDateString('vi-VN');
-                    const toDate = new Date(to).toLocaleDateString('vi-VN');
-                    orderStatusPeriodEl.textContent = `${fromDate} - ${toDate}`;
+                const fromDate = new Date(from).toLocaleDateString('vi-VN');
+                const toDate = new Date(to).toLocaleDateString('vi-VN');
+                orderStatusPeriodEl.textContent = `${fromDate} - ${toDate}`;
                 }
                 
                 // Update date range text
                 if (orderStatusDateRangeEl) {
-                    const rangeTexts = {
-                        'today': 'Hôm nay',
-                        '7': '7 ngày gần nhất',
-                        '30': '30 ngày gần nhất',
-                        '90': '90 ngày gần nhất',
-                        'month': 'Tháng này',
-                    };
-                    orderStatusDateRangeEl.textContent = `(${rangeTexts[range] || '7 ngày gần nhất'})`;
+                const rangeTexts = {
+                    'today': 'Hôm nay',
+                    '7': '7 ngày gần nhất',
+                    '30': '30 ngày gần nhất',
+                    '90': '90 ngày gần nhất',
+                    'month': 'Tháng này',
+                };
+                orderStatusDateRangeEl.textContent = `(${rangeTexts[range] || '7 ngày gần nhất'})`;
                 }
 
                 // Render bảng (có cột xu hướng)
@@ -6132,7 +6130,7 @@
                                 }
                             });
                         }
-                    } else {
+            } else {
                         // Reset tất cả rows
                         document.querySelectorAll('.order-status-row').forEach(row => {
                             row.style.backgroundColor = '';
@@ -6211,13 +6209,13 @@
                     orderStatusChart.update();
                 } else {
                     if (orderStatusCtx && labels.length > 0 && chartData.length > 0) {
-                        orderStatusChart = new Chart(orderStatusCtx, chartOptions);
+                    orderStatusChart = new Chart(orderStatusCtx, chartOptions);
                         orderStatusChart.data._statusData = [...statusDataForHover]; // Tạo copy để đồng bộ
-                        
-                        // Thêm event listener cho hover trên canvas (chỉ thêm 1 lần)
+                    
+                    // Thêm event listener cho hover trên canvas (chỉ thêm 1 lần)
                         if (!chartEventListenersAdded) {
-                            orderStatusCtx.addEventListener('mousemove', handleChartHover);
-                            orderStatusCtx.addEventListener('mouseleave', handleChartLeave);
+                    orderStatusCtx.addEventListener('mousemove', handleChartHover);
+                    orderStatusCtx.addEventListener('mouseleave', handleChartLeave);
                             chartEventListenersAdded = true;
                         }
                     }
@@ -6274,8 +6272,8 @@
                         tooltipElement.style.opacity = '0';
                         tooltipElement.style.transform = 'translateY(-5px)';
                         setTimeout(() => {
-                            if (tooltipElement) {
-                                tooltipElement.style.display = 'none';
+                    if (tooltipElement) {
+                        tooltipElement.style.display = 'none';
                             }
                         }, 200);
                     }
@@ -6737,7 +6735,6 @@
                 return;
             }
 
-            console.log('Loading top products with range:', range, 'from:', from, 'to:', to);
 
             // Show loading
             topProductsTableBody.innerHTML = `
@@ -6777,7 +6774,6 @@
 
                 const result = await response.json();
                 
-                console.log('Top Products API Response:', result); // Debug log
                 
                 if (!result.success) {
                     throw new Error(result.message || 'Lỗi từ server');
@@ -6788,7 +6784,6 @@
                     const totalRevenueEstimated = result.data.total_revenue_estimated || 0;
                     const totalRevenueCompleted = result.data.total_revenue_completed || 0;
                     
-                    console.log('Products loaded:', products.length); // Debug log
 
                     if (products.length === 0) {
                         topProductsTableBody.innerHTML = `
@@ -8117,11 +8112,15 @@
             loadInventory();
         }
 
-        // Toggle filter options based on filter type
+        // Toggle filter options based on filter type (with null guards)
         function toggleFilterOptions() {
-            const filterType = document.getElementById('order_filter_type').value;
+            const filterTypeEl = document.getElementById('order_filter_type');
             const monthGroup = document.getElementById('filter_month_group');
             const dateRangeGroup = document.getElementById('filter_date_range_group');
+
+            if (!filterTypeEl || !monthGroup || !dateRangeGroup) return;
+
+            const filterType = filterTypeEl.value || '';
             
             // Hide all groups first
             monthGroup.style.display = 'none';
