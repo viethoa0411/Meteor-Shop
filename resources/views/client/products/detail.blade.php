@@ -414,7 +414,7 @@
         </div>
         @php
             $variantOptions = $product->variants
-                ->map(function ($variant) {
+                ->map(function ($variant) use ($product) {
                     return [
                         'id' => $variant->id,
                         'color_name' => $variant->color_name,
