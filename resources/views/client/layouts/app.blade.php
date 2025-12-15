@@ -58,96 +58,236 @@
             margin: 0;
         }
 
+        /* ===== HEADER - Modern Professional Design ===== */
         .client-header {
-            background: #fff;
-            border-bottom: 1px solid #ebebeb;
+            background: #ffffff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
             position: sticky;
             top: 0;
             z-index: 1020;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .client-header.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .client-header__inner {
-            max-width: 1320px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 12px 24px;
+            padding: 16px 32px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 24px;
         }
 
+        /* Logo */
         .client-logo {
-            font-size: 32px;
-            font-weight: 700;
-            color: #111;
-            text-transform: none;
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
             display: flex;
-            align-items: flex-end;
-            gap: 4px;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
+        .client-logo:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .client-logo::before {
+            content: '⚡';
+            font-size: 24px;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Search Bar */
         .client-search {
             flex: 1;
+            max-width: 600px;
             display: flex;
-            align-items: stretch;
-            border: 1px solid #d6d6d6;
-            border-radius: 24px;
-            overflow: hidden;
-            background: #fff;
-            max-width: 520px;
+            align-items: center;
+            position: relative;
+            margin: 0 auto;
         }
 
         .client-search input {
             flex: 1;
-            border: none;
-            padding: 10px 16px;
+            width: 100%;
+            padding: 12px 20px 12px 48px;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
             font-size: 15px;
             outline: none;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+            color: #111;
+            box-sizing: border-box;
+        }
+
+        .client-search input::placeholder {
+            color: #9ca3af;
+        }
+
+        .client-search input:focus {
+            border-color: #f97316;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+        }
+
+        .client-search::before {
+            content: '\f002';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 18px;
+            color: #9ca3af;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .client-search button {
-            background: #3b3b3b;
+            position: absolute;
+            right: 4px;
+            background: linear-gradient(135deg, #f97316, #fb923c);
             border: none;
-            width: 48px;
-            display: grid;
-            place-items: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+            z-index: 2;
         }
 
+        .client-search button i {
+            font-size: 14px;
+        }
+
+        .client-search button:hover {
+            background: linear-gradient(135deg, #ea580c, #f97316);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+
+        .client-search button:active {
+            transform: scale(0.95);
+        }
+
+        /* Actions */
         .client-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-left: 0;
+            gap: 20px;
+            flex-shrink: 0;
         }
 
         .client-pill {
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: #2b2b2b;
-            font-weight: 500;
-            transition: color 0.2s ease;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #374151;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
 
         .client-pill:hover {
-            color: #2b5c73;
+            background: linear-gradient(135deg, #f97316, #fb923c);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+            border-color: transparent;
         }
 
         .client-pill__icon {
             font-size: 20px;
         }
 
+        .client-cart {
+            position: relative;
+        }
+
+        .client-cart__badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Account */
         .client-account {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: #2b2b2b;
+            gap: 10px;
+            padding: 8px 16px;
+            border-radius: 50px;
+            background: #f3f4f6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .client-account:hover {
+            background: linear-gradient(135deg, #f97316, #fb923c);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .client-account:hover .client-account__icon,
+        .client-account:hover .client-account__primary,
+        .client-account:hover .client-account__secondary {
+            color: #ffffff;
         }
 
         .client-account__icon {
-            font-size: 22px;
-            color: #6b6b6b;
+            font-size: 20px;
+            color: #6b7280;
+            transition: color 0.3s ease;
         }
 
         .client-account__labels {
@@ -158,52 +298,34 @@
         }
 
         .client-account__primary {
-            font-weight: 600;
-            color: #111;
+            font-weight: 700;
+            color: #111827;
+            font-size: 13px;
+            transition: color 0.3s ease;
         }
 
         .client-account__secondary {
-            color: #818181;
-            font-size: 13px;
+            color: #6b7280;
+            font-size: 11px;
+            transition: color 0.3s ease;
         }
 
         .client-account__secondary.dropdown-toggle::after {
             margin-left: 6px;
+            border-top-color: currentColor;
         }
 
-        .client-cart {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #111;
-            position: relative;
-        }
-
-        .client-cart__badge {
-            position: absolute;
-            top: -6px;
-            right: -12px;
-            background: #ff6624;
-            color: #fff;
-            border-radius: 50%;
-            min-width: 18px;
-            height: 18px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
+        /* Navigation */
         .client-nav {
-            border-top: 1px solid #ebebeb;
-            background: #fff;
+            background: #ffffff;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
 
         .client-nav__inner {
-            max-width: 1320px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 32px;
             display: flex;
             justify-content: center;
         }
@@ -211,59 +333,135 @@
         .client-nav ul {
             list-style: none;
             display: flex;
-            gap: 24px;
+            gap: 8px;
             margin: 0;
-            padding: 10px 0;
-            color: #2b2b2b;
-            font-weight: 500;
+            padding: 0;
+            align-items: center;
         }
 
         .client-nav li {
             position: relative;
         }
 
-        ::-webkit-scrollbar {
-            display: none;
+        .client-nav > .client-nav__inner > ul > li > a {
+            display: block;
+            padding: 14px 20px;
+            color: #374151;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .client-nav a,
-        .client-nav button {
-            color: inherit;
-            background: none;
-            border: none;
-            font: inherit;
-            padding: 0;
-            cursor: pointer;
+        .client-nav > .client-nav__inner > ul > li > a:hover {
+            color: #f97316;
+            background: rgba(249, 115, 22, 0.08);
+        }
+
+        .client-nav > .client-nav__inner > ul > li > a::after {
+            content: '';
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            border-radius: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .client-nav > .client-nav__inner > ul > li:hover > a::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        /* Tạo vùng kết nối giữa menu item và dropdown để có thể di chuột vào */
+        .client-nav li.has-dropdown::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            height: 12px;
+            background: transparent;
+            z-index: 1001;
+            pointer-events: none;
         }
 
         .client-nav .dropdown-menu {
             display: none;
             position: absolute;
-            top: 100% ;
+            top: calc(100% + 0px);
             left: 0;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
-            min-width: 220px;
-            padding: 8px 0;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            min-width: 240px;
+            padding: 12px 8px 8px 8px;
             z-index: 1002;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            animation: dropdownFadeIn 0.3s ease;
+            margin-top: 0;
+        }
+
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .client-nav .dropdown-menu li a {
             display: block;
-            padding: 10px 18px;
-            color: #333;
-            font-weight: 400;
+            padding: 12px 16px;
+            color: #374151;
+            font-weight: 500;
+            font-size: 14px;
             white-space: nowrap;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
         }
 
         .client-nav .dropdown-menu li a:hover {
-            background: #f6f6f6;
-            color: #2b5c73;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(251, 146, 60, 0.1));
+            color: #f97316;
+            padding-left: 20px;
         }
 
-        .client-nav li:hover>.dropdown-menu {
+        /* Giữ dropdown hiển thị khi hover vào menu item hoặc dropdown */
+        .client-nav li:hover > .dropdown-menu {
             display: block;
+        }
+
+        /* Đảm bảo dropdown vẫn hiển thị khi hover vào chính nó */
+        .client-nav .dropdown-menu:hover {
+            display: block;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         /* Icon menu dọc */
@@ -322,13 +520,475 @@
         }
 
 
-        /* Footer */
+        /* Footer - Professional Design */
         footer {
-            max-width: 100%;
-            background-color: #111;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+        
+        .footer-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-main {
+            padding: 60px 0 40px;
+            max-width: 1320px;
             margin: 0 auto;
-            color: #fff;
-            padding: 10px 15px;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-widget {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .footer-widget-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        
+        .footer-widget-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            border-radius: 2px;
+        }
+        
+        .footer-logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+            filter: brightness(1.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .footer-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .footer-description {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-social-link {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e2e8f0;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+        
+        .footer-social-link:hover {
+            background: linear-gradient(135deg, #f97316, #fb923c);
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-links a::before {
+            content: '→';
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+            color: #f97316;
+        }
+        
+        .footer-links a:hover {
+            color: #ffffff;
+            padding-left: 8px;
+        }
+        
+        .footer-links a:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .footer-contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .footer-contact-icon {
+            width: 20px;
+            height: 20px;
+            color: #f97316;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .footer-contact-text {
+            color: #cbd5e1;
+            flex: 1;
+        }
+        
+        .footer-contact-text strong {
+            color: #ffffff;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .footer-newsletter {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        .footer-newsletter-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            flex-wrap: nowrap;
+            align-items: stretch;
+        }
+        
+        .footer-newsletter-input {
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .footer-newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .footer-newsletter-input:focus {
+            border-color: #f97316;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+        
+        .footer-newsletter-btn {
+            flex: 0 0 auto;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #f97316, #fb923c);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-sizing: border-box;
+            min-width: fit-content;
+        }
+        
+        .footer-newsletter-btn:hover {
+            background: linear-gradient(135deg, #ea580c, #f97316);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+        
+        .footer-newsletter-btn:active {
+            transform: translateY(0);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .footer-bottom-content {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding-left: 24px;
+            padding-right: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .footer-copyright {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        .footer-copyright strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        .footer-payment-methods {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .footer-payment-text {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+        
+        .footer-payment-icon {
+            width: 40px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* ===== HEADER RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .client-header__inner {
+                padding: 14px 24px;
+                gap: 16px;
+            }
+
+            .client-search {
+                max-width: 400px;
+            }
+
+            .client-nav__inner {
+                padding: 0 24px;
+            }
+
+            .client-nav > .client-nav__inner > ul {
+                gap: 4px;
+            }
+
+            .client-nav > .client-nav__inner > ul > li > a {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .client-header__inner {
+                padding: 12px 16px;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .client-logo {
+                font-size: 24px;
+            }
+
+            .client-search {
+                order: 3;
+                width: 100%;
+                max-width: 100%;
+                margin-top: 12px;
+            }
+
+            .client-search input {
+                padding: 10px 16px 10px 44px;
+                font-size: 14px;
+            }
+
+            .client-search button {
+                width: 40px;
+                height: 40px;
+            }
+
+            .client-actions {
+                gap: 12px;
+            }
+
+            .client-pill {
+                width: 40px;
+                height: 40px;
+            }
+
+            .client-pill__icon {
+                font-size: 18px;
+            }
+
+            .client-account {
+                padding: 6px 12px;
+            }
+
+            .client-account__labels {
+                display: none;
+            }
+
+            .client-account__icon {
+                font-size: 18px;
+            }
+
+            .client-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .client-header__inner {
+                padding: 10px 12px;
+            }
+
+            .client-logo {
+                font-size: 20px;
+            }
+
+            .client-actions {
+                gap: 8px;
+            }
+
+            .client-pill {
+                width: 36px;
+                height: 36px;
+            }
+
+            .client-pill__icon {
+                font-size: 16px;
+            }
+
+            .client-cart__badge {
+                min-width: 18px;
+                height: 18px;
+                font-size: 10px;
+            }
+        }
+
+        /* Responsive Footer */
+        @media (max-width: 768px) {
+            .footer-main {
+                padding: 40px 0 30px;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+            
+            .footer-newsletter-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .footer-newsletter-input {
+                width: 100%;
+                margin-bottom: 0;
+            }
+            
+            .footer-newsletter-btn {
+                width: 100%;
+                margin-top: 8px;
+            }
+            
+            .footer-bottom-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-payment-methods {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .footer-main {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            
+            .footer-bottom-content {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
         }
 
         /* Các style khác */
@@ -508,8 +1168,8 @@
 
             <form action="{{ route('client.product.search') }}" method="GET" class="client-search">
                 <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..."
-                    value="{{ $searchQuery ?? '' }}">
-                <button type="submit">
+                    value="{{ $searchQuery ?? '' }}" autocomplete="off">
+                <button type="submit" aria-label="Tìm kiếm">
                     <i class="fa fa-search"></i>
                 </button>
             </form>
@@ -590,8 +1250,8 @@
         <nav class="client-nav">
             <div class="client-nav__inner">
                 <ul>
-                    <li>
-                        <a href="#" class="dropdown-toggle">Sản phẩm </a>
+                    <li class="has-dropdown">
+                        <a href="{{ route('client.product.search') }}?category=&minPrice=&maxPrice=&sort=newest" class="dropdown-toggle">Sản phẩm</a>
                         <ul class="dropdown-menu">
                             @forelse ($childCategories as $child)
                                 <li>
@@ -600,12 +1260,12 @@
                                     </a>
                                 </li>
                             @empty
-                                <li><span class="d-block px-3 py-2 text-muted">Đang cập nhật</span></li>
+                                <li><span style="display: block; padding: 12px 16px; color: #9ca3af; font-size: 14px;">Đang cập nhật</span></li>
                             @endforelse
                         </ul>
                     </li>
-                    <li>
-                        <a href="#" class="dropdown-toggle">Phòng </a>
+                    <li class="has-dropdown">
+                        <a href="{{ route('client.product.search') }}?category=&minPrice=&maxPrice=&sort=newest" class="dropdown-toggle">Phòng</a>
                         <ul class="dropdown-menu">
                             @foreach ($parentCategories as $parent)
                                 <li>
@@ -618,7 +1278,7 @@
                     </li>
                     <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="{{ route('client.contact.list') }}">Thiết kế nội thất</a></li>
-                    <li><a href="{{ route('client.blogs.list') }}">Bài Viết</a></li>
+                    <li><a href="{{ route('client.blogs.list') }}">Bài viết</a></li>
                     <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </div>
@@ -720,125 +1380,165 @@
         </div>
     </div>
     <footer id="footer" class="footer-wrapper">
-        <div class="footer-widgets footer footer-2 dark">
-            <div class="row dark large-columns-4 mb-0">
-                <div id="text-14" class="col pb-0 widget widget_text"><span class="widget-title">Kết nối với
-                        Meteor</span>
-                    <div class="is-divider small"></div>
-                    <div class="textwidget">
-                        <p>
-                            <img decoding="async" class="logo_ft img-fluid"
-                                src="{{ asset('storage/images/meteor.jpg') }}" alt="Logo Meteor"
-                                style="max-width: 120px;">
+        <div class="footer-main">
+            <div class="footer-grid">
+                {{-- Widget 1: About & Social --}}
+                <div class="footer-widget">
+                    <h3 class="footer-widget-title">Về Meteor Shop</h3>
+                    <img src="{{ asset('storage/images/meteor.jpg') }}" alt="Meteor Shop Logo" class="footer-logo">
+                    <p class="footer-description">
+                        Meteor Shop - Thương hiệu nội thất hiện đại hàng đầu Việt Nam. 
+                        Chúng tôi mang đến những sản phẩm chất lượng cao, thiết kế tinh tế 
+                        cho không gian sống của bạn.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-link" aria-label="Facebook" title="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="footer-social-link" aria-label="Instagram" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="#" class="footer-social-link" aria-label="Youtube" title="Youtube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                        <a href="#" class="footer-social-link" aria-label="TikTok" title="TikTok">
+                            <i class="bi bi-tiktok"></i>
+                        </a>
+                        <a href="#" class="footer-social-link" aria-label="Zalo" title="Zalo">
+                            <i class="bi bi-chat-dots"></i>
+                        </a>
+                        </div>
+                    </div>
+
+                {{-- Widget 2: Quick Links --}}
+                <div class="footer-widget">
+                    <h3 class="footer-widget-title">Meteor Shop</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ route('client.home') }}">Trang chủ</a></li>
+                        <li><a href="#">Giới thiệu</a></li>
+                        <li><a href="#">Chuyện Meteor</a></li>
+                        <li><a href="#">Tổng công ty</a></li>
+                        <li><a href="#">Tuyển dụng</a></li>
+                        <li><a href="#">Thẻ hội viên</a></li>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        </ul>
+                    </div>
+
+                {{-- Widget 3: Inspiration & Products --}}
+                <div class="footer-widget">
+                    <h3 class="footer-widget-title">Cảm hứng & Sản phẩm</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ route('client.products.index') }}">Tất cả sản phẩm</a></li>
+                        <li><a href="#">Ý tưởng và cảm hứng</a></li>
+                        <li><a href="{{ route('client.blogs.list') }}">Bài viết</a></li>
+                        <li><a href="#">Bộ sưu tập</a></li>
+                        <li><a href="#">Phòng khách</a></li>
+                        <li><a href="#">Phòng ngủ</a></li>
+                        <li><a href="#">Phòng làm việc</a></li>
+                        </ul>
+                    </div>
+
+                {{-- Widget 4: Contact & Newsletter --}}
+                <div class="footer-widget">
+                    <h3 class="footer-widget-title">Liên hệ & Newsletter</h3>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-envelope-fill footer-contact-icon"></i>
+                        <div class="footer-contact-text">
+                            <strong>Email</strong>
+                            <span>meteor@meteorshop.com</span>
+                        </div>
+                            </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-telephone-fill footer-contact-icon"></i>
+                        <div class="footer-contact-text">
+                            <strong>Hotline</strong>
+                            <span>0397 766 836</span>
+                                </div>
+                                </div>
+                    <div class="footer-contact-item">
+                        <i class="bi bi-clock-fill footer-contact-icon"></i>
+                        <div class="footer-contact-text">
+                            <strong>Giờ làm việc</strong>
+                            <span>8:00 - 22:00 (Tất cả các ngày)</span>
+                            </div>
+                    </div>
+                    
+                    <div class="footer-newsletter">
+                        <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 12px; line-height: 1.6;">
+                            Đăng ký nhận thông tin mới nhất về sản phẩm và ưu đãi đặc biệt từ Meteor Shop
                         </p>
-
-                        <div class="follow">
-                            <h4>Follow us</h4>
-                            <p><a href="">Instagram</a>–<a href="">Youtube</a>–<a
-                                    href="">Facebook</a></p>
-                        </div>
-                    </div>
-                </div>
-                <div id="nav_menu-2" class="col pb-0 widget widget_nav_menu"><span class="widget-title">Meteor</span>
-                    <div class="is-divider small"></div>
-                    <div class="menu-ve-nha-xinh-container">
-                        <ul id="menu-ve-nha-xinh" class="menu">
-                            <li id="menu-item-41004"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41004"><a
-                                    href="#">Giới thiệu</a></li>
-                            <li id="menu-item-41005"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-41005"><a
-                                    href="">Chuyện meteor</a></li>
-                            <li id="menu-item-41000"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41000"><a
-                                    href="">Tổng công ty</a></li>
-                            <li id="menu-item-41002"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41002"><a
-                                    href="">Tuyển dụng</a></li>
-                            <li id="menu-item-41001"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41001"><a
-                                    href="">Thẻ hội viên</a></li>
-                            <li id="menu-item-41003"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41003"><a
-                                    href="">Đổi trả hàng</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div id="nav_menu-3" class="col pb-0 widget widget_nav_menu"><span class="widget-title">CẢM HỨNG
-                        Meteor</span>
-                    <div class="is-divider small"></div>
-                    <div class="menu-cam-hung-nha-xinh-container">
-                        <ul id="menu-cam-hung-nha-xinh" class="menu">
-                            <li id="menu-item-449"
-                                class="menu-item menu-item-type-post_type menu-item-object-page menu-item-449"><a
-                                    href="">Sản phẩm</a></li>
-                            <li id="menu-item-450"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-450"><a
-                                    href="">Ý tưởng và cảm hứng</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div id="block_widget-3" class="col pb-0 widget block_widget">
-                    <span class="widget-title">Newsletter</span>
-                    <div class="is-divider small"></div>
-                    <div id="text-2944331817" class="text">
-                        <p>Hãy để lại email của bạn để nhận được những ý tưởng trang trí mới và những thông tin, ưu đãi
-                            từ Meteor</p>
-                        <p>Email: meteor</p>
-                        <p>Hotline: <strong>0397766836</strong></p>
-                        <style>
-                            #text-2944331817 {
-                                font-size: 0.75rem;
-                            }
-                        </style>
-                    </div>
-
-                    <div role="form" class="wpcf7" id="wpcf7-f9-o1" lang="en-US" dir="ltr">
-                        <div class="screen-reader-response">
-                            <p role="status" aria-live="polite" aria-atomic="true"></p>
-                            <ul></ul>
-                        </div>
-                        <form action="" method="post" class="wpcf7-form init" novalidate="novalidate"
-                            data-status="init">
-                            <div style="display: none;">
-                                <input type="hidden" name="_wpcf7" value="9">
-                                <input type="hidden" name="_wpcf7_version" value="5.5.2">
-                                <input type="hidden" name="_wpcf7_locale" value="en_US">
-                                <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f9-o1">
-                                <input type="hidden" name="_wpcf7_container_post" value="0">
-                                <input type="hidden" name="_wpcf7_posted_data_hash" value="">
-                                <input type="hidden" name="_wpcf7_recaptcha_response"
-                                    value="0cAFcWeA7swwLl_8VvpFI06BH3gsjO68Ua_z5VNFU3hy53nMAl1Ib7MeCY5iXtu94dRupk7wiA0keDJ5HgJdgtgo0EYcDooyKZ63qDfxkzaFXYp5nkEMhcr5_ue_kmeQU92aHNxsy1mWUxkQSKxN8OWCh6dzQdp-KzwjpGSFz4OPB-SOb1hbW1z8pZO8-hDZet1qfO2B5uU3s3GdEUfy1YJxrd7si21y0xUlVXLGtRiCG0t8dNFC_5oplJUw-1SX90fY-210RRm1Ee7D2dBieO58yWy-vKauhvB0yohn7yrNyo9CIvSYVz-QUfGqHLrgkOtkGddun16vrAHo8Z_ElyFdzntv7DI6ZDLfUi_mPDOnaataHiFt2X4nDFOq97xzSs9xEZxMR6SB5R9WTqJtC8lLASyMMnBeUsZBH-PB0yjNhs6B4kD2RMULDnqLynhTXu5sprEQIi3oh-hij4WC9plTBrZgcT5pcoRABIzY5xI6IGrLQfVwqY5tqcpPr0COV8-bFAlVDRQa9NO7AaXdPYQCCeM4aLO9CQvgA4oV4SsCs7gbTRZofv0P1hswqLW-dN1WYbDYRn0OPu3-A1A2RTbPNWikLvekFLE23T5y62gi5akjQVwaIdh5W9dOAcP6Se3m65nJCIk5AJ_fUhmc8HmBG4ieMc9ezZSLa0lG7_WqkTJ4AHm28pSwdK9SYiUdG4xQwZcxHHBW05E3Jex1l4im_aN5gAmzXxOrbckL8vXAzrYDQ7L2jNxTHuzTncUOIs1i8soQ_wUrerU40dgDRKcz-5qMYD6HwW-h8feMooaH2QXYRmbn2FByIMFCr7Bw8jvgyKCDlCJRz7">
-                            </div>
-                            <div class="flex-row form-flat medium-flex-wrap">
-                                <div class="flex-col flex-grow">
-                                    <span class="wpcf7-form-control-wrap your-email"><input type="email"
-                                            name="your-email" value="" size="40"
-                                            class="wpcf7-form-control wpcf7-text wpcf7-email wpcf7-validates-as-required wpcf7-validates-as-email"
-                                            aria-required="true" aria-invalid="false"
-                                            placeholder="Nhập email của bạn"></span>
-                                </div>
-                                <div class="flex-col ml-half">
-                                    <input type="submit" value="Đăng ký"
-                                        class="wpcf7-form-control has-spinner wpcf7-submit button"><span
-                                        class="wpcf7-spinner"></span>
-                                </div>
-                            </div>
-                            <div class="wpcf7-response-output" aria-hidden="true"></div>
+                        <form class="footer-newsletter-form" id="footerNewsletterForm" onsubmit="handleNewsletterSubmit(event)">
+                            @csrf
+                            <input type="email" name="email" class="footer-newsletter-input" 
+                                   placeholder="Nhập email của bạn" required>
+                            <button type="submit" class="footer-newsletter-btn">
+                                <i class="bi bi-send me-1"></i> Đăng ký
+                            </button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="absolute-footer dark medium-text-center small-text-center">
-            <div class="container clearfix">
-                <hr style="margin:30px auto;width:90%;border:0;border-top:1px solid #ddd;">
-                <div style="text-align: center; color:#bdbdbd; font-size: 16px">
-                    © 2025 METEOR SHOP
+
+        {{-- Footer Bottom --}}
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <div class="footer-copyright">
+                    © <strong>{{ date('Y') }}</strong> METEOR SHOP. Tất cả quyền được bảo lưu.
+                </div>
+                <div class="footer-payment-methods">
+                    <span class="footer-payment-text">Chấp nhận thanh toán:</span>
+                    <div class="footer-payment-icon">COD</div>
+                    <div class="footer-payment-icon">VNPay</div>
+                    <div class="footer-payment-icon">MoMo</div>
+                    <div class="footer-payment-icon">ZaloPay</div>
                 </div>
             </div>
         </div>
     </footer>
+
+    <script>
+        // Newsletter form handler
+        function handleNewsletterSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const email = form.querySelector('input[name="email"]').value;
+            const button = form.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            
+            // Disable button
+            button.disabled = true;
+            button.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Đang gửi...';
+            
+            // Simulate API call (replace with actual endpoint)
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đăng ký thành công!',
+                    text: 'Cảm ơn bạn đã đăng ký nhận thông tin từ Meteor Shop.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                form.reset();
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }, 1000);
+        }
+        
+        // Smooth scroll to top on footer logo click
+        document.addEventListener('DOMContentLoaded', function() {
+            const footerLogo = document.querySelector('.footer-logo');
+            if (footerLogo) {
+                footerLogo.style.cursor = 'pointer';
+                footerLogo.addEventListener('click', function() {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -898,6 +1598,43 @@
             });
         </script>
     @endif
+
+    <script>
+        // Header scroll effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('.client-header');
+            let lastScroll = 0;
+
+            window.addEventListener('scroll', function() {
+                const currentScroll = window.pageYOffset;
+
+                if (currentScroll > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+
+                lastScroll = currentScroll;
+            });
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#' && href.length > 1) {
+                        const target = document.querySelector(href);
+                        if (target) {
+                            e.preventDefault();
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 
     @stack('scripts')
 

@@ -327,51 +327,7 @@
         @push('scripts')
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    // Hero Banner Slider Logic
-                    const track = document.querySelector('.hero-banner-track');
-                    if (track) {
-                        const slides = track.querySelectorAll('.hero-slide');
-                        if (slides.length > 1) {
-                            const prevBtn = document.querySelector('.hero-nav-prev');
-                            const nextBtn = document.querySelector('.hero-nav-next');
-                            const dots = document.querySelectorAll('.hero-dot');
-                            let currentIndex = 0;
-                            const totalSlides = slides.length;
-                            let autoSlideInterval;
-
-                            function goToSlide(index) {
-                                if (index < 0) index = totalSlides - 1;
-                                if (index >= totalSlides) index = 0;
-                                currentIndex = index;
-                                track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                                dots.forEach((dot, i) => {
-                                    dot.classList.toggle('is-active', i === currentIndex);
-                                    dot.setAttribute('aria-current', i === currentIndex ? 'true' : 'false');
-                                });
-                            }
-
-                            function nextSlide() { goToSlide(currentIndex + 1); }
-                            function prevSlide() { goToSlide(currentIndex - 1); }
-                            function startAutoSlide() {
-                                stopAutoSlide();
-                                autoSlideInterval = setInterval(nextSlide, 4000);
-                            }
-                            function stopAutoSlide() {
-                                if (autoSlideInterval) clearInterval(autoSlideInterval);
-                            }
-
-                            if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); startAutoSlide(); });
-                            if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); startAutoSlide(); });
-                            dots.forEach((dot, index) => {
-                                dot.addEventListener('click', () => { goToSlide(index); startAutoSlide(); });
-                            });
-
-                            track.parentElement.addEventListener('mouseenter', stopAutoSlide);
-                            track.parentElement.addEventListener('mouseleave', startAutoSlide);
-                            startAutoSlide();
-                        }
-                    }
-
+                    // Wishlist toggle functionality
                     document.querySelectorAll('.wishlist-toggle-home').forEach(btn => {
                         btn.addEventListener('click', function(e) {
                             e.preventDefault();
@@ -636,7 +592,7 @@
 
                 let current = 0;
                 let timer = null;
-                const AUTO_TIME = 5000;
+                const AUTO_TIME = 4000; // 4 giây
                 let touchStartX = 0;
                 let touchEndX = 0;
                 const SWIPE_THRESHOLD = 50; // px
@@ -662,10 +618,12 @@
 
                     if (dots[current]) {
                         dots[current].classList.add('is-active');
+                        dots[current].setAttribute('aria-current', 'true');
                     }
                     dots.forEach((dot, i) => {
                         if (i !== current) {
                             dot.classList.remove('is-active');
+                            dot.setAttribute('aria-current', 'false');
                         }
                     });
                 };
@@ -674,30 +632,40 @@
                 const prev = () => goTo(current - 1);
 
                 const startAuto = () => {
-                    if (timer || slides.length <= 1) return;
-                    timer = setInterval(next, AUTO_TIME);
+                    stopAuto(); // Dừng timer cũ nếu có
+                    if (slides.length <= 1) return;
+                    timer = setInterval(() => {
+                        next();
+                    }, AUTO_TIME);
                 };
 
                 const stopAuto = () => {
-                    if (!timer) return;
+                    if (timer) {
                     clearInterval(timer);
                     timer = null;
+                    }
                 };
 
-                nextBtn && nextBtn.addEventListener('click', () => {
+                // Event listeners cho nút điều hướng
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
                     stopAuto();
                     next();
                     startAuto();
                     showNav();
                 });
+                }
 
-                prevBtn && prevBtn.addEventListener('click', () => {
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
                     stopAuto();
                     prev();
                     startAuto();
                     showNav();
                 });
+                }
 
+                // Event listeners cho dots
                 dots.forEach((dot, index) => {
                     dot.addEventListener('click', () => {
                         stopAuto();
@@ -708,14 +676,18 @@
                 });
 
                 if (slider) {
+                    // Pause khi hover
                     slider.addEventListener('mouseenter', () => {
                         stopAuto();
                         showNav();
                     });
+                    
+                    // Resume khi rời chuột
                     slider.addEventListener('mouseleave', () => {
                         startAuto();
                     });
 
+                    // Hiển thị nút điều hướng khi di chuyển chuột
                     slider.addEventListener('mousemove', () => {
                         showNav();
                     });
@@ -751,20 +723,9 @@
                     });
                 }
 
+                // Bắt đầu auto slide ngay khi load
                 startAuto();
             });
-
-
-
-            <
-            script >
-                let i = 0,
-                    s = document.querySelectorAll('.slide');
-            setInterval(() => {
-                s[i].classList.remove('active');
-                i = (i + 1) % s.length;
-                s[i].classList.add('active');
-            }, 4000); // 4000ms = 4 giây
         </script>
 
 
