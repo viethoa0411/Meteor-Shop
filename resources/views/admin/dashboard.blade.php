@@ -277,9 +277,9 @@
 
     {{-- ========== 2.5. QUICK ACTIONS SECTION ========== --}}
     <section class="mb-4">
-        <div class="card shadow-sm border-0" style="border-radius: 20px; background: #1F1F23; border: 1px solid rgba(255,255,255,0.1);">
+        <div class="card shadow-sm border-0 quick-actions-wrapper">
             <div class="card-body p-4">
-                <h5 class="text-white fw-bold mb-4" style="font-size: 1.1rem;">Thao tác nhanh</h5>
+                <h5 class="fw-bold mb-4 quick-actions-title" style="font-size: 1.1rem;">Thao tác nhanh</h5>
                 <div class="row g-3">
                     {{-- 1. Tạo sản phẩm --}}
                     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
@@ -1510,14 +1510,46 @@
         }
 
         /* ========== QUICK ACTIONS CARDS ========== */
+        :root {
+            --qa-wrapper-bg: #ffffff;
+            --qa-wrapper-border: rgba(0, 0, 0, 0.06);
+            --qa-card-bg: #ffffff;
+            --qa-card-border: rgba(0, 0, 0, 0.06);
+            --qa-card-hover-bg: #f8fafc;
+            --qa-title-color: #0f172a;
+            --qa-subtitle-color: #475569;
+        }
+
+        body.dark {
+            --qa-wrapper-bg: #1F1F23;
+            --qa-wrapper-border: rgba(255, 255, 255, 0.08);
+            --qa-card-bg: #1F1F23;
+            --qa-card-border: rgba(255, 255, 255, 0.1);
+            --qa-card-hover-bg: #27272a;
+            --qa-title-color: #f8fafc;
+            --qa-subtitle-color: #cbd5e1;
+        }
+
+        .quick-actions-wrapper {
+            border-radius: 20px;
+            background: var(--qa-wrapper-bg);
+            border: 1px solid var(--qa-wrapper-border);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .quick-actions-title {
+            color: var(--qa-title-color);
+            transition: color 0.3s ease;
+        }
+
         .quick-action-card {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             padding: 1.5rem 1rem;
-            background: #1F1F23;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--qa-card-bg);
+            border: 1px solid var(--qa-card-border);
             border-radius: 20px;
             transition: all 0.25s ease-out;
             cursor: pointer;
@@ -1527,8 +1559,8 @@
 
         .quick-action-card:hover {
             transform: scale(1.05);
-            background: #27272a;
-            border-color: rgba(255, 255, 255, 0.2);
+            background: var(--qa-card-hover-bg);
+            border-color: var(--qa-card-border);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
@@ -1618,13 +1650,13 @@
         .quick-action-title {
             font-size: 0.9rem;
             font-weight: 600;
-            color: #fff;
+            color: var(--qa-title-color);
             margin-bottom: 0.25rem;
         }
 
         .quick-action-subtitle {
             font-size: 0.7rem;
-            color: #9ca3af;
+            color: var(--qa-subtitle-color);
         }
 
         /* ========== BADGE GRADIENTS ========== */
