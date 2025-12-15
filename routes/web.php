@@ -116,6 +116,25 @@ Route::middleware(['admin'])
             ->name('dashboard.top-products');
         Route::get('/api/dashboard/inventory', [DashboardController::class, 'inventoryApi'])
             ->name('dashboard.inventory');
+        Route::get('/api/dashboard/notifications', [DashboardController::class, 'notificationsApi'])
+            ->name('dashboard.notifications');
+        // Notifications
+        Route::get('/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::post('/api/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])
+            ->name('notifications.read');
+        Route::post('/api/notifications/{id}/unread', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsUnread'])
+            ->name('notifications.unread');
+        Route::post('/api/notifications/read-all', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])
+            ->name('notifications.read-all');
+        Route::post('/api/notifications/bulk-action', [\App\Http\Controllers\Admin\NotificationController::class, 'bulkAction'])
+            ->name('notifications.bulk-action');
+        Route::delete('/api/notifications/{id}', [\App\Http\Controllers\Admin\NotificationController::class, 'destroy'])
+            ->name('notifications.destroy');
+        Route::get('/api/notifications/unread-count', [\App\Http\Controllers\Admin\NotificationController::class, 'getUnreadCount'])
+            ->name('notifications.unread-count');
+        Route::post('/api/notifications/save-filter', [\App\Http\Controllers\Admin\NotificationController::class, 'saveFilter'])
+            ->name('notifications.save-filter');
         Route::get('/api/dashboard/comments', [DashboardController::class, 'commentsApi'])
             ->name('dashboard.comments');
         Route::post('/api/dashboard/comments/{id}/approve', [DashboardController::class, 'approveComment'])
