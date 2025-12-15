@@ -186,26 +186,29 @@
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Dài</label>
+                                                <label>Dài (m)</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][length]"
-                                                        class="form-control" 
-                                                        value="{{ old('variants.'.$idx.'.length', $v->length) }}">
+                                                        class="form-control"
+                                                        value="{{ old('variants.'.$idx.'.length', $v->length) }}"
+                                                        placeholder="VD: 2.5">
 
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Rộng</label>
+                                                <label>Rộng (m)</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][width]"
-                                                        class="form-control" 
-                                                        value="{{ old('variants.'.$idx.'.width', $v->width) }}">
+                                                        class="form-control"
+                                                        value="{{ old('variants.'.$idx.'.width', $v->width) }}"
+                                                        placeholder="VD: 1.8">
 
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Cao</label>
+                                                <label>Cao (m)</label>
                                                 <input type="number" step="0.01" name="variants[{{ $idx }}][height]"
-                                                        class="form-control" 
-                                                        value="{{ old('variants.'.$idx.'.height', $v->height) }}">
+                                                        class="form-control"
+                                                        value="{{ old('variants.'.$idx.'.height', $v->height) }}"
+                                                        placeholder="VD: 0.8">
 
                                             </div>
                                         </div>
@@ -280,21 +283,21 @@
                         </div>
 
                         <div class="col-md-2">
-                            <label>Dài</label>
+                            <label>Dài (m)</label>
                             <input type="number" step="0.01"
-                                name="variants[new_${newVariantIndex}][length]" class="form-control">
+                                name="variants[new_${newVariantIndex}][length]" class="form-control" placeholder="VD: 2.5">
                         </div>
 
                         <div class="col-md-2">
-                            <label>Rộng</label>
+                            <label>Rộng (m)</label>
                             <input type="number" step="0.01"
-                                name="variants[new_${newVariantIndex}][width]" class="form-control">
+                                name="variants[new_${newVariantIndex}][width]" class="form-control" placeholder="VD: 1.8">
                         </div>
 
                         <div class="col-md-2">
-                            <label>Cao</label>
+                            <label>Cao (m)</label>
                             <input type="number" step="0.01"
-                                name="variants[new_${newVariantIndex}][height]" class="form-control">
+                                name="variants[new_${newVariantIndex}][height]" class="form-control" placeholder="VD: 0.8">
                         </div>
                     </div>
                     <div class="row g-3 mt-2">

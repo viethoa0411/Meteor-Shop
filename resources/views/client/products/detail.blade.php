@@ -181,14 +181,14 @@
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             @foreach ($product->variants->unique(fn($v) => "{$v->length}x{$v->width}x{$v->height}") as $variant)
                                 <button type="button" class="btn-variant size-btn"
-                                    data-size="{{ intval($variant->length) }}x{{ intval($variant->width) }}x{{ intval($variant->height) }}"
+                                    data-size="{{ $variant->length }}x{{ $variant->width }}x{{ $variant->height }}"
                                     style="border:1px solid #111;
                        background:#fff;
                        color:#111;
                        padding:6px 12px;
                        border-radius:6px;
                        cursor:pointer;">
-                                    {{ intval($variant->length) }}x{{ intval($variant->width) }}x{{ intval($variant->height) }}
+                                    {{ $variant->length }}m × {{ $variant->width }}m × {{ $variant->height }}m
                                 </button>
                             @endforeach
                         </div>
@@ -207,7 +207,7 @@
                         <label style="font-weight:600; display:block; margin-bottom:6px;">Chọn kích cỡ:</label>
                         <button type="button" class="btn-variant"
                             style="border:1px solid #111; background:#fff; color:#111; padding:6px 12px; border-radius:6px;">
-                            {{ $product->length ?? '?' }}x{{ $product->width ?? '?' }}x{{ $product->height ?? '?' }}
+                            {{ $product->length ?? '?' }}m × {{ $product->width ?? '?' }}m × {{ $product->height ?? '?' }}m
                         </button>
                     </div>
                 @endif

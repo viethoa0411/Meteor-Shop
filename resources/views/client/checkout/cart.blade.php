@@ -128,6 +128,7 @@
                                     <span id="shipping-fee-text">Vui lòng chọn địa chỉ để tính phí vận chuyển</span>
                                 </div>
                                 <input type="hidden" name="shipping_fee" id="shipping_fee_input" value="0">
+                                <input type="hidden" name="installation_fee" id="installation_fee_input" value="0">
                             </div>
 
                             <div class="mb-3">
@@ -272,11 +273,24 @@
                             <span>Giảm giá (<span id="applied-code"></span>):</span>
                             <strong class="text-success" id="discount-amount">- 0 đ</strong>
                         </div>
+                        <div class="mb-2 d-flex justify-content-between" id="installation-row" style="display:none;">
+                            <span>Phí lắp đặt:</span>
+                            <strong id="installation-fee">0 đ</strong>
+                        </div>
                         <div class="mb-3 pt-2 border-top d-flex justify-content-between">
                             <span class="fs-5 fw-bold">Tổng cộng:</span>
                             <span class="fs-5 fw-bold text-danger" id="total-amount">
                                 {{ number_format($subtotal, 0, ',', '.') }} đ
                             </span>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="installation-checkbox" name="installation">
+                                <label class="form-check-label" for="installation-checkbox">
+                                    <strong>Dịch vụ lắp đặt</strong>
+                                </label>
+                            </div>
+                            <small class="text-muted d-block mt-1">Phí lắp đặt sẽ được cộng thêm vào tổng tiền</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mã khuyến mãi</label>
@@ -307,7 +321,20 @@
             let districts = [];
             let wards = [];
 
-            // Load tỉnh/thành phố
+            // Danh sách tỉnh/thành phố miền Bắc (Set lower-case để so khớp chắc chắn)
+            const northernProvincesSet = new Set([
+                'hà nội', 'hải phòng', 'hải dương', 'hưng yên', 'hà nam', 
+                'nam định', 'thái bình', 'ninh bình', 'bắc ninh', 'bắc giang',
+                'quảng ninh', 'lào cai', 'yên bái', 'tuyên quang', 'lạng sơn',
+                'cao bằng', 'bắc kạn', 'thái nguyên', 'phú thọ', 'vĩnh phúc',
+                'điện biên', 'lai châu', 'sơn la', 'hòa bình'
+            ]);
+            const isNorthernProvince = (name) => {
+                if (!name) return false;
+                return northernProvincesSet.has(name.toLowerCase().trim());
+            };
+
+            // Load tỉnh/thành phố - Chỉ hiển thị miền Bắc
             async function loadProvinces() {
                 try {
                     const response = await fetch('https://esgoo.net/api-tinhthanh/1/0.htm');
@@ -322,11 +349,15 @@
 
                         citySelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
                         provinces.forEach(province => {
-                            const option = document.createElement('option');
-                            option.value = province.full_name;
-                            option.textContent = province.full_name;
-                            option.dataset.code = province.id;
-                            citySelect.appendChild(option);
+                            // Chỉ thêm các tỉnh miền Bắc
+                            const provinceName = province.full_name || province.name || '';
+                            if (isNorthernProvince(provinceName)) {
+                                const option = document.createElement('option');
+                                option.value = provinceName;
+                                option.textContent = provinceName;
+                                option.dataset.code = province.id;
+                                citySelect.appendChild(option);
+                            }
                         });
                     }
                 } catch (error) {
@@ -453,6 +484,8 @@
 
                 const subtotal = {{ $subtotal }};
                 let currentShippingFee = 0;
+                let installationFee = 0;
+                let isInstallationSelected = false;
 
                 // Hàm tính phí vận chuyển qua API
                 function calculateShippingFee() {
@@ -524,18 +557,47 @@
 
                 // Hàm cập nhật hiển thị tổng tiền
                 function updateTotalDisplay() {
-                    const total = Math.max(0, subtotal - currentDiscount + currentShippingFee);
+                    const total = Math.max(0, subtotal - currentDiscount + currentShippingFee + installationFee);
                     const shippingFeeEl = document.getElementById('shipping-fee');
                     const totalAmountEl = document.getElementById('total-amount');
+                    const installationRow = document.getElementById('installation-row');
+                    const installationFeeEl = document.getElementById('installation-fee');
 
                     if (shippingFeeEl) {
                         shippingFeeEl.textContent = currentShippingFee === 0 ?
                             'Miễn phí' :
                             currentShippingFee.toLocaleString('vi-VN') + ' đ';
                     }
+                    if (installationRow && installationFeeEl) {
+                        if (isInstallationSelected && installationFee > 0) {
+                            installationRow.style.display = 'flex';
+                            installationFeeEl.textContent = installationFee.toLocaleString('vi-VN') + ' đ';
+                        } else {
+                            installationRow.style.display = 'none';
+                        }
+                    }
                     if (totalAmountEl) {
                         totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
                     }
+                }
+
+                // Xử lý checkbox lắp đặt
+                const installationCheckbox = document.getElementById('installation-checkbox');
+                if (installationCheckbox) {
+                    installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+
+                    installationCheckbox.addEventListener('change', function() {
+                        isInstallationSelected = this.checked;
+                        const installationFeeInput = document.getElementById('installation_fee_input');
+                        if (!isInstallationSelected) {
+                            installationFee = 0;
+                            if (installationFeeInput) installationFeeInput.value = 0;
+                        } else {
+                            installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                            if (installationFeeInput) installationFeeInput.value = installationFee;
+                        }
+                        updateTotalDisplay();
+                    });
                 }
 
                 // Xử lý khi chọn tỉnh/thành phố

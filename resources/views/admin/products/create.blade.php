@@ -141,15 +141,15 @@
                             <div class="row g-3 mt-2">
                                 <div class="col-md-3">
                                     <input type="number" id="length" step="0.01" class="form-control"
-                                        placeholder="Chiều dài (cm)">
+                                        placeholder="Chiều dài (m) - VD: 2.5">
                                 </div>
                                 <div class="col-md-3">
                                     <input type="number" id="width" step="0.01" class="form-control"
-                                        placeholder="Chiều rộng (cm)">
+                                        placeholder="Chiều rộng (m) - VD: 1.8">
                                 </div>
                                 <div class="col-md-3">
                                     <input type="number" id="height" step="0.01" class="form-control"
-                                        placeholder="Chiều cao (cm)">
+                                        placeholder="Chiều cao (m) - VD: 0.8">
                                 </div>
                             </div>
                             <div class="row g-3 mt-2">
@@ -208,7 +208,7 @@
                 row.className = 'variant-row';
                 row.innerHTML = `
                     <div class="variant-swatch" style="background:${colorCode}"></div>
-                    <span>${colorName || colorCode} - ${length}×${width}×${height} cm - ${weight} kg - <b>${stock}</b> sp</span>
+                    <span>${colorName || colorCode} - ${length}×${width}×${height} m - ${weight} kg - <b>${stock}</b> sp</span>
                     <button type="button" class="btn btn-sm btn-link text-danger">x</button>
                 `;
 
