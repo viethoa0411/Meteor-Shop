@@ -97,8 +97,8 @@
                         Tổng tiền đã chọn:
                         <span id="selected-total">{{ number_format($total) ?? 0 }}đ</span>
                     </div>
-                    <button type="submit" id="checkout-selected" class="btn btn-dark mt-2 mt-md-0">
-                        Đặt hàng
+                    <button type="submit" form="cart-form" id="checkout-selected" class="btn btn-dark mt-2 mt-md-0">
+                        <i class="bi bi-cart-check me-1"></i> Đặt hàng
                     </button>
                 </div>
             </form>
@@ -249,7 +249,6 @@
                 }
             });
         });
-
     });
 </script>
 @endpush
