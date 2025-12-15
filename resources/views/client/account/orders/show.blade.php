@@ -178,96 +178,46 @@
                                     <i class="bi bi-truck me-1"></i> Theo dõi vận đơn
                                 </a>
                             @endif
-                                    @if ($order->canReturnRefund())
-                                        @php
-                                            $daysRemaining = $order->getReturnDaysRemaining();
-                                        @endphp
-                                        <div class="d-flex flex-column">
-                                            <a class="btn btn-outline-warning"
-                                                href="{{ route('client.account.orders.refund.return', $order) }}">
-                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Trả hàng hoàn tiền
-                                            </a>
-                                            @if ($daysRemaining !== null && $daysRemaining > 0)
-                                                <small class="text-muted text-center mt-1">(Còn {{ $daysRemaining }}
-                                                    ngày)</small>
-                                            @endif
-                                        </div>
-                                    @elseif ($order->order_status === 'completed' && $order->isReturnExpired())
-                                        <div class="alert alert-warning small mb-0 py-2">
-                                            <i class="bi bi-exclamation-triangle me-1"></i>
-                                            Đã quá thời hạn 7 ngày để yêu cầu trả hàng hoàn tiền
-                                        </div>
+
+
+                            @if ($order->order_status === 'delivered' && $order->delivered_at)
+                                @php
+                                    $deliveredAt = \Carbon\Carbon::parse($order->delivered_at);
+                                    $autoCompleteAt = $deliveredAt->copy()->addDays(2);
+                                    $remainingHours = max(0, now()->diffInHours($autoCompleteAt));
+                                    $remainingDays = intdiv($remainingHours, 24);
+                                    $remainingHoursMod = $remainingHours % 24;
+                                @endphp
+                                <div class="alert alert-info mt-2 mb-0 w-100">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Nếu bạn không xác nhận, hệ thống sẽ tự chuyển trạng thái sang <strong>Hoàn
+                                        thành</strong>
+                                    sau 2 ngày kể từ thời điểm giao hàng ({{ $deliveredAt->format('d/m/Y H:i') }}).
+                                    @if ($autoCompleteAt->isFuture())
+                                        <br><small>Còn {{ $remainingDays }} ngày {{ $remainingHoursMod }}
+                                            giờ.</small>
                                     @endif
+                                </div>
+                            @endif
+                            @if ($order->payment_method === 'momo' && $order->payment_status !== 'paid' && $order->order_status !== 'cancelled')
+                                <a href="{{ route('client.checkout.momo_payment_page', $order->order_code) }}" class="btn text-white me-2" style="background-color: #a50064; border-color: #a50064;">
+                                    <i class="bi bi-qr-code me-1"></i> Thanh toán
+                                </a>
+                            @endif
 
-                                    @if ($order->order_status === 'delivered' && $order->delivered_at)
-                                        @php
-                                            $deliveredAt = \Carbon\Carbon::parse($order->delivered_at);
-                                            $autoCompleteAt = $deliveredAt->copy()->addDays(2);
-                                            $remainingHours = max(0, now()->diffInHours($autoCompleteAt));
-                                            $remainingDays = intdiv($remainingHours, 24);
-                                            $remainingHoursMod = $remainingHours % 24;
-                                        @endphp
-                                        <div class="alert alert-info mt-2 mb-0 w-100">
-                                            <i class="bi bi-info-circle me-1"></i>
-                                            Nếu bạn không xác nhận, hệ thống sẽ tự chuyển trạng thái sang <strong>Hoàn
-                                                thành</strong>
-                                            sau 2 ngày kể từ thời điểm giao hàng ({{ $deliveredAt->format('d/m/Y H:i') }}).
-                                            @if ($autoCompleteAt->isFuture())
-                                                <br><small>Còn {{ $remainingDays }} ngày {{ $remainingHoursMod }}
-                                                    giờ.</small>
-                                            @endif
-                                        </div>
+                            @if ($order->canCancel())
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                    data-bs-target="#cancelOrderModal">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    @if ($order->payment_method === 'wallet' && $order->payment_status === 'paid')
+                                        Hủy đơn và hoàn tiền
+                                    @else
+                                        Hủy đơn hàng
                                     @endif
+                                </button>
+                            @endif
 
-                                    @if ($order->canCancelRefund())
-                                        <a class="btn btn-outline-danger"
-                                            href="{{ route('client.account.orders.refund.cancel', $order) }}">
-                                            <i class="bi bi-x-circle me-1"></i> Hủy đơn và hoàn tiền
-                                        </a>
-                                    @endif
-
-                                    @php
-                                        $pendingCancelRefund = $order
-                                            ->refunds()
-                                            ->where('type', 'cancel')
-                                            ->where('status', 'pending')
-                                            ->first();
-
-                                    @endphp
-
-                                    @if ($pendingCancelRefund)
-                                        <form action="{{ route('client.account.orders.refund.cancel.reset', $order) }}"
-                                            method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-outline-dark"
-                                                onclick="return confirm('Bạn muốn đặt lại đơn hàng và dừng hoàn tiền?');">
-                                                <i class="bi bi-arrow-repeat me-1"></i> Đặt lại
-                                            </button>
-                                        </form>
-                                    @endif
-
-                                    @if ($order->canCancel())
-                                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                                                data-bs-target="#cancelOrderModal">
-                                                <i class="bi bi-x-circle me-1"></i>
-                                                @if ($order->payment_method === 'wallet' && $order->payment_status === 'paid')
-                                                    Hủy đơn và hoàn tiền
-                                                @else
-                                                    Hủy đơn hàng
-                                                @endif
-                                            </button>
-                                        @endif
                         </div>
-
-                        @if ($order->canCancel() && $order->payment_method === 'wallet' && $order->payment_status === 'paid')
-                            <div class="alert alert-info mt-3 mb-0">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Nếu bạn hủy đơn hàng, số tiền <strong
-                                    class="text-success">{{ number_format($order->final_total, 0, ',', '.') }}đ</strong>
-                                sẽ
-                                được hoàn lại vào ví của bạn.
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -294,7 +244,6 @@
                                     <i class="bi bi-wallet2 me-1"></i>
                                     Số tiền <strong>{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được
                                     hoàn lại vào ví của bạn sau khi hủy đơn.
-
                                 </div>
                             @endif
 
@@ -329,4 +278,6 @@
             </div>
         </div>
     @endif
+
+
 @endsection
