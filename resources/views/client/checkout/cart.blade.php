@@ -168,27 +168,17 @@
                                         value="cash" {{ old('payment_method', 'cash') == 'cash' ? 'checked' : '' }}
                                         required>
                                     <label class="form-check-label" for="cash">
-                                        <strong>Thanh toán khi nhận hàng (COD)</strong>
+                                        <strong>Thanh toán khi nhận hàng</strong>
                                     </label>
                                 </div>
 
                                 @auth
-                                    @php
-                                        $wallet = \App\Models\ClientWallet::where('user_id', auth()->id())->first();
-                                        $walletBalance = $wallet ? $wallet->balance : 0;
-                                    @endphp
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="payment_method" id="wallet"
-                                            value="wallet" {{ old('payment_method') == 'wallet' ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="wallet">
-                                            <strong>Thanh toán bằng Ví</strong>
-                                            <span class="text-muted ms-2">(Số dư: {{ number_format($walletBalance) }}đ)</span>
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="momo"
+                                            value="momo" {{ old('payment_method') == 'momo' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="momo">
+                                            <strong>Thanh toán bằng Momo</strong>
                                         </label>
-                                    </div>
-                                    <div id="wallet-warning" class="alert alert-warning mt-2 py-2 d-none">
-                                        <i class="bi bi-exclamation-triangle me-1"></i>
-                                        Số dư ví không đủ. <a href="{{ route('client.account.wallet.deposit') }}">Nạp thêm
-                                            tiền</a>
                                     </div>
                                 @endauth
 
