@@ -117,7 +117,15 @@ public function items(): HasMany
 
     public function getStatusMetaAttribute(): array
     {
-        return self::STATUS_META[$this->order_status] ?? ['label' => ucfirst($this->order_status), 'badge' => 'secondary', 'icon' => 'bi-question-circle'];
+        $meta = self::STATUS_META[$this->order_status] ?? ['label' => ucfirst($this->order_status), 'badge' => 'secondary', 'icon' => 'bi-question-circle'];
+
+        if ($this->payment_method === 'momo' && $this->payment_status !== 'paid' && $this->order_status === 'pending') {
+            $meta['label'] = 'Chờ thanh toán';
+            $meta['badge'] = 'warning'; // Optional: make it warning color to indicate action needed
+            $meta['icon'] = 'bi-credit-card';
+        }
+
+        return $meta;
     }
 
     protected function statusLabel(): Attribute
