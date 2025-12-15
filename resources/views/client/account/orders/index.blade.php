@@ -139,7 +139,9 @@
                     'shipping' => ['label' => 'Đang giao', 'icon' => 'bi-truck'],
                     'delivered' => ['label' => 'Đã giao', 'icon' => 'bi-box-seam'],
                     'completed' => ['label' => 'Hoàn thành', 'icon' => 'bi-check2-circle'],
+
                     'cancelled' => ['label' => 'Đã hủy', 'icon' => 'bi-x-circle'],
+                    'returned' => ['label' => 'Trả hàng', 'icon' => 'bi-arrow-repeat'],
                 ];
             @endphp
             @foreach ($tabConfig as $tabKey => $tab)
@@ -373,7 +375,6 @@
                     <a class="btn btn-outline-secondary" href="{{ route('client.account.orders.show', $order) }}">
                         <i class="bi bi-eye me-1"></i> Xem chi tiết
                     </a>
-
                     @if ($order->payment_method === 'momo' && $order->payment_status !== 'paid' && $order->order_status === 'pending')
                         <a href="{{ route('client.checkout.momo_payment_page', ['order_code' => $order->order_code]) }}" class="btn btn-outline-secondary">
                             <i class="bi bi-credit-card me-1"></i> Thanh toán

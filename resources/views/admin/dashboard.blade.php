@@ -22,6 +22,7 @@
 
     {{-- ========== 2. KPI SUMMARY SECTION (TOP KPIs) ========== --}}
     <section class="mb-4">
+
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
             {{-- 🔵 1. KPI Tổng Doanh Thu (Premium Design) --}}
             <div class="col">
@@ -204,6 +205,7 @@
                                     <span class="text-white" style="opacity: 0.9;">% sản phẩm bán được:</span>
                                     <strong class="text-white">{{ $soldPercentage }}%</strong>
                             </div>
+
                             </div>
                         </div>
                     </div>
@@ -211,6 +213,7 @@
             </div>
 
             {{-- ✔ 5. KPI Tỷ lệ hoàn thành đơn (Premium Design với Progress Donut) --}}
+
             <div class="col">
                 @php
                     $completed = $orderStatsByStatus['completed'] ?? 0;
@@ -267,6 +270,7 @@
                                     <span class="text-white" style="opacity: 0.9;">Tổng đơn:</span>
                                     <strong class="text-white">{{ $totalForRate }} đơn</strong>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -5263,6 +5267,7 @@
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Counter Animation cho số liệu thống kê
@@ -5530,6 +5535,7 @@
                     chart: {
                         type: 'line',
                         height: 380,
+
                         toolbar: {
                             show: true,
                             tools: {
@@ -5539,6 +5545,7 @@
                                 zoomin: true,
                                 zoomout: true,
                                 pan: false, // Tắt panning
+
                                 reset: true,
                             }
                         },
@@ -5683,6 +5690,7 @@
                             height: 12,
                             radius: 2,
                         },
+
                     },
                     grid: {
                         borderColor: '#e5e7eb',
@@ -6037,6 +6045,7 @@
                             data: chartData,
                             backgroundColor: colors,
                             borderWidth: 2,
+
                             borderColor: '#ffffff',
                         }]
                     },
@@ -8116,7 +8125,6 @@
         if (inventoryTableBody) {
             loadInventory();
         }
-
         // Toggle filter options based on filter type
         function toggleFilterOptions() {
             const filterType = document.getElementById('order_filter_type').value;

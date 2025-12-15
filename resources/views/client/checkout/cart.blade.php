@@ -169,6 +169,7 @@
                                         required>
                                     <label class="form-check-label" for="cash">
                                         <strong>Thanh toán khi nhận hàng</strong>
+
                                     </label>
                                 </div>
 
@@ -180,6 +181,7 @@
                                             <strong>Thanh toán bằng Momo</strong>
                                         </label>
                                     </div>
+
                                 @endauth
 
                                 @error('payment_method')

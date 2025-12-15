@@ -47,8 +47,6 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
-
-
      public function wishlists()
     {
         return $this->hasMany(Wishlist::class, 'product_id');
@@ -66,6 +64,24 @@ class Product extends Model
     {
         return $this->sale_price ?? $this->price;
     }
+
+    /**
+     * Kiểm tra còn hàng
+     */
+
+    public function orderDetails()
+    {
+        return $this->hasMany(\App\Models\OrderDetail::class, 'product_id');
+    }
+
+    public function hasOrders()
+    {
+        return $this->orderDetails()->exists();
+    }
+
+    /**
+     * Tính giá hiển thị (ưu tiên sale_price nếu có)
+     */
 
     /**
      * Tính % giảm giá

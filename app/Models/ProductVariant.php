@@ -15,6 +15,8 @@ class ProductVariant extends Model
         'width',
         'height',
         'price',
+        'weight', 
+        'weight_unit',
         'stock',
         'sku',
     ];
@@ -34,4 +36,22 @@ class ProductVariant extends Model
         return $this->orderItems()->exists();
     }
 
+     public function setWeightAttribute($value)
+    {
+        $unit = $this->attributes['weight_unit'] ?? 'kg';
+        if (is_null($value)) {
+            $this->attributes['weight'] = null;
+            return;
+        }
+
+        // Nếu muốn chuẩn hoá: từ g -> kg, lb -> kg
+        if ($unit === 'g') {
+            $this->attributes['weight'] = $value / 1000;
+        } elseif ($unit === 'lb') {
+            $this->attributes['weight'] = $value * 0.45359237;
+            $this->attributes['weight_unit'] = 'kg'; // lưu nội bộ bằng kg
+        } else {
+            $this->attributes['weight'] = $value;
+        }
+    }
 }

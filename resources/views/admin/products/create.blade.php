@@ -152,10 +152,27 @@
                                         placeholder="Chiều cao (cm)">
                                 </div>
                                 <div class="col-md-3">
-                                    <input type="number" id="variant_stock" class="form-control"
-                                        placeholder="số lượng sản phẩm">
+                                     <label>Tồn kho</label>
+                                    <input type="number" min="0" id="variant_stock" class="form-control"
+                                        placeholder="Số lượng">
                                 </div>
-                            </div>
+                                <div class="col-md-3">
+                                    <label>Giá (VNĐ)</label>
+                                    <input type="number" step="0.01" min="0" id="variant_price" class="form-control"
+                                        placeholder="Giá biến thể">
+                                    <small class="text-muted">Để trống sẽ dùng giá sản phẩm</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex gap-2">
+                                        <input type="number" id="weight" step="0.01" min="0" placeholder="Trọng lượng" class="form-control" />
+                                        <select id="weight_unit" class="form-select">
+                                            <option value="kg" selected>kg</option>
+                                            <option value="g">g</option>
+                                            <option value="lb">lb</option>
+                                        </select>
+                                    </div>
+                                    <small class="text-muted">Mặc định: kg</small>
+                                </div>
                             <button type="button" class="btn btn-primary mt-2 mb-3" id="add_variant">Thêm biến
                                 thể</button>
 
@@ -191,16 +208,33 @@
                 const width = document.getElementById('width').value.trim();
                 const height = document.getElementById('height').value.trim();
                 const stock = document.getElementById('variant_stock').value.trim();
+                 const price = document.getElementById('variant_price').value.trim();
+
+                const weightEl = document.getElementById('weight'); // optional
+                const weightUnitEl = document.getElementById('weight_unit'); // optional
+                const weight = weightEl ? weightEl.value.trim() : ''; 
+                const weightUnit = weightUnitEl ? weightUnitEl.value : 'kg';
 
                 if (!length || !width || !height) return alert('Nhập đủ kích thước!');
                 if (!colorCode) return alert('Chọn màu!');
-                if (!stock) return alert('Nhập tồn kho cho biến thể!');
+                if (!stock) return alert('Nhập tồn kho cho biến thể!');      
+                if (price !== '' && (isNaN(parseFloat(price)) || parseFloat(price) < 0)) {
+                    return alert('Giá phải là số và lớn hơn hoặc bằng 0!');
+                }
+                if (weight !== '' && (isNaN(parseFloat(weight)) || parseFloat(weight) < 0)) {
+                    return alert('Cân nặng phải là số và lớn hơn hoặc bằng 0!');
+                }
+
+
 
                 const row = document.createElement('div');
-                row.className = 'variant-row';
+                row.className = 'variant-row';   
+                const weightDisplay = weight !== '' ? `${weight} ${weightUnit}` : '(chưa nhập)';
+                const priceDisplay = price !== '' ? `${parseFloat(price).toLocaleString('vi-VN')} đ` : '(dùng giá SP)';
                 row.innerHTML = `
             <div class="variant-swatch" style="background:${colorCode}"></div>
-            <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp</span>
+            <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp - ${priceDisplay} - ${weightDisplay}</span>
+            <small style="margin-right:12px;">${weight !== '' ? weight + ' ' + weightUnit : ''}</small>
             <button type="button" class="btn btn-sm btn-link text-danger">x</button>
         `;
 
@@ -214,16 +248,18 @@
                 variantList.appendChild(row);
 
                 hiddenDiv.innerHTML = `
-            <input type="hidden" name="variants[${idx}][color_name]" value="${colorName}">
-            <input type="hidden" name="variants[${idx}][color_code]" value="${colorCode}">
-            <input type="hidden" name="variants[${idx}][length]" value="${length}">
-            <input type="hidden" name="variants[${idx}][width]" value="${width}">
-            <input type="hidden" name="variants[${idx}][height]" value="${height}">
-            <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
+                    <input type="hidden" name="variants[${idx}][color_name]" value="${colorName}">
+                    <input type="hidden" name="variants[${idx}][color_code]" value="${colorCode}">
+                    <input type="hidden" name="variants[${idx}][length]" value="${length}">
+                    <input type="hidden" name="variants[${idx}][width]" value="${width}">
+                    <input type="hidden" name="variants[${idx}][height]" value="${height}">
+                    <input type="hidden" name="variants[${idx}][stock]" value="${stock}">
+                    <input type="hidden" name="variants[${idx}][price]" value="${escapeHtml(price || '')}">
+                    <input type="hidden" name="variants[${idx}][weight]" value="${escapeHtml(weight)}">
+                    <input type="hidden" name="variants[${idx}][weight_unit]" value="${escapeHtml(weightUnit)}">
         `;
                 hiddenVariants.appendChild(hiddenDiv);
                 idx++;
-
                 // Reset input
                 document.getElementById('color_name').value = '';
                 document.getElementById('color_code').value = '#000000';
@@ -231,7 +267,19 @@
                 document.getElementById('width').value = '';
                 document.getElementById('height').value = '';
                 document.getElementById('variant_stock').value = '';
+                document.getElementById('variant_price').value = '';
+                if (weightEl) weightEl.value = '';
+                if (weightUnitEl) weightUnitEl.value = 'kg';
             });
+                 // helper để tránh XSS khi inject value vào HTML
+            function escapeHtml(text) {
+                if (typeof text !== 'string') return text;
+                return text.replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+            }
         });
     </script>
 

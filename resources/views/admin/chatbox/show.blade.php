@@ -68,6 +68,7 @@
                                     @if($message->sender_type != 'client')
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                                         <small class="d-block mb-1 text-white-50">
 =======
                                         <small class="d-block mb-1 {{ $message->sender_type == 'bot' ? 'text-white-50' : 'text-white-50' }}">
@@ -75,6 +76,11 @@
 =======
                                         <small class="d-block mb-1 {{ $message->sender_type == 'bot' ? 'text-white-50' : 'text-white-50' }}">
 >>>>>>> origin/Trang_Chu_Client
+=======
+                                        <small class="d-block mb-1 text-white-50">
+                                        <small class="d-block mb-1 {{ $message->sender_type == 'bot' ? 'text-white-50' : 'text-white-50' }}">
+                                        <small class="d-block mb-1 {{ $message->sender_type == 'bot' ? 'text-white-50' : 'text-white-50' }}">
+>>>>>>> origin/sua_Bien_The_update
                                             {{ $message->sender_type == 'bot' ? '🤖 Bot' : $message->sender->name ?? 'Admin' }}
                                         </small>
                                     @endif
@@ -331,7 +337,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Trang_Chu_Client

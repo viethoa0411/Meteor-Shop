@@ -9,8 +9,10 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ClientWallet;
 use App\Models\WalletTransaction;
+
 use App\Models\OrderPayment;
 use App\Models\MomoPayment;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -252,6 +254,7 @@ class CheckoutController extends Controller
             'shipping_address' => 'required|string|max:500',
             'shipping_method'  => 'required|string|in:standard,express,fast',
             'payment_method'   => 'required|string|in:cash,wallet,momo',
+
             'notes'            => 'nullable|string|max:1000',
             'quantity'         => 'nullable|integer|min:1',
         ], [
@@ -263,6 +266,8 @@ class CheckoutController extends Controller
             'customer_email.email'      => 'Email không hợp lệ',
             'shipping_city.required'    => 'Vui lòng chọn tỉnh/thành phố',
             'shipping_district.required' => 'Vui lòng chọn quận/huyện',
+
+
             'shipping_ward.required'    => 'Vui lòng chọn phường/xã',
             'shipping_address.required' => 'Vui lòng nhập địa chỉ chi tiết',
         ]);
@@ -327,6 +332,7 @@ class CheckoutController extends Controller
         
         \Illuminate\Support\Facades\Log::info('Process: Saved Payment Method', ['method' => $request->payment_method]);
 
+
         $checkoutSession['shipping_fee']      = $shippingFee;
         $checkoutSession['notes']             = $request->notes;
         $checkoutSession['discount_amount']   = $discountAmount;
@@ -336,7 +342,6 @@ class CheckoutController extends Controller
             0,
             $checkoutSession['subtotal'] - $discountAmount + $shippingFee
         );
-
 
         session(['checkout_session' => $checkoutSession]);
 
@@ -360,15 +365,18 @@ class CheckoutController extends Controller
         
         \Illuminate\Support\Facades\Log::info('Confirm: Checkout Session', ['payment_method' => $checkoutSession['payment_method'] ?? 'N/A']);
 
+
         if (!$checkoutSession) {
             return redirect()->route('client.home')
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
         }
 
+
         // Nếu thanh toán Momo, tạo đơn và chuyển hướng ngay (Skip confirm view)
         if (isset($checkoutSession['payment_method']) && $checkoutSession['payment_method'] === 'momo') {
             return $this->createOrder();
         }
+
 
         // Nếu là checkout từ cart hoặc reorder
         if (in_array($checkoutSession['type'], ['cart', 'reorder'])) {
@@ -420,6 +428,7 @@ class CheckoutController extends Controller
                 'customer_email'   => $checkoutSession['customer_email'],
                 'shipping_city'    => $checkoutSession['shipping_city'],
                 'shipping_district' => $checkoutSession['shipping_district'],
+
                 'shipping_ward'    => $checkoutSession['shipping_ward'],
                 'shipping_address' => $checkoutSession['shipping_address'],
                 'shipping_method'  => $checkoutSession['shipping_method'],
@@ -563,6 +572,7 @@ class CheckoutController extends Controller
             // Xử lý thanh toán bằng ví
             \Illuminate\Support\Facades\Log::info('CreateOrder: Check Payment Method', ['method' => $checkoutSession['payment_method']]);
 
+
             if ($checkoutSession['payment_method'] === 'wallet') {
                 $clientWallet = ClientWallet::where('user_id', Auth::id())->first();
 
@@ -607,6 +617,7 @@ class CheckoutController extends Controller
                     return redirect()->back()->with('error', 'Không thể tạo giao dịch Momo. Vui lòng thử lại sau.');
                 }
             }
+
             // Nếu là tiền mặt, có thể giữ payment_status = pending để shipper thu hộ
 
             // Tăng lượt dùng mã khuyến mãi nếu có
@@ -705,6 +716,7 @@ class CheckoutController extends Controller
      * Trang đặt hàng thành công
      */
     public function success(Request $request, $orderCode)
+
     {
         // Kiểm tra đăng nhập
         if (!Auth::check()) {
@@ -815,7 +827,6 @@ class CheckoutController extends Controller
                 \Illuminate\Support\Facades\Log::error('Momo Signature Mismatch', ['calculated' => $checkSignature, 'received' => $signature]);
             }
         }
-
         // Lấy sản phẩm liên quan
         $relatedProducts = Product::where('category_id', $order->items->first()->product->category_id ?? null)
             ->where('id', '!=', $order->items->first()->product_id ?? 0)
@@ -852,18 +863,18 @@ class CheckoutController extends Controller
     private function getShippingFeeValue($method, $city, $subtotal)
     {
         // Logic tính phí vận chuyển đơn giản
-        $baseFee = 0; // Phí cơ bản
+        $baseFee = 30000; // Phí cơ bản
 
         switch ($method) {
             case 'express':
-                $baseFee = 0;
+                $baseFee = 50000;
                 break;
             case 'fast':
-                $baseFee = 0;
+                $baseFee = 70000;
                 break;
             case 'standard':
             default:
-                $baseFee = 0;
+                $baseFee = 30000;
                 break;
         }
 

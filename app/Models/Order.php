@@ -96,7 +96,6 @@ public function items(): HasMany
     {
         return $this->hasMany(OrderDetail::class, 'order_id')->orderBy('id');
     }
-
     public function scopeOwnedBy($query, int $userId)
     {
         return $query->where('user_id', $userId);

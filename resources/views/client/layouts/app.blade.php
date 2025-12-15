@@ -836,6 +836,7 @@
                 <div style="text-align: center; color:#bdbdbd; font-size: 16px">
                     © 2025 METEOR SHOP
                 </div>
+
             </div>
         </div>
     </footer>
@@ -1600,6 +1601,7 @@
                     // Bind quick reply events
                     document.querySelectorAll('.chatbox-quick-reply').forEach(btn => {
                         btn.addEventListener('click', function() {
+
                             sendMessage(this.dataset.message);
                         });
                     });
@@ -1730,6 +1732,7 @@
                                 'X-CSRF-TOKEN': csrfToken
                             },
                             body: JSON.stringify({
+
                                 message: message,
                                 session_token: sessionToken,
                                 page_url: window.location.href
@@ -1827,7 +1830,11 @@
                 if (count > 0) {
                     chatBadge.textContent = count > 99 ? '99+' : count;
                     chatBadge.style.display = 'flex';
+<<<<<<< HEAD
                 } else {
+=======
+                    } else {
+>>>>>>> origin/sua_Bien_The_update
                     chatBadge.style.display = 'none';
                 }
             }
