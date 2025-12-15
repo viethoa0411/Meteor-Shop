@@ -105,6 +105,8 @@
                                 Thanh toán khi nhận hàng (COD)
                             @elseif ($checkoutSession['payment_method'] == 'wallet')
                                 <span class="text-success"><i class="bi bi-wallet2 me-1"></i>Thanh toán bằng Ví</span>
+                            @elseif ($checkoutSession['payment_method'] == 'momo')
+                                <span class="text-primary" style="color: #a50064 !important;"><i class="bi bi-credit-card me-1"></i>Thanh toán bằng Momo</span>
                             @else
                                 {{ $checkoutSession['payment_method'] }}
                             @endif
