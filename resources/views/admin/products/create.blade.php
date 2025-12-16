@@ -158,39 +158,28 @@
                                         placeholder="Cân nặng (kg)">
                                 </div>
                                 <div class="col-md-3">
-                                     <label>Tồn kho</label>
+                                    <label>Tồn kho</label>
                                     <input type="number" min="0" id="variant_stock" class="form-control"
                                         placeholder="Số lượng">
                                 </div>
                                 <div class="col-md-3">
                                     <label>Giá (VNĐ)</label>
-                                    <input type="number" step="0.01" min="0" id="variant_price" class="form-control"
-                                        placeholder="Giá biến thể">
+                                    <input type="number" step="0.01" min="0" id="variant_price"
+                                        class="form-control" placeholder="Giá biến thể">
                                     <small class="text-muted">Để trống sẽ dùng giá sản phẩm</small>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="d-flex gap-2">
-                                        <input type="number" id="weight" step="0.01" min="0" placeholder="Trọng lượng" class="form-control" />
-                                        <select id="weight_unit" class="form-select">
-                                            <option value="kg" selected>kg</option>
-                                            <option value="g">g</option>
-                                            <option value="lb">lb</option>
-                                        </select>
+                                <button type="button" class="btn btn-primary mt-2 mb-3" id="add_variant">Thêm biến
+                                    thể</button>
+
+                                <div id="variant-list" class="mb-3"></div>
+                                <div id="hidden-variants"></div>
+
+                                <div class="d-flex mt-3">
+                                    <div class="ms-auto">
+                                        <a href="{{ route('admin.products.list') }}" class="btn btn-danger me-2">Hủy</a>
+                                        <button type="submit" class="btn btn-primary">Lưu</button>
                                     </div>
-                                    <small class="text-muted">Mặc định: kg</small>
                                 </div>
-                            <button type="button" class="btn btn-primary mt-2 mb-3" id="add_variant">Thêm biến
-                                thể</button>
-
-                            <div id="variant-list" class="mb-3"></div>
-                            <div id="hidden-variants"></div>
-
-                            <div class="d-flex mt-3">
-                                <div class="ms-auto">
-                                    <a href="{{ route('admin.products.list') }}" class="btn btn-danger me-2">Hủy</a>
-                                    <button type="submit" class="btn btn-primary">Lưu</button>
-                                </div>
-                            </div>
 
                         </form>
                     </div>
@@ -208,6 +197,7 @@
             let idx = 0;
 
             addBtn.addEventListener('click', function() {
+                try {
                 const colorName = document.getElementById('color_name').value.trim();
                 const colorCode = document.getElementById('color_code').value.trim();
                 const length = document.getElementById('length').value.trim();
@@ -215,16 +205,14 @@
                 const height = document.getElementById('height').value.trim();
                 const weight = document.getElementById('weight').value.trim();
                 const stock = document.getElementById('variant_stock').value.trim();
-                 const price = document.getElementById('variant_price').value.trim();
+                const price = document.getElementById('variant_price').value.trim();
 
-                const weightEl = document.getElementById('weight'); // optional
                 const weightUnitEl = document.getElementById('weight_unit'); // optional
-                const weight = weightEl ? weightEl.value.trim() : ''; 
                 const weightUnit = weightUnitEl ? weightUnitEl.value : 'kg';
 
                 if (!length || !width || !height) return alert('Nhập đủ kích thước!');
                 if (!colorCode) return alert('Chọn màu!');
-                if (!stock) return alert('Nhập tồn kho cho biến thể!');      
+                if (!stock) return alert('Nhập tồn kho cho biến thể!');
                 if (price !== '' && (isNaN(parseFloat(price)) || parseFloat(price) < 0)) {
                     return alert('Giá phải là số và lớn hơn hoặc bằng 0!');
                 }
@@ -235,9 +223,10 @@
 
 
                 const row = document.createElement('div');
-                row.className = 'variant-row';   
+                row.className = 'variant-row';
                 const weightDisplay = weight !== '' ? `${weight} ${weightUnit}` : '(chưa nhập)';
-                const priceDisplay = price !== '' ? `${parseFloat(price).toLocaleString('vi-VN')} đ` : '(dùng giá SP)';
+                const priceDisplay = price !== '' ? `${parseFloat(price).toLocaleString('vi-VN')} đ` :
+                    '(dùng giá SP)';
                 row.innerHTML = `
             <div class="variant-swatch" style="background:${colorCode}"></div>
             <span>${colorName || colorCode} - ${length}×${width}×${height} cm - <b>${stock}</b> sp - ${priceDisplay} - ${weightDisplay}</span>
@@ -277,17 +266,20 @@
                 document.getElementById('weight').value = '';
                 document.getElementById('variant_stock').value = '';
                 document.getElementById('variant_price').value = '';
-                if (weightEl) weightEl.value = '';
                 if (weightUnitEl) weightUnitEl.value = 'kg';
+                } catch (e) {
+                    console.error('Lỗi thêm biến thể:', e);
+                    alert('Có lỗi xảy ra khi thêm biến thể: ' + e.message);
+                }
             });
-                 // helper để tránh XSS khi inject value vào HTML
+            // helper để tránh XSS khi inject value vào HTML
             function escapeHtml(text) {
                 if (typeof text !== 'string') return text;
                 return text.replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
             }
         });
     </script>
