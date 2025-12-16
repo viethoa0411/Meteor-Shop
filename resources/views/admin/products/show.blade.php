@@ -158,8 +158,8 @@
                                                 </td>
                                                 <td>
                                                     @if ($v->length || $v->width || $v->height)
-                                                        {{ $v->length ?? '—' }} × {{ $v->width ?? '—' }} ×
-                                                        {{ $v->height ?? '—' }} m
+                                                        {{ (float)$v->length ?? '—' }} × {{ (float)$v->width ?? '—' }} ×
+                                                        {{ (float)$v->height ?? '—' }} mm
                                                     @else
                                                         —
                                                     @endif
@@ -168,9 +168,9 @@
                                                 <td>{{ $v->stock }}</td>
                                                 <td>
                                                     @if ($v->weight)
-                                                        {{ $v->weight }} {{ $v->weight_unit ?? 'kg' }}
+                                                        {{ (float)$v->weight }} {{ $v->weight_unit ?? 'kg' }}
                                                     @else
-                                                        —
+                                                        chưa có cân nặng
                                                     @endif
                                                 </td>
                                             </tr>
@@ -186,7 +186,7 @@
                         <div class="mt-3">
                             <div class="fw-semibold">Mô tả</div>
                             <div class="lh-base">
-                                {!! nl2br(e($product->description)) ?: '<span class="text-secondary">—</span>' !!}
+                                {!! nl2br(e($product->description)) ?: '<span class="text-secondary">chưa có mô tả</span>' !!}
                             </div>
                         </div>
 
