@@ -140,21 +140,21 @@
                             </div>
                             <div class="row g-3 mt-2">
                                 <div class="col-md-3">
-                                    <input type="number" id="length" step="0.01" class="form-control"
-                                        placeholder="Chiều dài (m) - VD: 2.5">
+                                    <input type="number" id="length" step="100" class="form-control"
+                                        placeholder="Chiều dài (mm) - VD: 1000">
                                 </div>
                                 <div class="col-md-3">
-                                    <input type="number" id="width" step="0.01" class="form-control"
-                                        placeholder="Chiều rộng (m) - VD: 1.8">
+                                    <input type="number" id="width" step="100" class="form-control"
+                                        placeholder="Chiều rộng (mm) - VD: 1000">
                                 </div>
                                 <div class="col-md-3">
-                                    <input type="number" id="height" step="0.01" class="form-control"
-                                        placeholder="Chiều cao (m) - VD: 0.8">
+                                    <input type="number" id="height" step="100" class="form-control"
+                                        placeholder="Chiều cao (mm) - VD: 1000">
                                 </div>
                             </div>
                             <div class="row g-3 mt-2">
                                 <div class="col-md-3">
-                                    <input type="number" id="weight" step="0.01" class="form-control"
+                                    <input type="number" id="weight" step="1" class="form-control"
                                         placeholder="Cân nặng (kg)">
                                 </div>
                                 <div class="col-md-3">
@@ -164,7 +164,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label>Giá (VNĐ)</label>
-                                    <input type="number" step="0.01" min="0" id="variant_price"
+                                    <input type="number" step="100" min="0" id="variant_price"
                                         class="form-control" placeholder="Giá biến thể">
                                     <small class="text-muted">Để trống sẽ dùng giá sản phẩm</small>
                                 </div>
