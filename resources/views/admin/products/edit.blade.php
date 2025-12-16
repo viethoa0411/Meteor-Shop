@@ -265,29 +265,6 @@
                                                        placeholder="Giá biến thể">
                                                 <small class="text-muted">Để trống = giá SP</small>
                                             </div>
-
-
-                                            {{-- Cân nặng --}}
-                                            <div class="col-md-3 mt-3">
-                                                <label>Cân nặng</label>
-                                                <input type="number" step="0.01" min="0"
-                                                        name="variants[{{ $idx }}][weight]" class="form-control"
-                                                       value="{{ old('variants.'.$idx.'.weight', $v->weight) }}" placeholder="0.00"
-                                                       {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
-                                            </div>
-
-                                            <div class="col-md-2 mt-3">
-                                                <label>Đơn vị</label>
-                                                <select name="variants[{{ $idx }}][weight_unit]" class="form-select"
-                                                        {{ ($hasOrders ?? false) && $variantHasOrders ? 'disabled' : '' }}>
-                                                    <option value="kg" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'kg' ? 'selected' : '' }}>kg</option>
-                                                    <option value="g" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'g' ? 'selected' : '' }}>g</option>
-                                                    <option value="lb" {{ old('variants.'.$idx.'.weight_unit', $v->weight_unit ?? 'kg') == 'lb' ? 'selected' : '' }}>lb</option>
-                                                </select>
-                                                @if(($hasOrders ?? false) && $variantHasOrders)
-                                                    <input type="hidden" name="variants[{{ $idx }}][weight_unit]" value="{{ $v->weight_unit ?? 'kg' }}">
-                                                @endif
-                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -382,23 +359,8 @@
                         <div class="col-md-2 mt-3">
                             <label>Giá (VNĐ)</label>
                             <input type="number" step="0.01" min="0"
-                                name="variants[new_${variantIndex}][price]" class="form-control" placeholder="Giá biến thể">
+                                name="variants[new_${newVariantIndex}][price]" class="form-control" placeholder="Giá biến thể">
                             <small class="text-muted">Để trống = giá SP</small>
-                        </div>
-
-                         <div class="col-md-3 mt-3">
-                            <label>Cân nặng</label>
-                            <input type="number" step="1" 
-                                name="variants[new_${newVariantIndex}][weight]" class="form-control" placeholder="0.00">
-                        </div>
-
-                        <div class="col-md-2 mt-3">
-                            <label>Đơn vị</label>
-                            <select name="variants[new_${newVariantIndex}][weight_unit]" class="form-select">
-                                <option value="kg" selected>kg</option>
-                                <option value="g">g</option>
-                                <option value="lb">lb</option>
-                            </select>
                         </div>
                     </div>
                 </div>`;
