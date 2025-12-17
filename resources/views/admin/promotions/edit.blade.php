@@ -109,23 +109,23 @@
                 </div>
 
                 <div class="row g-3 mt-1">
-                    <div class="col-md-6">
+                    <div class="col-md-6" id="category_container" style="display: none;">
                         <label class="form-label">Danh mục áp dụng</label>
-                        <select name="category_ids[]" class="form-select" multiple>
+                        <select name="category_ids[]" class="form-select" multiple style="height: 200px;">
                             @foreach ($categories as $c)
                                 <option value="{{ $c->id }}" {{ in_array($c->id, old('category_ids', $selectedCategoryIds)) ? 'selected' : '' }}>{{ $c->name }}</option>
                             @endforeach
                         </select>
-                        <div class="form-text">Chỉ dùng khi chọn phạm vi "Theo danh mục"</div>
+                        <div class="form-text">Giữ Ctrl (Windows) hoặc Command (Mac) để chọn nhiều</div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" id="product_container" style="display: none;">
                         <label class="form-label">Sản phẩm áp dụng</label>
-                        <select name="product_ids[]" class="form-select" multiple>
+                        <select name="product_ids[]" class="form-select" multiple style="height: 200px;">
                             @foreach ($products as $p)
                                 <option value="{{ $p->id }}" {{ in_array($p->id, old('product_ids', $selectedProductIds)) ? 'selected' : '' }}>{{ $p->name }}</option>
                             @endforeach
                         </select>
-                        <div class="form-text">Chỉ dùng khi chọn phạm vi "Theo sản phẩm"</div>
+                        <div class="form-text">Giữ Ctrl (Windows) hoặc Command (Mac) để chọn nhiều</div>
                     </div>
                 </div>
 
@@ -139,4 +139,29 @@
         </div>
     </div>
  </div>
+
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const scopeSelect = document.querySelector('select[name="scope"]');
+        const categoryContainer = document.getElementById('category_container');
+        const productContainer = document.getElementById('product_container');
+
+        function toggleScope() {
+            const scope = scopeSelect.value;
+            if (scope === 'category') {
+                categoryContainer.style.display = 'block';
+                productContainer.style.display = 'none';
+            } else if (scope === 'product') {
+                categoryContainer.style.display = 'none';
+                productContainer.style.display = 'block';
+            } else {
+                categoryContainer.style.display = 'none';
+                productContainer.style.display = 'none';
+            }
+        }
+
+        scopeSelect.addEventListener('change', toggleScope);
+        toggleScope(); // Chạy lần đầu khi trang tải
+    });
+ </script>
 @endsection
