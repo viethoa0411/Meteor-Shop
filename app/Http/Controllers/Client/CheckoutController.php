@@ -270,8 +270,6 @@ class CheckoutController extends Controller
             'customer_email.email'      => 'Email không hợp lệ',
             'shipping_city.required'    => 'Vui lòng chọn tỉnh/thành phố',
             'shipping_district.required' => 'Vui lòng chọn quận/huyện',
-
-
             'shipping_ward.required'    => 'Vui lòng chọn phường/xã',
             'shipping_address.required' => 'Vui lòng nhập địa chỉ chi tiết',
         ]);
@@ -935,9 +933,6 @@ class CheckoutController extends Controller
                 'surcharge' => $shippingCalculation['surcharge'],
             ]);
         }
-
-        // Gọi hàm tính phí nội bộ
-        $fee = $this->getShippingFeeValue($method, $city, $subtotal);
 
         return response()->json([
             'success' => true,
