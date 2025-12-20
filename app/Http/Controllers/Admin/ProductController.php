@@ -9,7 +9,9 @@ use App\Models\ProductVariant;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\NotificationService;
 
 
 class ProductController extends Controller
@@ -221,27 +223,50 @@ class ProductController extends Controller
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
+        // Lưu stock cũ để so sánh
+        $oldStock = $product->stock;
+        
         // Cập nhật thông tin sản phẩm
         $updateData = [
-
-            'name' => $request->name,
             'price' => $request->price,
-            'stock' => $request->stock,
-            'category_id' => $request->category_id,
             'stock' => $request->stock ?? $product->stock,
             'description' => $request->description,
             'status' => $request->status,
             'image' => $imagePath,
-
         ];
 
-         // Chỉ cho phép thay đổi tên và danh mục nếu chưa có đơn hàng
+        // Chỉ cho phép thay đổi tên và danh mục nếu chưa có đơn hàng
         if (!$hasOrders) {
             $updateData['name'] = $request->name;
             $updateData['category_id'] = $request->category_id;
         }
 
         $product->update($updateData);
+
+        // Kiểm tra và tạo thông báo về tồn kho
+        $newStock = $product->fresh()->stock;
+        if ($newStock == 0) {
+            // Sản phẩm hết hàng
+            try {
+                NotificationService::createForAdmins([
+                    'type' => 'product',
+                    'level' => 'danger',
+                    'title' => 'Sản phẩm hết hàng',
+                    'message' => $product->name . ' đã hết hàng',
+                    'url' => route('admin.products.show', $product->id),
+                    'metadata' => ['product_id' => $product->id, 'stock' => 0]
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Error creating out of stock notification: ' . $e->getMessage());
+            }
+        } elseif ($newStock > 0 && $newStock <= 10 && ($oldStock > 10 || $oldStock == 0)) {
+            // Sản phẩm sắp hết hàng (chỉ thông báo khi chuyển từ >10 xuống <=10 hoặc từ 0 lên >0)
+            try {
+                NotificationService::notifyLowStock($product);
+            } catch (\Exception $e) {
+                Log::error('Error creating low stock notification: ' . $e->getMessage());
+            }
+        }
 
         // Xử lý upload ảnh phụ (nếu có) - không cho phép thay đổi nếu có đơn hàng
         if ($request->hasFile('images') && !$hasOrders) {
@@ -280,7 +305,8 @@ class ProductController extends Controller
             $variant = $product->variants->firstWhere('id', $v['id']);
 
                 if ($variant) {
-                    $variantData = [
+                    $oldVariantStock = $variant->stock;
+                    $variant->update([
                         'product_version' => $version,
                         'color_name' => $v['color_name'],
                         'color_code' => $v['color_code'],
@@ -290,20 +316,39 @@ class ProductController extends Controller
                         'weight'     => $v['weight'] ?? 0,
                         'stock'      => $v['stock'] ?? 0,
                         'price'      => $v['price'] ?? $product->price,
-                        'weight'     => $v['weight'] ?? null,
-                        'weight_unit'=> $v['weight_unit'] ?? 'kg',
-                    ];
-
-                    // Chỉ cho phép thay đổi màu sắc, kích thước, cân nặng nếu chưa có đơn hàng
-                    if (!$hasOrders || !$variant->hasOrders()) {
-                        $variantData['color_name'] = $v['color_name'] ?? $variant->color_name;
-                        $variantData['color_code'] = $v['color_code'] ?? $variant->color_code;
-                        $variantData['length'] = $v['length'] ?? $variant->length;
-                        $variantData['width'] = $v['width'] ?? $variant->width;
-                        $variantData['height'] = $v['height'] ?? $variant->height;
+                    ]);
+                    
+                    // Kiểm tra stock của variant sau khi update
+                    $newVariantStock = $variant->fresh()->stock;
+                    if ($newVariantStock == 0 && $oldVariantStock > 0) {
+                        // Variant hết hàng
+                        try {
+                            NotificationService::createForAdmins([
+                                'type' => 'product',
+                                'level' => 'danger',
+                                'title' => 'Biến thể hết hàng',
+                                'message' => $product->name . ' - ' . ($variant->color_name ?? 'Biến thể') . ' đã hết hàng',
+                                'url' => route('admin.products.show', $product->id),
+                                'metadata' => ['product_id' => $product->id, 'variant_id' => $variant->id, 'stock' => 0]
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Error creating variant out of stock notification: ' . $e->getMessage());
+                        }
+                    } elseif ($newVariantStock > 0 && $newVariantStock <= 10 && ($oldVariantStock > 10 || $oldVariantStock == 0)) {
+                        // Variant sắp hết hàng
+                        try {
+                            NotificationService::createForAdmins([
+                                'type' => 'product',
+                                'level' => 'warning',
+                                'title' => 'Biến thể sắp hết hàng',
+                                'message' => $product->name . ' - ' . ($variant->color_name ?? 'Biến thể') . ' chỉ còn ' . $newVariantStock . ' sản phẩm',
+                                'url' => route('admin.products.show', $product->id),
+                                'metadata' => ['product_id' => $product->id, 'variant_id' => $variant->id, 'stock' => $newVariantStock]
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Error creating variant low stock notification: ' . $e->getMessage());
+                        }
                     }
-
-                    $variant->update($variantData);
                 }
 
                 continue;
@@ -312,6 +357,7 @@ class ProductController extends Controller
                    // Tạo biến thể mới - chỉ cho phép nếu chưa có đơn hàng
                 if (!$hasOrders) {
                         $product->variants()->create([
+
                         'product_id'      => $product->id,
                         'product_version' => $version,
                         'color_name'      => $v['color_name'] ?? null,
@@ -326,6 +372,35 @@ class ProductController extends Controller
                         'weight'          => $v['weight'] ?? null,
                         'weight_unit'     => $v['weight_unit'] ?? 'kg',
                     ]);
+                    
+                    // Kiểm tra stock của variant
+                    if ($variant->stock == 0) {
+                        try {
+                            NotificationService::createForAdmins([
+                                'type' => 'product',
+                                'level' => 'danger',
+                                'title' => 'Biến thể hết hàng',
+                                'message' => $product->name . ' - ' . ($variant->color_name ?? 'Biến thể') . ' đã hết hàng',
+                                'url' => route('admin.products.show', $product->id),
+                                'metadata' => ['product_id' => $product->id, 'variant_id' => $variant->id, 'stock' => 0]
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Error creating variant out of stock notification: ' . $e->getMessage());
+                        }
+                    } elseif ($variant->stock > 0 && $variant->stock <= 10) {
+                        try {
+                            NotificationService::createForAdmins([
+                                'type' => 'product',
+                                'level' => 'warning',
+                                'title' => 'Biến thể sắp hết hàng',
+                                'message' => $product->name . ' - ' . ($variant->color_name ?? 'Biến thể') . ' chỉ còn ' . $variant->stock . ' sản phẩm',
+                                'url' => route('admin.products.show', $product->id),
+                                'metadata' => ['product_id' => $product->id, 'variant_id' => $variant->id, 'stock' => $variant->stock]
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Error creating variant low stock notification: ' . $e->getMessage());
+                        }
+                    }
                 }
                 }
         return redirect()->route('admin.products.list')->with('success', 'Cập nhật sản phẩm thành công!');

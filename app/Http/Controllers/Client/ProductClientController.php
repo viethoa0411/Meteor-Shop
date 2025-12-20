@@ -576,6 +576,32 @@ class ProductClientController extends Controller
             'status' => $status,
         ]);
 
+        // Tạo thông báo cho admin về review mới (chỉ khi status là pending)
+        if ($status === 'pending') {
+            try {
+                \App\Services\NotificationService::notifyNewReview($review);
+            } catch (\Exception $e) {
+                // Không dừng flow nếu tạo notification thất bại
+                Log::error('Error creating review notification: ' . $e->getMessage());
+            }
+        }
+        
+        // Tạo thông báo cho review tiêu cực (1-2 sao)
+        if ($request->rating <= 2) {
+            try {
+                \App\Services\NotificationService::createForAdmins([
+                    'type' => 'review',
+                    'level' => 'warning',
+                    'title' => 'Review tiêu cực',
+                    'message' => 'Sản phẩm ' . $product->name . ' có review ' . $request->rating . ' sao',
+                    'url' => route('admin.comments.index', ['review_id' => $review->id]) ?? route('admin.comments.index'),
+                    'metadata' => ['review_id' => $review->id, 'rating' => $request->rating, 'product_id' => $product->id]
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Error creating negative review notification: ' . $e->getMessage());
+            }
+        }
+
         // Update product rating average (only if approved)
         if ($status === 'approved') {
             $this->updateProductRating($product->id);

@@ -21,6 +21,9 @@ use Carbon\Carbon;
 use App\Services\PromotionService;
 use App\Helpers\ShippingHelper;
 
+use App\Services\NotificationService;
+
+
 class CheckoutController extends Controller
 {
     /**
@@ -40,11 +43,11 @@ class CheckoutController extends Controller
      */
     public function index(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info('Checkout Index called', $request->all());
+        Log::info('Checkout Index called', $request->all());
 
         // Kiểm tra đăng nhập
         if (!Auth::check()) {
-            \Illuminate\Support\Facades\Log::info('Checkout: User not logged in');
+            Log::info('Checkout: User not logged in');
             return redirect()->route('client.login')
                 ->with('error', 'Vui lòng đăng nhập để tiếp tục đặt hàng');
         }
@@ -99,7 +102,7 @@ class CheckoutController extends Controller
                 $cart = session()->get('cart', []);
             }
 
-            \Illuminate\Support\Facades\Log::info('Checkout Cart', ['cart_count' => count($cart), 'selected' => $selectedIds]);
+            Log::info('Checkout Cart', ['cart_count' => count($cart), 'selected' => $selectedIds]);
 
             if (empty($cart)) {
                 return redirect()->route('cart.index')
@@ -140,7 +143,7 @@ class CheckoutController extends Controller
 
                 // Kiểm tra tồn kho
                 if ($stock < $item['quantity']) {
-                    \Illuminate\Support\Facades\Log::info('Checkout: Out of stock', ['item' => $item['name'], 'stock' => $stock, 'qty' => $item['quantity']]);
+                    Log::info('Checkout: Out of stock', ['item' => $item['name'], 'stock' => $stock, 'qty' => $item['quantity']]);
                     return redirect()->route('cart.index')
                         ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                 }
@@ -346,7 +349,7 @@ class CheckoutController extends Controller
         $checkoutSession['shipping_method']   = $request->shipping_method;
         $checkoutSession['payment_method']    = $request->payment_method;
         
-        \Illuminate\Support\Facades\Log::info('Process: Saved Payment Method', ['method' => $request->payment_method]);
+        Log::info('Process: Saved Payment Method', ['method' => $request->payment_method]);
 
 
         $checkoutSession['shipping_fee']      = $shippingFee;
@@ -381,7 +384,7 @@ class CheckoutController extends Controller
 
         $checkoutSession = session('checkout_session');
         
-        \Illuminate\Support\Facades\Log::info('Confirm: Checkout Session', ['payment_method' => $checkoutSession['payment_method'] ?? 'N/A']);
+        Log::info('Confirm: Checkout Session', ['payment_method' => $checkoutSession['payment_method'] ?? 'N/A']);
 
         $shippingSettings = ShippingSetting::getSettings();
 
@@ -591,7 +594,7 @@ class CheckoutController extends Controller
             }
 
             // Xử lý thanh toán bằng ví
-            \Illuminate\Support\Facades\Log::info('CreateOrder: Check Payment Method', ['method' => $checkoutSession['payment_method']]);
+            Log::info('CreateOrder: Check Payment Method', ['method' => $checkoutSession['payment_method']]);
 
 
             if ($checkoutSession['payment_method'] === 'wallet') {
@@ -621,7 +624,7 @@ class CheckoutController extends Controller
             }
             // Xử lý thanh toán Momo
             elseif (isset($checkoutSession['payment_method']) && trim($checkoutSession['payment_method']) == 'momo') {
-                \Illuminate\Support\Facades\Log::info('CreateOrder: Processing Momo Payment (API)');
+                Log::info('CreateOrder: Processing Momo Payment (API)');
                 
                 // Gọi hàm tạo thanh toán Momo
                 $payUrl = $this->_createMomoPayment($order);
@@ -652,6 +655,14 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // Tạo thông báo cho admin về đơn hàng mới
+            try {
+                NotificationService::notifyNewOrder($order);
+            } catch (\Exception $e) {
+                // Không dừng flow nếu tạo notification thất bại
+                Log::error('Error creating order notification: ' . $e->getMessage());
+            }
 
             // Xóa checkout session
             session()->forget('checkout_session');
@@ -759,7 +770,7 @@ class CheckoutController extends Controller
             $request->has('message') && $request->has('payType') && $request->has('responseTime') && 
             $request->has('extraData') && $request->has('signature')) {
             
-            \Illuminate\Support\Facades\Log::info('Momo Return Callback', $request->all());
+            Log::info('Momo Return Callback', $request->all());
 
             $partnerCode = $request->partnerCode;
             $requestId = $request->requestId;
@@ -818,7 +829,7 @@ class CheckoutController extends Controller
                                  'paid_at'        => now(),
                              ]);
                          } catch (\Exception $e) {
-                             \Illuminate\Support\Facades\Log::error('OrderPayment Save Error: ' . $e->getMessage());
+                             Log::error('OrderPayment Save Error: ' . $e->getMessage());
                          }
                      }
                 } else {
@@ -842,11 +853,11 @@ class CheckoutController extends Controller
                         'signature'     => $signature,
                     ]);
                 } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error('Momo Payment Save Error: ' . $e->getMessage());
+                    Log::error('Momo Payment Save Error: ' . $e->getMessage());
                 }
 
             } else {
-                \Illuminate\Support\Facades\Log::error('Momo Signature Mismatch', ['calculated' => $checkSignature, 'received' => $signature]);
+                Log::error('Momo Signature Mismatch', ['calculated' => $checkSignature, 'received' => $signature]);
             }
         }
         // Lấy sản phẩm liên quan
@@ -1190,16 +1201,16 @@ class CheckoutController extends Controller
             'signature' => $signature
         );
         
-        \Illuminate\Support\Facades\Log::info('Momo Request Data', $data);
+        Log::info('Momo Request Data', $data);
 
         $result = $this->execPostRequest($endpoint, json_encode($data));
         
-        \Illuminate\Support\Facades\Log::info('Momo Response', ['response' => $result]);
+        Log::info('Momo Response', ['response' => $result]);
         
         $jsonResult = json_decode($result, true);
 
         if (isset($jsonResult['errorCode']) && $jsonResult['errorCode'] != 0) {
-            \Illuminate\Support\Facades\Log::error('Momo Payment Error: ' . ($jsonResult['localMessage'] ?? $jsonResult['message'] ?? 'Unknown Error'));
+            Log::error('Momo Payment Error: ' . ($jsonResult['localMessage'] ?? $jsonResult['message'] ?? 'Unknown Error'));
         }
 
         return $jsonResult['payUrl'] ?? null;

@@ -186,6 +186,33 @@ class OrderController extends Controller
             ]);
         }
 
+        // 7. Tạo thông báo cho các trạng thái đặc biệt
+        try {
+            $order = DB::table('orders')->where('id', $id)->first();
+            if ($order) {
+                // Tạo object order tạm để truyền vào notification
+                $orderObj = (object) [
+                    'id' => $order->id,
+                    'order_code' => $order->order_code ?? 'N/A',
+                ];
+
+                // Thông báo khi thanh toán thất bại
+                if ($newStatus === 'cancelled' && $currentStatus !== 'cancelled') {
+                    \App\Services\NotificationService::createForAdmins([
+                        'type' => 'order',
+                        'level' => 'warning',
+                        'title' => 'Đơn hàng bị hủy',
+                        'message' => 'Đơn hàng #' . ($order->order_code ?? $order->id) . ' đã bị hủy',
+                        'url' => route('admin.orders.show', $id),
+                        'metadata' => ['order_id' => $id, 'status' => $newStatus]
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            // Không dừng flow nếu tạo notification thất bại
+            \Log::error('Error creating order status notification: ' . $e->getMessage());
+        }
+
         return back()->with('success', 'Cập nhật trạng thái thành công!');
     }
 

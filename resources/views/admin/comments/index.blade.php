@@ -69,11 +69,11 @@
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="{{ route('admin.comments.pending') }}" class="btn btn-warning btn-sm">
                         <i class="bi bi-clock-history"></i> Chờ duyệt 
-                        <span class="badge bg-white text-warning ms-1">{{ $stats['pending'] ?? 0 }}</span>
+                        <span class="badge bg-white text-warning ms-1">{{ isset($stats) && isset($stats['pending']) ? $stats['pending'] : 0 }}</span>
                     </a>
                     <a href="{{ route('admin.comments.reported') }}" class="btn btn-danger btn-sm">
                         <i class="bi bi-flag"></i> Bị báo cáo 
-                        <span class="badge bg-white text-danger ms-1">{{ $stats['reported'] ?? 0 }}</span>
+                        <span class="badge bg-white text-danger ms-1">{{ isset($stats) && isset($stats['reported']) ? $stats['reported'] : 0 }}</span>
                     </a>
                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="sortByHelpful()" title="Sắp xếp theo hữu ích nhất">
                         <i class="bi bi-hand-thumbs-up"></i> Hữu ích nhất
@@ -105,11 +105,13 @@
                     <label class="form-label small fw-bold">Sản phẩm</label>
                     <select name="product_id" class="form-select form-select-sm" id="productFilter">
                         <option value="">Tất cả sản phẩm</option>
+                        @if(isset($products) && $products->count() > 0)
                         @foreach($products as $product)
                             <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
                                 {{ Str::limit($product->name, 50) }}
                             </option>
                         @endforeach
+                        @endif
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -370,14 +372,23 @@
                                         <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" 
                                                 data-bs-toggle="dropdown">
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            @if($review->status != 'approved')
-                                                <li><a class="dropdown-item" href="#" onclick="approveReview({{ $review->id }}, event)">
+                                        <ul class="dropdown-menu dropdown-menu-end" id="dropdown-menu-{{ $review->id }}">
+                                            @if($review->status == 'rejected')
+                                                {{-- Khi từ chối: hiển thị Phê duyệt --}}
+                                                <li><a class="dropdown-item approve-action" href="#" onclick="approveReview({{ $review->id }}, event)">
                                                     <i class="bi bi-check2-circle text-success"></i> Phê duyệt
                                                 </a></li>
-                                            @endif
-                                            @if($review->status != 'rejected')
-                                                <li><a class="dropdown-item" href="#" onclick="rejectReview({{ $review->id }}, event)">
+                                            @elseif($review->status == 'approved')
+                                                {{-- Khi đã duyệt: hiển thị Từ chối --}}
+                                                <li><a class="dropdown-item reject-action" href="#" onclick="rejectReview({{ $review->id }}, event)">
+                                                    <i class="bi bi-x-circle text-danger"></i> Từ chối
+                                                </a></li>
+                                            @else
+                                                {{-- Khi pending hoặc hidden: hiển thị cả hai --}}
+                                                <li><a class="dropdown-item approve-action" href="#" onclick="approveReview({{ $review->id }}, event)">
+                                                    <i class="bi bi-check2-circle text-success"></i> Phê duyệt
+                                                </a></li>
+                                                <li><a class="dropdown-item reject-action" href="#" onclick="rejectReview({{ $review->id }}, event)">
                                                     <i class="bi bi-x-circle text-danger"></i> Từ chối
                                                 </a></li>
                                             @endif
@@ -408,16 +419,16 @@
                         @endforelse
 
                         {{-- Pagination at bottom of table --}}
-                        @if($reviews->hasPages())
+                        @if(isset($reviews) && $reviews->hasPages())
                             <tr>
                                 <td colspan="10" class="border-0">
                                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 py-3 px-3 bg-light border-top">
                                         <div class="text-muted small">
                                             <i class="bi bi-info-circle me-1"></i>
                                             Hiển thị
-                                            <strong>{{ $reviews->firstItem() }}</strong>–<strong>{{ $reviews->lastItem() }}</strong>
+                                            <strong>{{ $reviews->firstItem() ?? 0 }}</strong>–<strong>{{ $reviews->lastItem() ?? 0 }}</strong>
                                             trên tổng
-                                            <strong>{{ $reviews->total() }}</strong> bình luận
+                                            <strong>{{ $reviews->total() ?? 0 }}</strong> bình luận
                                         </div>
                                         <div>
                                             {{ $reviews->appends(request()->except('page'))->links('vendor.pagination.bootstrap-5') }}
@@ -568,8 +579,11 @@
 
     // Go to page
     function goToPageNumber() {
-        const page = document.getElementById('goToPage').value;
-        const maxPage = {{ $reviews->lastPage() }};
+        const pageInput = document.getElementById('goToPage');
+        if (!pageInput) return;
+        
+        const page = parseInt(pageInput.value);
+        const maxPage = {{ isset($reviews) && $reviews->lastPage() ? $reviews->lastPage() : 1 }};
         if (page >= 1 && page <= maxPage) {
             const url = new URL(window.location.href);
             url.searchParams.set('page', page);
@@ -920,6 +934,14 @@
     // Approve Review (AJAX - no reload)
     function approveReview(id, event) {
         if (event) event.preventDefault();
+        event.stopPropagation();
+        
+        if (typeof Swal === 'undefined') {
+            if (confirm('Bạn có chắc muốn phê duyệt bình luận này?')) {
+                performApprove(id);
+            }
+            return;
+        }
         
         Swal.fire({
             title: 'Xác nhận',
@@ -932,15 +954,34 @@
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
+                performApprove(id);
+            }
+        });
+    }
+    
+    function performApprove(id) {
                 showLoading();
                 fetch(`/admin/comments/${id}/approve`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
-                    }
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
                 })
-                .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                });
+            }
+            return res.json();
+        })
                 .then(data => {
                     hideLoading();
                     if (data.status === 'success') {
@@ -953,15 +994,22 @@
                 })
                 .catch(err => {
                     hideLoading();
-                    showToast('error', 'Có lỗi xảy ra');
-                });
-            }
+            console.error('Approve error:', err);
+            showToast('error', 'Có lỗi xảy ra: ' + err.message);
         });
     }
 
     // Reject Review
     function rejectReview(id, event) {
         if (event) event.preventDefault();
+        event.stopPropagation();
+        
+        if (typeof Swal === 'undefined') {
+            if (confirm('Bạn có chắc muốn từ chối bình luận này?')) {
+                performReject(id);
+            }
+            return;
+        }
         
         Swal.fire({
             title: 'Xác nhận',
@@ -974,15 +1022,34 @@
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
+                performReject(id);
+            }
+        });
+    }
+    
+    function performReject(id) {
                 showLoading();
                 fetch(`/admin/comments/${id}/reject`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
-                    }
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
                 })
-                .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                });
+            }
+            return res.json();
+        })
                 .then(data => {
                     hideLoading();
                     if (data.status === 'success') {
@@ -995,15 +1062,22 @@
                 })
                 .catch(err => {
                     hideLoading();
-                    showToast('error', 'Có lỗi xảy ra');
-                });
-            }
+            console.error('Reject error:', err);
+            showToast('error', 'Có lỗi xảy ra: ' + err.message);
         });
     }
 
     // Hide Review
     function hideReview(id, event) {
         if (event) event.preventDefault();
+        event.stopPropagation();
+        
+        if (typeof Swal === 'undefined') {
+            if (confirm('Bạn có chắc muốn ẩn bình luận này?')) {
+                performHide(id);
+            }
+            return;
+        }
         
         Swal.fire({
             title: 'Xác nhận',
@@ -1016,15 +1090,34 @@
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
+                performHide(id);
+            }
+        });
+    }
+    
+    function performHide(id) {
                 showLoading();
                 fetch(`/admin/comments/${id}/hide`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
-                    }
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
                 })
-                .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                });
+            }
+            return res.json();
+        })
                 .then(data => {
                     hideLoading();
                     if (data.status === 'success') {
@@ -1037,24 +1130,37 @@
                 })
                 .catch(err => {
                     hideLoading();
-                    showToast('error', 'Có lỗi xảy ra');
-                });
-            }
+            console.error('Hide error:', err);
+            showToast('error', 'Có lỗi xảy ra: ' + err.message);
         });
     }
 
     // Show Review
     function showReview(id, event) {
         if (event) event.preventDefault();
+        event.stopPropagation();
         showLoading();
         fetch(`/admin/comments/${id}/show`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                });
+            }
+            return res.json();
+        })
         .then(data => {
             hideLoading();
             if (data.status === 'success') {
@@ -1067,13 +1173,22 @@
         })
         .catch(err => {
             hideLoading();
-            showToast('error', 'Có lỗi xảy ra');
+            console.error('Show error:', err);
+            showToast('error', 'Có lỗi xảy ra: ' + err.message);
         });
     }
 
     // Delete Review
     function deleteReview(id, event) {
         if (event) event.preventDefault();
+        event.stopPropagation();
+        
+        if (typeof Swal === 'undefined') {
+            if (confirm('Bạn có chắc muốn xóa vĩnh viễn bình luận này? Hành động này không thể hoàn tác!')) {
+                performDelete(id);
+            }
+            return;
+        }
         
         Swal.fire({
             title: 'Xác nhận xóa',
@@ -1086,20 +1201,42 @@
             cancelButtonText: 'Hủy'
         }).then((result) => {
             if (result.isConfirmed) {
+                performDelete(id);
+            }
+        });
+    }
+    
+    function performDelete(id) {
                 showLoading();
                 fetch(`/admin/comments/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
-                    }
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
                 })
-                .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                });
+            }
+            return res.json();
+        })
                 .then(data => {
                     hideLoading();
                     if (data.status === 'success') {
                         showToast('success', data.message);
-                        document.querySelector(`tr[data-review-id="${id}"]`)?.remove();
+                const row = document.querySelector(`tr[data-review-id="${id}"]`);
+                if (row) {
+                    row.remove();
+                }
                         refreshReviewIds();
                         updateBadgeCounts();
                         if (document.querySelectorAll('.review-row').length === 0) {
@@ -1111,9 +1248,8 @@
                 })
                 .catch(err => {
                     hideLoading();
-                    showToast('error', 'Có lỗi xảy ra');
-                });
-            }
+            console.error('Delete error:', err);
+            showToast('error', 'Có lỗi xảy ra: ' + err.message);
         });
     }
 
@@ -1139,11 +1275,115 @@
             `;
         }
 
-        // Update action dropdown
-        const dropdown = row.querySelector('.dropdown-menu');
+        // Update action dropdown based on new status
+        const dropdown = row.querySelector(`#dropdown-menu-${id}`) || row.querySelector('.dropdown-menu');
         if (dropdown) {
-            // Rebuild dropdown based on new status
-            // This is simplified - you might want to reload the row HTML
+            updateDropdownMenu(dropdown, newStatus, id);
+        }
+    }
+    
+    // Update dropdown menu based on status
+    function updateDropdownMenu(dropdown, status, reviewId) {
+        if (!dropdown) return;
+        
+        // Find existing action items
+        const approveItem = dropdown.querySelector('.approve-action')?.closest('li');
+        const rejectItem = dropdown.querySelector('.reject-action')?.closest('li');
+        const hideItem = dropdown.querySelector('a[onclick*="hideReview"]')?.closest('li');
+        const showItem = dropdown.querySelector('a[onclick*="showReview"]')?.closest('li');
+        
+        // Remove existing approve/reject items
+        if (approveItem && approveItem.parentNode === dropdown) {
+            approveItem.remove();
+        }
+        if (rejectItem && rejectItem.parentNode === dropdown) {
+            rejectItem.remove();
+        }
+        
+        // Helper function to safely insert before divider or append
+        function safeInsert(element) {
+            // Tìm lại divider mỗi lần để đảm bảo nó vẫn còn trong dropdown
+            const currentDivider = dropdown.querySelector('.dropdown-divider');
+            if (currentDivider && currentDivider.parentNode === dropdown) {
+                try {
+                    dropdown.insertBefore(element, currentDivider);
+                } catch (e) {
+                    // Nếu insertBefore thất bại, dùng appendChild
+                    console.warn('insertBefore failed, using appendChild:', e);
+                    dropdown.appendChild(element);
+                }
+            } else {
+                dropdown.appendChild(element);
+            }
+        }
+        
+        if (status === 'rejected') {
+            // Khi từ chối: hiển thị "Phê duyệt", ẩn "Từ chối"
+            const approveLi = document.createElement('li');
+            approveLi.innerHTML = `
+                <a class="dropdown-item approve-action" href="#" onclick="approveReview(${reviewId}, event)">
+                    <i class="bi bi-check2-circle text-success"></i> Phê duyệt
+                </a>
+            `;
+            safeInsert(approveLi);
+        } else if (status === 'approved') {
+            // Khi đã duyệt: hiển thị "Từ chối", ẩn "Phê duyệt"
+            const rejectLi = document.createElement('li');
+            rejectLi.innerHTML = `
+                <a class="dropdown-item reject-action" href="#" onclick="rejectReview(${reviewId}, event)">
+                    <i class="bi bi-x-circle text-danger"></i> Từ chối
+                </a>
+            `;
+            safeInsert(rejectLi);
+        } else {
+            // Khi pending hoặc hidden: hiển thị cả hai
+            const approveLi = document.createElement('li');
+            approveLi.innerHTML = `
+                <a class="dropdown-item approve-action" href="#" onclick="approveReview(${reviewId}, event)">
+                    <i class="bi bi-check2-circle text-success"></i> Phê duyệt
+                </a>
+            `;
+            const rejectLi = document.createElement('li');
+            rejectLi.innerHTML = `
+                <a class="dropdown-item reject-action" href="#" onclick="rejectReview(${reviewId}, event)">
+                    <i class="bi bi-x-circle text-danger"></i> Từ chối
+                </a>
+            `;
+            safeInsert(approveLi);
+            safeInsert(rejectLi);
+        }
+        
+        // Update hide/show button
+        if (status === 'hidden') {
+            if (hideItem && hideItem.parentNode === dropdown) {
+                hideItem.style.display = 'none';
+            }
+            if (!showItem || showItem.parentNode !== dropdown) {
+                const showLi = document.createElement('li');
+                showLi.innerHTML = `
+                    <a class="dropdown-item" href="#" onclick="showReview(${reviewId}, event)">
+                        <i class="bi bi-eye text-info"></i> Hiện
+                    </a>
+                `;
+                safeInsert(showLi);
+            } else {
+                showItem.style.display = '';
+            }
+        } else {
+            if (showItem && showItem.parentNode === dropdown) {
+                showItem.style.display = 'none';
+            }
+            if (!hideItem || hideItem.parentNode !== dropdown) {
+                const hideLi = document.createElement('li');
+                hideLi.innerHTML = `
+                    <a class="dropdown-item" href="#" onclick="hideReview(${reviewId}, event)">
+                        <i class="bi bi-eye-slash text-warning"></i> Ẩn
+                    </a>
+                `;
+                safeInsert(hideLi);
+            } else {
+                hideItem.style.display = '';
+            }
         }
     }
 
@@ -1245,7 +1485,10 @@
 
     // Clear Filters
     function clearFilters() {
-        document.getElementById('filterForm').reset();
+        const filterForm = document.getElementById('filterForm');
+        if (filterForm) {
+            filterForm.reset();
+        }
         window.location.href = '{{ route('admin.comments.index') }}';
     }
 

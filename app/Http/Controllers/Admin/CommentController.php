@@ -19,6 +19,7 @@ class CommentController extends Controller
      */
     public function index(Request $request)
     {
+        try {
         $query = Review::with(['product.images', 'user', 'reports', 'replies.admin'])
             ->withCount('helpfulVotes');
 
@@ -27,6 +28,15 @@ class CommentController extends Controller
         // Sort
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
+            
+            // Validate sort column to prevent SQL injection
+            $allowedSortColumns = ['created_at', 'rating', 'helpful_votes_count', 'product_id', 'user_id', 'status'];
+            if (!in_array($sortBy, $allowedSortColumns)) {
+                $sortBy = 'created_at';
+            }
+            
+            // Validate sort order
+            $sortOrder = strtolower($sortOrder) === 'asc' ? 'asc' : 'desc';
         
         if ($sortBy === 'helpful_votes_count') {
             $query->orderBy('helpful_votes_count', $sortOrder)
@@ -51,6 +61,23 @@ class CommentController extends Controller
         ];
 
         return view('admin.comments.index', compact('reviews', 'products', 'stats'));
+        } catch (\Exception $e) {
+            \Log::error('Error loading comments index', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return view('admin.comments.index', [
+                'reviews' => collect([])->paginate(20),
+                'products' => collect([]),
+                'stats' => [
+                    'total' => 0,
+                    'pending' => 0,
+                    'approved' => 0,
+                    'reported' => 0,
+                ]
+            ])->with('error', 'Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại.');
+        }
     }
 
     /**
@@ -650,19 +677,32 @@ class CommentController extends Controller
         $allowStatusFilter = $options['allow_status'] ?? true;
 
         if ($request->filled('product_id')) {
-            $query->where('product_id', $request->product_id);
+            $productId = (int) $request->product_id;
+            if ($productId > 0) {
+                $query->where('product_id', $productId);
+            }
         }
 
         if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+            $userId = (int) $request->user_id;
+            if ($userId > 0) {
+                $query->where('user_id', $userId);
+            }
         }
 
         if ($request->filled('rating')) {
-            $query->where('rating', $request->rating);
+            $rating = (int) $request->rating;
+            if ($rating >= 1 && $rating <= 5) {
+                $query->where('rating', $rating);
+            }
         }
 
         if ($allowStatusFilter && $request->filled('status')) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            $allowedStatuses = ['pending', 'approved', 'rejected', 'hidden'];
+            if (in_array($status, $allowedStatuses)) {
+                $query->where('status', $status);
+            }
         }
 
         if ($request->filled('has_images')) {
@@ -678,7 +718,8 @@ class CommentController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = trim($request->search);
+            if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('content', 'LIKE', "%{$search}%")
                     ->orWhereHas('product', function ($q) use ($search) {
@@ -689,14 +730,25 @@ class CommentController extends Controller
                             ->orWhere('email', 'LIKE', "%{$search}%");
                     });
             });
+            }
         }
 
         if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
+            try {
+                $dateFrom = \Carbon\Carbon::parse($request->date_from)->startOfDay();
+                $query->whereDate('created_at', '>=', $dateFrom);
+            } catch (\Exception $e) {
+                \Log::warning('Invalid date_from filter', ['date' => $request->date_from]);
+            }
         }
 
         if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
+            try {
+                $dateTo = \Carbon\Carbon::parse($request->date_to)->endOfDay();
+                $query->whereDate('created_at', '<=', $dateTo);
+            } catch (\Exception $e) {
+                \Log::warning('Invalid date_to filter', ['date' => $request->date_to]);
+            }
         }
     }
 

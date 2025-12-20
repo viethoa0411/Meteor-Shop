@@ -32,7 +32,7 @@
 @section('content')
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12 col-lg-10 mx-auto">
+            <div class="col-12">
 
                 {{-- Thông báo --}}
                 @if (session('success'))

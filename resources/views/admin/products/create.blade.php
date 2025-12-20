@@ -33,7 +33,7 @@
 @section('content')
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-10 col-lg-8 mx-auto">
+            <div class="col-12">
 
                 @if (session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
