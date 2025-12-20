@@ -142,7 +142,7 @@ class CheckoutController extends Controller
                 if ($stock < $item['quantity']) {
                     \Illuminate\Support\Facades\Log::info('Checkout: Out of stock', ['item' => $item['name'], 'stock' => $stock, 'qty' => $item['quantity']]);
                     return redirect()->route('cart.index')
-                        ->with('error', "Sản phẩm {$item['name']} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                        ->with('error', " Sản phẩm {$item['name']} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                 }
 
                 $itemSubtotal = $price * $item['quantity'];
@@ -214,7 +214,7 @@ class CheckoutController extends Controller
         // Kiểm tra tồn kho
         if ($stock < $qty) {
             return redirect()->back()
-                ->with('error', "Sản phẩm '{$product->name}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                ->with('error', " Sản phẩm {$product->name} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
         }
 
         // Lưu thông tin vào session
@@ -555,7 +555,7 @@ class CheckoutController extends Controller
                 if ($stock < $checkoutSession['quantity']) {
                     DB::rollBack();
                     return redirect()->back()
-                        ->with('error', "Sản phẩm '{$product->name}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                        ->with('error', " Sản phẩm {$product->name} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                 }
 
                 // Lấy lại product với images để lưu snapshot
