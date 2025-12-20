@@ -103,7 +103,7 @@ class CartController extends Controller
                 $item['image']    = $item['image'] ?? null;
                 $item['category'] = $item['category'] ?? null;
             }
-            
+
             $item['max_stock'] = $stock;
 
             $item['color'] = $item['color'] ?? null;
@@ -218,7 +218,7 @@ class CartController extends Controller
             if (($currentQtyInCart + $quantity) > $currentStock) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => "Chỉ còn $currentStock sản phẩm trong kho. Bạn đã có $currentQtyInCart trong giỏ.",
+                    'message' => "Kho chỉ còn $currentStock sản phẩm. Bạn đã có $currentQtyInCart sản phẩm trong giỏ hàng.",
                 ]);
             }
 
@@ -264,7 +264,7 @@ class CartController extends Controller
         if (($currentQtyInCart + $quantity) > $currentStock) {
             return response()->json([
                 'status'  => 'error',
-                'message' => "Chỉ còn $currentStock sản phẩm trong kho. Bạn đã có $currentQtyInCart trong giỏ.",
+                'message' => "Kho chỉ còn $currentStock sản phẩm. Bạn đã có $currentQtyInCart sản phẩm trong giỏ hàng.",
             ]);
         }
 
@@ -339,7 +339,7 @@ class CartController extends Controller
                 if (($ci->quantity + 1) > $realStock) {
                     return response()->json([
                         'status'  => 'error',
-                        'message' => "Kho chỉ còn $realStock sản phẩm!",
+                        'message' => "Kho chỉ còn $realStock sản phẩm.",
                         'max_stock' => $realStock,
                     ]);
                 }
@@ -385,7 +385,7 @@ class CartController extends Controller
             if (($item['quantity'] + 1) > $realStock) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => "Kho chỉ còn $realStock sản phẩm!",
+                    'message' => "Kho chỉ còn $realStock sản phẩm.",
                     'max_stock' => $realStock,
                 ]);
             }
