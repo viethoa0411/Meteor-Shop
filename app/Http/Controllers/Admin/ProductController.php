@@ -368,7 +368,6 @@ class ProductController extends Controller
                         'weight'          => $v['weight'] ?? 0,
                         'stock'           => $v['stock'] ?? 0,
                         'price'           => $v['price'] ?? $product->price,
-
                         'weight'          => $v['weight'] ?? null,
                         'weight_unit'     => $v['weight_unit'] ?? 'kg',
                     ]);

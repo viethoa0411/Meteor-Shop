@@ -141,7 +141,7 @@ class ChatController extends Controller
                         'type' => 'chat',
                         'level' => 'info',
                         'title' => 'Tin nhắn mới',
-                        'message' => $senderName . ' đã gửi tin nhắn: ' . \Illuminate\Support\Str::limit($messageText, 50),
+                        'message' => $senderName . ' đã gửi tin nhắn: ' . Str::limit($messageText, 50),
                         'url' => route('admin.chatbox.show', $session->id),
                         'metadata' => ['session_id' => $session->id, 'message_id' => $message->id]
                     ]);
