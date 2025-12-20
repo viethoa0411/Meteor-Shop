@@ -158,6 +158,11 @@ class OrderController extends Controller
             $updatePayload[$statusTimestamps[$newStatus]] = now();
         }
 
+        // Tự động cập nhật trạng thái thanh toán nếu là COD và đã giao hàng
+        if ($newStatus === 'delivered' && $order->payment_method === 'cash') {
+            $updatePayload['payment_status'] = 'paid';
+        }
+
         // 4. Cập nhật đơn hàng
         DB::table('orders')
             ->where('id', $id)

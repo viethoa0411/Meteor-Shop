@@ -174,14 +174,28 @@ public function items(): HasMany
 
     public function getReturnDaysRemaining(): ?int
     {
-        if ($this->order_status !== 'completed' || !$this->delivered_at) {
+        if ($this->order_status !== 'completed') {
             return null;
         }
 
-        $daysSinceDelivery = now()->diffInDays($this->delivered_at);
-        $remaining = 7 - $daysSinceDelivery;
+        // Nếu có thời gian hoàn thành (dựa vào updated_at khi status là completed)
+        // Nếu không (trường hợp cũ), fallback về delivered_at hoặc created_at
+        $completedAt = $this->updated_at ?? $this->delivered_at;
 
-        return $remaining > 0 ? $remaining : 0;
+        if (!$completedAt) {
+            return 0;
+        }
+
+        // Đảm bảo là Carbon instance
+        $completedAt = \Carbon\Carbon::parse($completedAt);
+
+        // Tính ngày hết hạn (7 ngày sau khi hoàn thành)
+        $deadline = $completedAt->copy()->addDays(7);
+
+        // Tính số ngày còn lại (false để trả về số âm nếu đã qua hạn)
+        $remaining = now()->diffInDays($deadline, false);
+
+        return $remaining > 0 ? (int)$remaining : 0;
     }
 
 
@@ -197,16 +211,14 @@ public function items(): HasMany
 
     public function canReturn(): bool
     {
-        return $this->order_status === 'completed' && $this->return_status === 'none';
+        return $this->order_status === 'completed'
+            && $this->return_status === 'none'
+            && $this->getReturnDaysRemaining() > 0;
     }
 
     public function isReturnExpired(): bool
     {
-        if ($this->order_status !== 'completed' || !$this->delivered_at) {
-            return false;
-        }
-
-        return now()->diffInDays($this->delivered_at) >= 7;
+        return $this->getReturnDaysRemaining() === 0;
     }
 
     public function canReturnRefund(): bool

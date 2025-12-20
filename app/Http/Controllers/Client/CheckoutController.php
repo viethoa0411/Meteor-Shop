@@ -145,7 +145,7 @@ class CheckoutController extends Controller
                 if ($stock < $item['quantity']) {
                     Log::info('Checkout: Out of stock', ['item' => $item['name'], 'stock' => $stock, 'qty' => $item['quantity']]);
                     return redirect()->route('cart.index')
-                        ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                        ->with('error', " Sản phẩm {$item['name']} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                 }
 
                 $itemSubtotal = $price * $item['quantity'];
@@ -217,7 +217,7 @@ class CheckoutController extends Controller
         // Kiểm tra tồn kho
         if ($stock < $qty) {
             return redirect()->back()
-                ->with('error', 'Số lượng sản phẩm không đủ. Tồn kho hiện tại: ' . $stock);
+                ->with('error', " Sản phẩm {$product->name} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
         }
 
         // Lưu thông tin vào session
@@ -310,7 +310,7 @@ class CheckoutController extends Controller
 
             if ($stock < $newQuantity) {
                 return redirect()->back()
-                    ->with('error', 'Số lượng sản phẩm không đủ. Tồn kho hiện tại: ' . $stock)
+                    ->with('error', "Sản phẩm '{$product->name}' không đủ tồn kho. Tồn kho hiện tại: {$stock}")
                     ->withInput();
             }
 
@@ -385,6 +385,7 @@ class CheckoutController extends Controller
         $checkoutSession = session('checkout_session');
         
         Log::info('Confirm: Checkout Session', ['payment_method' => $checkoutSession['payment_method'] ?? 'N/A']);
+
 
         $shippingSettings = ShippingSetting::getSettings();
 
@@ -490,7 +491,7 @@ class CheckoutController extends Controller
                     if ($stock < $item['quantity']) {
                         DB::rollBack();
                         return redirect()->back()
-                            ->with('error', "Sản phẩm '{$item['name']}' không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+                            ->with('error', "Sản phẩm {$item['name']} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                     }
 
                     // Lấy product với images để lưu snapshot
@@ -558,7 +559,7 @@ class CheckoutController extends Controller
                 if ($stock < $checkoutSession['quantity']) {
                     DB::rollBack();
                     return redirect()->back()
-                        ->with('error', 'Số lượng sản phẩm không đủ. Tồn kho hiện tại: ' . $stock);
+                        ->with('error', " Sản phẩm {$product->name} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
                 }
 
                 // Lấy lại product với images để lưu snapshot
@@ -626,14 +627,15 @@ class CheckoutController extends Controller
             elseif (isset($checkoutSession['payment_method']) && trim($checkoutSession['payment_method']) == 'momo') {
                 Log::info('CreateOrder: Processing Momo Payment (API)');
                 
+
                 // Gọi hàm tạo thanh toán Momo
                 $payUrl = $this->_createMomoPayment($order);
 
                 if ($payUrl) {
                     // Commit transaction & Xóa session
-                    DB::commit(); 
+                    DB::commit();
                     session()->forget('checkout_session');
-                    
+
                     // Chuyển hướng đến trang thanh toán Momo
                     return redirect($payUrl);
                 } else {
@@ -764,13 +766,14 @@ class CheckoutController extends Controller
 
         // Xử lý callback từ Momo (nếu có)
         // Lưu ý: Momo có thể không trả về accessKey trong redirectUrl, nên ta dùng accessKey từ cấu hình
-        if ($request->has('partnerCode') && $request->has('requestId') && 
-            $request->has('amount') && $request->has('orderId') && $request->has('orderInfo') && 
-            $request->has('orderType') && $request->has('transId') && $request->has('resultCode') && 
-            $request->has('message') && $request->has('payType') && $request->has('responseTime') && 
+        if ($request->has('partnerCode') && $request->has('requestId') &&
+            $request->has('amount') && $request->has('orderId') && $request->has('orderInfo') &&
+            $request->has('orderType') && $request->has('transId') && $request->has('resultCode') &&
+            $request->has('message') && $request->has('payType') && $request->has('responseTime') &&
             $request->has('extraData') && $request->has('signature')) {
-            
+
             Log::info('Momo Return Callback', $request->all());
+
 
             $partnerCode = $request->partnerCode;
             $requestId = $request->requestId;
@@ -990,10 +993,10 @@ class CheckoutController extends Controller
         ]);
 
         $feeData = $settings->calculateShippingFee(
-            $items, 
-            $method, 
-            $subtotal, 
-            $destinationCity, 
+            $items,
+            $method,
+            $subtotal,
+            $destinationCity,
             $destinationDistrict,
             $destinationWard,
             $destinationAddress
@@ -1207,6 +1210,7 @@ class CheckoutController extends Controller
         
         Log::info('Momo Response', ['response' => $result]);
         
+
         $jsonResult = json_decode($result, true);
 
         if (isset($jsonResult['errorCode']) && $jsonResult['errorCode'] != 0) {
