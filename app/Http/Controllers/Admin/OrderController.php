@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
 use App\Models\OrderLog;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
@@ -215,7 +216,7 @@ class OrderController extends Controller
             }
         } catch (\Exception $e) {
             // Không dừng flow nếu tạo notification thất bại
-            \Log::error('Error creating order status notification: ' . $e->getMessage());
+            Log::error('Error creating order status notification: ' . $e->getMessage());
         }
 
         return back()->with('success', 'Cập nhật trạng thái thành công!');
