@@ -197,6 +197,51 @@ class OrderController extends Controller
         return redirect()->route('client.checkout.index');
     }
 
+    public function markAsReceived(Request $request, Order $order)
+    {
+        $this->authorizeOwnership($request->user()->id, $order);
+
+        if ($order->order_status !== 'delivered') {
+            return back()->with('error', 'Đơn hàng chưa được giao hoặc trạng thái không hợp lệ.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $order->update([
+                'order_status' => 'completed',
+                'updated_at' => now(), // Cập nhật thời gian hoàn thành
+                'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
+            ]);
+
+            // Log status change
+            OrderLog::create([
+                'order_id' => $order->id,
+                'status' => 'completed',
+                'updated_by' => $request->user()->id,
+                'role' => 'customer',
+                'created_at' => now(),
+            ]);
+
+            // Cập nhật history nếu có bảng history
+             if (Schema::hasTable('order_status_history')) {
+                \App\Models\OrderStatusHistory::create([
+                    'order_id'   => $order->id,
+                    'admin_id'   => null, // Customer action
+                    'old_status' => 'delivered',
+                    'new_status' => 'completed',
+                    'note'       => 'Khách hàng xác nhận đã nhận hàng',
+                ]);
+            }
+
+            DB::commit();
+
+            return back()->with('success', 'Cảm ơn bạn đã mua sắm! Đơn hàng đã được hoàn tất.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
     public function returnRequest(ReturnOrderRequest $request, Order $order)
     {
         $this->authorizeOwnership($request->user()->id, $order);
@@ -252,31 +297,6 @@ class OrderController extends Controller
 
 
         return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');
-    }
-
-    public function markAsReceived(Request $request, Order $order)
-    {
-        $this->authorizeOwnership($request->user()->id, $order);
-
-        if ($order->order_status !== 'delivered') {
-            return back()->with('error', 'Chỉ có thể xác nhận đã nhận hàng khi đơn hàng đang ở trạng thái "Đã giao".');
-        }
-
-        $order->update([
-            'order_status' => 'completed',
-            'delivered_at' => $order->delivered_at ?: now(),
-            'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
-        ]);
-
-        OrderLog::create([
-            'order_id' => $order->id,
-            'status' => 'completed',
-            'updated_by' => $request->user()->id,
-            'role' => 'customer',
-            'created_at' => now(),
-        ]);
-
-        return back()->with('success', 'Đã xác nhận nhận hàng thành công! Cảm ơn bạn đã mua sắm.');
     }
 
     protected function applyFilters($query, Request $request)
