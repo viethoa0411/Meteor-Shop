@@ -1,42 +1,42 @@
 @php
-    $cart = [];
-    $cartCount = 0;
+$cart = [];
+$cartCount = 0;
 
-    if (auth()->check()) {
-        $cartModel = \App\Models\Cart::with(['items.product'])
-            ->where('user_id', auth()->id())
-            ->where('status', 'active')
-            ->first();
+if (auth()->check()) {
+$cartModel = \App\Models\Cart::with(['items.product'])
+->where('user_id', auth()->id())
+->where('status', 'active')
+->first();
 
-        if ($cartModel) {
-            foreach ($cartModel->items as $ci) {
-                $product = $ci->product;
-                $cart[$ci->id] = [
-                    'name' => $product ? $product->name : '',
-                    'price' => (float) $ci->price,
-                    'quantity' => (int) $ci->quantity,
-                ];
-                $cartCount += (int) $ci->quantity;
-            }
-        }
-    } else {
-        $sessionCart = session()->get('cart', []);
-        foreach ($sessionCart as $id => $item) {
-            $cart[$id] = $item;
-            $cartCount += $item['quantity'] ?? 0;
-        }
-    }
+if ($cartModel) {
+foreach ($cartModel->items as $ci) {
+$product = $ci->product;
+$cart[$ci->id] = [
+'name' => $product ? $product->name : '',
+'price' => (float) $ci->price,
+'quantity' => (int) $ci->quantity,
+];
+$cartCount += (int) $ci->quantity;
+}
+}
+} else {
+$sessionCart = session()->get('cart', []);
+foreach ($sessionCart as $id => $item) {
+$cart[$id] = $item;
+$cartCount += $item['quantity'] ?? 0;
+}
+}
 
-    $wishlistItems = collect();
-    $wishlistCount = 0;
+$wishlistItems = collect();
+$wishlistCount = 0;
 
-    if (auth()->check()) {
-        $wishlistItems = \App\Models\Wishlist::with('product')
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get();
-        $wishlistCount = $wishlistItems->count();
-    }
+if (auth()->check()) {
+$wishlistItems = \App\Models\Wishlist::with('product')
+->where('user_id', auth()->id())
+->latest()
+->get();
+$wishlistCount = $wishlistItems->count();
+}
 @endphp
 
 <!DOCTYPE html>
@@ -113,8 +113,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
         }
 
         /* Search Bar */
@@ -254,8 +261,15 @@
         }
 
         @keyframes badgePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
         }
 
         /* Account */
@@ -343,7 +357,7 @@
             position: relative;
         }
 
-        .client-nav > .client-nav__inner > ul > li > a {
+        .client-nav>.client-nav__inner>ul>li>a {
             display: block;
             padding: 14px 20px;
             color: #374151;
@@ -355,12 +369,12 @@
             position: relative;
         }
 
-        .client-nav > .client-nav__inner > ul > li > a:hover {
+        .client-nav>.client-nav__inner>ul>li>a:hover {
             color: #f97316;
             background: rgba(249, 115, 22, 0.08);
         }
 
-        .client-nav > .client-nav__inner > ul > li > a::after {
+        .client-nav>.client-nav__inner>ul>li>a::after {
             content: '';
             position: absolute;
             bottom: 8px;
@@ -373,7 +387,7 @@
             transition: transform 0.3s ease;
         }
 
-        .client-nav > .client-nav__inner > ul > li:hover > a::after {
+        .client-nav>.client-nav__inner>ul>li:hover>a::after {
             transform: translateX(-50%) scaleX(1);
         }
 
@@ -411,6 +425,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -436,7 +451,7 @@
         }
 
         /* Giữ dropdown hiển thị khi hover vào menu item hoặc dropdown */
-        .client-nav li:hover > .dropdown-menu {
+        .client-nav li:hover>.dropdown-menu {
             display: block;
         }
 
@@ -528,7 +543,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         footer::before {
             content: '';
             position: absolute;
@@ -538,12 +553,12 @@
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         }
-        
+
         .footer-wrapper {
             position: relative;
             z-index: 1;
         }
-        
+
         .footer-main {
             padding: 60px 0 40px;
             max-width: 1320px;
@@ -551,29 +566,30 @@
             padding-left: 24px;
             padding-right: 24px;
         }
-        
+
         .footer-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 40px;
             margin-bottom: 40px;
         }
-        
+
         .footer-widget {
             animation: fadeInUp 0.6s ease-out;
         }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         .footer-widget-title {
             font-size: 18px;
             font-weight: 700;
@@ -582,7 +598,7 @@
             position: relative;
             padding-bottom: 12px;
         }
-        
+
         .footer-widget-title::after {
             content: '';
             position: absolute;
@@ -593,31 +609,31 @@
             background: linear-gradient(90deg, #f97316, #fb923c);
             border-radius: 2px;
         }
-        
+
         .footer-logo {
             max-width: 150px;
             margin-bottom: 20px;
             filter: brightness(1.1);
             transition: transform 0.3s ease;
         }
-        
+
         .footer-logo:hover {
             transform: scale(1.05);
         }
-        
+
         .footer-description {
             font-size: 14px;
             line-height: 1.7;
             color: #cbd5e1;
             margin-bottom: 24px;
         }
-        
+
         .footer-social {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
         }
-        
+
         .footer-social-link {
             width: 42px;
             height: 42px;
@@ -632,24 +648,24 @@
             text-decoration: none;
             backdrop-filter: blur(10px);
         }
-        
+
         .footer-social-link:hover {
             background: linear-gradient(135deg, #f97316, #fb923c);
             color: #ffffff;
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
         }
-        
+
         .footer-links {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        
+
         .footer-links li {
             margin-bottom: 12px;
         }
-        
+
         .footer-links a {
             color: #cbd5e1;
             text-decoration: none;
@@ -659,7 +675,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .footer-links a::before {
             content: '→';
             opacity: 0;
@@ -667,17 +683,17 @@
             transition: all 0.3s ease;
             color: #f97316;
         }
-        
+
         .footer-links a:hover {
             color: #ffffff;
             padding-left: 8px;
         }
-        
+
         .footer-links a:hover::before {
             opacity: 1;
             transform: translateX(0);
         }
-        
+
         .footer-contact-item {
             display: flex;
             align-items: flex-start;
@@ -686,7 +702,7 @@
             font-size: 14px;
             line-height: 1.6;
         }
-        
+
         .footer-contact-icon {
             width: 20px;
             height: 20px;
@@ -694,18 +710,18 @@
             flex-shrink: 0;
             margin-top: 2px;
         }
-        
+
         .footer-contact-text {
             color: #cbd5e1;
             flex: 1;
         }
-        
+
         .footer-contact-text strong {
             color: #ffffff;
             display: block;
             margin-bottom: 4px;
         }
-        
+
         .footer-newsletter {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
@@ -716,7 +732,7 @@
             box-sizing: border-box;
             overflow: hidden;
         }
-        
+
         .footer-newsletter-form {
             display: flex;
             gap: 8px;
@@ -726,7 +742,7 @@
             flex-wrap: nowrap;
             align-items: stretch;
         }
-        
+
         .footer-newsletter-input {
             flex: 1 1 auto;
             min-width: 0;
@@ -740,17 +756,17 @@
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
-        
+
         .footer-newsletter-input::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
-        
+
         .footer-newsletter-input:focus {
             border-color: #f97316;
             background: rgba(255, 255, 255, 0.15);
             box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
         }
-        
+
         .footer-newsletter-btn {
             flex: 0 0 auto;
             padding: 12px 20px;
@@ -766,23 +782,23 @@
             box-sizing: border-box;
             min-width: fit-content;
         }
-        
+
         .footer-newsletter-btn:hover {
             background: linear-gradient(135deg, #ea580c, #f97316);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
         }
-        
+
         .footer-newsletter-btn:active {
             transform: translateY(0);
         }
-        
+
         .footer-bottom {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 24px 0;
             background: rgba(0, 0, 0, 0.2);
         }
-        
+
         .footer-bottom-content {
             max-width: 1320px;
             margin: 0 auto;
@@ -794,30 +810,30 @@
             flex-wrap: wrap;
             gap: 16px;
         }
-        
+
         .footer-copyright {
             color: #94a3b8;
             font-size: 14px;
         }
-        
+
         .footer-copyright strong {
             color: #ffffff;
             font-weight: 600;
         }
-        
+
         .footer-payment-methods {
             display: flex;
             gap: 12px;
             align-items: center;
             flex-wrap: wrap;
         }
-        
+
         .footer-payment-text {
             color: #94a3b8;
             font-size: 13px;
             margin-right: 8px;
         }
-        
+
         .footer-payment-icon {
             width: 40px;
             height: 24px;
@@ -830,7 +846,7 @@
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         /* ===== HEADER RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .client-header__inner {
@@ -846,11 +862,11 @@
                 padding: 0 24px;
             }
 
-            .client-nav > .client-nav__inner > ul {
+            .client-nav>.client-nav__inner>ul {
                 gap: 4px;
             }
 
-            .client-nav > .client-nav__inner > ul > li > a {
+            .client-nav>.client-nav__inner>ul>li>a {
                 padding: 12px 16px;
                 font-size: 13px;
             }
@@ -948,43 +964,43 @@
             .footer-main {
                 padding: 40px 0 30px;
             }
-            
+
             .footer-grid {
                 grid-template-columns: 1fr;
                 gap: 32px;
             }
-            
+
             .footer-newsletter-form {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .footer-newsletter-input {
                 width: 100%;
                 margin-bottom: 0;
             }
-            
+
             .footer-newsletter-btn {
                 width: 100%;
                 margin-top: 8px;
             }
-            
+
             .footer-bottom-content {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .footer-payment-methods {
                 justify-content: center;
             }
         }
-        
+
         @media (max-width: 480px) {
             .footer-main {
                 padding-left: 16px;
                 padding-right: 16px;
             }
-            
+
             .footer-bottom-content {
                 padding-left: 16px;
                 padding-right: 16px;
@@ -1148,16 +1164,16 @@
 
 <body>
     @php
-        // Lấy danh mục cha (Phòng) nếu chưa có sẵn
-        // Giữ lại logic Laravel Blade từ File 1 để đảm bảo Menu Dropdown hoạt động
-        $parentCategories =
-            $parentCategories ?? \App\Models\Category::whereNull('parent_id')->where('status', 1)->get();
+    // Lấy danh mục cha (Phòng) nếu chưa có sẵn
+    // Giữ lại logic Laravel Blade từ File 1 để đảm bảo Menu Dropdown hoạt động
+    $parentCategories =
+    $parentCategories ?? \App\Models\Category::whereNull('parent_id')->where('status', 1)->get();
 
-        // Giả định $childCategories hoặc $cate được truyền vào View hoặc cần được định nghĩa
-        // Nếu $childCategories chưa được truyền, bạn cần phải định nghĩa nó ở đây hoặc trong Controller
-        $childCategories = $childCategories ?? [];
-        // Giả định $cate là danh mục dùng cho Menu dọc
-        $cate = $cate ?? ($parentCategories->isNotEmpty() ? $parentCategories : collect());
+    // Giả định $childCategories hoặc $cate được truyền vào View hoặc cần được định nghĩa
+    // Nếu $childCategories chưa được truyền, bạn cần phải định nghĩa nó ở đây hoặc trong Controller
+    $childCategories = $childCategories ?? [];
+    // Giả định $cate là danh mục dùng cho Menu dọc
+    $cate = $cate ?? ($parentCategories->isNotEmpty() ? $parentCategories : collect());
     @endphp
 
     <header class="client-header">
@@ -1177,31 +1193,31 @@
             <div class="client-actions">
                 <div class="client-cart">
                     @auth
-                        <a data-bs-toggle="offcanvas" href="#wishlistCanvas" role="button" class="client-pill">
-                            <i class="bi bi-heart client-pill__icon"></i>
-                        </a>
-                        <span class="client-cart__badge {{ $wishlistCount > 0 ? '' : 'd-none' }}" data-wishlist-badge>
-                            {{ $wishlistCount }}
-                        </span>
+                    <a data-bs-toggle="offcanvas" href="#wishlistCanvas" role="button" class="client-pill">
+                        <i class="bi bi-heart client-pill__icon"></i>
+                    </a>
+                    <span class="client-cart__badge {{ $wishlistCount > 0 ? '' : 'd-none' }}" data-wishlist-badge>
+                        {{ $wishlistCount }}
+                    </span>
                     @else
-                        <a href="{{ route('client.login') }}" class="client-pill">
-                            <i class="bi bi-heart client-pill__icon"></i>
-                        </a>
+                    <a href="{{ route('client.login') }}" class="client-pill">
+                        <i class="bi bi-heart client-pill__icon"></i>
+                    </a>
                     @endauth
                 </div>
 
                 <div class="client-cart">
                     @auth
-                        <a data-bs-toggle="offcanvas" href="#cartCanvas" role="button" class="client-pill">
-                            <i class="bi bi-cart3 client-pill__icon"></i>
-                        </a>
-                        @if ($cartCount > 0)
-                            <span class="client-cart__badge">{{ $cartCount }}</span>
-                        @endif
+                    <a data-bs-toggle="offcanvas" href="#cartCanvas" role="button" class="client-pill">
+                        <i class="bi bi-cart3 client-pill__icon"></i>
+                    </a>
+                    @if ($cartCount > 0)
+                    <span class="client-cart__badge">{{ $cartCount }}</span>
+                    @endif
                     @else
-                        <a href="{{ route('client.login') }}" class="client-pill">
-                            <i class="bi bi-cart3 client-pill__icon"></i>
-                        </a>
+                    <a href="{{ route('client.login') }}" class="client-pill">
+                        <i class="bi bi-cart3 client-pill__icon"></i>
+                    </a>
                     @endauth
                 </div>
 
@@ -1209,38 +1225,38 @@
                     <i class="fa-regular fa-user client-account__icon"></i>
                     <div class="client-account__labels">
                         @auth
-                            <span class="client-account__primary">{{ Auth::user()->name }}</span>
-                            <div class="dropdown">
-                                <a class="client-account__secondary dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    Tài khoản của tôi
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end mt-2">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('client.account.wallet.index') }}">
-                                            <i class="bi bi-wallet2 me-2"></i>Ví của tôi
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('client.account.orders.index') }}">
-                                            <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form action="{{ route('client.logout') }}" method="POST">
-                                            @csrf
-                                            <button class="dropdown-item" type="submit">
-                                                <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
+                        <span class="client-account__primary">{{ Auth::user()->name }}</span>
+                        <div class="dropdown">
+                            <a class="client-account__secondary dropdown-toggle" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Tài khoản của tôi
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end mt-2">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('client.account.wallet.index') }}">
+                                        <i class="bi bi-wallet2 me-2"></i>Ví của tôi
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('client.account.orders.index') }}">
+                                        <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <form action="{{ route('client.logout') }}" method="POST">
+                                        @csrf
+                                        <button class="dropdown-item" type="submit">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                         @else
-                            <a class="client-account__primary" href="{{ route('client.login') }}">Đăng nhập</a>
+                        <a class="client-account__primary" href="{{ route('client.login') }}">Đăng nhập</a>
                         @endauth
                     </div>
                 </div>
@@ -1254,13 +1270,13 @@
                         <a href="{{ route('client.product.search') }}?category=&minPrice=&maxPrice=&sort=newest" class="dropdown-toggle">Sản phẩm</a>
                         <ul class="dropdown-menu">
                             @forelse ($childCategories as $child)
-                                <li>
-                                    <a href="{{ route('client.product.category', $child->slug) }}">
-                                        {{ $child->name }}
-                                    </a>
-                                </li>
+                            <li>
+                                <a href="{{ route('client.product.category', $child->slug) }}">
+                                    {{ $child->name }}
+                                </a>
+                            </li>
                             @empty
-                                <li><span style="display: block; padding: 12px 16px; color: #9ca3af; font-size: 14px;">Đang cập nhật</span></li>
+                            <li><span style="display: block; padding: 12px 16px; color: #9ca3af; font-size: 14px;">Đang cập nhật</span></li>
                             @endforelse
                         </ul>
                     </li>
@@ -1268,11 +1284,11 @@
                         <a href="{{ route('client.product.search') }}?category=&minPrice=&maxPrice=&sort=newest" class="dropdown-toggle">Phòng</a>
                         <ul class="dropdown-menu">
                             @foreach ($parentCategories as $parent)
-                                <li>
-                                    <a href="{{ route('client.product.category', $parent->slug) }}">
-                                        {{ $parent->name }}
-                                    </a>
-                                </li>
+                            <li>
+                                <a href="{{ route('client.product.category', $parent->slug) }}">
+                                    {{ $parent->name }}
+                                </a>
+                            </li>
                             @endforeach
                         </ul>
                     </li>
@@ -1298,41 +1314,41 @@
         </div>
         <div class="offcanvas-body d-flex flex-column" style="height: 100%;">
             @if (auth()->check())
-                @if ($wishlistItems->count())
-                    <ul class="list-group mb-3">
-                        @foreach ($wishlistItems as $wishlist)
-                            @php $product = $wishlist->product; @endphp
-                            @if ($product)
-                                <li class="list-group-item d-flex align-items-center position-relative">
-                                    <a href="{{ route('client.product.detail', $product->slug) }}"
-                                        class="d-flex flex-column text-decoration-none text-dark flex-grow-1 pe-4">
-                                        <strong>{{ $product->name }}</strong>
-                                        <small class="text-muted">
-                                            {{ number_format($product->price, 0, ',', '.') }}₫
-                                        </small>
-                                    </a>
-                                    <button class="btn-close position-absolute top-0 end-0 m-2 remove-wishlist-item"
-                                        data-product-id="{{ $product->id }}"></button>
-                                </li>
-                            @endif
-                        @endforeach
-                    </ul>
-                    <div class="mt-auto d-flex flex-column gap-2">
-                        <a href="{{ route('client.wishlist.index') }}" class="btn btn-outline-dark w-100">
-                            Xem danh sách chi tiết
-                        </a>
-                    </div>
-                @else
-                    <p>Danh sách yêu thích trống.</p>
-                    <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100 mt-2">
-                        Khám phá sản phẩm
+            @if ($wishlistItems->count())
+            <ul class="list-group mb-3">
+                @foreach ($wishlistItems as $wishlist)
+                @php $product = $wishlist->product; @endphp
+                @if ($product)
+                <li class="list-group-item d-flex align-items-center position-relative">
+                    <a href="{{ route('client.product.detail', $product->slug) }}"
+                        class="d-flex flex-column text-decoration-none text-dark flex-grow-1 pe-4">
+                        <strong>{{ $product->name }}</strong>
+                        <small class="text-muted">
+                            {{ number_format($product->price, 0, ',', '.') }}₫
+                        </small>
                     </a>
+                    <button class="btn-close position-absolute top-0 end-0 m-2 remove-wishlist-item"
+                        data-product-id="{{ $product->id }}"></button>
+                </li>
                 @endif
-            @else
-                <p>Vui lòng đăng nhập để xem danh sách yêu thích.</p>
-                <a href="{{ route('client.login') }}" class="btn btn-primary w-100 mt-2">
-                    Đăng nhập
+                @endforeach
+            </ul>
+            <div class="mt-auto d-flex flex-column gap-2">
+                <a href="{{ route('client.wishlist.index') }}" class="btn btn-outline-dark w-100">
+                    Xem danh sách chi tiết
                 </a>
+            </div>
+            @else
+            <p>Danh sách yêu thích trống.</p>
+            <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100 mt-2">
+                Khám phá sản phẩm
+            </a>
+            @endif
+            @else
+            <p>Vui lòng đăng nhập để xem danh sách yêu thích.</p>
+            <a href="{{ route('client.login') }}" class="btn btn-primary w-100 mt-2">
+                Đăng nhập
+            </a>
             @endif
         </div>
     </div>
@@ -1346,36 +1362,36 @@
 
         <div class="offcanvas-body d-flex flex-column" style="height: 100%;">
             @if ($cart && count($cart))
-                <ul class="list-group mb-3">
-                    @foreach ($cart as $id => $item)
-                        <li class="list-group-item d-flex justify-content-between align-items-center position-relative"
-                            id="cart-item-{{ $id }}">
-                            <div>
-                                <strong>{{ $item['name'] }}</strong> <br>
-                                Số lượng: {{ $item['quantity'] }}
-                            </div>
-                            <span>{{ number_format($item['price'] * $item['quantity']) }}₫</span>
-                            <button class="btn-close position-absolute top-0 end-0 m-2 remove-cart-item"
-                                data-id="{{ $id }}"></button>
-                        </li>
-                    @endforeach
-                </ul>
+            <ul class="list-group mb-3">
+                @foreach ($cart as $id => $item)
+                <li class="list-group-item d-flex justify-content-between align-items-center position-relative"
+                    id="cart-item-{{ $id }}">
+                    <div>
+                        <strong>{{ $item['name'] }}</strong> <br>
+                        Số lượng: {{ $item['quantity'] }}
+                    </div>
+                    <span>{{ number_format($item['price'] * $item['quantity']) }}₫</span>
+                    <button class="btn-close position-absolute top-0 end-0 m-2 remove-cart-item"
+                        data-id="{{ $id }}"></button>
+                </li>
+                @endforeach
+            </ul>
 
-                <div class="d-flex justify-content-between fw-bold mb-3">
-                    <span>Tổng:</span>
-                    <span id="cart-total">
-                        {{ number_format(array_sum(array_map(fn($i) => $i['price'] * $i['quantity'], $cart))) }}₫
-                    </span>
-                </div>
+            <div class="d-flex justify-content-between fw-bold mb-3">
+                <span>Tổng:</span>
+                <span id="cart-total">
+                    {{ number_format(array_sum(array_map(fn($i) => $i['price'] * $i['quantity'], $cart))) }}₫
+                </span>
+            </div>
 
-                <div class="mt-auto d-flex flex-column gap-2">
-                    <a href="{{ route('cart.index') }}" class="btn btn-dark w-100">Xem giỏ hàng</a>
-                </div>
+            <div class="mt-auto d-flex flex-column gap-2">
+                <a href="{{ route('cart.index') }}" class="btn btn-dark w-100">Xem giỏ hàng</a>
+            </div>
             @else
-                <p>Giỏ hàng trống.</p>
-                <a href="{{ route('client.home') }}" class="btn btn-primary w-100 mt-2">
-                    Quay về trang chủ
-                </a>
+            <p>Giỏ hàng trống.</p>
+            <a href="{{ route('client.home') }}" class="btn btn-primary w-100 mt-2">
+                Quay về trang chủ
+            </a>
             @endif
         </div>
     </div>
@@ -1387,8 +1403,8 @@
                     <h3 class="footer-widget-title">Về Meteor Shop</h3>
                     <img src="{{ asset('storage/images/meteor.jpg') }}" alt="Meteor Shop Logo" class="footer-logo">
                     <p class="footer-description">
-                        Meteor Shop - Thương hiệu nội thất hiện đại hàng đầu Việt Nam. 
-                        Chúng tôi mang đến những sản phẩm chất lượng cao, thiết kế tinh tế 
+                        Meteor Shop - Thương hiệu nội thất hiện đại hàng đầu Việt Nam.
+                        Chúng tôi mang đến những sản phẩm chất lượng cao, thiết kế tinh tế
                         cho không gian sống của bạn.
                     </p>
                     <div class="footer-social">
@@ -1407,8 +1423,8 @@
                         <a href="#" class="footer-social-link" aria-label="Zalo" title="Zalo">
                             <i class="bi bi-chat-dots"></i>
                         </a>
-                        </div>
                     </div>
+                </div>
 
                 {{-- Widget 2: Quick Links --}}
                 <div class="footer-widget">
@@ -1421,8 +1437,8 @@
                         <li><a href="#">Tuyển dụng</a></li>
                         <li><a href="#">Thẻ hội viên</a></li>
                         <li><a href="#">Chính sách đổi trả</a></li>
-                        </ul>
-                    </div>
+                    </ul>
+                </div>
 
                 {{-- Widget 3: Inspiration & Products --}}
                 <div class="footer-widget">
@@ -1435,8 +1451,8 @@
                         <li><a href="#">Phòng khách</a></li>
                         <li><a href="#">Phòng ngủ</a></li>
                         <li><a href="#">Phòng làm việc</a></li>
-                        </ul>
-                    </div>
+                    </ul>
+                </div>
 
                 {{-- Widget 4: Contact & Newsletter --}}
                 <div class="footer-widget">
@@ -1447,30 +1463,30 @@
                             <strong>Email</strong>
                             <span>meteor@meteorshop.com</span>
                         </div>
-                            </div>
+                    </div>
                     <div class="footer-contact-item">
                         <i class="bi bi-telephone-fill footer-contact-icon"></i>
                         <div class="footer-contact-text">
                             <strong>Hotline</strong>
                             <span>0397 766 836</span>
-                                </div>
-                                </div>
+                        </div>
+                    </div>
                     <div class="footer-contact-item">
                         <i class="bi bi-clock-fill footer-contact-icon"></i>
                         <div class="footer-contact-text">
                             <strong>Giờ làm việc</strong>
                             <span>8:00 - 22:00 (Tất cả các ngày)</span>
-                            </div>
+                        </div>
                     </div>
-                    
+
                     <div class="footer-newsletter">
                         <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 12px; line-height: 1.6;">
                             Đăng ký nhận thông tin mới nhất về sản phẩm và ưu đãi đặc biệt từ Meteor Shop
                         </p>
                         <form class="footer-newsletter-form" id="footerNewsletterForm" onsubmit="handleNewsletterSubmit(event)">
                             @csrf
-                            <input type="email" name="email" class="footer-newsletter-input" 
-                                   placeholder="Nhập email của bạn" required>
+                            <input type="email" name="email" class="footer-newsletter-input"
+                                placeholder="Nhập email của bạn" required>
                             <button type="submit" class="footer-newsletter-btn">
                                 <i class="bi bi-send me-1"></i> Đăng ký
                             </button>
@@ -1506,11 +1522,11 @@
             const email = form.querySelector('input[name="email"]').value;
             const button = form.querySelector('button[type="submit"]');
             const originalText = button.innerHTML;
-            
+
             // Disable button
             button.disabled = true;
             button.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Đang gửi...';
-            
+
             // Simulate API call (replace with actual endpoint)
             setTimeout(() => {
                 Swal.fire({
@@ -1525,7 +1541,7 @@
                 button.innerHTML = originalText;
             }, 1000);
         }
-        
+
         // Smooth scroll to top on footer logo click
         document.addEventListener('DOMContentLoaded', function() {
             const footerLogo = document.querySelector('.footer-logo');
@@ -1579,25 +1595,25 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @if(session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Thành công',
-                text: "{{ session('success') }}",
-                timer: 3000,
-                showConfirmButton: false
-            });
-        </script>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Thành công',
+            text: "{{ session('success') }}",
+            timer: 3000,
+            showConfirmButton: false
+        });
+    </script>
     @endif
 
     @if(session('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi',
-                text: "{{ session('error') }}",
-            });
-        </script>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi',
+            text: "{{ session('error') }}",
+        });
+    </script>
     @endif
 
     <script>
@@ -1620,7 +1636,7 @@
 
             // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
+                anchor.addEventListener('click', function(e) {
                     const href = this.getAttribute('href');
                     if (href !== '#' && href.length > 1) {
                         const target = document.querySelector(href);
@@ -2436,7 +2452,7 @@
                     let response;
                     // Get CSRF token
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute(
-                    'content');
+                        'content');
 
                     if (imageFile) {
                         // Send with FormData for image upload
@@ -2567,11 +2583,8 @@
                 if (count > 0) {
                     chatBadge.textContent = count > 99 ? '99+' : count;
                     chatBadge.style.display = 'flex';
-<<<<<<< HEAD
+
                 } else {
-=======
-                    } else {
->>>>>>> origin/sua_Bien_The_update
                     chatBadge.style.display = 'none';
                 }
             }
@@ -2580,7 +2593,7 @@
                 try {
                     const audio = new Audio(
                         'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleQAA'
-                        );
+                    );
                     audio.volume = 0.3;
                     audio.play().catch(() => {});
                 } catch (e) {}
@@ -2607,6 +2620,94 @@
                 if (e.key === 'Enter' && !selectedImage) {
                     sendMessage(chatInput.value);
                 }
+            });
+        });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý xóa sản phẩm khỏi wishlist trong offcanvas popup
+            document.querySelectorAll('.remove-wishlist-item').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const productId = this.dataset.productId;
+                    if (!productId) return;
+
+                    // Loading nhẹ
+                    const originalIcon = this.innerHTML;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                    this.disabled = true;
+
+                    fetch('{{ route("client.wishlist.toggle") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                product_id: productId
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Server error');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.status === 'success' && data.liked === false) {
+                                // 1. Xóa item khỏi popup ngay
+                                this.closest('li').remove();
+
+                                // 2. Cập nhật badge wishlist ở header
+                                const badge = document.querySelector('[data-wishlist-badge]');
+                                if (badge) {
+                                    let count = parseInt(badge.textContent) || 1;
+                                    count--;
+                                    if (count <= 0) {
+                                        badge.classList.add('d-none');
+                                        // Hiển thị thông báo trống trong popup
+                                        const list = document.querySelector('#wishlistCanvas .offcanvas-body ul.list-group');
+                                        if (list) {
+                                            list.innerHTML = `
+                                    <p class="text-center text-muted py-4">Danh sách yêu thích trống.</p>
+                                    <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100">
+                                        Khám phá sản phẩm
+                                    </a>
+                                `;
+                                        }
+                                    } else {
+                                        badge.textContent = count > 99 ? '99+' : count;
+                                    }
+                                }
+
+                                // 3. QUAN TRỌNG: Cập nhật tim đỏ → trắng trên trang hiện tại (nếu có)
+                                const heartButtons = document.querySelectorAll(`[data-wishlist-product-id="${productId}"], .wishlist-toggle-btn[data-product-id="${productId}"]`);
+                                heartButtons.forEach(heartBtn => {
+                                    const icon = heartBtn.querySelector('i');
+                                    if (icon) {
+                                        icon.classList.remove('bi-heart-fill', 'text-danger');
+                                        icon.classList.add('bi-heart');
+                                    }
+                                    // Nếu có lớp active hoặc liked, xóa đi
+                                    heartBtn.classList.remove('liked', 'active');
+                                });
+
+                                // Thông báo thành công
+                                alert(data.message || 'Đã xóa khỏi danh sách yêu thích thành công!');
+                            } else {
+                                alert(data.message || 'Không thể xóa.');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            alert('Lỗi kết nối. Vui lòng thử lại.');
+                        })
+                        .finally(() => {
+                            this.innerHTML = originalIcon;
+                            this.disabled = false;
+                        });
+                });
             });
         });
     </script>

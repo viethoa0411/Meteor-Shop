@@ -321,7 +321,12 @@ Route::middleware(['admin'])
                 Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');
                 Route::post('/{id}/restore', [AdminController::class, 'restore'])->name('restore');
             });
-
+            
+            Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
+                Route::get('/profile', [App\Http\Controllers\Client\Account\ProfileController::class, 'index'])->name('profile');
+                Route::post('/profile/update', [App\Http\Controllers\Client\Account\ProfileController::class, 'updateProfile'])->name('profile.update');
+                Route::post('/password/update', [App\Http\Controllers\Client\Account\ProfileController::class, 'updatePassword'])->name('password.update');
+            });
             // Users
             Route::prefix('users')->name('users.')->group(function () {
                 Route::get('/', [AccountUserController::class, 'index'])->name('list');
@@ -357,7 +362,7 @@ Route::middleware(['admin'])
             Route::get('/', [ShippingSettingController::class, 'index'])->name('index');
             Route::put('/', [ShippingSettingController::class, 'update'])->name('update');
             Route::post('/calculate-fee', [ShippingSettingController::class, 'calculateFee'])->name('calculate-fee');
-            
+
             // Shipping Distances CRUD
             Route::get('/distances', [ShippingSettingController::class, 'distancesIndex'])->name('distances.index');
             Route::get('/distances/data', [ShippingSettingController::class, 'distancesData'])->name('distances.data');
