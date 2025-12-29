@@ -52,6 +52,7 @@ use App\Http\Controllers\Client\ChatController;
 use App\Http\Controllers\Client\WishlistController as ClientWishlistController;
 use App\Http\Controllers\Client\Account\OrderController as ClientAccountOrderController;
 use App\Http\Controllers\Client\Contact\ContactController as ClientContactController;
+use App\Http\Controllers\Client\Account\ProfileController;
 
 // Client Wallet
 use App\Http\Controllers\Client\Wallet\WalletController as ClientWalletController;
@@ -321,12 +322,6 @@ Route::middleware(['admin'])
                 Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');
                 Route::post('/{id}/restore', [AdminController::class, 'restore'])->name('restore');
             });
-            
-            Route::middleware('auth')->prefix('account')->name('client.account.')->group(function () {
-                Route::get('/profile', [App\Http\Controllers\Client\Account\ProfileController::class, 'index'])->name('profile');
-                Route::post('/profile/update', [App\Http\Controllers\Client\Account\ProfileController::class, 'updateProfile'])->name('profile.update');
-                Route::post('/password/update', [App\Http\Controllers\Client\Account\ProfileController::class, 'updatePassword'])->name('password.update');
-            });
             // Users
             Route::prefix('users')->name('users.')->group(function () {
                 Route::get('/', [AccountUserController::class, 'index'])->name('list');
@@ -488,7 +483,12 @@ Route::middleware('auth')->prefix('account')->name('client.account.')->group(fun
     Route::get('/review-reports', [\App\Http\Controllers\Client\Account\ReviewReportController::class, 'index'])->name('review-reports.index');
 });
 
-
+// Profile (client account)
+Route::middleware('auth')->group(function () {
+    Route::get('/account/profile', [ProfileController::class, 'index'])->name('client.account.profile');
+    Route::post('/account/profile/update', [ProfileController::class, 'updateProfile'])->name('client.account.profile.update');
+    Route::post('/account/password/update', [ProfileController::class, 'updatePassword'])->name('client.account.password.update');
+});
 /*
 |--------------------------------------------------------------------------
 | CHECKOUT (không gắn middleware, controller tự kiểm tra đăng nhập)
