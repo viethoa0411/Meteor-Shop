@@ -64,7 +64,7 @@
             </div>
 
             <div class="card-footer text-end">
-                <a href="{{ route('admin.account.admin.edit', $user->id) }}" class="btn btn-info">
+                <a href="{{ route('admin.account.admin.change-info.form', $user->id) }}" class="btn btn-info">
                     <i class="bi bi-pencil-square"></i> Sửa
                 </a>
 
