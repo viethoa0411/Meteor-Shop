@@ -100,10 +100,19 @@ class ProductController extends Controller
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
+        // Tạo slug unique
+        $baseSlug = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
+        $slug = $baseSlug;
+        $count = 1;
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $count;
+            $count++;
+        }
+
         // 🛍️ Tạo sản phẩm chính
         $product = Product::create([
             'name' => $request->name,
-            'slug' => $request->slug ? Str::slug($request->slug) : Str::slug($request->name),
+            'slug' => $slug,
             'description' => $request->description,
             'price' => $request->price,
             'image' => $imagePath,
