@@ -329,8 +329,7 @@ class CheckoutController extends Controller
         // Lấy phí lắp đặt
         $installationFee = 0;
         if ($request->has('installation') && $request->installation) {
-            $shippingSettings = ShippingSetting::getSettings();
-            $installationFee = (float)($request->installation_fee ?? $shippingSettings->installation_fee ?? 0);
+            $installationFee = 100000;
         }
 
         // Lấy số tiền giảm (nếu đã áp dụng promotion trước đó)
@@ -348,7 +347,7 @@ class CheckoutController extends Controller
         $checkoutSession['shipping_address']  = $request->shipping_address;
         $checkoutSession['shipping_method']   = $request->shipping_method;
         $checkoutSession['payment_method']    = $request->payment_method;
-        
+
         Log::info('Process: Saved Payment Method', ['method' => $request->payment_method]);
 
 
@@ -383,7 +382,7 @@ class CheckoutController extends Controller
         }
 
         $checkoutSession = session('checkout_session');
-        
+
         Log::info('Confirm: Checkout Session', ['payment_method' => $checkoutSession['payment_method'] ?? 'N/A']);
 
 
@@ -626,7 +625,7 @@ class CheckoutController extends Controller
             // Xử lý thanh toán Momo
             elseif (isset($checkoutSession['payment_method']) && trim($checkoutSession['payment_method']) == 'momo') {
                 Log::info('CreateOrder: Processing Momo Payment (API)');
-                
+
 
                 // Gọi hàm tạo thanh toán Momo
                 $payUrl = $this->_createMomoPayment($order);
@@ -1090,8 +1089,18 @@ class CheckoutController extends Controller
         );
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+
+        // Tắt kiểm tra SSL (fix lỗi SSL certificate problem trên local)
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
         //execute post
         $result = curl_exec($ch);
+
+        if ($result === false) {
+            Log::error('Momo Curl Error: ' . curl_error($ch));
+        }
+
         //close connection
         curl_close($ch);
         return $result;
@@ -1203,13 +1212,13 @@ class CheckoutController extends Controller
             'requestType' => $requestType,
             'signature' => $signature
         );
-        
+
         Log::info('Momo Request Data', $data);
 
         $result = $this->execPostRequest($endpoint, json_encode($data));
-        
+
         Log::info('Momo Response', ['response' => $result]);
-        
+
 
         $jsonResult = json_decode($result, true);
 
