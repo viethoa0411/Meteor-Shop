@@ -316,11 +316,13 @@ Route::middleware(['admin'])
                 Route::get('/create', [AdminController::class, 'create'])->name('create');
                 Route::post('/', [AdminController::class, 'store'])->name('store');
                 Route::get('/trash', [AdminController::class, 'trash'])->name('trash');
-                Route::get('/{id}/edit', [AdminController::class, 'edit'])->name('edit');
                 Route::get('/{id}', [AdminController::class, 'show'])->name('show');
-                Route::put('/{id}', [AdminController::class, 'update'])->name('update');
                 Route::delete('/{id}', [AdminController::class, 'destroy'])->name('destroy');
                 Route::post('/{id}/restore', [AdminController::class, 'restore'])->name('restore');
+                // THAY ĐỔI THÔNG TIN QUA OTP (bỏ edit/update cũ)
+                Route::get('/{id}/change-info', [AdminController::class, 'changeInfoForm'])->name('change-info.form');
+                Route::post('/{id}/change-info/send-otp', [AdminController::class, 'sendOtpForChangeInfo'])->name('change-info.send-otp');
+                Route::post('/{id}/change-info/verify-otp', [AdminController::class, 'verifyOtpAndUpdateInfo'])->name('change-info.verify-otp');
             });
             // Users
             Route::prefix('users')->name('users.')->group(function () {
