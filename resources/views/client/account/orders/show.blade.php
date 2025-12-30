@@ -242,10 +242,6 @@
                                     <i class="bi bi-wallet2 me-1"></i>
                                     Số tiền <strong>{{ number_format($order->final_total, 0, ',', '.') }}đ</strong> sẽ được
                                     hoàn lại vào ví của bạn sau khi hủy đơn.
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/sua_Bien_The_update
                                 </div>
                             @endif
 
@@ -280,9 +276,4 @@
             </div>
         </div>
     @endif
-<<<<<<< HEAD
-
-
-=======
->>>>>>> origin/sua_Bien_The_update
 @endsection

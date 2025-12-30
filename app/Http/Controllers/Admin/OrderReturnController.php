@@ -172,7 +172,10 @@ class OrderReturnController extends Controller
             if ($order->order_status === 'return_requested') {
                 DB::table('orders')
                     ->where('id', $orderId)
-                    ->update(['order_status' => 'completed']);
+                    ->update([
+                        'order_status' => 'completed',
+                        'completed_at' => now(),
+                    ]);
             }
 
             // Lưu lịch sử
@@ -351,6 +354,7 @@ class OrderReturnController extends Controller
                 $updateData['returned_at'] = now();
             } elseif ($newReturnStatus === 'rejected' && $order->order_status === 'return_requested') {
                 $updateData['order_status'] = 'completed';
+                $updateData['completed_at'] = now();
                 if (($order->payment_method ?? null) === 'cash') {
                     $updateData['payment_status'] = 'paid';
                 }
