@@ -1006,15 +1006,7 @@
                 // Xử lý checkbox lắp đặt
                 const installationCheckbox = document.getElementById('installation-checkbox');
                 if (installationCheckbox) {
-                    // Lấy phí lắp đặt từ server
-                    fetch('{{ route("admin.shipping.index") }}')
-                        .then(() => {
-                            // Giả sử phí lắp đặt được lấy từ một API hoặc từ biến PHP
-                            installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
-                        })
-                        .catch(() => {
-                            installationFee = 0;
-                        });
+                    const fixedInstallationFee = 100000;
 
                     installationCheckbox.addEventListener('change', function() {
                         isInstallationSelected = this.checked;
@@ -1023,7 +1015,7 @@
                             installationFee = 0;
                             if (installationFeeInput) installationFeeInput.value = 0;
                         } else {
-                            installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                            installationFee = fixedInstallationFee;
                             if (installationFeeInput) installationFeeInput.value = installationFee;
                         }
                         updateTotalDisplay();

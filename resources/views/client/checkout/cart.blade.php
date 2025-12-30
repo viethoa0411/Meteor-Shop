@@ -637,7 +637,7 @@
                 // Xử lý checkbox lắp đặt
                 const installationCheckbox = document.getElementById('installation-checkbox');
                 if (installationCheckbox) {
-                    installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                    const fixedInstallationFee = 100000;
 
                     installationCheckbox.addEventListener('change', function() {
                         isInstallationSelected = this.checked;
@@ -646,7 +646,7 @@
                             installationFee = 0;
                             if (installationFeeInput) installationFeeInput.value = 0;
                         } else {
-                            installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                            installationFee = fixedInstallationFee;
                             if (installationFeeInput) installationFeeInput.value = installationFee;
                         }
                         updateTotalDisplay();
