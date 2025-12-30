@@ -52,7 +52,7 @@
 
                 <div class="mb-3">
                     <strong>Ngày tạo:</strong>
-                    <p>{{ $user->created_at->format('d/m/Y H:i') }}</p>
+                    <p>{{ $user->created_at ? $user->created_at->format('d/m/Y H:i') : 'Không xác định' }}</p>
                 </div>
 
                 @if ($user->deleted_at)
