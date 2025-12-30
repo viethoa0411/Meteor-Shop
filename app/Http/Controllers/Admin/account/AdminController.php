@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
-   
+
     public function index(Request $request)
     {
         // Bước 1: Tạo query chỉ lấy user có role = 'admin'
@@ -45,7 +45,7 @@ class AdminController extends Controller
         return view('admin.account.admin.list', compact('users'));
     }
 
-   
+
     public function create()
     {
         // Trả về view form tạo admin
@@ -70,7 +70,7 @@ class AdminController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-'password' => Hash::make($request->password), // Mã hóa password trước khi lưu
+            'password' => Hash::make($request->password), // Mã hóa password trước khi lưu
             'role' => $request->role,
             'address' => $request->address,
             'status' => $request->status,
@@ -80,7 +80,7 @@ class AdminController extends Controller
         return redirect()->route('admin.account.admin.list')->with('success', 'Đã thêm người dùng thành công.');
     }
 
-   
+
     public function show($id)
     {
         // Bước 1: Tìm admin theo ID, bao gồm cả admin đã bị ẩn (soft deleted)
@@ -91,7 +91,7 @@ class AdminController extends Controller
         return view('admin.account.admin.show', compact('user'));
     }
 
-  
+
     public function edit($id)
     {
         // Bước 1: Tìm admin theo ID (chỉ lấy admin chưa bị ẩn)
@@ -100,7 +100,7 @@ class AdminController extends Controller
         // Bước 2: Trả về view form chỉnh sửa với dữ liệu admin
         return view('admin.account.admin.edit', compact('user'));
     }
-   
+
     public function update(Request $request, $id)
     {
         // Bước 1: Tìm admin theo ID
@@ -136,10 +136,10 @@ class AdminController extends Controller
         ]);
 
         // Bước 4: Redirect về danh sách admin với thông báo thành công
-return redirect()->route('admin.account.admin.list')->with('success', 'Cập nhật người dùng thành công.');
+        return redirect()->route('admin.account.admin.list')->with('success', 'Cập nhật người dùng thành công.');
     }
 
-   
+
     public function destroy($id)
     {
         // Bước 1: Tìm admin theo ID
@@ -152,7 +152,7 @@ return redirect()->route('admin.account.admin.list')->with('success', 'Cập nh�
         return redirect()->route('admin.account.admin.list')->with('success', 'Tài khoản admin đã được ẩn.');
     }
 
-    
+
     public function trash()
     {
         // Bước 1: Lấy danh sách admin đã bị ẩn, phân trang 15 bản ghi/trang
@@ -162,7 +162,7 @@ return redirect()->route('admin.account.admin.list')->with('success', 'Cập nh�
         return view('admin.account.admin.trash', compact('users'));
     }
 
-    
+
     public function restore($id)
     {
         // Bước 1: Tìm admin đã bị ẩn theo ID
@@ -173,5 +173,82 @@ return redirect()->route('admin.account.admin.list')->with('success', 'Cập nh�
 
         // Bước 3: Redirect về trang trash với thông báo
         return redirect()->route('admin.account.admin.trash')->with('success', 'Khôi phục tài khoản admin thành công.');
+    }
+    public function changeInfoForm($id)
+    {
+        $user = User::findOrFail($id);
+        // Chỉ cho phép admin thay đổi chính mình hoặc admin khác (middleware admin đã bảo vệ)
+        return view('admin.account.admin.change-info', compact('user'));
+    }
+
+    /**
+     * Gửi OTP về email admin
+     */
+    public function sendOtpForChangeInfo(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', Rule::unique('users')->ignore($id)],
+            'phone' => 'nullable|string|max:20',
+            'role' => 'required|in:admin,staff,super_admin', // nếu có role phân cấp
+            'status' => 'required|in:active,inactive,banned',
+        ]);
+
+        // Tạo OTP 6 số
+        $otp = rand(100000, 999999);
+
+        // Lưu tạm vào session (hết hạn 10 phút)
+        session([
+            'admin_change_admin_info' => [
+                'user_id' => $id,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'role' => $request->role,
+                'status' => $request->status,
+                'otp' => $otp,
+                'expires_at' => now()->addMinutes(10),
+            ]
+        ]);
+
+        // Gửi email OTP
+        \Mail::to($user->email)->send(new \App\Mail\AdminOtpChangeInfoMail($otp, $user->name));
+
+        return back()->with('success', 'Mã OTP đã gửi đến email: ' . $user->email . '. Vui lòng nhập để xác nhận.');
+    }
+
+    /**
+     * Xác nhận OTP và lưu thay đổi
+     */
+    public function verifyOtpAndUpdateInfo(Request $request, $id)
+    {
+        $request->validate([
+            'otp' => 'required|digits:6',
+        ]);
+
+        $data = session('admin_change_admin_info');
+
+        if (!$data || $data['user_id'] != $id || now()->gt($data['expires_at'])) {
+            return back()->withErrors(['otp' => 'Mã OTP không hợp lệ hoặc đã hết hạn']);
+        }
+
+        if ($request->otp != $data['otp']) {
+            return back()->withErrors(['otp' => 'Mã OTP sai']);
+        }
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'role' => $data['role'],
+            'status' => $data['status'],
+        ]);
+
+        session()->forget('admin_change_admin_info');
+
+        return redirect()->route('admin.account.admin.list')->with('success', 'Thay đổi thông tin admin thành công!');
     }
 }
