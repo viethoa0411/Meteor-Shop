@@ -251,8 +251,8 @@
                 {{-- Các nút hành động --}}
                 <td data-label="Hành động">
                     <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                        <a href="{{ route('admin.account.admin.edit', $user->id) }}" class="btn btn-sm btn-info">
-                            <i class="bi bi-pencil-square"></i> Sửa
+                        <a href="{{ route('admin.account.admin.change-info.form', $user->id) }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-shield-lock"></i> Thay đổi thông tin
                         </a>
 
                         <form action="{{ route('admin.account.admin.destroy', $user->id) }}" method="POST"
