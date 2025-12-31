@@ -528,7 +528,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         footer::before {
             content: '';
             position: absolute;
@@ -538,12 +538,12 @@
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         }
-        
+
         .footer-wrapper {
             position: relative;
             z-index: 1;
         }
-        
+
         .footer-main {
             padding: 60px 0 40px;
             max-width: 1320px;
@@ -551,18 +551,18 @@
             padding-left: 24px;
             padding-right: 24px;
         }
-        
+
         .footer-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 40px;
             margin-bottom: 40px;
         }
-        
+
         .footer-widget {
             animation: fadeInUp 0.6s ease-out;
         }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -573,7 +573,7 @@
                 transform: translateY(0);
             }
         }
-        
+
         .footer-widget-title {
             font-size: 18px;
             font-weight: 700;
@@ -582,7 +582,7 @@
             position: relative;
             padding-bottom: 12px;
         }
-        
+
         .footer-widget-title::after {
             content: '';
             position: absolute;
@@ -593,31 +593,31 @@
             background: linear-gradient(90deg, #f97316, #fb923c);
             border-radius: 2px;
         }
-        
+
         .footer-logo {
             max-width: 150px;
             margin-bottom: 20px;
             filter: brightness(1.1);
             transition: transform 0.3s ease;
         }
-        
+
         .footer-logo:hover {
             transform: scale(1.05);
         }
-        
+
         .footer-description {
             font-size: 14px;
             line-height: 1.7;
             color: #cbd5e1;
             margin-bottom: 24px;
         }
-        
+
         .footer-social {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
         }
-        
+
         .footer-social-link {
             width: 42px;
             height: 42px;
@@ -632,24 +632,24 @@
             text-decoration: none;
             backdrop-filter: blur(10px);
         }
-        
+
         .footer-social-link:hover {
             background: linear-gradient(135deg, #f97316, #fb923c);
             color: #ffffff;
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
         }
-        
+
         .footer-links {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        
+
         .footer-links li {
             margin-bottom: 12px;
         }
-        
+
         .footer-links a {
             color: #cbd5e1;
             text-decoration: none;
@@ -659,7 +659,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .footer-links a::before {
             content: '→';
             opacity: 0;
@@ -667,17 +667,17 @@
             transition: all 0.3s ease;
             color: #f97316;
         }
-        
+
         .footer-links a:hover {
             color: #ffffff;
             padding-left: 8px;
         }
-        
+
         .footer-links a:hover::before {
             opacity: 1;
             transform: translateX(0);
         }
-        
+
         .footer-contact-item {
             display: flex;
             align-items: flex-start;
@@ -686,7 +686,7 @@
             font-size: 14px;
             line-height: 1.6;
         }
-        
+
         .footer-contact-icon {
             width: 20px;
             height: 20px;
@@ -694,18 +694,18 @@
             flex-shrink: 0;
             margin-top: 2px;
         }
-        
+
         .footer-contact-text {
             color: #cbd5e1;
             flex: 1;
         }
-        
+
         .footer-contact-text strong {
             color: #ffffff;
             display: block;
             margin-bottom: 4px;
         }
-        
+
         .footer-newsletter {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
@@ -716,7 +716,7 @@
             box-sizing: border-box;
             overflow: hidden;
         }
-        
+
         .footer-newsletter-form {
             display: flex;
             gap: 8px;
@@ -726,7 +726,7 @@
             flex-wrap: nowrap;
             align-items: stretch;
         }
-        
+
         .footer-newsletter-input {
             flex: 1 1 auto;
             min-width: 0;
@@ -740,17 +740,17 @@
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
-        
+
         .footer-newsletter-input::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
-        
+
         .footer-newsletter-input:focus {
             border-color: #f97316;
             background: rgba(255, 255, 255, 0.15);
             box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
         }
-        
+
         .footer-newsletter-btn {
             flex: 0 0 auto;
             padding: 12px 20px;
@@ -766,23 +766,23 @@
             box-sizing: border-box;
             min-width: fit-content;
         }
-        
+
         .footer-newsletter-btn:hover {
             background: linear-gradient(135deg, #ea580c, #f97316);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
         }
-        
+
         .footer-newsletter-btn:active {
             transform: translateY(0);
         }
-        
+
         .footer-bottom {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 24px 0;
             background: rgba(0, 0, 0, 0.2);
         }
-        
+
         .footer-bottom-content {
             max-width: 1320px;
             margin: 0 auto;
@@ -794,30 +794,30 @@
             flex-wrap: wrap;
             gap: 16px;
         }
-        
+
         .footer-copyright {
             color: #94a3b8;
             font-size: 14px;
         }
-        
+
         .footer-copyright strong {
             color: #ffffff;
             font-weight: 600;
         }
-        
+
         .footer-payment-methods {
             display: flex;
             gap: 12px;
             align-items: center;
             flex-wrap: wrap;
         }
-        
+
         .footer-payment-text {
             color: #94a3b8;
             font-size: 13px;
             margin-right: 8px;
         }
-        
+
         .footer-payment-icon {
             width: 40px;
             height: 24px;
@@ -830,7 +830,7 @@
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         /* ===== HEADER RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .client-header__inner {
@@ -948,43 +948,43 @@
             .footer-main {
                 padding: 40px 0 30px;
             }
-            
+
             .footer-grid {
                 grid-template-columns: 1fr;
                 gap: 32px;
             }
-            
+
             .footer-newsletter-form {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .footer-newsletter-input {
                 width: 100%;
                 margin-bottom: 0;
             }
-            
+
             .footer-newsletter-btn {
                 width: 100%;
                 margin-top: 8px;
             }
-            
+
             .footer-bottom-content {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .footer-payment-methods {
                 justify-content: center;
             }
         }
-        
+
         @media (max-width: 480px) {
             .footer-main {
                 padding-left: 16px;
                 padding-right: 16px;
             }
-            
+
             .footer-bottom-content {
                 padding-left: 16px;
                 padding-right: 16px;
@@ -1387,8 +1387,8 @@
                     <h3 class="footer-widget-title">Về Meteor Shop</h3>
                     <img src="{{ asset('storage/images/meteor.jpg') }}" alt="Meteor Shop Logo" class="footer-logo">
                     <p class="footer-description">
-                        Meteor Shop - Thương hiệu nội thất hiện đại hàng đầu Việt Nam. 
-                        Chúng tôi mang đến những sản phẩm chất lượng cao, thiết kế tinh tế 
+                        Meteor Shop - Thương hiệu nội thất hiện đại hàng đầu Việt Nam.
+                        Chúng tôi mang đến những sản phẩm chất lượng cao, thiết kế tinh tế
                         cho không gian sống của bạn.
                     </p>
                     <div class="footer-social">
@@ -1462,14 +1462,14 @@
                             <span>8:00 - 22:00 (Tất cả các ngày)</span>
                             </div>
                     </div>
-                    
+
                     <div class="footer-newsletter">
                         <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 12px; line-height: 1.6;">
                             Đăng ký nhận thông tin mới nhất về sản phẩm và ưu đãi đặc biệt từ Meteor Shop
                         </p>
                         <form class="footer-newsletter-form" id="footerNewsletterForm" onsubmit="handleNewsletterSubmit(event)">
                             @csrf
-                            <input type="email" name="email" class="footer-newsletter-input" 
+                            <input type="email" name="email" class="footer-newsletter-input"
                                    placeholder="Nhập email của bạn" required>
                             <button type="submit" class="footer-newsletter-btn">
                                 <i class="bi bi-send me-1"></i> Đăng ký
@@ -1506,11 +1506,11 @@
             const email = form.querySelector('input[name="email"]').value;
             const button = form.querySelector('button[type="submit"]');
             const originalText = button.innerHTML;
-            
+
             // Disable button
             button.disabled = true;
             button.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Đang gửi...';
-            
+
             // Simulate API call (replace with actual endpoint)
             setTimeout(() => {
                 Swal.fire({
@@ -1525,7 +1525,7 @@
                 button.innerHTML = originalText;
             }, 1000);
         }
-        
+
         // Smooth scroll to top on footer logo click
         document.addEventListener('DOMContentLoaded', function() {
             const footerLogo = document.querySelector('.footer-logo');
@@ -1592,10 +1592,43 @@
 
     @if(session('error'))
         <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi',
-                text: "{{ session('error') }}",
+            document.addEventListener('DOMContentLoaded', function() {
+                const errorMessage = {!! json_encode(session('error')) !!};
+
+                if (errorMessage.includes('100 triệu') || errorMessage.includes('100.000.000')) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Thông báo giới hạn giá trị',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-3">Để đảm bảo an toàn giao dịch và hỗ trợ phương thức vận chuyển đặc biệt cho đơn hàng giá trị cao <b>(trên 100 triệu VNĐ)</b>.</p>
+                                <p class="mb-0">Nếu quý khách có nhu cầu đặt giá trị cao, vui lòng liên hệ <b>Hotline/Mail</b> để được hỗ trợ thanh toán trực tiếp và nhận ưu đãi riêng.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Đã hiểu',
+                        confirmButtonColor: '#3085d6'
+                    });
+                } else if (errorMessage.includes('10 sản phẩm')) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Thông báo giới hạn số lượng',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-3">Để đảm bảo chất lượng vận chuyển tốt nhất, hệ thống hiện giới hạn tối đa <b>10 sản phẩm</b> trên mỗi đơn hàng.</p>
+                                <p class="mb-0">Nếu quý khách có nhu cầu đặt số lượng lớn, vui lòng liên hệ <b>Hotline/Mail</b> để nhận chính sách ưu đãi riêng.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Đã hiểu',
+                        confirmButtonColor: '#3085d6'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thông báo',
+                        text: errorMessage,
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
             });
         </script>
     @endif
