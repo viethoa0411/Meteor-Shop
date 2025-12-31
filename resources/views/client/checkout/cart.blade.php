@@ -209,7 +209,7 @@
 
             {{-- Tóm tắt đơn hàng --}}
             <div class="col-lg-4">
-                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card shadow-sm sticky-top checkout-summary-card" style="top: 20px;">
                     <div class="card-header bg-light">
                         <h5 class="mb-0"><i class="bi bi-cart-check me-2"></i>Tóm tắt đơn hàng</h5>
                     </div>
@@ -389,12 +389,12 @@
                         if (!citySelect) return;
 
                         citySelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
-                        
+
                         let addedCount = 0;
                         provinces.forEach(province => {
                             // Lấy tên tỉnh từ nhiều nguồn có thể
                             const provinceName = province.full_name || province.name || province.title || '';
-                            
+
                             // Chỉ thêm các tỉnh miền Bắc
                             if (isNorthernProvince(provinceName)) {
                                 const option = document.createElement('option');
@@ -746,6 +746,17 @@
 
                 // Khởi tạo lần đầu - tính phí sau khi trang load
                 setTimeout(calculateShippingFee, 1000);
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const header = document.querySelector('.client-header');
+                const summary = document.querySelector('.checkout-summary-card');
+                if (header && summary) {
+                    const headerHeight = header.offsetHeight || 0;
+                    summary.style.top = (headerHeight + 20) + 'px';
+                    summary.style.zIndex = '900';
+                }
             });
         </script>
     @endpush

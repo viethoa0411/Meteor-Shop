@@ -217,12 +217,12 @@
                                         <label class="form-label small mb-1">Số lượng:</label>
                                         <div class="input-group input-group-sm quantity-control" style="max-width: 120px;">
                                             <button type="button" class="btn btn-outline-secondary" id="qty-minus" aria-label="Giảm số lượng">−</button>
-                                            <input type="number" 
-                                                id="quantity-input" 
-                                                name="quantity" 
-                                                class="form-control text-center" 
-                                                value="{{ $qty }}" 
-                                                min="1" 
+                                            <input type="number"
+                                                id="quantity-input"
+                                                name="quantity"
+                                                class="form-control text-center"
+                                                value="{{ $qty }}"
+                                                min="1"
                                                 max="{{ $stock }}"
                                                 data-price="{{ $price }}"
                                                 data-stock="{{ $stock }}"
@@ -394,7 +394,7 @@
                 'sơn la', 'son la', 'sonla',
                 'hòa bình', 'hoa binh', 'hoabinh'
             ]);
-            
+
             // Hàm normalize tên tỉnh để so sánh (loại bỏ dấu, khoảng trắng, chuyển lowercase)
             function normalizeProvinceName(name) {
                 if (!name) return '';
@@ -405,26 +405,26 @@
                     .replace(/\s+/g, ' ') // Chuẩn hóa khoảng trắng
                     .trim();
             }
-            
+
             // Hàm kiểm tra xem tên tỉnh có chứa tên tỉnh miền Bắc không
             function isNorthernProvince(name) {
                 if (!name) return false;
-                
+
                 const normalized = normalizeProvinceName(name);
                 const normalizedNoSpace = normalized.replace(/\s+/g, '');
-                
+
                 // Check trực tiếp
                 if (northernProvincesSet.has(normalized) || northernProvincesSet.has(normalizedNoSpace)) {
                     return true;
                 }
-                
+
                 // Check nếu tên tỉnh chứa tên tỉnh miền Bắc (cho trường hợp "Tỉnh Hà Nội")
                 for (const provinceName of northernProvincesSet) {
                     if (normalized.includes(provinceName) || normalizedNoSpace.includes(provinceName.replace(/\s+/g, ''))) {
                         return true;
                     }
                 }
-                
+
                 return false;
             }
 
@@ -438,7 +438,7 @@
 
                 // Đảm bảo select không bị disabled
                 citySelect.disabled = false;
-                
+
                 // Hiển thị loading state
                 citySelect.innerHTML = '<option value="">Đang tải dữ liệu...</option>';
                 citySelect.disabled = true;
@@ -449,27 +449,27 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
-                    
+
                     console.log('API Response:', data); // Debug
-                    
+
                     if (data.error === 0 && data.data && Array.isArray(data.data)) {
                         provinces = data.data;
                         citySelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
-                        
+
                         let addedCount = 0;
                         let allProvinces = [];
-                        
+
                         provinces.forEach(province => {
                             // Lấy tên tỉnh từ nhiều nguồn có thể
                             const provinceName = province.full_name || province.name || province.title || '';
-                            
+
                             if (!provinceName) return; // Bỏ qua nếu không có tên
-                            
+
                             // Lưu tất cả để debug (chỉ 5 tỉnh đầu)
                             if (allProvinces.length < 5) {
                                 allProvinces.push(provinceName);
                             }
-                            
+
                             // Kiểm tra nếu là tỉnh miền Bắc
                             if (isNorthernProvince(provinceName)) {
                                 const option = document.createElement('option');
@@ -480,18 +480,18 @@
                                 addedCount++;
                             }
                         });
-                        
+
                         // Debug: Log một số tên tỉnh để kiểm tra
                         if (addedCount === 0 && allProvinces.length > 0) {
                             console.log('Mẫu tên tỉnh từ API:', allProvinces);
                             console.log('Ví dụ normalize:', allProvinces[0], '->', normalizeProvinceName(allProvinces[0]));
                         }
-                        
+
                         // Kích hoạt select sau khi load xong
                         citySelect.disabled = false;
-                        
+
                         console.log(`Đã tải ${addedCount} tỉnh/thành phố miền Bắc (tổng ${provinces.length} từ API)`);
-                        
+
                         // Chỉ hiển thị tỉnh miền Bắc, không có fallback
                         if (addedCount === 0) {
                             citySelect.innerHTML = '<option value="">-- Không có tỉnh miền Bắc --</option>';
@@ -500,7 +500,7 @@
                             errorOption.textContent = '⚠ Không tìm thấy tỉnh miền Bắc. Vui lòng liên hệ hỗ trợ.';
                             errorOption.disabled = true;
                             citySelect.appendChild(errorOption);
-                            
+
                             if (typeof Swal !== 'undefined') {
                                 Swal.fire({
                                     icon: 'warning',
@@ -523,7 +523,7 @@
                     errorOption.disabled = true;
                     citySelect.appendChild(errorOption);
                     citySelect.disabled = false;
-                    
+
                     // Hiển thị thông báo lỗi cho người dùng
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
@@ -560,11 +560,11 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
-                    
+
                     if (data.error === 0 && data.data && Array.isArray(data.data)) {
                         districts = data.data || [];
                         districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
-                        
+
                         districts.forEach(district => {
                             const option = document.createElement('option');
                             option.value = district.full_name || district.name || '';
@@ -573,7 +573,7 @@
                             districtSelect.appendChild(option);
                         });
                         districtSelect.disabled = false;
-                        
+
                         // Reset phường/xã
                         const wardSelect = document.getElementById('shipping_ward');
                         if (wardSelect) {
@@ -619,11 +619,11 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
-                    
+
                     if (data.error === 0 && data.data && Array.isArray(data.data)) {
                         wards = data.data || [];
                         wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
-                        
+
                         wards.forEach(ward => {
                             const option = document.createElement('option');
                             option.value = ward.full_name || ward.name || '';
@@ -651,7 +651,7 @@
                 const citySelect = document.getElementById('shipping_city');
                 const districtSelect = document.getElementById('shipping_district');
                 const wardSelect = document.getElementById('shipping_ward');
-                
+
                 if (citySelect) {
                     citySelect.disabled = false;
                 }
@@ -670,7 +670,7 @@
                     citySelect.addEventListener('change', function() {
                         const selectedOption = this.options[this.selectedIndex];
                         const provinceCode = selectedOption.dataset.code;
-                        
+
                         if (provinceCode && provinceCode !== '') {
                             loadDistricts(provinceCode);
                         } else {
@@ -684,7 +684,7 @@
                                 wardSelect.disabled = true;
                             }
                         }
-                        
+
                         // Debounce shipping calculation
                         if (shippingCalculationTimeout) {
                             clearTimeout(shippingCalculationTimeout);
@@ -700,7 +700,7 @@
                     districtSelect.addEventListener('change', function() {
                         const selectedOption = this.options[this.selectedIndex];
                         const districtCode = selectedOption.dataset.code;
-                        
+
                         if (districtCode && districtCode !== '') {
                             loadWards(districtCode);
                         } else {
@@ -710,7 +710,7 @@
                                 wardSelect.disabled = true;
                             }
                         }
-                        
+
                         // Tính phí vận chuyển ngay khi chọn quận/huyện xong
                         if (shippingCalculationTimeout) {
                             clearTimeout(shippingCalculationTimeout);
@@ -720,7 +720,7 @@
                         }, 300);
                     });
                 }
-                
+
                 // Xử lý khi chọn phường/xã (cũng tính lại phí)
                 if (wardSelect) {
                     wardSelect.addEventListener('change', function() {
@@ -738,13 +738,13 @@
                 const quantityHidden = document.getElementById('quantity-hidden');
                 const qtyMinus = document.getElementById('qty-minus');
                 const qtyPlus = document.getElementById('qty-plus');
-                
+
                 // Kiểm tra các element có tồn tại không
                 if (!quantityInput || !quantityHidden || !qtyMinus || !qtyPlus) {
                     console.error('Không tìm thấy các element cần thiết');
                     return;
                 }
-                
+
                 const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
 
                 const price = parseFloat(quantityInput.getAttribute('data-price')) || 0;
@@ -776,7 +776,7 @@
                     // Đảm bảo số lượng hợp lệ
                     newQty = Math.max(1, Math.min(newQty, maxStock));
                     const oldQty = parseInt(quantityInput.value) || 1;
-                    
+
                     quantityInput.value = newQty;
                     if (quantityHidden) {
                         quantityHidden.value = newQty;
@@ -814,7 +814,7 @@
                     }
 
                     updateTotalDisplay();
-                    
+
                     // Debounce shipping calculation
                     if (shippingCalculationTimeout) {
                         clearTimeout(shippingCalculationTimeout);
@@ -898,7 +898,7 @@
                         if (shippingLoading) {
                             shippingLoading.classList.add('d-none');
                         }
-                        
+
                         if (data.success) {
                             currentShippingFee = data.fee;
                             const shippingFeeInput = document.getElementById('shipping_fee_input');
@@ -1075,7 +1075,7 @@
                         newQty = maxStock;
                         this.value = maxStock;
                     }
-                    
+
                     // Debounce update để tránh gọi quá nhiều lần
                     if (quantityUpdateTimeout) {
                         clearTimeout(quantityUpdateTimeout);
@@ -1127,7 +1127,7 @@
                 const walletRadio = document.getElementById('wallet');
                 const walletWarning = document.getElementById('wallet-warning');
                 const walletBalance = {{ $walletBalance }};
-                
+
                 function checkWalletBalance() {
                     const total = Math.max(0, (currentSubtotal - currentDiscount) + currentShippingFee + installationFee);
                     if (walletRadio && walletRadio.checked && walletWarning) {
@@ -1280,6 +1280,17 @@
                 setTimeout(calculateShippingFee, 1000);
             });
         </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const header = document.querySelector('.client-header');
+                const summary = document.querySelector('.checkout-summary-card');
+                const leftFirstCard = document.querySelector('.col-lg-8 .card');
+                if (header && summary && leftFirstCard) {
+                    const headerHeight = header.offsetHeight || 0;
+                    summary.style.top = (headerHeight + 20) + 'px';
+                    summary.style.zIndex = '900';
+                }
+            });
+        </script>
     @endpush
 @endsection
-
