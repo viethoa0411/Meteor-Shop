@@ -1,42 +1,42 @@
 @php
-$cart = [];
-$cartCount = 0;
+    $cart = [];
+    $cartCount = 0;
 
-if (auth()->check()) {
-$cartModel = \App\Models\Cart::with(['items.product'])
-->where('user_id', auth()->id())
-->where('status', 'active')
-->first();
+    if (auth()->check()) {
+        $cartModel = \App\Models\Cart::with(['items.product'])
+            ->where('user_id', auth()->id())
+            ->where('status', 'active')
+            ->first();
 
-if ($cartModel) {
-foreach ($cartModel->items as $ci) {
-$product = $ci->product;
-$cart[$ci->id] = [
-'name' => $product ? $product->name : '',
-'price' => (float) $ci->price,
-'quantity' => (int) $ci->quantity,
-];
-$cartCount += (int) $ci->quantity;
-}
-}
-} else {
-$sessionCart = session()->get('cart', []);
-foreach ($sessionCart as $id => $item) {
-$cart[$id] = $item;
-$cartCount += $item['quantity'] ?? 0;
-}
-}
+        if ($cartModel) {
+            foreach ($cartModel->items as $ci) {
+                $product = $ci->product;
+                $cart[$ci->id] = [
+                    'name' => $product ? $product->name : '',
+                    'price' => (float) $ci->price,
+                    'quantity' => (int) $ci->quantity,
+                ];
+                $cartCount += (int) $ci->quantity;
+            }
+        }
+    } else {
+        $sessionCart = session()->get('cart', []);
+        foreach ($sessionCart as $id => $item) {
+            $cart[$id] = $item;
+            $cartCount += $item['quantity'] ?? 0;
+        }
+    }
 
-$wishlistItems = collect();
-$wishlistCount = 0;
+    $wishlistItems = collect();
+    $wishlistCount = 0;
 
-if (auth()->check()) {
-$wishlistItems = \App\Models\Wishlist::with('product')
-->where('user_id', auth()->id())
-->latest()
-->get();
-$wishlistCount = $wishlistItems->count();
-}
+    if (auth()->check()) {
+        $wishlistItems = \App\Models\Wishlist::with('product')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
+        $wishlistCount = $wishlistItems->count();
+    }
 @endphp
 
 <!DOCTYPE html>
@@ -560,7 +560,7 @@ $wishlistCount = $wishlistItems->count();
         }
 
         .footer-main {
-            padding: 60px 0 40px;
+            padding: 20px 0 0px;
             max-width: 1320px;
             margin: 0 auto;
             padding-left: 24px;
@@ -1164,16 +1164,16 @@ $wishlistCount = $wishlistItems->count();
 
 <body>
     @php
-    // Lấy danh mục cha (Phòng) nếu chưa có sẵn
-    // Giữ lại logic Laravel Blade từ File 1 để đảm bảo Menu Dropdown hoạt động
-    $parentCategories =
-    $parentCategories ?? \App\Models\Category::whereNull('parent_id')->where('status', 1)->get();
+        // Lấy danh mục cha (Phòng) nếu chưa có sẵn
+        // Giữ lại logic Laravel Blade từ File 1 để đảm bảo Menu Dropdown hoạt động
+        $parentCategories =
+            $parentCategories ?? \App\Models\Category::whereNull('parent_id')->where('status', 1)->get();
 
-    // Giả định $childCategories hoặc $cate được truyền vào View hoặc cần được định nghĩa
-    // Nếu $childCategories chưa được truyền, bạn cần phải định nghĩa nó ở đây hoặc trong Controller
-    $childCategories = $childCategories ?? [];
-    // Giả định $cate là danh mục dùng cho Menu dọc
-    $cate = $cate ?? ($parentCategories->isNotEmpty() ? $parentCategories : collect());
+        // Giả định $childCategories hoặc $cate được truyền vào View hoặc cần được định nghĩa
+        // Nếu $childCategories chưa được truyền, bạn cần phải định nghĩa nó ở đây hoặc trong Controller
+        $childCategories = $childCategories ?? [];
+        // Giả định $cate là danh mục dùng cho Menu dọc
+        $cate = $cate ?? ($parentCategories->isNotEmpty() ? $parentCategories : collect());
     @endphp
 
     <header class="client-header">
@@ -1183,8 +1183,8 @@ $wishlistCount = $wishlistItems->count();
             </a>
 
             <form action="{{ route('client.product.search') }}" method="GET" class="client-search">
-                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..."
-                    value="{{ $searchQuery ?? '' }}" autocomplete="off">
+                <input type="text" name="query" placeholder="Tìm kiếm sản phẩm..." value="{{ $searchQuery ?? '' }}"
+                    autocomplete="off">
                 <button type="submit" aria-label="Tìm kiếm">
                     <i class="fa fa-search"></i>
                 </button>
@@ -1193,31 +1193,31 @@ $wishlistCount = $wishlistItems->count();
             <div class="client-actions">
                 <div class="client-cart">
                     @auth
-                    <a data-bs-toggle="offcanvas" href="#wishlistCanvas" role="button" class="client-pill">
-                        <i class="bi bi-heart client-pill__icon"></i>
-                    </a>
-                    <span class="client-cart__badge {{ $wishlistCount > 0 ? '' : 'd-none' }}" data-wishlist-badge>
-                        {{ $wishlistCount }}
-                    </span>
+                        <a data-bs-toggle="offcanvas" href="#wishlistCanvas" role="button" class="client-pill">
+                            <i class="bi bi-heart client-pill__icon"></i>
+                        </a>
+                        <span class="client-cart__badge {{ $wishlistCount > 0 ? '' : 'd-none' }}" data-wishlist-badge>
+                            {{ $wishlistCount }}
+                        </span>
                     @else
-                    <a href="{{ route('client.login') }}" class="client-pill">
-                        <i class="bi bi-heart client-pill__icon"></i>
-                    </a>
+                        <a href="{{ route('client.login') }}" class="client-pill">
+                            <i class="bi bi-heart client-pill__icon"></i>
+                        </a>
                     @endauth
                 </div>
 
                 <div class="client-cart">
                     @auth
-                    <a data-bs-toggle="offcanvas" href="#cartCanvas" role="button" class="client-pill">
-                        <i class="bi bi-cart3 client-pill__icon"></i>
-                    </a>
-                    @if ($cartCount > 0)
-                    <span class="client-cart__badge">{{ $cartCount }}</span>
-                    @endif
+                        <a data-bs-toggle="offcanvas" href="#cartCanvas" role="button" class="client-pill">
+                            <i class="bi bi-cart3 client-pill__icon"></i>
+                        </a>
+                        @if ($cartCount > 0)
+                            <span class="client-cart__badge">{{ $cartCount }}</span>
+                        @endif
                     @else
-                    <a href="{{ route('client.login') }}" class="client-pill">
-                        <i class="bi bi-cart3 client-pill__icon"></i>
-                    </a>
+                        <a href="{{ route('client.login') }}" class="client-pill">
+                            <i class="bi bi-cart3 client-pill__icon"></i>
+                        </a>
                     @endauth
                 </div>
 
@@ -1225,43 +1225,43 @@ $wishlistCount = $wishlistItems->count();
                     <i class="fa-regular fa-user client-account__icon"></i>
                     <div class="client-account__labels">
                         @auth
-                        <span class="client-account__primary">{{ Auth::user()->name }}</span>
-                        <div class="dropdown">
-                            <a class="client-account__secondary dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Tài khoản của tôi
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end mt-2">
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('client.account.wallet.index') }}">
-                                        <i class="bi bi-wallet2 me-2"></i>Ví của tôi
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('client.account.orders.index') }}">
-                                        <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('client.account.profile') }}">
-                                        <i class="bi bi-person-circle me-2"></i>Thông tin cá nhân
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <form action="{{ route('client.logout') }}" method="POST">
-                                        @csrf
-                                        <button class="dropdown-item" type="submit">
-                                            <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
+                            <span class="client-account__primary">{{ Auth::user()->name }}</span>
+                            <div class="dropdown">
+                                <a class="client-account__secondary dropdown-toggle" href="#" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    Tài khoản của tôi
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end mt-2">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('client.account.wallet.index') }}">
+                                            <i class="bi bi-wallet2 me-2"></i>Ví của tôi
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('client.account.orders.index') }}">
+                                            <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('client.account.profile') }}">
+                                            <i class="bi bi-person-circle me-2"></i>Thông tin cá nhân
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <form action="{{ route('client.logout') }}" method="POST">
+                                            @csrf
+                                            <button class="dropdown-item" type="submit">
+                                                <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         @else
-                        <a class="client-account__primary" href="{{ route('client.login') }}">Đăng nhập</a>
+                            <a class="client-account__primary" href="{{ route('client.login') }}">Đăng nhập</a>
                         @endauth
                     </div>
                 </div>
@@ -1272,28 +1272,32 @@ $wishlistCount = $wishlistItems->count();
             <div class="client-nav__inner">
                 <ul>
                     <li class="has-dropdown">
-                        <a href="{{ route('client.product.search') }}?category=&minPrice=&maxPrice=&sort=newest" class="dropdown-toggle">Sản phẩm</a>
+                        <a href="{{ route('client.product.search') }}?category=&minPrice=&maxPrice=&sort=newest"
+                            class="dropdown-toggle">Sản phẩm</a>
                         <ul class="dropdown-menu">
                             @forelse ($childCategories as $child)
-                            <li>
-                                <a href="{{ route('client.product.category', $child->slug) }}">
-                                    {{ $child->name }}
-                                </a>
-                            </li>
+                                <li>
+                                    <a href="{{ route('client.product.category', $child->slug) }}">
+                                        {{ $child->name }}
+                                    </a>
+                                </li>
                             @empty
-                            <li><span style="display: block; padding: 12px 16px; color: #9ca3af; font-size: 14px;">Đang cập nhật</span></li>
+                                <li><span
+                                        style="display: block; padding: 12px 16px; color: #9ca3af; font-size: 14px;">Đang
+                                        cập nhật</span></li>
                             @endforelse
                         </ul>
                     </li>
                     <li class="has-dropdown">
-                        <a href="{{ route('client.product.search') }}?category=&minPrice=&maxPrice=&sort=newest" class="dropdown-toggle">Phòng</a>
+                        <a href="{{ route('client.product.search') }}?category=&minPrice=&maxPrice=&sort=newest"
+                            class="dropdown-toggle">Phòng</a>
                         <ul class="dropdown-menu">
                             @foreach ($parentCategories as $parent)
-                            <li>
-                                <a href="{{ route('client.product.category', $parent->slug) }}">
-                                    {{ $parent->name }}
-                                </a>
-                            </li>
+                                <li>
+                                    <a href="{{ route('client.product.category', $parent->slug) }}">
+                                        {{ $parent->name }}
+                                    </a>
+                                </li>
                             @endforeach
                         </ul>
                     </li>
@@ -1319,41 +1323,41 @@ $wishlistCount = $wishlistItems->count();
         </div>
         <div class="offcanvas-body d-flex flex-column" style="height: 100%;">
             @if (auth()->check())
-            @if ($wishlistItems->count())
-            <ul class="list-group mb-3">
-                @foreach ($wishlistItems as $wishlist)
-                @php $product = $wishlist->product; @endphp
-                @if ($product)
-                <li class="list-group-item d-flex align-items-center position-relative">
-                    <a href="{{ route('client.product.detail', $product->slug) }}"
-                        class="d-flex flex-column text-decoration-none text-dark flex-grow-1 pe-4">
-                        <strong>{{ $product->name }}</strong>
-                        <small class="text-muted">
-                            {{ number_format($product->price, 0, ',', '.') }}₫
-                        </small>
+                @if ($wishlistItems->count())
+                    <ul class="list-group mb-3">
+                        @foreach ($wishlistItems as $wishlist)
+                            @php $product = $wishlist->product; @endphp
+                            @if ($product)
+                                <li class="list-group-item d-flex align-items-center position-relative">
+                                    <a href="{{ route('client.product.detail', $product->slug) }}"
+                                        class="d-flex flex-column text-decoration-none text-dark flex-grow-1 pe-4">
+                                        <strong>{{ $product->name }}</strong>
+                                        <small class="text-muted">
+                                            {{ number_format($product->price, 0, ',', '.') }}₫
+                                        </small>
+                                    </a>
+                                    <button class="btn-close position-absolute top-0 end-0 m-2 remove-wishlist-item"
+                                        data-product-id="{{ $product->id }}"></button>
+                                </li>
+                            @endif
+                        @endforeach
+                    </ul>
+                    <div class="mt-auto d-flex flex-column gap-2">
+                        <a href="{{ route('client.wishlist.index') }}" class="btn btn-outline-dark w-100">
+                            Xem danh sách chi tiết
+                        </a>
+                    </div>
+                @else
+                    <p>Danh sách yêu thích trống.</p>
+                    <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100 mt-2">
+                        Khám phá sản phẩm
                     </a>
-                    <button class="btn-close position-absolute top-0 end-0 m-2 remove-wishlist-item"
-                        data-product-id="{{ $product->id }}"></button>
-                </li>
                 @endif
-                @endforeach
-            </ul>
-            <div class="mt-auto d-flex flex-column gap-2">
-                <a href="{{ route('client.wishlist.index') }}" class="btn btn-outline-dark w-100">
-                    Xem danh sách chi tiết
+            @else
+                <p>Vui lòng đăng nhập để xem danh sách yêu thích.</p>
+                <a href="{{ route('client.login') }}" class="btn btn-primary w-100 mt-2">
+                    Đăng nhập
                 </a>
-            </div>
-            @else
-            <p>Danh sách yêu thích trống.</p>
-            <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100 mt-2">
-                Khám phá sản phẩm
-            </a>
-            @endif
-            @else
-            <p>Vui lòng đăng nhập để xem danh sách yêu thích.</p>
-            <a href="{{ route('client.login') }}" class="btn btn-primary w-100 mt-2">
-                Đăng nhập
-            </a>
             @endif
         </div>
     </div>
@@ -1367,36 +1371,36 @@ $wishlistCount = $wishlistItems->count();
 
         <div class="offcanvas-body d-flex flex-column" style="height: 100%;">
             @if ($cart && count($cart))
-            <ul class="list-group mb-3">
-                @foreach ($cart as $id => $item)
-                <li class="list-group-item d-flex justify-content-between align-items-center position-relative"
-                    id="cart-item-{{ $id }}">
-                    <div>
-                        <strong>{{ $item['name'] }}</strong> <br>
-                        Số lượng: {{ $item['quantity'] }}
-                    </div>
-                    <span>{{ number_format($item['price'] * $item['quantity']) }}₫</span>
-                    <button class="btn-close position-absolute top-0 end-0 m-2 remove-cart-item"
-                        data-id="{{ $id }}"></button>
-                </li>
-                @endforeach
-            </ul>
+                <ul class="list-group mb-3">
+                    @foreach ($cart as $id => $item)
+                        <li class="list-group-item d-flex justify-content-between align-items-center position-relative"
+                            id="cart-item-{{ $id }}">
+                            <div>
+                                <strong>{{ $item['name'] }}</strong> <br>
+                                Số lượng: {{ $item['quantity'] }}
+                            </div>
+                            <span>{{ number_format($item['price'] * $item['quantity']) }}₫</span>
+                            <button class="btn-close position-absolute top-0 end-0 m-2 remove-cart-item"
+                                data-id="{{ $id }}"></button>
+                        </li>
+                    @endforeach
+                </ul>
 
-            <div class="d-flex justify-content-between fw-bold mb-3">
-                <span>Tổng:</span>
-                <span id="cart-total">
-                    {{ number_format(array_sum(array_map(fn($i) => $i['price'] * $i['quantity'], $cart))) }}₫
-                </span>
-            </div>
+                <div class="d-flex justify-content-between fw-bold mb-3">
+                    <span>Tổng:</span>
+                    <span id="cart-total">
+                        {{ number_format(array_sum(array_map(fn($i) => $i['price'] * $i['quantity'], $cart))) }}₫
+                    </span>
+                </div>
 
-            <div class="mt-auto d-flex flex-column gap-2">
-                <a href="{{ route('cart.index') }}" class="btn btn-dark w-100">Xem giỏ hàng</a>
-            </div>
+                <div class="mt-auto d-flex flex-column gap-2">
+                    <a href="{{ route('cart.index') }}" class="btn btn-dark w-100">Xem giỏ hàng</a>
+                </div>
             @else
-            <p>Giỏ hàng trống.</p>
-            <a href="{{ route('client.home') }}" class="btn btn-primary w-100 mt-2">
-                Quay về trang chủ
-            </a>
+                <p>Giỏ hàng trống.</p>
+                <a href="{{ route('client.home') }}" class="btn btn-primary w-100 mt-2">
+                    Quay về trang chủ
+                </a>
             @endif
         </div>
     </div>
@@ -1488,14 +1492,11 @@ $wishlistCount = $wishlistItems->count();
                         <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 12px; line-height: 1.6;">
                             Đăng ký nhận thông tin mới nhất về sản phẩm và ưu đãi đặc biệt từ Meteor Shop
                         </p>
-                        <form class="footer-newsletter-form" id="footerNewsletterForm" onsubmit="handleNewsletterSubmit(event)">
+                        <form class="footer-newsletter-form" id="footerNewsletterForm"
+                            onsubmit="handleNewsletterSubmit(event)">
                             @csrf
                             <input type="email" name="email" class="footer-newsletter-input"
-<<<<<<< HEAD
                                 placeholder="Nhập email của bạn" required>
-=======
-                                   placeholder="Nhập email của bạn" required>
->>>>>>> origin/cap_nhat_order_admin
                             <button type="submit" class="footer-newsletter-btn">
                                 <i class="bi bi-send me-1"></i> Đăng ký
                             </button>
@@ -1603,19 +1604,19 @@ $wishlistCount = $wishlistItems->count();
     {{-- SweetAlert2 for client-side modals (báo cáo bình luận, thông báo đẹp) --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    @if(session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Thành công',
-            text: "{{ session('success') }}",
-            timer: 3000,
-            showConfirmButton: false
-        });
-    </script>
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
     @endif
 
-    @if(session('error'))
+    @if (session('error'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const errorMessage = {!! json_encode(session('error')) !!};
@@ -2666,90 +2667,98 @@ $wishlistCount = $wishlistItems->count();
         });
 
 
-        document.addEventListener('DOMContentLoaded', function () {
-    // Xử lý xóa sản phẩm khỏi wishlist trong offcanvas popup
-    document.querySelectorAll('.remove-wishlist-item').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý xóa sản phẩm khỏi wishlist trong offcanvas popup
+            document.querySelectorAll('.remove-wishlist-item').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-            const productId = this.dataset.productId;
-            if (!productId) return;
+                    const productId = this.dataset.productId;
+                    if (!productId) return;
 
-            // Loading nhẹ
-            const originalIcon = this.innerHTML;
-            this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-            this.disabled = true;
+                    // Loading nhẹ
+                    const originalIcon = this.innerHTML;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                    this.disabled = true;
 
-            fetch('{{ route("client.wishlist.toggle") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ product_id: productId })
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Server error');
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'success' && data.liked === false) {
-                    // 1. Xóa item khỏi popup ngay
-                    this.closest('li').remove();
+                    fetch('{{ route('client.wishlist.toggle') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                product_id: productId
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Server error');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.status === 'success' && data.liked === false) {
+                                // 1. Xóa item khỏi popup ngay
+                                this.closest('li').remove();
 
-                    // 2. Cập nhật badge wishlist ở header
-                    const badge = document.querySelector('[data-wishlist-badge]');
-                    if (badge) {
-                        let count = parseInt(badge.textContent) || 1;
-                        count--;
-                        if (count <= 0) {
-                            badge.classList.add('d-none');
-                            // Hiển thị thông báo trống trong popup
-                            const list = document.querySelector('#wishlistCanvas .offcanvas-body ul.list-group');
-                            if (list) {
-                                list.innerHTML = `
+                                // 2. Cập nhật badge wishlist ở header
+                                const badge = document.querySelector('[data-wishlist-badge]');
+                                if (badge) {
+                                    let count = parseInt(badge.textContent) || 1;
+                                    count--;
+                                    if (count <= 0) {
+                                        badge.classList.add('d-none');
+                                        // Hiển thị thông báo trống trong popup
+                                        const list = document.querySelector(
+                                            '#wishlistCanvas .offcanvas-body ul.list-group');
+                                        if (list) {
+                                            list.innerHTML = `
                                     <p class="text-center text-muted py-4">Danh sách yêu thích trống.</p>
                                     <a href="{{ route('client.products.index') }}" class="btn btn-primary w-100">
                                         Khám phá sản phẩm
                                     </a>
                                 `;
+                                        }
+                                    } else {
+                                        badge.textContent = count > 99 ? '99+' : count;
+                                    }
+                                }
+
+                                // 3. QUAN TRỌNG: Cập nhật tim đỏ → trắng trên trang hiện tại (nếu có)
+                                const heartButtons = document.querySelectorAll(
+                                    `[data-wishlist-product-id="${productId}"], .wishlist-toggle-btn[data-product-id="${productId}"]`
+                                );
+                                heartButtons.forEach(heartBtn => {
+                                    const icon = heartBtn.querySelector('i');
+                                    if (icon) {
+                                        icon.classList.remove('bi-heart-fill',
+                                            'text-danger');
+                                        icon.classList.add('bi-heart');
+                                    }
+                                    // Nếu có lớp active hoặc liked, xóa đi
+                                    heartBtn.classList.remove('liked', 'active');
+                                });
+
+                                // Thông báo thành công
+                                alert(data.message ||
+                                    'Đã xóa khỏi danh sách yêu thích thành công!');
+                            } else {
+                                alert(data.message || 'Không thể xóa.');
                             }
-                        } else {
-                            badge.textContent = count > 99 ? '99+' : count;
-                        }
-                    }
-
-                    // 3. QUAN TRỌNG: Cập nhật tim đỏ → trắng trên trang hiện tại (nếu có)
-                    const heartButtons = document.querySelectorAll(`[data-wishlist-product-id="${productId}"], .wishlist-toggle-btn[data-product-id="${productId}"]`);
-                    heartButtons.forEach(heartBtn => {
-                        const icon = heartBtn.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove('bi-heart-fill', 'text-danger');
-                            icon.classList.add('bi-heart');
-                        }
-                        // Nếu có lớp active hoặc liked, xóa đi
-                        heartBtn.classList.remove('liked', 'active');
-                    });
-
-                    // Thông báo thành công
-                    alert(data.message || 'Đã xóa khỏi danh sách yêu thích thành công!');
-                } else {
-                    alert(data.message || 'Không thể xóa.');
-                }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                alert('Lỗi kết nối. Vui lòng thử lại.');
-            })
-            .finally(() => {
-                this.innerHTML = originalIcon;
-                this.disabled = false;
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            alert('Lỗi kết nối. Vui lòng thử lại.');
+                        })
+                        .finally(() => {
+                            this.innerHTML = originalIcon;
+                            this.disabled = false;
+                        });
+                });
             });
         });
-    });
-});
     </script>
 </body>
 

@@ -141,11 +141,6 @@
                     Còn: <span id="stock-display" style="font-weight:bold;">--</span>
                 </p>
 
-                {{--  Cân nặng --}}
-                <p style="font-size:14px; color:#555; margin-bottom:10px;">
-                    Cân nặng: <span id="weight-display" style="font-weight:bold;">--</span> <span id="weight-unit-display" style="font-weight:bold;"></span>
-                </p>
-
                 {{-- Thông tin chung --}}
                 <div style="margin-bottom:16px; line-height:1.7; color:#444;">
                     <p><strong>Danh mục:</strong>
