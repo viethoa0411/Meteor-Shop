@@ -94,16 +94,25 @@ class ProductController extends Controller
             'variants.*.weight_unit' => 'required_with:variants.*.weight|in:g,kg,lb',
         ]);
 
-        // 🖼 Upload ảnh đại diện
+        //  Upload ảnh đại diện
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
+        // Tạo slug unique
+        $baseSlug = $request->slug ? Str::slug($request->slug) : Str::slug($request->name);
+        $slug = $baseSlug;
+        $count = 1;
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $count;
+            $count++;
+        }
+
         // 🛍️ Tạo sản phẩm chính
         $product = Product::create([
             'name' => $request->name,
-            'slug' => $request->slug ? Str::slug($request->slug) : Str::slug($request->name),
+            'slug' => $slug,
             'description' => $request->description,
             'price' => $request->price,
             'image' => $imagePath,
@@ -225,7 +234,7 @@ class ProductController extends Controller
 
         // Lưu stock cũ để so sánh
         $oldStock = $product->stock;
-        
+
         // Cập nhật thông tin sản phẩm
         $updateData = [
             'price' => $request->price,
@@ -289,8 +298,8 @@ class ProductController extends Controller
             }
         }
 
-        // ========================== 
-        // 🔥 TĂNG VERSION SẢN PHẨM     
+        // ==========================
+        // 🔥 TĂNG VERSION SẢN PHẨM
         // ==========================
         $product->increment('product_version');
         $product->refresh();
@@ -299,7 +308,7 @@ class ProductController extends Controller
         // BIến thể
         foreach ($request->variants ?? [] as $v) {
 
-            // Sửa biến thể cũ 
+            // Sửa biến thể cũ
           if (!empty($v['id'])) {
 
             $variant = $product->variants->firstWhere('id', $v['id']);
@@ -317,7 +326,7 @@ class ProductController extends Controller
                         'stock'      => $v['stock'] ?? 0,
                         'price'      => $v['price'] ?? $product->price,
                     ]);
-                    
+
                     // Kiểm tra stock của variant sau khi update
                     $newVariantStock = $variant->fresh()->stock;
                     if ($newVariantStock == 0 && $oldVariantStock > 0) {
@@ -371,7 +380,7 @@ class ProductController extends Controller
                         'weight'          => $v['weight'] ?? null,
                         'weight_unit'     => $v['weight_unit'] ?? 'kg',
                     ]);
-                    
+
                     // Kiểm tra stock của variant
                     if ($variant->stock == 0) {
                         try {

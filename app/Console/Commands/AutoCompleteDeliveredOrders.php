@@ -27,6 +27,7 @@ class AutoCompleteDeliveredOrders extends Command
             $order->update([
                 'order_status' => 'completed',
                 'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
+                'completed_at' => now(),
                 'updated_at' => now(),
             ]);
 

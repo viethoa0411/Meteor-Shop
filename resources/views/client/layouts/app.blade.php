@@ -1491,7 +1491,11 @@ $wishlistCount = $wishlistItems->count();
                         <form class="footer-newsletter-form" id="footerNewsletterForm" onsubmit="handleNewsletterSubmit(event)">
                             @csrf
                             <input type="email" name="email" class="footer-newsletter-input"
+<<<<<<< HEAD
                                 placeholder="Nhập email của bạn" required>
+=======
+                                   placeholder="Nhập email của bạn" required>
+>>>>>>> origin/cap_nhat_order_admin
                             <button type="submit" class="footer-newsletter-btn">
                                 <i class="bi bi-send me-1"></i> Đăng ký
                             </button>
@@ -1612,13 +1616,46 @@ $wishlistCount = $wishlistItems->count();
     @endif
 
     @if(session('error'))
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Lỗi',
-            text: "{{ session('error') }}",
-        });
-    </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const errorMessage = {!! json_encode(session('error')) !!};
+
+                if (errorMessage.includes('100 triệu') || errorMessage.includes('100.000.000')) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Thông báo giới hạn giá trị',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-3">Để đảm bảo an toàn giao dịch và hỗ trợ phương thức vận chuyển đặc biệt cho đơn hàng giá trị cao <b>(trên 100 triệu VNĐ)</b>.</p>
+                                <p class="mb-0">Nếu quý khách có nhu cầu đặt giá trị cao, vui lòng liên hệ <b>Hotline/Mail</b> để được hỗ trợ thanh toán trực tiếp và nhận ưu đãi riêng.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Đã hiểu',
+                        confirmButtonColor: '#3085d6'
+                    });
+                } else if (errorMessage.includes('10 sản phẩm')) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Thông báo giới hạn số lượng',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-3">Để đảm bảo chất lượng vận chuyển tốt nhất, hệ thống hiện giới hạn tối đa <b>10 sản phẩm</b> trên mỗi đơn hàng.</p>
+                                <p class="mb-0">Nếu quý khách có nhu cầu đặt số lượng lớn, vui lòng liên hệ <b>Hotline/Mail</b> để nhận chính sách ưu đãi riêng.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Đã hiểu',
+                        confirmButtonColor: '#3085d6'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thông báo',
+                        text: errorMessage,
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
+            });
+        </script>
     @endif
 
     <script>

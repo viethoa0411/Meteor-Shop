@@ -31,10 +31,10 @@
                         <p class="mb-1"><strong>Họ tên:</strong> {{ $checkoutSession['customer_name'] }}</p>
                         <p class="mb-1"><strong>Số điện thoại:</strong> {{ $checkoutSession['customer_phone'] }}</p>
                         <p class="mb-1"><strong>Email:</strong> {{ $checkoutSession['customer_email'] }}</p>
-                        <p class="mb-0"><strong>Địa chỉ:</strong> 
-                            {{ $checkoutSession['shipping_address'] }}, 
-                            {{ $checkoutSession['shipping_ward'] }}, 
-                            {{ $checkoutSession['shipping_district'] }}, 
+                        <p class="mb-0"><strong>Địa chỉ:</strong>
+                            {{ $checkoutSession['shipping_address'] }},
+                            {{ $checkoutSession['shipping_ward'] }},
+                            {{ $checkoutSession['shipping_district'] }},
                             {{ $checkoutSession['shipping_city'] }}
                         </p>
                     </div>
@@ -48,7 +48,7 @@
                     <div class="card-body">
                         <div class="d-flex">
                             <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/120' }}"
-                                alt="{{ $product->name }}" 
+                                alt="{{ $product->name }}"
                                 style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
                             <div class="ms-3 flex-grow-1">
                                 <h6 class="mb-2">{{ $product->name }}</h6>
@@ -58,7 +58,7 @@
                                     </p>
                                     @if ($variant->length && $variant->width && $variant->height)
                                         <p class="text-muted small mb-1">
-                                            <strong>Kích thước:</strong> 
+                                            <strong>Kích thước:</strong>
                                             {{ $variant->length }}x{{ $variant->width }}x{{ $variant->height }} cm
                                         </p>
                                     @endif
@@ -67,7 +67,7 @@
                                     <strong>Số lượng:</strong> {{ $checkoutSession['quantity'] }}
                                 </p>
                                 <p class="mb-0">
-                                    <strong>Đơn giá:</strong> 
+                                    <strong>Đơn giá:</strong>
                                     <span class="text-danger">{{ number_format($checkoutSession['price'], 0, ',', '.') }} đ</span>
                                 </p>
                             </div>
@@ -82,7 +82,7 @@
                     </div>
                     <div class="card-body">
                         <p class="mb-2">
-                            <strong>Vận chuyển:</strong> 
+                            <strong>Vận chuyển:</strong>
                             @if ($checkoutSession['shipping_method'] == 'standard')
                                 Giao hàng tiêu chuẩn
                             @elseif ($checkoutSession['shipping_method'] == 'express')
@@ -119,7 +119,7 @@
 
             {{-- Tóm tắt đơn hàng --}}
             <div class="col-lg-4">
-                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card shadow-sm sticky-top checkout-summary-card" style="top: 20px;">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Tóm tắt đơn hàng</h5>
                     </div>
@@ -138,7 +138,7 @@
                                 @endif
                             </strong>
                         </div>
-                        @php 
+                        @php
                             $installationFee = $checkoutSession['installation_fee'] ?? 0;
                             $hasInstallation = $checkoutSession['has_installation'] ?? false;
                         @endphp
@@ -207,6 +207,18 @@
                     alert('Không thể copy: ' + err);
                 });
             }
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const header = document.querySelector('.client-header');
+                const summary = document.querySelector('.checkout-summary-card');
+                const leftFirstCard = document.querySelector('.col-lg-8 .card');
+                if (header && summary && leftFirstCard) {
+                    const headerHeight = header.offsetHeight || 0;
+                    summary.style.top = (headerHeight + 20) + 'px';
+                    summary.style.zIndex = '900';
+                }
+            });
         </script>
     @endpush
 @endsection

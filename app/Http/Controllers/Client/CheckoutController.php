@@ -167,6 +167,19 @@ class CheckoutController extends Controller
                 ];
             }
 
+            // --- Limit Check: Max 10 products ---
+            $totalQuantity = array_sum(array_column($cartItems, 'quantity'));
+            if ($totalQuantity > 10) {
+                 return redirect()->route('cart.index')
+                    ->with('error', "Giới hạn tối đa 10 sản phẩm mỗi đơn hàng. Bạn đang chọn {$totalQuantity} sản phẩm. Vui lòng giảm số lượng.");
+            }
+
+            // --- Limit Check: Max 100 million ---
+            if ($subtotal > 100000000) {
+                 return redirect()->route('cart.index')
+                    ->with('error', "Đơn hàng trên 100 triệu vui lòng liên hệ trực tiếp để được hỗ trợ. Vui lòng giảm giá trị đơn hàng.");
+            }
+
             // Lưu thông tin vào session
             $checkoutData = [
                 'type'       => 'cart',
@@ -184,6 +197,12 @@ class CheckoutController extends Controller
         $productId = $request->get('product_id');
         $variantId = $request->get('variant_id');
         $qty       = max(1, (int) $request->get('qty', 1));
+
+        // --- Limit Logic: Max 10 ---
+        if ($qty > 10) {
+             return redirect()->back()
+                ->with('error', 'Giới hạn tối đa 10 sản phẩm mỗi đơn hàng. Vui lòng giảm số lượng.');
+        }
 
         if (!$productId) {
             return redirect()->route('client.home')
@@ -218,6 +237,12 @@ class CheckoutController extends Controller
         if ($stock < $qty) {
             return redirect()->back()
                 ->with('error', " Sản phẩm {$product->name} không đủ tồn kho. Tồn kho hiện tại: {$stock}");
+        }
+
+        // --- Limit Logic: Max 100 million total ---
+        if (($price * $qty) > 100000000) {
+            return redirect()->back()
+                ->with('error', 'Để đảm bảo an toàn giao dịch và hỗ trợ phương thức vận chuyển đặc biệt cho đơn hàng giá trị cao (trên 100 triệu VNĐ), quý khách vui lòng liên hệ bộ phận CSKH để được hướng dẫn thanh toán trực tiếp và nhận ưu đãi riêng.');
         }
 
         // Lưu thông tin vào session
@@ -329,8 +354,7 @@ class CheckoutController extends Controller
         // Lấy phí lắp đặt
         $installationFee = 0;
         if ($request->has('installation') && $request->installation) {
-            $shippingSettings = ShippingSetting::getSettings();
-            $installationFee = (float)($request->installation_fee ?? $shippingSettings->installation_fee ?? 0);
+            $installationFee = 100000;
         }
 
         // Lấy số tiền giảm (nếu đã áp dụng promotion trước đó)
@@ -348,7 +372,7 @@ class CheckoutController extends Controller
         $checkoutSession['shipping_address']  = $request->shipping_address;
         $checkoutSession['shipping_method']   = $request->shipping_method;
         $checkoutSession['payment_method']    = $request->payment_method;
-        
+
         Log::info('Process: Saved Payment Method', ['method' => $request->payment_method]);
 
 
@@ -365,6 +389,19 @@ class CheckoutController extends Controller
         );
 
         session(['checkout_session' => $checkoutSession]);
+
+        if ($checkoutSession['type'] === 'buy_now') {
+            if ((int)$checkoutSession['quantity'] > 10) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Giới hạn tối đa 10 sản phẩm mỗi đơn hàng. Vui lòng giảm số lượng.');
+            }
+            if ((float)$checkoutSession['subtotal'] > 100000000) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Nếu quý khách có nhu cầu đặt giá trị cao, vui lòng liên hệ Hotline/Mail để được hỗ trợ thanh toán trực tiếp và nhận ưu đãi riêng.');
+            }
+        }
 
         return redirect()->route('client.checkout.confirm');
     }
@@ -383,7 +420,7 @@ class CheckoutController extends Controller
         }
 
         $checkoutSession = session('checkout_session');
-        
+
         Log::info('Confirm: Checkout Session', ['payment_method' => $checkoutSession['payment_method'] ?? 'N/A']);
 
 
@@ -436,6 +473,27 @@ class CheckoutController extends Controller
         if (!$checkoutSession) {
             return redirect()->route('client.home')
                 ->with('error', 'Phiên đặt hàng đã hết hạn. Vui lòng thử lại.');
+        }
+
+        $totalQuantity = 0;
+        $totalSubtotal = 0;
+
+        if (in_array($checkoutSession['type'], ['cart', 'reorder']) && isset($checkoutSession['items'])) {
+            $totalQuantity = array_sum(array_map(fn($i) => (int)$i['quantity'], $checkoutSession['items']));
+            $totalSubtotal = array_sum(array_map(fn($i) => (float)$i['subtotal'], $checkoutSession['items']));
+        } else {
+            $totalQuantity = (int)($checkoutSession['quantity'] ?? 0);
+            $totalSubtotal = (float)($checkoutSession['subtotal'] ?? 0);
+        }
+
+        if ($totalQuantity > 10) {
+            return redirect()->back()
+                ->with('error', "Giới hạn tối đa 10 sản phẩm mỗi đơn hàng. Bạn đang chọn {$totalQuantity} sản phẩm. Vui lòng giảm số lượng.");
+        }
+
+        if ($totalSubtotal > 100000000) {
+            return redirect()->back()
+                ->with('error', "Nếu quý khách có nhu cầu đặt giá trị cao, vui lòng liên hệ Hotline/Mail để được hỗ trợ thanh toán trực tiếp và nhận ưu đãi riêng.");
         }
 
         DB::beginTransaction();
@@ -626,7 +684,7 @@ class CheckoutController extends Controller
             // Xử lý thanh toán Momo
             elseif (isset($checkoutSession['payment_method']) && trim($checkoutSession['payment_method']) == 'momo') {
                 Log::info('CreateOrder: Processing Momo Payment (API)');
-                
+
 
                 // Gọi hàm tạo thanh toán Momo
                 $payUrl = $this->_createMomoPayment($order);
@@ -1090,8 +1148,18 @@ class CheckoutController extends Controller
         );
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+
+        // Tắt kiểm tra SSL (fix lỗi SSL certificate problem trên local)
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
         //execute post
         $result = curl_exec($ch);
+
+        if ($result === false) {
+            Log::error('Momo Curl Error: ' . curl_error($ch));
+        }
+
         //close connection
         curl_close($ch);
         return $result;
@@ -1203,13 +1271,13 @@ class CheckoutController extends Controller
             'requestType' => $requestType,
             'signature' => $signature
         );
-        
+
         Log::info('Momo Request Data', $data);
 
         $result = $this->execPostRequest($endpoint, json_encode($data));
-        
+
         Log::info('Momo Response', ['response' => $result]);
-        
+
 
         $jsonResult = json_decode($result, true);
 

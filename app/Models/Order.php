@@ -51,6 +51,7 @@ class Order extends Model
         'packed_at',
         'shipped_at',
         'delivered_at',
+        'completed_at',
         'cancelled_at',
         'refunded_at',
     ];
@@ -67,6 +68,7 @@ class Order extends Model
         'packed_at' => 'datetime',
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
         'refunded_at' => 'datetime',
     ];
@@ -178,9 +180,9 @@ public function items(): HasMany
             return null;
         }
 
-        // Nếu có thời gian hoàn thành (dựa vào updated_at khi status là completed)
-        // Nếu không (trường hợp cũ), fallback về delivered_at hoặc created_at
-        $completedAt = $this->updated_at ?? $this->delivered_at;
+        // Nếu có thời gian hoàn thành (dựa vào completed_at khi status là completed)
+        // Nếu không (trường hợp cũ), fallback về updated_at hoặc delivered_at
+        $completedAt = $this->completed_at ?? $this->updated_at ?? $this->delivered_at;
 
         if (!$completedAt) {
             return 0;

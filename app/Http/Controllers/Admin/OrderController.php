@@ -147,6 +147,7 @@ class OrderController extends Controller
             'processing' => 'confirmed_at',
             'shipping'   => 'shipped_at',
             'delivered'  => 'delivered_at',
+            'completed'  => 'completed_at',
             'returned'   => 'returned_at',
         ];
 

@@ -218,6 +218,11 @@
                                 Giao thành công: <span class="text-primary">{{ date('d/m/Y H:i', strtotime($order->delivered_at)) }}</span>
                             </li>
                         @endif
+                        @if ($order->completed_at)
+                            <li class="list-group-item d-flex justify-content-between">
+                                Hoàn thành: <span class="text-success fw-bold">{{ date('d/m/Y H:i', strtotime($order->completed_at)) }}</span>
+                            </li>
+                        @endif
                         @if ($order->returned_at)
                             <li class="list-group-item d-flex justify-content-between text-secondary">
                                 Đã trả hàng: <span>{{ date('d/m/Y H:i', strtotime($order->returned_at)) }}</span>

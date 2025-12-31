@@ -210,6 +210,7 @@ class OrderController extends Controller
             $order->update([
                 'order_status' => 'completed',
                 'updated_at' => now(), // Cập nhật thời gian hoàn thành
+                'completed_at' => now(),
                 'payment_status' => $order->payment_method === 'cash' ? 'paid' : $order->payment_status,
             ]);
 

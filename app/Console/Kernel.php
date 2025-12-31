@@ -9,7 +9,7 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('orders:auto-complete-delivered')->dailyAt('01:00');
+        $schedule->command('orders:auto-complete-delivered')->hourly();
     }
 
     protected function commands(): void
