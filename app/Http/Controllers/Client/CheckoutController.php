@@ -190,7 +190,10 @@ class CheckoutController extends Controller
 
             session(['checkout_session' => $checkoutData]);
 
-            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData', 'shippingSettings'));
+            // Lấy danh sách voucher khả dụng
+            $promotions = \App\Models\Promotion::active()->available()->get();
+
+            return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData', 'shippingSettings', 'promotions'));
         }
 
         // Xử lý checkout mua ngay (1 sản phẩm)
@@ -258,7 +261,10 @@ class CheckoutController extends Controller
 
         session(['checkout_session' => $checkoutData]);
 
-        return view('client.checkout.index', compact('product', 'variant', 'qty', 'price', 'stock', 'user', 'checkoutData', 'shippingSettings'));
+        // Lấy danh sách voucher khả dụng
+        $promotions = \App\Models\Promotion::active()->available()->get();
+
+        return view('client.checkout.index', compact('product', 'variant', 'qty', 'price', 'stock', 'user', 'checkoutData', 'shippingSettings', 'promotions'));
     }
 
     /**
@@ -801,6 +807,40 @@ class CheckoutController extends Controller
         return response()->json([
             'ok'          => true,
             'promotion'   => $promotionData,
+            'final_total' => $checkoutSession['final_total'],
+        ]);
+    }
+
+    /**
+     * Hủy mã khuyến mãi
+     */
+    public function removePromotion(Request $request)
+    {
+        if (!Auth::check()) {
+            return response()->json(['ok' => false, 'error' => 'Vui lòng đăng nhập'], 401);
+        }
+
+        $checkoutSession = session('checkout_session');
+        if (!$checkoutSession) {
+            return response()->json(['ok' => false, 'error' => 'Phiên đặt hàng đã hết hạn'], 400);
+        }
+
+        // Xóa thông tin promotion
+        unset($checkoutSession['promotion']);
+        $checkoutSession['discount_amount'] = 0;
+
+        // Tính lại tổng tiền
+        $shippingFee = $checkoutSession['shipping_fee'] ?? 0;
+        $installationFee = $checkoutSession['installation_fee'] ?? 0;
+        $checkoutSession['final_total'] = max(
+            0,
+            $checkoutSession['subtotal'] + $shippingFee + $installationFee
+        );
+
+        session(['checkout_session' => $checkoutSession]);
+
+        return response()->json([
+            'ok'          => true,
             'final_total' => $checkoutSession['final_total'],
         ]);
     }
