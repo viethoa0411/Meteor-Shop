@@ -917,12 +917,40 @@
                                         }
                                     });
                                 } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Không thể thêm vào giỏ',
-                                        text: data.message || 'Có lỗi xảy ra.',
-                                        confirmButtonColor: '#d33'
-                                    });
+                                    if (data.message && data.message.includes('100 triệu')) {
+                                        Swal.fire({
+                                            icon: 'info',
+                                            title: 'Thông báo giới hạn giá trị',
+                                            html: `
+                                                <div class="text-start">
+                                                    <p class="mb-3">Để đảm bảo an toàn giao dịch và hỗ trợ phương thức vận chuyển đặc biệt cho đơn hàng giá trị cao <b>(trên 100 triệu VNĐ)</b>.</p>
+                                                    <p class="mb-0">Nếu quý khách có nhu cầu đặt giá trị cao, vui lòng liên hệ <b>Hotline/Mail</b> để được hỗ trợ thanh toán trực tiếp và nhận ưu đãi riêng.</p>
+                                                </div>
+                                            `,
+                                            confirmButtonText: 'Đã hiểu',
+                                            confirmButtonColor: '#3085d6'
+                                        });
+                                    } else if (data.message && data.message.includes('10 sản phẩm')) {
+                                        Swal.fire({
+                                            icon: 'info',
+                                            title: 'Thông báo giới hạn số lượng',
+                                            html: `
+                                                <div class="text-start">
+                                                    <p class="mb-3">Để đảm bảo chất lượng vận chuyển tốt nhất, hệ thống hiện giới hạn tối đa <b>10 sản phẩm</b> trên mỗi đơn hàng.</p>
+                                                    <p class="mb-0">Nếu quý khách có nhu cầu đặt số lượng lớn, vui lòng liên hệ <b>Hotline/Mail</b> để nhận chính sách ưu đãi riêng.</p>
+                                                </div>
+                                            `,
+                                            confirmButtonText: 'Đã hiểu',
+                                            confirmButtonColor: '#3085d6'
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Không thể thêm vào giỏ',
+                                            text: data.message || 'Có lỗi xảy ra.',
+                                            confirmButtonColor: '#d33'
+                                        });
+                                    }
                                 }
                             })
                             .catch((err) => {
@@ -1109,41 +1137,7 @@
                 document.getElementById('lightboxImage').src = src;
                 new bootstrap.Modal(document.getElementById('imageLightbox')).show();
             }
-        </script>
-                                            <p class="mb-3">Để đảm bảo an toàn giao dịch và hỗ trợ phương thức vận chuyển đặc biệt cho đơn hàng giá trị cao <b>(trên 100 triệu VNĐ)</b>.</p>
-                                            <p class="mb-0">Nếu quý khách có nhu cầu đặt giá trị cao, vui lòng liên hệ <b>Hotline/Mail</b> để được hỗ trợ thanh toán trực tiếp và nhận ưu đãi riêng.</p>
-                                        </div>
-                                    `,
-                                    confirmButtonText: 'Đã hiểu',
-                                    confirmButtonColor: '#3085d6'
-                                });
-                            } else if (data.message && data.message.includes('10 sản phẩm')) {
-                                Swal.fire({
-                                    icon: 'info',
-                                    title: 'Thông báo giới hạn số lượng',
-                                    html: `
-                                        <div class="text-start">
-                                            <p class="mb-3">Để đảm bảo chất lượng vận chuyển tốt nhất, hệ thống hiện giới hạn tối đa <b>10 sản phẩm</b> trên mỗi đơn hàng.</p>
-                                            <p class="mb-0">Nếu quý khách có nhu cầu đặt số lượng lớn, vui lòng liên hệ <b>Hotline/Mail</b> để nhận chính sách ưu đãi riêng.</p>
-                                        </div>
-                                    `,
-                                    confirmButtonText: 'Đã hiểu',
-                                    confirmButtonColor: '#3085d6'
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Lỗi',
-                                    text: data.message || 'Không thể thêm vào giỏ hàng.'
-                                });
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('Có lỗi xảy ra');
-                    });
-            }
+
 
 
 
