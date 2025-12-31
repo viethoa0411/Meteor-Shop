@@ -37,10 +37,10 @@
                         @endphp
                         <tr id="row-{{ $id }}" class="{{ $isOutOfStock ? 'table-secondary' : '' }}">
                             <td class="text-center">
-                                <input type="checkbox" name="selected[]" value="{{ $id }}" 
-                                    class="cart-item-checkbox" 
+                                <input type="checkbox" name="selected[]" value="{{ $id }}"
+                                    class="cart-item-checkbox"
                                     data-id="{{ $id }}"
-                                    data-subtotal="{{ $item['price'] * $item['quantity'] }}" 
+                                    data-subtotal="{{ $item['price'] * $item['quantity'] }}"
                                     {{ $isOutOfStock ? 'disabled' : 'checked' }}>
                             </td>
 
@@ -195,6 +195,8 @@
 
             // Chặn bớt request nếu giảm về 1
             if (type === 'minus' && currentQty <= 1) return;
+
+            // Check limit 10 (REMOVED)
             if (type === 'plus' && maxStock && currentQty >= maxStock) {
                 alert('Bạn chỉ có thể mua tối đa ' + maxStock + ' sản phẩm cho lựa chọn này.');
                 return;
@@ -222,8 +224,12 @@
                         }
                     }
                 } else if (data.status === 'error') {
-                    // Nếu lỗi (hết hàng), alert ra và KHÔNG tăng số lượng
-                    alert(data.message);
+                    // Nếu lỗi (hết hàng hoặc giới hạn), hiện SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thông báo',
+                        text: data.message
+                    });
                 }
             }).fail(function() {
                 alert('Có lỗi xảy ra, vui lòng thử lại');
