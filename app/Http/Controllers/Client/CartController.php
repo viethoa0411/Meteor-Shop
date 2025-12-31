@@ -215,33 +215,46 @@ class CartController extends Controller
                 ->first();
 
             $currentQtyInCart = $existing ? (int) $existing->quantity : 0;
-            if (($currentQtyInCart + $quantity) > $currentStock) {
+
+            // --- Limit logic: Max 10 products (REMOVED) ---
+            // --- Limit logic: Max 100 million total (REMOVED) ---
+            $newTotal = $cartModel->total_price + ($quantity * $price);
+
+            $targetQty = min($currentQtyInCart + $quantity, $currentStock);
+
+            try {
+                if ($existing) {
+                    $existing->quantity = $targetQty;
+                    $existing->price    = $price;
+                    $existing->subtotal = (float) $existing->quantity * (float) $existing->price;
+                    $existing->save();
+                } else {
+                    if ($currentStock <= 0) {
+                        return response()->json([
+                            'status'  => 'error',
+                            'message' => 'Sản phẩm đã hết hàng.',
+                        ]);
+                    }
+                    $item = new CartItem([
+                        'product_id' => $product->id,
+                        'variant_id' => $variantId,
+                        'color'      => $color ?? ($variant->color_name ?? null),
+                        'size'       => $size ?? (
+                            isset($variant) && $variant->length && $variant->width && $variant->height
+                                ? $variant->length . 'x' . $variant->width . 'x' . $variant->height
+                                : null
+                        ),
+                        'quantity'   => min($quantity, $currentStock),
+                        'price'      => $price,
+                        'subtotal'   => (float) min($quantity, $currentStock) * (float) $price,
+                    ]);
+                    $cartModel->items()->save($item);
+                }
+            } catch (\Exception $e) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => "Kho chỉ còn $currentStock sản phẩm. Bạn đã có $currentQtyInCart sản phẩm trong giỏ hàng.",
+                    'message' => 'Lỗi khi thêm vào giỏ: ' . $e->getMessage(),
                 ]);
-            }
-
-            if ($existing) {
-                $existing->quantity = $currentQtyInCart + $quantity;
-                $existing->price    = $price;
-                $existing->subtotal = (float) $existing->quantity * (float) $existing->price;
-                $existing->save();
-            } else {
-                $item = new CartItem([
-                    'product_id' => $product->id,
-                    'variant_id' => $variantId,
-                    'color'      => $color ?? ($variant->color_name ?? null),
-                    'size'       => $size ?? (
-                        isset($variant) && $variant->length && $variant->width && $variant->height
-                            ? $variant->length . 'x' . $variant->width . 'x' . $variant->height
-                            : null
-                    ),
-                    'quantity'   => $quantity,
-                    'price'      => $price,
-                    'subtotal'   => (float) $quantity * (float) $price,
-                ]);
-                $cartModel->items()->save($item);
             }
 
             $cartModel->recalculateTotals();
@@ -261,23 +274,29 @@ class CartController extends Controller
             : 'p' . $productId;
 
         $currentQtyInCart = isset($cart[$key]) ? (int)$cart[$key]['quantity'] : 0;
-        if (($currentQtyInCart + $quantity) > $currentStock) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => "Kho chỉ còn $currentStock sản phẩm. Bạn đã có $currentQtyInCart sản phẩm trong giỏ hàng.",
-            ]);
-        }
+
+        // --- Limit logic: Max 10 products (REMOVED) ---
+        // --- Limit logic: Max 100 million total (REMOVED) ---
+        $currentTotal = $this->getTotal();
+
+        $targetQty = min($currentQtyInCart + $quantity, $currentStock);
 
         if (isset($cart[$key])) {
-            $cart[$key]['quantity'] += $quantity;
+            $cart[$key]['quantity'] = $targetQty;
             $cart[$key]['price']     = $price;
         } else {
+            if ($currentStock <= 0) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Sản phẩm đã hết hàng.',
+                ]);
+            }
             $cart[$key] = [
                 'product_id' => $product->id,
                 'variant_id' => $variantId,
                 'name'       => $product->name,
                 'price'      => $price,
-                'quantity'   => $quantity,
+                'quantity'   => min($quantity, $currentStock),
                 'color'      => $color ?? ($variant->color_name ?? null),
                 'size'       => $size ?? (
                     isset($variant) && $variant->length && $variant->width && $variant->height
@@ -336,6 +355,9 @@ class CartController extends Controller
             }
 
             if ($type === 'plus') {
+                // --- Limit logic: Max 3 products (REMOVED) ---
+                // --- Limit logic: Max 100 million total (REMOVED) ---
+
                 if (($ci->quantity + 1) > $realStock) {
                     return response()->json([
                         'status'  => 'error',
