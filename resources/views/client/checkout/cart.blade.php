@@ -602,6 +602,7 @@
                         document.getElementById('shipping-fee-text').textContent =
                             'Vui lòng chọn địa chỉ để tính phí vận chuyển';
                         document.getElementById('shipping-fee-display').className = 'alert alert-info mb-0';
+                        updateTotalDisplay();
                         return;
                     }
 
@@ -651,6 +652,76 @@
                 let currentDiscount = 0;
                 let appliedCode = '';
 
+                // Hàm kiểm tra phương thức thanh toán dựa trên tổng tiền
+                function checkPaymentMethodAvailability(total) {
+                    const cashRadio = document.getElementById('cash');
+                    const cashLabel = document.querySelector('label[for="cash"]');
+                    const cashContainer = cashRadio ? cashRadio.closest('.form-check') : null;
+                    const momoRadio = document.getElementById('momo');
+                    const warningId = 'cod-warning-text';
+
+                    if (!cashRadio) return;
+
+                    // Ngưỡng 5.000.000 đ
+                    const threshold = 5000000;
+
+                    if (total > threshold) {
+                        // 1. Chuyển sang Momo nếu đang chọn COD
+                        if (cashRadio.checked) {
+                            if (momoRadio) {
+                                momoRadio.checked = true;
+                            } else {
+                                cashRadio.checked = false;
+                            }
+                        }
+
+                        // 2. Disable và style lại COD
+                        cashRadio.disabled = true;
+                        if (cashContainer) {
+                            cashContainer.classList.add('opacity-50');
+                            cashContainer.title = "Không hỗ trợ thanh toán khi nhận hàng cho đơn trên 5 triệu";
+                        }
+
+                        // 3. Thêm dòng thông báo nhỏ ngay dưới label (thay vì alert box to)
+                        let warningText = document.getElementById(warningId);
+                        if (!warningText && cashLabel) {
+                            warningText = document.createElement('div');
+                            warningText.id = warningId;
+                            warningText.className = 'alert alert-danger py-1 px-2 mt-2 mb-0 d-inline-block small fw-bold';
+                            warningText.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Chỉ hỗ trợ đơn hàng dưới 5.000.000đ';
+                            cashLabel.parentNode.appendChild(warningText);
+                        } else if (warningText) {
+                            warningText.style.display = 'block';
+                        }
+
+                        // Xóa style cũ nếu có (đề phòng)
+                        if (cashLabel) {
+                            cashLabel.style.textDecoration = 'none';
+                            cashLabel.classList.remove('text-muted'); // opacity ở container đã đủ làm mờ
+                        }
+
+                        // Xóa alert box cũ (nếu còn từ code trước)
+                        const oldMsg = document.getElementById('cod-disabled-msg');
+                        if (oldMsg) oldMsg.remove();
+
+                    } else {
+                        // Enable lại
+                        cashRadio.disabled = false;
+                        if (cashContainer) {
+                            cashContainer.classList.remove('opacity-50');
+                            cashContainer.removeAttribute('title');
+                        }
+
+                        // Ẩn warning text
+                        const warningText = document.getElementById(warningId);
+                        if (warningText) warningText.style.display = 'none';
+
+                        // Xóa alert box cũ
+                        const oldMsg = document.getElementById('cod-disabled-msg');
+                        if (oldMsg) oldMsg.remove();
+                    }
+                }
+
                 // Hàm cập nhật hiển thị tổng tiền
                 // Hàm cập nhật hiển thị phương thức thanh toán (ẩn COD nếu > 10 triệu)
                 function updatePaymentMethodDisplay() {
@@ -684,6 +755,10 @@
 
                 function updateTotalDisplay() {
                     const total = Math.max(0, subtotal - currentDiscount + currentShippingFee + installationFee);
+
+                    // Kiểm tra phương thức thanh toán
+                    checkPaymentMethodAvailability(total);
+
                     const shippingFeeEl = document.getElementById('shipping-fee');
                     const totalAmountEl = document.getElementById('total-amount');
                     const installationRow = document.getElementById('installation-row');
@@ -914,6 +989,7 @@
                 });
 
                 // Khởi tạo lần đầu - tính phí sau khi trang load
+                updateTotalDisplay();
                 setTimeout(calculateShippingFee, 1000);
             });
         </script>
