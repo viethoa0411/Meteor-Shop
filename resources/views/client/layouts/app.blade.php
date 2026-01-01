@@ -2714,6 +2714,38 @@ $wishlistCount = $wishlistItems->count();
     });
 });
     </script>
-</body>
+    <!-- Floating Contact Buttons (Zalo, Messenger, Phone) -->
+<div class="position-fixed end-0 top-50 translate-middle-y me-3" style="z-index: 1040; pointer-events: none;">
+    <div class="d-flex flex-column gap-3 align-items-end" style="pointer-events: auto;">
+        @php $contact = \App\Models\ContactInfo::getActive(); @endphp
 
+        @if($contact->show_messenger && $contact->messenger_link)
+            <a href="{{ $contact->messenger_link }}" target="_blank" 
+               class="btn btn-info rounded-circle shadow-lg d-flex align-items-center justify-content-center" 
+               style="width: 40px; height: 40px; background: #0084ff;" 
+               title="Chat Messenger">
+                <i class="bi bi-messenger fs-3 text-white"></i>
+            </a>
+        @endif
+
+        @if($contact->show_zalo && $contact->zalo_link)
+            <a href="{{ $contact->zalo_link }}" target="_blank" 
+               class="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center" 
+               style="width: 40px; height: 40px; background: #00c853;" 
+               title="Chat Zalo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" width="36">
+            </a>
+        @endif
+
+        @if($contact->show_phone && $contact->phone_number)
+            <a href="tel:{{ preg_replace('/\D/', '', $contact->phone_number) }}" 
+               class="btn btn-success rounded-circle shadow-lg d-flex align-items-center justify-content-center" 
+               style="width: 40px; height: 40px;" 
+               title="Gọi ngay: {{ $contact->phone_number }}">
+                <i class="bi bi-telephone-fill fs-3 text-white"></i>
+            </a>
+        @endif
+    </div>
+</div>
+</body>
 </html>
