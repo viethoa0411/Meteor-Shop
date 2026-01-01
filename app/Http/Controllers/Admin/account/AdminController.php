@@ -188,67 +188,84 @@ class AdminController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users')->ignore($id)],
             'phone' => 'nullable|string|max:20',
-            'role' => 'required|in:admin,staff,super_admin', // nếu có role phân cấp
+            'role' => 'required|in:admin,staff,super_admin',
             'status' => 'required|in:active,inactive,banned',
-        ]);
+        ];
 
-        // Tạo OTP 6 số
+        // Nếu muốn đổi mật khẩu → bắt buộc nhập mật khẩu cũ + mật khẩu mới
+        if ($request->filled('password')) {
+            $rules['current_password'] = ['required', function ($attribute, $value, $fail) use ($user) {
+                if (!Hash::check($value, $user->password)) {
+                    $fail('Mật khẩu cũ không đúng.');
+                }
+            }];
+            $rules['password'] = 'required|string|min:8|confirmed';
+        }
+
+        $request->validate($rules);
+
         $otp = rand(100000, 999999);
 
-        // Lưu tạm vào session (hết hạn 10 phút)
-        session([
-            'admin_change_admin_info' => [
-                'user_id' => $id,
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'role' => $request->role,
-                'status' => $request->status,
-                'otp' => $otp,
-                'expires_at' => now()->addMinutes(10),
-            ]
-        ]);
+        $data = [
+            'user_id' => $id,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role,
+            'status' => $request->status,
+            'otp' => $otp,
+            'expires_at' => now()->addMinutes(10),
+        ];
 
-        // Gửi email OTP
+        if ($request->filled('password')) {
+            $data['password'] = $request->password; // lưu tạm mật khẩu mới
+        }
+
+        session(['admin_change_admin_info' => $data]);
+
         \Mail::to($user->email)->send(new \App\Mail\AdminOtpChangeInfoMail($otp, $user->name));
 
-        return back()->with('success', 'Mã OTP đã gửi đến email: ' . $user->email . '. Vui lòng nhập để xác nhận.');
+        return back()->with('success', 'Mã OTP đã gửi đến email: ' . $user->email . '. Vui lòng nhập để xác nhận thay đổi.');
     }
 
     /**
-     * Xác nhận OTP và lưu thay đổi
+     * Xác nhận OTP và lưu (đã kiểm tra mật khẩu cũ ở bước trước)
      */
     public function verifyOtpAndUpdateInfo(Request $request, $id)
     {
-        $request->validate([
-            'otp' => 'required|digits:6',
-        ]);
+        $request->validate(['otp' => 'required|digits:6']);
 
         $data = session('admin_change_admin_info');
 
         if (!$data || $data['user_id'] != $id || now()->gt($data['expires_at'])) {
-            return back()->withErrors(['otp' => 'Mã OTP không hợp lệ hoặc đã hết hạn']);
+            return back()->withErrors(['otp' => 'Mật khẩu OTP không hợp lệ hoặc đã hết hạn']);
         }
 
         if ($request->otp != $data['otp']) {
-            return back()->withErrors(['otp' => 'Mã OTP sai']);
+            return back()->withErrors(['otp' => 'Mật khẩu OTP không đúng']);
         }
 
-        $user = User::findOrFail($id);
-        $user->update([
+        $updateData = [
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
             'role' => $data['role'],
             'status' => $data['status'],
-        ]);
+        ];
+
+        if (isset($data['password'])) {
+            $updateData['password'] = Hash::make($data['password']);
+        }
+
+        $user = User::findOrFail($id);
+        $user->update($updateData);
 
         session()->forget('admin_change_admin_info');
 
-        return redirect()->route('admin.account.admin.list')->with('success', 'Thay đổi thông tin admin thành công!');
+        return redirect()->route('admin.account.admin.list')->with('success', 'Thay đổi thông tin admin (bao gồm mật khẩu) thành công!');
     }
 }
