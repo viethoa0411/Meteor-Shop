@@ -21,6 +21,7 @@ class ProductController extends Controller
      */
     public function list(Request $request)
     {
+        $products = Product::orderBy('sort_order', 'asc')->paginate(10);
         $query = Product::query()
             ->select(['id', 'name', 'slug', 'price', 'stock', 'image', 'category_id', 'status', 'created_at'])
             ->with(['category:id,name'])
