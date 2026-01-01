@@ -14,23 +14,23 @@
         <div class="card-body">
             <!-- Thông báo thành công -->
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             @endif
 
             <!-- Lỗi validate -->
             @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Vui lòng sửa các lỗi sau:</strong>
-                    <ul class="mt-2 mb-0">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Vui lòng sửa các lỗi sau:</strong>
+                <ul class="mt-2 mb-0">
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             @endif
 
             <!-- Form gửi thông tin mới + gửi OTP -->
@@ -67,43 +67,70 @@
                     </div>
                 </div>
 
-                <div class="d-flex gap-3">
-                    <button type="submit" class="btn btn-warning btn-lg px-5">
-                        <i class="bi bi-envelope-check me-2"></i>Gửi mã OTP xác nhận
-                    </button>
-                    <a href="{{ route('admin.account.admin.list') }}" class="btn btn-secondary btn-lg px-4">Hủy</a>
+                <div class="col-md-12">
+                    <hr class="my-4">
+                    <h6 class="fw-bold text-warning">
+                        <i class="bi bi-key me-2"></i>Đổi mật khẩu (không bắt buộc)
+                    </h6>
+                    <small class="text-muted">Nếu đổi mật khẩu, bạn phải nhập mật khẩu cũ để xác nhận</small>
                 </div>
-            </form>
-
-            <!-- Phần nhập OTP (chỉ hiện khi đã gửi OTP thành công) -->
-            @if(session('admin_change_admin_info'))
-                <hr class="my-5 border-secondary">
-                <div class="alert alert-info p-4">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    <strong>Mã OTP đã được gửi đến email:</strong> {{ $user->email }}<br>
-                    <small>Mã có hiệu lực trong 10 phút. Vui lòng kiểm tra hộp thư (bao gồm cả Spam/Junk).</small>
+                <div class="col-md-4">
+                    <label class="form-label">Mật khẩu cũ</label>
+                    <input type="password" name="current_password" class="form-control" placeholder="Nhập mật khẩu cũ">
+                    @error('current_password')
+                    <small class="text-danger d-block mt-1">{{ $message }}</small>
+                    @enderror
                 </div>
-
-                <form action="{{ route('admin.account.admin.change-info.verify-otp', $user->id) }}" method="POST" class="border p-4 rounded bg-light">
-                    @csrf
-                    <div class="row align-items-center justify-content-center">
-                        <div class="col-auto text-center">
-                            <label class="form-label fw-bold fs-5 mb-3">Nhập mã OTP (6 số)</label>
-                            <input type="text" name="otp" class="form-control form-control-lg text-center fw-bold" 
-                                   placeholder="------" maxlength="6" style="width: 250px; letter-spacing: 10px; font-size: 24px;" required>
-                            @error('otp')
-                                <small class="text-danger d-block mt-2">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="col-auto mt-4 mt-md-0">
-                            <button type="submit" class="btn btn-success btn-lg px-5">
-                                <i class="bi bi-check-circle-fill me-2"></i>Xác nhận thay đổi
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            @endif
+                <div class="col-md-4">
+                    <label class="form-label">Mật khẩu mới</label>
+                    <input type="password" name="password" class="form-control" placeholder="Để trống nếu không đổi">
+                    @error('password')
+                    <small class="text-danger d-block mt-1">{{ $message }}</small>
+                    @enderror
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Xác nhận mật khẩu mới</label>
+                    <input type="password" name="password_confirmation" class="form-control" placeholder="Nhập lại mật khẩu mới">
+                </div>
         </div>
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-warning btn-lg px-5">
+                <i class="bi bi-envelope-check me-2"></i>Gửi mã OTP xác nhận
+            </button>
+            <a href="{{ route('admin.account.admin.list') }}" class="btn btn-secondary btn-lg px-4">Hủy</a>
+        </div>
+        </form>
+
+
+        <!-- Phần nhập OTP (chỉ hiện khi đã gửi OTP thành công) -->
+        @if(session('admin_change_admin_info'))
+        <hr class="my-5 border-secondary">
+        <div class="alert alert-info p-4">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <strong>Mã OTP đã được gửi đến email:</strong> {{ $user->email }}<br>
+            <small>Mã có hiệu lực trong 10 phút. Vui lòng kiểm tra hộp thư (bao gồm cả Spam/Junk).</small>
+        </div>
+
+        <form action="{{ route('admin.account.admin.change-info.verify-otp', $user->id) }}" method="POST" class="border p-4 rounded bg-light">
+            @csrf
+            <div class="row align-items-center justify-content-center">
+                <div class="col-auto text-center">
+                    <label class="form-label fw-bold fs-5 mb-3">Nhập mã OTP (6 số)</label>
+                    <input type="text" name="otp" class="form-control form-control-lg text-center fw-bold"
+                        placeholder="------" maxlength="6" style="width: 250px; letter-spacing: 10px; font-size: 24px;" required>
+                    @error('otp')
+                    <small class="text-danger d-block mt-2">{{ $message }}</small>
+                    @enderror
+                </div>
+                <div class="col-auto mt-4 mt-md-0">
+                    <button type="submit" class="btn btn-success btn-lg px-5">
+                        <i class="bi bi-check-circle-fill me-2"></i>Xác nhận thay đổi
+                    </button>
+                </div>
+            </div>
+        </form>
+        @endif
     </div>
+</div>
 </div>
 @endsection
