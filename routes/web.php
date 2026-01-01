@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\ChatboxController;
 use App\Http\Controllers\Admin\Account\AdminController;
 use App\Http\Controllers\Admin\Account\UserController as AccountUserController;
 
+
 // Admin Wallet (quản trị)
 use App\Http\Controllers\Admin\Wallet\WalletManagementController;
 use App\Http\Controllers\Admin\Wallet\WalletDetailController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\Admin\Wallet\WalletWithdrawController;
 use App\Http\Controllers\Admin\Wallet\WalletController as AdminWalletController;
 use App\Http\Controllers\Admin\Wallet\WithdrawController as AdminWithdrawController;
 use App\Http\Controllers\Admin\Wallet\SettingsController as AdminWalletSettingsController;
+use App\Http\Controllers\Admin\ContactInfoController;
 
 // Thêm từ nhánh Trang_Chu_Client
 use App\Http\Controllers\Admin\HomeCategoryController;
@@ -300,6 +302,7 @@ Route::middleware(['admin'])
             // Settings routes
             Route::get('/settings', [AdminWalletSettingsController::class, 'index'])->name('settings');
             Route::put('/settings', [AdminWalletSettingsController::class, 'update'])->name('settings.update');
+            
         });
 
         /* Wishlist (ADMIN) */
@@ -374,6 +377,11 @@ Route::middleware(['admin'])
             Route::get('/distances/template/download', [ShippingSettingController::class, 'downloadTemplate'])->name('distances.template');
             Route::post('/distances/import', [ShippingSettingController::class, 'importExcel'])->name('distances.import');
         });
+        // Contact info (admin)
+        Route::prefix('contact-info')->name('contact-info.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Admin\ContactInfoController::class, 'index'])->name('index');
+            Route::put('/update', [App\Http\Controllers\Admin\ContactInfoController::class, 'update'])->name('update');
+        });
     });
 
 
@@ -427,6 +435,8 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 // Contacts (public)
 Route::get('/contact/list', [ClientContactController::class, 'list'])->name('client.contact.list');
 Route::post('/contact/store', [ClientContactController::class, 'store'])->name('client.contact.store');
+// Contact info (admin)
+
 
 // Wishlist (client)
 Route::get('/wishlist', [ClientWishlistController::class, 'index'])->name('client.wishlist.index');
