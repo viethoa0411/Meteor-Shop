@@ -513,6 +513,7 @@ Route::post('/checkout/create-order', [CheckoutController::class, 'createOrder']
 Route::get('/checkout/payment/momo/{order_code}', [CheckoutController::class, 'showMomoPayment'])->name('client.checkout.momo_payment_page');
 Route::post('/checkout/payment/momo/{order_code}/process', [CheckoutController::class, 'processMomoPayment'])->name('client.checkout.momo_payment.process');
 Route::post('/checkout/apply-promotion', [CheckoutController::class, 'applyPromotion'])->name('client.checkout.applyPromotion');
+Route::post('/checkout/remove-promotion', [CheckoutController::class, 'removePromotion'])->name('client.checkout.removePromotion');
 Route::get('/order-success/{order_code}', [CheckoutController::class, 'success'])->name('client.checkout.success');
 Route::post('/checkout/calculate-shipping', [CheckoutController::class, 'calculateShippingFee'])->name('client.checkout.calculateShipping');
 

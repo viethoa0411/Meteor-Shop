@@ -255,9 +255,18 @@
                             <span>Phí vận chuyển:</span>
                             <strong id="shipping-fee">-</strong>
                         </div>
-                        <div class="mb-2 d-flex justify-content-between" id="discount-row" style="display:none;">
-                            <span>Giảm giá (<span id="applied-code"></span>):</span>
-                            <strong class="text-success" id="discount-amount">- 0 đ</strong>
+                        <div class="mb-2 d-flex justify-content-between align-items-center" id="discount-row">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">Giảm giá:</span>
+                                <span id="voucher-badge" class="badge bg-light text-primary border {{ (isset($checkoutData['promotion']) && !empty($checkoutData['promotion']['code'])) ? 'd-flex' : 'd-none' }} align-items-center py-2 px-2">
+                                    <i class="bi bi-ticket-perforated me-1"></i>
+                                    <span id="applied-code" class="me-1">{{ $checkoutData['promotion']['code'] ?? '' }}</span>
+                                    <span id="remove-promotion-btn" class="ms-2 text-danger hover-opacity-75" style="cursor: pointer;" title="Hủy mã">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                    </span>
+                                </span>
+                            </div>
+                            <strong class="text-success" id="discount-amount">- {{ number_format($checkoutData['discount_amount'] ?? 0, 0, ',', '.') }} đ</strong>
                         </div>
 
                         @php
@@ -300,6 +309,25 @@
                             </div>
                             <div class="form-text" id="promotion-hint">Áp dụng mã sau khi chọn số lượng.</div>
                             <div class="small mt-2" id="promotion-message"></div>
+
+                            {{-- Danh sách voucher --}}
+                            @if(isset($promotions) && $promotions->count() > 0)
+                                <div class="mt-3">
+                                    <label class="form-label fw-bold small">Mã giảm giá khả dụng:</label>
+                                    <div class="list-group" id="voucher-list" style="max-height: 200px; overflow-y: auto;">
+                                        @foreach($promotions as $promo)
+                                            <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center voucher-item p-2"
+                                                    data-code="{{ $promo->code }}">
+                                                <div class="me-2">
+                                                    <div class="fw-bold text-primary small">{{ $promo->code }}</div>
+                                                    <small class="text-muted" style="font-size: 0.75rem;">{{ $promo->description ?? $promo->name }}</small>
+                                                </div>
+                                                <span class="badge bg-light text-dark border small">Áp dụng</span>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="alert alert-info small mb-0">
@@ -330,6 +358,13 @@
 
             .quantity-updated {
                 animation: quantityPulse 0.5s ease;
+            }
+
+            .hover-opacity-75 {
+                transition: opacity 0.2s;
+            }
+            .hover-opacity-75:hover {
+                opacity: 0.75;
             }
 
             @keyframes quantityPulse {
@@ -367,13 +402,32 @@
 
     @push('scripts')
         <script>
+<<<<<<< HEAD
             let currentDiscount = 0;
             let appliedCode = '';
             let installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
             let isInstallationSelected = {{ (($shippingSettings->installation_fee ?? 0) > 0) ? 'true' : 'false' }};
             const COD_LIMIT = 10000000; // 10 triệu
+=======
+            let currentDiscount = {{ $checkoutData['discount_amount'] ?? 0 }};
+            let appliedCode = '{{ $checkoutData['promotion']['code'] ?? '' }}';
+            let installationFee = 0;
+            let isInstallationSelected = false;
+>>>>>>> origin/cap_nhat_order_admin
             let shippingCalculationTimeout = null;
             let quantityUpdateTimeout = null;
+
+            // Đảm bảo ẩn voucher badge khi không có code hợp lệ lúc load trang
+            document.addEventListener('DOMContentLoaded', function() {
+                if (!appliedCode || appliedCode.trim() === '') {
+                    const voucherBadge = document.getElementById('voucher-badge');
+                    if (voucherBadge) {
+                        voucherBadge.classList.remove('d-flex');
+                        voucherBadge.classList.add('d-none');
+                    }
+                    currentDiscount = 0;
+                }
+            });
 
             // Load dữ liệu địa chỉ từ API
             let provinces = [];
@@ -775,10 +829,13 @@
                 }
 
                 function clearPromotion() {
-                    const discountRow = document.getElementById('discount-row');
+                    const voucherBadge = document.getElementById('voucher-badge');
                     const appliedCodeEl = document.getElementById('applied-code');
                     const discountAmountEl = document.getElementById('discount-amount');
-                    if (discountRow) discountRow.style.display = 'none';
+                    if (voucherBadge) {
+                        voucherBadge.classList.remove('d-flex');
+                        voucherBadge.classList.add('d-none');
+                    }
                     if (appliedCodeEl) appliedCodeEl.textContent = '';
                     if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
                     currentDiscount = 0;
@@ -995,39 +1052,83 @@
                     });
                 }
 
-                // Hàm cập nhật hiển thị phương thức thanh toán (ẩn COD nếu > 10 triệu)
-                function updatePaymentMethodDisplay() {
-                    const codOption = document.getElementById('cod-payment-option');
-                    const codRadio = document.getElementById('cash');
+                // Hàm kiểm tra phương thức thanh toán dựa trên tổng tiền
+                function checkPaymentMethodAvailability(total) {
+                    const cashRadio = document.getElementById('cash');
+                    const cashLabel = document.querySelector('label[for="cash"]');
+                    const cashContainer = cashRadio ? cashRadio.closest('.form-check') : null;
                     const momoRadio = document.getElementById('momo');
-                    const codMessage = document.getElementById('cod-restriction-message');
-                    const totalAmount = (currentSubtotal - currentDiscount) + currentShippingFee + installationFee;
+                    const warningId = 'cod-warning-text';
 
-                    if (codOption && codRadio && momoRadio) {
-                        if (totalAmount > COD_LIMIT) {
-                            // Ẩn COD và hiển thị thông báo
-                            codOption.style.display = 'none';
-                            if (codMessage) codMessage.style.display = 'block';
-                            
-                            // Nếu đang chọn COD, tự động chuyển sang Momo
-                            if (codRadio.checked) {
-                                if (momoRadio) {
-                                    momoRadio.checked = true;
-                                    codRadio.required = false;
-                                }
+                    if (!cashRadio) return;
+
+                    // Ngưỡng 5.000.000 đ
+                    const threshold = 5000000;
+
+                    if (total > threshold) {
+                        // 1. Chuyển sang Momo nếu đang chọn COD
+                        if (cashRadio.checked) {
+                            if (momoRadio) {
+                                momoRadio.checked = true;
+                            } else {
+                                cashRadio.checked = false;
                             }
-                        } else {
-                            // Hiển thị COD và ẩn thông báo
-                            codOption.style.display = 'block';
-                            if (codMessage) codMessage.style.display = 'none';
-                            codRadio.required = true;
                         }
+
+                        // 2. Disable và style lại COD
+                        cashRadio.disabled = true;
+                        if (cashContainer) {
+                            cashContainer.classList.add('opacity-50');
+                            cashContainer.title = "Không hỗ trợ thanh toán khi nhận hàng cho đơn trên 5 triệu";
+                        }
+
+                        // 3. Thêm dòng thông báo nhỏ ngay dưới label (thay vì alert box to)
+                        let warningText = document.getElementById(warningId);
+                        if (!warningText && cashLabel) {
+                            warningText = document.createElement('div');
+                            warningText.id = warningId;
+                            warningText.className = 'alert alert-danger py-1 px-2 mt-2 mb-0 d-inline-block small fw-bold';
+                            warningText.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Chỉ hỗ trợ đơn hàng dưới 5.000.000đ';
+                            cashLabel.parentNode.appendChild(warningText);
+                        } else if (warningText) {
+                            warningText.style.display = 'block';
+                        }
+
+                        // Xóa style cũ nếu có (đề phòng)
+                        if (cashLabel) {
+                            cashLabel.style.textDecoration = 'none';
+                            cashLabel.classList.remove('text-muted'); // opacity ở container đã đủ làm mờ
+                        }
+
+                        // Xóa alert box cũ (nếu còn từ code trước)
+                        const oldMsg = document.getElementById('cod-disabled-msg');
+                        if (oldMsg) oldMsg.remove();
+
+                    } else {
+                        // Enable lại
+                        cashRadio.disabled = false;
+                        if (cashContainer) {
+                            cashContainer.classList.remove('opacity-50');
+                            cashContainer.removeAttribute('title');
+                        }
+
+                        // Ẩn warning text
+                        const warningText = document.getElementById(warningId);
+                        if (warningText) warningText.style.display = 'none';
+
+                        // Xóa alert box cũ
+                        const oldMsg = document.getElementById('cod-disabled-msg');
+                        if (oldMsg) oldMsg.remove();
                     }
                 }
 
                 // Hàm cập nhật hiển thị tổng tiền
                 function updateTotalDisplay() {
                     const total = Math.max(0, (currentSubtotal - currentDiscount) + currentShippingFee + installationFee);
+
+                    // Kiểm tra phương thức thanh toán
+                    checkPaymentMethodAvailability(total);
+
                     const shippingFeeEl = document.getElementById('shipping-fee');
                     const totalAmountEl = document.getElementById('total-amount');
                     const installationRow = document.getElementById('installation-row');
@@ -1304,7 +1405,11 @@
                             currentDiscount = Number(data.promotion.discount_amount) || 0;
                             appliedCode = data.promotion.code || '';
 
-                            if (discountRow) discountRow.style.display = 'flex';
+                            const voucherBadge = document.getElementById('voucher-badge');
+                            if (voucherBadge) {
+                                voucherBadge.classList.remove('d-none');
+                                voucherBadge.classList.add('d-flex');
+                            }
                             if (appliedCodeEl) appliedCodeEl.textContent = appliedCode;
                             if (discountAmountEl) discountAmountEl.textContent = '- ' + currentDiscount.toLocaleString('vi-VN') + ' đ';
                             updateTotalDisplay();
@@ -1329,6 +1434,73 @@
                                 e.preventDefault();
                                 applyBtn.click();
                             }
+                        });
+                    }
+
+                    // Xử lý chọn voucher từ danh sách
+                    const voucherItems = document.querySelectorAll('.voucher-item');
+                    voucherItems.forEach(item => {
+                        item.addEventListener('click', function() {
+                            const code = this.dataset.code;
+                            if (codeInput) {
+                                codeInput.value = code;
+                                applyBtn.click();
+                            }
+                        });
+                    });
+
+                    // Xử lý hủy voucher
+                    const removePromoBtn = document.getElementById('remove-promotion-btn');
+                    if (removePromoBtn) {
+                        removePromoBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+
+                            // Loading/Confirm state if needed
+                            // if (!confirm('Bạn có chắc muốn hủy mã giảm giá này?')) return;
+
+                            setMessage('Đang hủy mã...', 'warning');
+
+                            fetch('{{ route('client.checkout.removePromotion') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            })
+                            .then(async res => {
+                                if (res.status === 401) {
+                                    window.location.href = '{{ route('client.login') }}';
+                                    return null;
+                                }
+                                const data = await res.json();
+                                if (!data.ok) {
+                                    throw new Error(data.error || 'Có lỗi xảy ra.');
+                                }
+                                return data;
+                            })
+                            .then(data => {
+                                if (!data) return;
+
+                                // Reset discount info
+                                currentDiscount = 0;
+                                appliedCode = '';
+
+                                // UI updates
+                                const voucherBadge = document.getElementById('voucher-badge');
+                                if (voucherBadge) {
+                                    voucherBadge.classList.remove('d-flex');
+                                    voucherBadge.classList.add('d-none');
+                                }
+                                if (appliedCodeEl) appliedCodeEl.textContent = '';
+                                if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
+                                if (codeInput) codeInput.value = '';
+
+                                updateTotalDisplay();
+                                setMessage('Đã hủy mã giảm giá.', 'info');
+                            })
+                            .catch(err => {
+                                setMessage(err.message || 'Không thể hủy mã.', 'danger');
+                            });
                         });
                     }
                 }
