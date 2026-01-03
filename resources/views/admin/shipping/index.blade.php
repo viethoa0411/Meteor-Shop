@@ -162,89 +162,158 @@
                         </div>
 
                         <hr>
-                        <h6 class="fw-bold">Phí kích thước (tính theo mét)</h6>
+                        <h6 class="fw-bold">Phí kích thước (Chiều dài, Rộng, Cao)</h6>
                         <div class="alert alert-info small mb-3">
                             <i class="bi bi-info-circle me-1"></i>
-                            Tổng phí kích thước sẽ được nhân với khoảng cách (km) từ kho đến địa chỉ giao hàng
+                            <strong>Công thức:</strong> Tính phí theo block cm (cm đầu + cm tiếp theo) cho từng chiều, sau đó nhân với khoảng cách và số lượng
                         </div>
+                        
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Chiều dài - Mét đầu <span class="text-danger">*</span></label>
+                            <div class="col-md-12">
+                                <h6 class="text-primary">Chiều dài</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Block cm đầu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="length_block_cm" class="form-control"
+                                        value="{{ old('length_block_cm', $settings->length_block_cm ?? 200) }}" min="1" max="1000" required>
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                                <div class="form-text">Ví dụ: 200cm đầu</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Phí block cm đầu <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" name="first_length_price" class="form-control"
-                                        value="{{ old('first_length_price', $settings->first_length_price) }}" min="0" required>
+                                        value="{{ old('first_length_price', $settings->first_length_price ?? 10000) }}" min="0" required>
                                     <span class="input-group-text">đ</span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Chiều dài - Mét tiếp theo <span class="text-danger">*</span></label>
+                            <div class="col-md-4">
+                                <label class="form-label">Phí block cm tiếp theo <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" name="next_length_price" class="form-control"
-                                        value="{{ old('next_length_price', $settings->next_length_price) }}" min="0" required>
+                                        value="{{ old('next_length_price', $settings->next_length_price ?? 5000) }}" min="0" required>
                                     <span class="input-group-text">đ</span>
                                 </div>
                             </div>
                         </div>
+
                         <div class="row g-3 mt-2">
-                            <div class="col-md-6">
-                                <label class="form-label">Chiều rộng - Mét đầu <span class="text-danger">*</span></label>
+                            <div class="col-md-12">
+                                <h6 class="text-primary">Chiều rộng</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Block cm đầu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="width_block_cm" class="form-control"
+                                        value="{{ old('width_block_cm', $settings->width_block_cm ?? 200) }}" min="1" max="1000" required>
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                                <div class="form-text">Ví dụ: 200cm đầu</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Phí block cm đầu <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" name="first_width_price" class="form-control"
-                                        value="{{ old('first_width_price', $settings->first_width_price) }}" min="0" required>
+                                        value="{{ old('first_width_price', $settings->first_width_price ?? 8000) }}" min="0" required>
                                     <span class="input-group-text">đ</span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Chiều rộng - Mét tiếp theo <span class="text-danger">*</span></label>
+                            <div class="col-md-4">
+                                <label class="form-label">Phí block cm tiếp theo <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" name="next_width_price" class="form-control"
-                                        value="{{ old('next_width_price', $settings->next_width_price) }}" min="0" required>
+                                        value="{{ old('next_width_price', $settings->next_width_price ?? 4000) }}" min="0" required>
                                     <span class="input-group-text">đ</span>
                                 </div>
                             </div>
                         </div>
+
                         <div class="row g-3 mt-2">
-                            <div class="col-md-6">
-                                <label class="form-label">Chiều cao - Mét đầu <span class="text-danger">*</span></label>
+                            <div class="col-md-12">
+                                <h6 class="text-primary">Chiều cao</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Block cm đầu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="height_block_cm" class="form-control"
+                                        value="{{ old('height_block_cm', $settings->height_block_cm ?? 200) }}" min="1" max="1000" required>
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                                <div class="form-text">Ví dụ: 200cm đầu</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Phí block cm đầu <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" name="first_height_price" class="form-control"
-                                        value="{{ old('first_height_price', $settings->first_height_price) }}" min="0" required>
+                                        value="{{ old('first_height_price', $settings->first_height_price ?? 8000) }}" min="0" required>
                                     <span class="input-group-text">đ</span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Chiều cao - Mét tiếp theo <span class="text-danger">*</span></label>
+                            <div class="col-md-4">
+                                <label class="form-label">Phí block cm tiếp theo <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" name="next_height_price" class="form-control"
-                                        value="{{ old('next_height_price', $settings->next_height_price) }}" min="0" required>
+                                        value="{{ old('next_height_price', $settings->next_height_price ?? 4000) }}" min="0" required>
                                     <span class="input-group-text">đ</span>
                                 </div>
                             </div>
                         </div>
 
                         <hr>
-                        <h6 class="fw-bold">Phí theo cân nặng</h6>
-                        <div class="alert alert-info small mb-3">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Tổng phí cân nặng sẽ được nhân với khoảng cách (km) từ kho đến địa chỉ giao hàng
-                        </div>
+                        <h6 class="fw-bold">Phí cân nặng</h6>
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Cân nặng đầu tiên (kg) <span class="text-danger">*</span></label>
+                            <div class="col-md-4">
+                                <label class="form-label">Block kg đầu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="weight_block_kg" class="form-control"
+                                        value="{{ old('weight_block_kg', $settings->weight_block_kg ?? 10) }}" min="1" max="100" required>
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                                <div class="form-text">Ví dụ: 10kg đầu</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Phí block kg đầu <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" name="first_weight_price" class="form-control"
-                                        value="{{ old('first_weight_price', $settings->first_weight_price) }}" min="0" required>
+                                        value="{{ old('first_weight_price', $settings->first_weight_price ?? 15000) }}" min="0" required>
                                     <span class="input-group-text">đ</span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Mỗi kg tiếp theo <span class="text-danger">*</span></label>
+                            <div class="col-md-4">
+                                <label class="form-label">Phí block kg tiếp theo <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" name="next_weight_price" class="form-control"
-                                        value="{{ old('next_weight_price', $settings->next_weight_price) }}" min="0" required>
+                                        value="{{ old('next_weight_price', $settings->next_weight_price ?? 7000) }}" min="0" required>
                                     <span class="input-group-text">đ</span>
                                 </div>
                             </div>
+                        </div>
+
+                        <hr>
+                        <h6 class="fw-bold">Phí tối thiểu</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Phí vận chuyển tối thiểu <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" name="min_shipping_fee" class="form-control"
+                                    value="{{ old('min_shipping_fee', $settings->min_shipping_fee ?? 30000) }}" min="0" required>
+                                <span class="input-group-text">đ</span>
+                            </div>
+                            <div class="form-text">Phí tối thiểu khi tính ra quá thấp</div>
+                        </div>
+
+                        <hr>
+                        <h6 class="fw-bold">Giảm giá cùng đơn hàng</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Phần trăm giảm giá phí vận chuyển (%) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" name="same_order_discount_percent" class="form-control"
+                                    value="{{ old('same_order_discount_percent', $settings->same_order_discount_percent ?? 0) }}"
+                                    min="0" max="100" step="0.01" required>
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <div class="form-text">Áp dụng khi có 2 sản phẩm trở lên trong cùng đơn hàng. Giảm giá được tính dựa trên phí vận chuyển ban đầu.</div>
                         </div>
 
                         <hr>
@@ -369,7 +438,19 @@
                 <div class="col-md-6">
                     <p><strong>Quy tắc tính phí vận chuyển:</strong></p>
                     <ul>
-                        <li><strong>Tiêu chuẩn</strong> = (Tổng phí chiều dài + Tổng phí chiều rộng + Tổng phí chiều cao + Tổng phí cân nặng) × Khoảng cách (km) × Số lượng</li>
+                        <li><strong>Kích thước:</strong> Tính phí theo block cm cho từng chiều (Dài, Rộng, Cao)
+                            <ul>
+                                <li>Chiều dài: {{ $settings->length_block_cm ?? 200 }}cm đầu = {{ number_format($settings->first_length_price ?? 10000) }}đ, tiếp theo = {{ number_format($settings->next_length_price ?? 5000) }}đ</li>
+                                <li>Chiều rộng: {{ $settings->width_block_cm ?? 200 }}cm đầu = {{ number_format($settings->first_width_price ?? 8000) }}đ, tiếp theo = {{ number_format($settings->next_width_price ?? 4000) }}đ</li>
+                                <li>Chiều cao: {{ $settings->height_block_cm ?? 200 }}cm đầu = {{ number_format($settings->first_height_price ?? 8000) }}đ, tiếp theo = {{ number_format($settings->next_height_price ?? 4000) }}đ</li>
+                            </ul>
+                        </li>
+                        <li><strong>Cân nặng:</strong> {{ $settings->weight_block_kg ?? 10 }}kg đầu = {{ number_format($settings->first_weight_price ?? 15000) }}đ, tiếp theo = {{ number_format($settings->next_weight_price ?? 7000) }}đ</li>
+                        <li><strong>Công thức:</strong> Phí mỗi item = (Phí dài + Phí rộng + Phí cao + Phí cân nặng) × Khoảng cách (km) × Số lượng</li>
+                        <li><strong>Phí tối thiểu:</strong> {{ number_format($settings->min_shipping_fee ?? 30000) }}đ</li>
+                        @if($settings->same_order_discount_percent > 0)
+                        <li><strong>Giảm giá cùng đơn hàng</strong>: Giảm {{ number_format($settings->same_order_discount_percent, 2) }}% trên phí vận chuyển ban đầu khi có 2 sản phẩm trở lên</li>
+                        @endif
                         <li><strong>{{ $settings->express_label }}</strong>: Phụ phí {{ $settings->express_surcharge_type === 'percent' ? $settings->express_surcharge_value . '%' : number_format($settings->express_surcharge_value) . 'đ' }} trên phí tiêu chuẩn</li>
                         <li><strong>{{ $settings->fast_label }}</strong>: Phụ phí {{ $settings->fast_surcharge_type === 'percent' ? $settings->fast_surcharge_value . '%' : number_format($settings->fast_surcharge_value) . 'đ' }} trên phí tiêu chuẩn</li>
                     </ul>
