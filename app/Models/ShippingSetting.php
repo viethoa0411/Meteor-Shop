@@ -189,6 +189,21 @@ class ShippingSetting extends Model
             'subtotal' => $subtotal,
         ]);
 
+        // Kiểm tra điều kiện miễn phí vận chuyển
+        if ($this->free_shipping_enabled && $subtotal >= $this->free_shipping_threshold) {
+            Log::info('Shipping: Đủ điều kiện miễn phí vận chuyển', [
+                'subtotal' => $subtotal,
+                'threshold' => $this->free_shipping_threshold,
+            ]);
+            
+            return [
+                'standard_fee' => 0,
+                'surcharge' => 0,
+                'total' => 0,
+                'is_free' => true,
+            ];
+        }
+
         // Tính phí vận chuyển theo block cm và cân nặng cho TỪNG item, sau đó cộng dồn
         $totalStandardFee = 0;
         $lengthBlockCm = (int)($this->length_block_cm ?? 200);

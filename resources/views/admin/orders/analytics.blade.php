@@ -730,7 +730,6 @@
 </div>
 
 {{-- Chart.js --}}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Timeline Chart với nhiều series
     const timelineCtx = document.getElementById('timelineChart');

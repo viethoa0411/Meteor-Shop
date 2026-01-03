@@ -402,18 +402,10 @@
 
     @push('scripts')
         <script>
-<<<<<<< HEAD
-            let currentDiscount = 0;
-            let appliedCode = '';
-            let installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
-            let isInstallationSelected = {{ (($shippingSettings->installation_fee ?? 0) > 0) ? 'true' : 'false' }};
-            const COD_LIMIT = 10000000; // 10 triệu
-=======
             let currentDiscount = {{ $checkoutData['discount_amount'] ?? 0 }};
             let appliedCode = '{{ $checkoutData['promotion']['code'] ?? '' }}';
             let installationFee = 0;
             let isInstallationSelected = false;
->>>>>>> origin/cap_nhat_order_admin
             let shippingCalculationTimeout = null;
             let quantityUpdateTimeout = null;
 
@@ -820,6 +812,9 @@
 
                 let currentShippingFee = 0;
                 let currentSubtotal = price;
+                let currentDiscount = {{ $checkoutData['discount_amount'] ?? 0 }};
+                let appliedCode = '{{ $checkoutData['promotion']['code'] ?? '' }}';
+                const fixedInstallationFee = {{ $shippingSettings->installation_fee ?? 0 }};
 
                 function setMessage(message, type = 'info') {
                     const el = document.getElementById('promotion-message');
@@ -885,7 +880,7 @@
                     }
 
                     // Cập nhật hiển thị COD và tổng tiền
-                    updatePaymentMethodDisplay();
+                    // updatePaymentMethodDisplay(); // Function removed/renamed
                     updateTotalDisplay();
 
                     updateTotalDisplay();
@@ -1153,7 +1148,7 @@
                     }
                     
                     // Cập nhật hiển thị phương thức thanh toán
-                    updatePaymentMethodDisplay();
+                    // updatePaymentMethodDisplay(); // Removed
                 }
 
                 // Xử lý checkbox lắp đặt (giữ lại để tương thích, nhưng phí lắp đặt luôn được tính)
