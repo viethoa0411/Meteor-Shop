@@ -46,6 +46,10 @@ class ShippingSettingController extends Controller
             'next_height_price' => 'nullable|numeric|min:0',
             'first_weight_price' => 'nullable|numeric|min:0',
             'next_weight_price' => 'nullable|numeric|min:0',
+            'length_block_cm' => 'nullable|integer|min:1|max:1000',
+            'width_block_cm' => 'nullable|integer|min:1|max:1000',
+            'height_block_cm' => 'nullable|integer|min:1|max:1000',
+            'weight_block_kg' => 'nullable|integer|min:1|max:100',
             'express_surcharge_type' => 'nullable|in:percent,fixed',
             'fast_surcharge_type' => 'nullable|in:percent,fixed',
             'express_surcharge_value' => 'nullable|numeric|min:0',
@@ -53,6 +57,15 @@ class ShippingSettingController extends Controller
             'express_label' => 'nullable|string|max:255',
             'fast_label' => 'nullable|string|max:255',
             'installation_fee' => 'nullable|numeric|min:0',
+            'same_order_discount_percent' => 'nullable|numeric|min:0|max:100',
+            'same_product_discount_percent' => 'nullable|numeric|min:0|max:100',
+            'volume_price_per_m3' => 'nullable|numeric|min:0',
+            'min_shipping_fee' => 'nullable|numeric|min:0',
+            'conversion_factor' => 'nullable|integer|min:1000|max:10000',
+            'price_per_km_per_ton' => 'nullable|numeric|min:0',
+            'free_km_first' => 'nullable|numeric|min:0',
+            'labor_fee_type' => 'nullable|in:percent,fixed',
+            'labor_fee_value' => 'nullable|numeric|min:0',
         ]);
 
         $settings = ShippingSetting::getSettings();
@@ -89,6 +102,10 @@ class ShippingSettingController extends Controller
         if ($request->has('next_height_price')) $updateData['next_height_price'] = $request->next_height_price ?? 0;
         if ($request->has('first_weight_price')) $updateData['first_weight_price'] = $request->first_weight_price ?? 0;
         if ($request->has('next_weight_price')) $updateData['next_weight_price'] = $request->next_weight_price ?? 0;
+        if ($request->has('length_block_cm')) $updateData['length_block_cm'] = $request->length_block_cm ?? 200;
+        if ($request->has('width_block_cm')) $updateData['width_block_cm'] = $request->width_block_cm ?? 200;
+        if ($request->has('height_block_cm')) $updateData['height_block_cm'] = $request->height_block_cm ?? 200;
+        if ($request->has('weight_block_kg')) $updateData['weight_block_kg'] = $request->weight_block_kg ?? 10;
         if ($request->has('express_surcharge_type')) $updateData['express_surcharge_type'] = $request->express_surcharge_type;
         if ($request->has('express_surcharge_value')) $updateData['express_surcharge_value'] = $request->express_surcharge_value ?? 0;
         if ($request->has('fast_surcharge_type')) $updateData['fast_surcharge_type'] = $request->fast_surcharge_type;
@@ -96,6 +113,15 @@ class ShippingSettingController extends Controller
         if ($request->has('express_label')) $updateData['express_label'] = $request->express_label;
         if ($request->has('fast_label')) $updateData['fast_label'] = $request->fast_label;
         if ($request->has('installation_fee')) $updateData['installation_fee'] = $request->installation_fee ?? 0;
+        if ($request->has('same_order_discount_percent')) $updateData['same_order_discount_percent'] = $request->same_order_discount_percent ?? 0;
+        if ($request->has('same_product_discount_percent')) $updateData['same_product_discount_percent'] = $request->same_product_discount_percent ?? 0;
+        if ($request->has('volume_price_per_m3')) $updateData['volume_price_per_m3'] = $request->volume_price_per_m3 ?? 5000;
+        if ($request->has('min_shipping_fee')) $updateData['min_shipping_fee'] = $request->min_shipping_fee ?? 30000;
+        if ($request->has('conversion_factor')) $updateData['conversion_factor'] = $request->conversion_factor ?? 5000;
+        if ($request->has('price_per_km_per_ton')) $updateData['price_per_km_per_ton'] = $request->price_per_km_per_ton ?? 17000;
+        if ($request->has('free_km_first')) $updateData['free_km_first'] = $request->free_km_first ?? 10.0;
+        if ($request->has('labor_fee_type')) $updateData['labor_fee_type'] = $request->labor_fee_type;
+        if ($request->has('labor_fee_value')) $updateData['labor_fee_value'] = $request->labor_fee_value ?? 10.0;
 
         $settings->update($updateData);
 

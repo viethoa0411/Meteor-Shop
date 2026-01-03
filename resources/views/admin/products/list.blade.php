@@ -81,7 +81,7 @@
                 <table class="table table-striped table-hover align-middle text-center mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>STT</th>
                             <th>Tên</th>
                             <th>Ảnh</th>
                             <th>Giá</th>
@@ -93,7 +93,7 @@
                     <tbody>
                         @foreach ($products as $product)
                             <tr>
-                                <td>{{ $product->id }}</td>
+                                <td class="text-center fw-bold">{{ $loop->iteration }}</td>
 
                                 <td class="text-center">
                                     <a href="{{ route('admin.products.show', $product) }}" class="text-dark"

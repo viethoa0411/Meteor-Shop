@@ -12,6 +12,7 @@ class CategoryController extends Controller
     // Hiển thị danh sách danh mục
     public function list(Request $request)
     {
+        $categories = Category::orderBy('sort_order', 'asc')->paginate(15);
         $query = Category::with('parent');
 
         $status = $request->get('status', 'active');

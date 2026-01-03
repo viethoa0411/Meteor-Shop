@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Wishlist; 
+use App\Models\Wishlist;
 
 
 
@@ -48,10 +48,9 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
-     public function wishlists()
+    public function wishlists()
     {
         return $this->hasMany(Wishlist::class, 'product_id');
-
     }
     public function reviews()
     {
@@ -104,5 +103,28 @@ class Product extends Model
             return $this->variants->sum('stock') > 0;
         }
         return ($this->stock ?? 0) > 0;
+    }
+    
+    protected static function booted()
+    {
+        static::created(function ($product) {
+            // Khi thêm sản phẩm mới → đặt sort_order = 1 (lên đầu)
+            // Các sản phẩm cũ tăng sort_order lên 1
+            \DB::transaction(function () use ($product) {
+                \DB::table('products')
+                    ->where('id', '!=', $product->id)
+                    ->increment('sort_order');
+
+                $product->sort_order = 1;
+                $product->saveQuietly();
+            });
+        });
+
+        static::deleted(function ($product) {
+            // Khi xóa → giảm sort_order của các sản phẩm có sort_order lớn hơn
+            \DB::table('products')
+                ->where('sort_order', '>', $product->sort_order)
+                ->decrement('sort_order');
+        });
     }
 }

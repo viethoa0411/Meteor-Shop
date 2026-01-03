@@ -28,6 +28,10 @@ class ShippingSetting extends Model
         'next_height_price',
         'first_weight_price',
         'next_weight_price',
+        'length_block_cm',
+        'width_block_cm',
+        'height_block_cm',
+        'weight_block_kg',
         'express_surcharge_type',
         'express_surcharge_value',
         'fast_surcharge_type',
@@ -35,6 +39,15 @@ class ShippingSetting extends Model
         'express_label',
         'fast_label',
         'installation_fee',
+        'same_order_discount_percent',
+        'same_product_discount_percent',
+        'volume_price_per_m3',
+        'min_shipping_fee',
+        'conversion_factor',
+        'price_per_km_per_ton',
+        'free_km_first',
+        'labor_fee_type',
+        'labor_fee_value',
     ];
 
     protected $casts = [
@@ -52,9 +65,21 @@ class ShippingSetting extends Model
         'next_height_price' => 'decimal:0',
         'first_weight_price' => 'decimal:0',
         'next_weight_price' => 'decimal:0',
+        'length_block_cm' => 'integer',
+        'width_block_cm' => 'integer',
+        'height_block_cm' => 'integer',
+        'weight_block_kg' => 'integer',
         'express_surcharge_value' => 'decimal:0',
         'fast_surcharge_value' => 'decimal:0',
         'installation_fee' => 'decimal:0',
+        'same_order_discount_percent' => 'decimal:2',
+        'same_product_discount_percent' => 'decimal:2',
+        'volume_price_per_m3' => 'decimal:0',
+        'min_shipping_fee' => 'decimal:0',
+        'conversion_factor' => 'integer',
+        'price_per_km_per_ton' => 'decimal:0',
+        'free_km_first' => 'decimal:2',
+        'labor_fee_value' => 'decimal:2',
     ];
 
     /**
@@ -85,6 +110,10 @@ class ShippingSetting extends Model
                 'next_height_price' => 4000,
                 'first_weight_price' => 15000,
                 'next_weight_price' => 7000,
+                'length_block_cm' => 200,
+                'width_block_cm' => 200,
+                'height_block_cm' => 200,
+                'weight_block_kg' => 10,
                 'express_surcharge_type' => 'percent',
                 'express_surcharge_value' => 20,
                 'fast_surcharge_type' => 'percent',
@@ -93,6 +122,15 @@ class ShippingSetting extends Model
                 'fast_label' => 'Giao hàng hỏa tốc',
                 'free_shipping_enabled' => true,
                 'installation_fee' => 0,
+                'same_order_discount_percent' => 0,
+                'same_product_discount_percent' => 0,
+                'volume_price_per_m3' => 5000,
+                'min_shipping_fee' => 30000,
+                'conversion_factor' => 5000,
+                'price_per_km_per_ton' => 17000,
+                'free_km_first' => 10.0,
+                'labor_fee_type' => 'percent',
+                'labor_fee_value' => 10.0,
             ]);
         }
         
@@ -143,8 +181,6 @@ class ShippingSetting extends Model
             'google_maps_enabled' => config('services.google_maps.enabled', false),
         ]);
         
-        $standardFee = 0;
-
         // Log để debug
         Log::info('Shipping: Bắt đầu tính phí', [
             'items_count' => count($items),
@@ -153,26 +189,86 @@ class ShippingSetting extends Model
             'subtotal' => $subtotal,
         ]);
 
+        // Tính phí vận chuyển theo block cm và cân nặng cho TỪNG item, sau đó cộng dồn
+        $totalStandardFee = 0;
+        $lengthBlockCm = (int)($this->length_block_cm ?? 200);
+        $widthBlockCm = (int)($this->width_block_cm ?? 200);
+        $heightBlockCm = (int)($this->height_block_cm ?? 200);
+        $weightBlockKg = (int)($this->weight_block_kg ?? 10);
+
         foreach ($items as $item) {
-            $itemFee = $this->calculateStandardFeeForItem(
-                (float)($item['length_cm'] ?? 0),
-                (float)($item['width_cm'] ?? 0),
-                (float)($item['height_cm'] ?? 0),
-                (float)($item['weight_kg'] ?? 0),
-                (int)($item['quantity'] ?? 1),
-                $distanceKm
+            $quantity = max(1, (int)($item['quantity'] ?? 1));
+            $lengthCm = (float)($item['length_cm'] ?? 0);
+            $widthCm = (float)($item['width_cm'] ?? 0);
+            $heightCm = (float)($item['height_cm'] ?? 0);
+            $weightKg = (float)($item['weight_kg'] ?? 0);
+
+            // Tính phí kích thước và cân nặng cho 1 item (chưa nhân với km và quantity)
+            $itemFee = $this->calculateDimensionAndWeightFee(
+                $lengthCm,
+                $widthCm,
+                $heightCm,
+                $weightKg,
+                $lengthBlockCm,
+                $widthBlockCm,
+                $heightBlockCm,
+                $weightBlockKg
             );
+
+            // Tính phí ban đầu cho 1 sản phẩm (đã nhân với km)
+            // F = phí vận chuyển 1 sản phẩm đầu tiên
+            $itemFeePerUnit = $itemFee * $distanceKm;
+
+            // Áp dụng giảm giá khi mua nhiều sản phẩm cùng loại (quantity > 1)
+            // Công thức: Nếu q = 1: Phí = F
+            //            Nếu q ≥ 2: Phí = F + (q - 1) × F × r
+            // Trong đó: r = tỷ lệ tính phí cho sản phẩm tiếp theo
+            //           r = (100 - same_product_discount_percent) / 100
+            if ($quantity > 1 && $this->same_product_discount_percent > 0) {
+                // Tính tỷ lệ r: nếu giảm 50% thì r = 0.5, nếu giảm 10% thì r = 0.9
+                $r = (100 - (float)$this->same_product_discount_percent) / 100;
+                
+                // Công thức: F + (q - 1) × F × r
+                $itemTotalFee = $itemFeePerUnit + (($quantity - 1) * $itemFeePerUnit * $r);
+                
+                Log::debug('Shipping: Áp dụng giảm giá sản phẩm cùng loại', [
+                    'quantity' => $quantity,
+                    'item_fee_per_unit' => $itemFeePerUnit,
+                    'discount_percent' => $this->same_product_discount_percent,
+                    'rate_r' => $r,
+                    'item_total_fee' => $itemTotalFee,
+                    'formula' => "F + (q - 1) × F × r = {$itemFeePerUnit} + ({$quantity} - 1) × {$itemFeePerUnit} × {$r}",
+                ]);
+            } else {
+                // Không có giảm giá hoặc quantity = 1: nhân với số lượng như bình thường
+                $itemTotalFee = $itemFeePerUnit * $quantity;
+            }
             
-            Log::info('Shipping: Phí từng item', [
-                'item' => $item,
+            $totalStandardFee += $itemTotalFee;
+
+            Log::debug('Shipping: Tính phí cho item', [
+                'length_cm' => $lengthCm,
+                'width_cm' => $widthCm,
+                'height_cm' => $heightCm,
+                'weight_kg' => $weightKg,
+                'quantity' => $quantity,
                 'item_fee' => $itemFee,
+                'item_fee_per_unit' => $itemFeePerUnit,
+                'distance_km' => $distanceKm,
+                'item_total_fee' => $itemTotalFee,
             ]);
-            
-            $standardFee += $itemFee;
         }
 
-        Log::info('Shipping: Tổng phí tiêu chuẩn', [
-            'standard_fee' => $standardFee,
+        // Phí tiêu chuẩn (đã áp dụng giảm giá sản phẩm cùng loại cho từng item trong vòng lặp)
+        $standardFee = $totalStandardFee;
+
+        // Áp dụng phí tối thiểu
+        $minShippingFee = (float)($this->min_shipping_fee ?? 30000);
+        $standardFee = max($standardFee, $minShippingFee);
+
+        Log::info('Shipping: Tổng phí tiêu chuẩn (sau khi áp dụng giảm giá sản phẩm cùng loại)', [
+            'total_standard_fee' => $standardFee,
+            'items_count' => count($items),
             'distance_km' => $distanceKm,
         ]);
 
@@ -183,6 +279,48 @@ class ShippingSetting extends Model
             'surcharge' => $surcharge,
             'total' => max(0, $standardFee + $surcharge),
         ];
+    }
+
+    /**
+     * Tính phí kích thước và cân nặng (CHƯA nhân với km và quantity)
+     * 
+     * @param float $lengthCm
+     * @param float $widthCm
+     * @param float $heightCm
+     * @param float $weightKg
+     * @return float Phí kích thước + cân nặng (chưa nhân với km)
+     */
+    private function calculateDimensionAndWeightFee(
+        float $lengthCm,
+        float $widthCm,
+        float $heightCm,
+        float $weightKg,
+        int $lengthBlockCm = 200,
+        int $widthBlockCm = 200,
+        int $heightBlockCm = 200,
+        int $weightBlockKg = 10
+    ): float {
+        // Tính số block cho từng chiều (dựa vào cấu hình)
+        $lengthBlocks = max(0, $lengthCm / $lengthBlockCm);
+        $widthBlocks = max(0, $widthCm / $widthBlockCm);
+        $heightBlocks = max(0, $heightCm / $heightBlockCm);
+        $weightKg = max(0, $weightKg);
+
+        // Tính phí kích thước và cân nặng
+        $lengthFee = $this->calculateDimensionFee($lengthBlocks, (float)$this->first_length_price, (float)$this->next_length_price);
+        $widthFee = $this->calculateDimensionFee($widthBlocks, (float)$this->first_width_price, (float)$this->next_width_price);
+        $heightFee = $this->calculateDimensionFee($heightBlocks, (float)$this->first_height_price, (float)$this->next_height_price);
+        
+        // Cân nặng: block kg đầu + block kg tiếp theo
+        $weightFee = 0;
+        if ($weightKg > 0) {
+            $weightBlocks = max(1, ceil($weightKg / $weightBlockKg));
+            $extraWeightBlocks = max(0, $weightBlocks - 1);
+            $weightFee = (float)$this->first_weight_price + ($extraWeightBlocks * (float)$this->next_weight_price);
+        }
+
+        // Tổng phí kích thước + cân nặng
+        return $lengthFee + $widthFee + $heightFee + $weightFee;
     }
 
     /**
@@ -201,33 +339,37 @@ class ShippingSetting extends Model
         int $quantity = 1,
         float $distanceKm = 1.0
     ): float {
-        $lengthMeters = max(0, $lengthCm / 100);
-        $widthMeters = max(0, $widthCm / 100);
-        $heightMeters = max(0, $heightCm / 100);
+        // Tất cả kích thước: 200cm đầu + 200cm tiếp theo (thay vì 1m đầu + 1m tiếp theo)
+        $length200cmBlocks = max(0, $lengthCm / 200);
+        $width200cmBlocks = max(0, $widthCm / 200);
+        $height200cmBlocks = max(0, $heightCm / 200);
         $weightKg = max(0, $weightKg);
         
         // Đảm bảo distanceKm tối thiểu là 1km
         $distanceKm = max(1.0, $distanceKm);
 
         // BƯỚC 1: Tính phí kích thước và cân nặng (CHƯA nhân với km)
-        // Chiều dài: Mét đầu + Mét tiếp theo
-        $lengthFee = $this->calculateDimensionFee($lengthMeters, (float)$this->first_length_price, (float)$this->next_length_price);
+        // Chiều dài: 200cm đầu + 200cm tiếp theo
+        $lengthFee = $this->calculateDimensionFee($length200cmBlocks, (float)$this->first_length_price, (float)$this->next_length_price);
         
-        // Chiều rộng: Mét đầu + Mét tiếp theo
-        $widthFee = $this->calculateDimensionFee($widthMeters, (float)$this->first_width_price, (float)$this->next_width_price);
+        // Chiều rộng: 200cm đầu + 200cm tiếp theo
+        $widthFee = $this->calculateDimensionFee($width200cmBlocks, (float)$this->first_width_price, (float)$this->next_width_price);
         
-        // Chiều cao: Mét đầu + Mét tiếp theo
-        $heightFee = $this->calculateDimensionFee($heightMeters, (float)$this->first_height_price, (float)$this->next_height_price);
+        // Chiều cao: 200cm đầu + 200cm tiếp theo
+        $heightFee = $this->calculateDimensionFee($height200cmBlocks, (float)$this->first_height_price, (float)$this->next_height_price);
         
-        // Cân nặng: Kg đầu + Kg tiếp theo
+        // Cân nặng: 10kg đầu + 10kg tiếp theo (thay vì 1kg đầu + 1kg tiếp theo)
         $weightFee = 0;
+        $weight10kgBlocks = 0;
         if ($weightKg > 0) {
-            // Kg đầu tiên: first_weight_price
-            // Mỗi kg tiếp theo: next_weight_price
-            // Ví dụ: 5kg, kg đầu 15000, kg tiếp theo 7000
-            // Phí = 15000 + (5-1)*7000 = 15000 + 28000 = 43000
-            $extraWeightUnit = max(0, ceil($weightKg - 1));
-            $weightFee = (float)$this->first_weight_price + ($extraWeightUnit * (float)$this->next_weight_price);
+            // 10kg đầu tiên: first_weight_price
+            // Mỗi 10kg tiếp theo: next_weight_price
+            // Ví dụ: 25kg, 10kg đầu 15000, mỗi 10kg tiếp theo 7000
+            // Số khối 10kg: ceil(25/10) = 3
+            // Phí = 15000 + (3-1)*7000 = 15000 + 14000 = 29000
+            $weight10kgBlocks = max(1, ceil($weightKg / 10));
+            $extraWeightBlocks = max(0, $weight10kgBlocks - 1);
+            $weightFee = (float)$this->first_weight_price + ($extraWeightBlocks * (float)$this->next_weight_price);
         }
 
         // BƯỚC 2: Tổng phí kích thước + cân nặng (CHƯA nhân với km)
@@ -239,9 +381,10 @@ class ShippingSetting extends Model
             'width_cm' => $widthCm,
             'height_cm' => $heightCm,
             'weight_kg' => $weightKg,
-            'length_meters' => $lengthMeters,
-            'width_meters' => $widthMeters,
-            'height_meters' => $heightMeters,
+            'length_200cm_blocks' => $length200cmBlocks,
+            'width_200cm_blocks' => $width200cmBlocks,
+            'height_200cm_blocks' => $height200cmBlocks,
+            'weight_10kg_blocks' => $weight10kgBlocks,
             'length_fee' => $lengthFee,
             'width_fee' => $widthFee,
             'height_fee' => $heightFee,

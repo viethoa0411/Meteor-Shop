@@ -89,7 +89,7 @@
                 <table class="table table-striped table-hover align-middle text-center mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>STT</th>
                             <th>Tên danh mục</th>
                             <th>Danh mục cha</th>
                             <th>Trạng thái</th>
@@ -99,7 +99,7 @@
                     <tbody>
                         @foreach ($categories as $category)
                             <tr>
-                                <td data-label="ID">{{ $category->id }}</td>
+                                <td data-label="STT">{{ $loop->iteration }}</td>
                                 <td data-label="Tên danh mục">{{ $category->name }}</td>
                                 <td data-label="Danh mục cha">{{ $category->parent?->name ?? 'Không có' }}</td>
                                 <td data-label="Trạng thái">
