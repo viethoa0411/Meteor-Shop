@@ -1034,11 +1034,12 @@ class CheckoutController extends Controller
         $settings = $shippingCalculation['settings'];
 
         // Kiểm tra xem có phải miễn phí vận chuyển do đạt ngưỡng không
-        $isFreeShipping = false;
-        if ($fee === 0 && $shippingCalculation['standard_fee'] > 0) {
-            // Nếu fee = 0 nhưng standard_fee > 0, có nghĩa là được miễn phí do đạt ngưỡng
+        $isFreeShipping = $shippingCalculation['is_free'] ?? false;
+
+        if (!$isFreeShipping && $fee === 0 && $shippingCalculation['standard_fee'] > 0) {
+            // Nếu fee = 0 nhưng standard_fee > 0, có nghĩa là được miễn phí do đạt ngưỡng (logic cũ)
             $isFreeShipping = true;
-        } elseif ($fee === 0 && $shippingCalculation['standard_fee'] === 0) {
+        } elseif ($fee === 0 && !$isFreeShipping && $shippingCalculation['standard_fee'] === 0) {
             // Nếu cả fee và standard_fee đều = 0, có thể do không có dữ liệu kích thước/cân nặng
             Log::warning('Checkout: Phí vận chuyển = 0, có thể do thiếu dữ liệu kích thước/cân nặng', [
                 'standard_fee' => $shippingCalculation['standard_fee'],
@@ -1104,6 +1105,7 @@ class CheckoutController extends Controller
             'fee' => $feeData['total'],
             'standard_fee' => $feeData['standard_fee'],
             'surcharge' => $feeData['surcharge'],
+            'is_free' => $feeData['is_free'] ?? false,
             'settings' => $settings,
             'subtotal' => $subtotal,
         ];

@@ -799,6 +799,9 @@
 
                 let currentShippingFee = 0;
                 let currentSubtotal = price;
+                let currentDiscount = {{ $checkoutData['discount_amount'] ?? 0 }};
+                let appliedCode = '{{ $checkoutData['promotion']['code'] ?? '' }}';
+                const fixedInstallationFee = {{ $shippingSettings->installation_fee ?? 0 }};
 
                 function setMessage(message, type = 'info') {
                     const el = document.getElementById('promotion-message');

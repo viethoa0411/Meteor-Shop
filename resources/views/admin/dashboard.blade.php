@@ -5490,6 +5490,16 @@
         async function loadRevenueOrdersChart(range = '7', groupBy = 'day') {
             if (!revenueOrdersChartEl) return;
 
+            // Destroy existing chart before showing loading state to prevent DOM detachment issues
+            if (revenueOrdersChart) {
+                try {
+                    revenueOrdersChart.destroy();
+                } catch (e) {
+                    console.warn('Error destroying chart:', e);
+                }
+                revenueOrdersChart = null;
+            }
+
             // Show loading skeleton
             revenueOrdersChartEl.innerHTML = '<div class="d-flex align-items-center justify-content-center" style="min-height: 380px;"><div class="spinner-border text-primary" role="status"></div></div>';
 
