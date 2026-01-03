@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a9266cf464f38bed0171920a246b4f15",
+    "content-hash": "461daf02e97cf074cd0c0c423297366e",
     "packages": [
         {
             "name": "brick/math",
@@ -2290,14 +2290,9 @@
         {
             "name": "maatwebsite/excel",
             "version": "3.1.67",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/SpartnerNL/Laravel-Excel.git",
-                "reference": "e508e34a502a3acc3329b464dad257378a7edb4d"
-            },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/e508e34a502a3acc3329b464dad257378a7edb4d",
+                "url": "https://mirrors.cloud.tencent.com/repository/composer/maatwebsite/excel/3.1.67/maatwebsite-excel-3.1.67.zip",
                 "reference": "e508e34a502a3acc3329b464dad257378a7edb4d",
                 "shasum": ""
             },
@@ -2330,7 +2325,6 @@
                     "Maatwebsite\\Excel\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2356,16 +2350,6 @@
                 "issues": "https://github.com/SpartnerNL/Laravel-Excel/issues",
                 "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.67"
             },
-            "funding": [
-                {
-                    "url": "https://laravel-excel.com/commercial-support",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/patrickbrouwers",
-                    "type": "github"
-                }
-            ],
             "time": "2025-08-26T09:13:16+00:00"
         },
         {

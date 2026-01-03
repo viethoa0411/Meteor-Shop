@@ -304,16 +304,28 @@
                         </div>
 
                         <hr>
-                        <h6 class="fw-bold">Giảm giá cùng đơn hàng</h6>
+                        <h6 class="fw-bold">Giảm giá sản phẩm cùng loại</h6>
+                        <div class="alert alert-info small mb-3">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <strong>Cách tính:</strong> Mỗi sản phẩm được tính độc lập. Sản phẩm đầu tiên tính đủ phí, các sản phẩm tiếp theo được giảm % phí. Công thức: <strong>Phí = F + (q - 1) × F × r</strong> (với F = phí 1 sản phẩm, q = số lượng, r = tỷ lệ tính phí cho sản phẩm tiếp theo). Sau đó cộng tất cả các sản phẩm lại với nhau.
+                        </div>
                         <div class="mb-3">
-                            <label class="form-label">Phần trăm giảm giá phí vận chuyển (%) <span class="text-danger">*</span></label>
+                            <label class="form-label">Phần trăm giảm giá (%) <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="number" name="same_order_discount_percent" class="form-control"
-                                    value="{{ old('same_order_discount_percent', $settings->same_order_discount_percent ?? 0) }}"
+                                <input type="number" name="same_product_discount_percent" class="form-control"
+                                    value="{{ old('same_product_discount_percent', $settings->same_product_discount_percent ?? 0) }}"
                                     min="0" max="100" step="0.01" required>
                                 <span class="input-group-text">%</span>
                             </div>
-                            <div class="form-text">Áp dụng khi có 2 sản phẩm trở lên trong cùng đơn hàng. Giảm giá được tính dựa trên phí vận chuyển ban đầu.</div>
+                            <div class="form-text">
+                                <strong>Ví dụ 1:</strong> Sản phẩm A có quantity = 4, phí ban đầu 1 cái = 100,000đ, giảm giá = 50%<br>
+                                → r = (100 - 50) / 100 = 0.5<br>
+                                → Phí A = 100,000 + (4 - 1) × 100,000 × 0.5 = 100,000 + 150,000 = 250,000đ<br><br>
+                                <strong>Ví dụ 2:</strong> Sản phẩm B có quantity = 3, phí ban đầu 1 cái = 60,000đ, giảm giá = 10%<br>
+                                → r = (100 - 10) / 100 = 0.9<br>
+                                → Phí B = 60,000 + (3 - 1) × 60,000 × 0.9 = 60,000 + 108,000 = 168,000đ<br><br>
+                                → <strong>Tổng phí đơn hàng = 250,000 + 168,000 = 418,000đ</strong>
+                            </div>
                         </div>
 
                         <hr>
@@ -448,8 +460,8 @@
                         <li><strong>Cân nặng:</strong> {{ $settings->weight_block_kg ?? 10 }}kg đầu = {{ number_format($settings->first_weight_price ?? 15000) }}đ, tiếp theo = {{ number_format($settings->next_weight_price ?? 7000) }}đ</li>
                         <li><strong>Công thức:</strong> Phí mỗi item = (Phí dài + Phí rộng + Phí cao + Phí cân nặng) × Khoảng cách (km) × Số lượng</li>
                         <li><strong>Phí tối thiểu:</strong> {{ number_format($settings->min_shipping_fee ?? 30000) }}đ</li>
-                        @if($settings->same_order_discount_percent > 0)
-                        <li><strong>Giảm giá cùng đơn hàng</strong>: Giảm {{ number_format($settings->same_order_discount_percent, 2) }}% trên phí vận chuyển ban đầu khi có 2 sản phẩm trở lên</li>
+                        @if($settings->same_product_discount_percent > 0)
+                        <li><strong>Giảm giá sản phẩm cùng loại</strong>: Giảm {{ number_format($settings->same_product_discount_percent, 2) }}% cho các sản phẩm tiếp theo khi mua nhiều sản phẩm cùng loại (quantity > 1). Công thức: <strong>Phí = F + (q - 1) × F × r</strong> (với F = phí 1 sản phẩm, q = số lượng, r = {{ number_format((100 - $settings->same_product_discount_percent) / 100, 2) }}). Mỗi sản phẩm được tính độc lập, sau đó cộng tất cả lại với nhau.</li>
                         @endif
                         <li><strong>{{ $settings->express_label }}</strong>: Phụ phí {{ $settings->express_surcharge_type === 'percent' ? $settings->express_surcharge_value . '%' : number_format($settings->express_surcharge_value) . 'đ' }} trên phí tiêu chuẩn</li>
                         <li><strong>{{ $settings->fast_label }}</strong>: Phụ phí {{ $settings->fast_surcharge_type === 'percent' ? $settings->fast_surcharge_value . '%' : number_format($settings->fast_surcharge_value) . 'đ' }} trên phí tiêu chuẩn</li>

@@ -58,6 +58,7 @@ class ShippingSettingController extends Controller
             'fast_label' => 'nullable|string|max:255',
             'installation_fee' => 'nullable|numeric|min:0',
             'same_order_discount_percent' => 'nullable|numeric|min:0|max:100',
+            'same_product_discount_percent' => 'nullable|numeric|min:0|max:100',
             'volume_price_per_m3' => 'nullable|numeric|min:0',
             'min_shipping_fee' => 'nullable|numeric|min:0',
             'conversion_factor' => 'nullable|integer|min:1000|max:10000',
@@ -113,6 +114,7 @@ class ShippingSettingController extends Controller
         if ($request->has('fast_label')) $updateData['fast_label'] = $request->fast_label;
         if ($request->has('installation_fee')) $updateData['installation_fee'] = $request->installation_fee ?? 0;
         if ($request->has('same_order_discount_percent')) $updateData['same_order_discount_percent'] = $request->same_order_discount_percent ?? 0;
+        if ($request->has('same_product_discount_percent')) $updateData['same_product_discount_percent'] = $request->same_product_discount_percent ?? 0;
         if ($request->has('volume_price_per_m3')) $updateData['volume_price_per_m3'] = $request->volume_price_per_m3 ?? 5000;
         if ($request->has('min_shipping_fee')) $updateData['min_shipping_fee'] = $request->min_shipping_fee ?? 30000;
         if ($request->has('conversion_factor')) $updateData['conversion_factor'] = $request->conversion_factor ?? 5000;

@@ -74,7 +74,8 @@
         }
 
         .admin-header .dropdown {
-            overflow: visible; /* allow badge/bubble to overflow */
+            overflow: visible;
+            /* allow badge/bubble to overflow */
         }
 
         .admin-header.scrolled {
@@ -104,9 +105,10 @@
             transition: all 0.25s ease;
             border-radius: 12px;
             padding: 10px 16px;
-            overflow: visible; /* ensure badge is visible outside button */
+            overflow: visible;
+            /* ensure badge is visible outside button */
             position: relative;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
         }
 
         .admin-header-btn.notification-btn {
@@ -125,11 +127,11 @@
 
         .admin-header-btn:active {
             transform: translateY(0);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.12) inset;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) inset;
         }
 
         .admin-header-btn:focus-visible {
-            outline: 2px solid rgba(255,255,255,0.7);
+            outline: 2px solid rgba(255, 255, 255, 0.7);
             outline-offset: 2px;
         }
 
@@ -161,8 +163,8 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             line-height: 1.1;
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
         }
@@ -178,9 +180,20 @@
         }
 
         @keyframes badgePulse {
-            0% { transform: scale(1); opacity: 0.7; }
-            70% { transform: scale(1.25); opacity: 0; }
-            100% { transform: scale(1.25); opacity: 0; }
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+
+            70% {
+                transform: scale(1.25);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1.25);
+                opacity: 0;
+            }
         }
 
         /* Sidebar Styles */
@@ -198,12 +211,15 @@
             transition: all 0.3s ease;
             z-index: 100;
             /* Hide scrollbar but keep scroll functionality */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
         }
 
         .admin-sidebar::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
+            /* Chrome, Safari, Opera */
         }
 
         .admin-sidebar-title {
@@ -287,9 +303,12 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
             }
+
             50% {
                 opacity: 0.7;
             }
@@ -299,9 +318,11 @@
             0% {
                 transform: scale(1);
             }
+
             50% {
                 transform: scale(1.2);
             }
+
             100% {
                 transform: scale(1);
             }
@@ -312,6 +333,7 @@
                 opacity: 1;
                 transform: scale(1);
             }
+
             to {
                 opacity: 0;
                 transform: scale(0);
@@ -404,13 +426,13 @@
             position: relative;
         }
 
-        .admin-dropdown-item > .admin-sidebar-link .bi-chevron-right {
+        .admin-dropdown-item>.admin-sidebar-link .bi-chevron-right {
             margin-left: auto;
             transition: transform 0.3s ease;
             flex-shrink: 0;
         }
 
-        .admin-dropdown-item.active > .admin-sidebar-link .bi-chevron-right {
+        .admin-dropdown-item.active>.admin-sidebar-link .bi-chevron-right {
             transform: rotate(90deg);
         }
 
@@ -498,6 +520,7 @@
             0% {
                 left: -100%;
             }
+
             100% {
                 left: 100%;
             }
@@ -750,6 +773,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -962,20 +986,20 @@
                     <!-- Notifications -->
                     <div class="dropdown position-relative">
 
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" 
-                                  id="notificationBadge" 
-                                  style="font-size: 0.65rem; display: none;">
-                                0
-                            </span>
-                        <button class="admin-header-btn position-relative" type="button" 
-                                id="notificationsBtn" 
-                                data-bs-toggle="dropdown" 
-                                aria-expanded="false"
-                                title="Notifications">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
+                            id="notificationBadge"
+                            style="font-size: 0.65rem; display: none;">
+                            0
+                        </span>
+                        <button class="admin-header-btn position-relative" type="button"
+                            id="notificationsBtn"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            title="Notifications">
                             <i class="bi bi-bell-fill"></i>
-                            
+
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg border-0" 
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg border-0"
                             id="notificationDropdown"
                             style="min-width: 380px; max-width: 420px; max-height: 500px; overflow-y: auto; padding: 0;">
                             <!-- Header -->
@@ -986,15 +1010,17 @@
                                         <span>Thông báo</span>
                                         <span class="badge bg-primary ms-2" id="notificationHeaderCount" style="display: none; font-size: 0.7rem;">0</span>
                                     </h6>
-                                    <button class="btn btn-sm btn-link text-decoration-none p-0 text-muted" 
-                                            id="markAllReadBtn"
-                                            style="font-size: 0.8rem; white-space: nowrap;">
+                                    <button class="btn btn-sm btn-link text-decoration-none p-0 text-muted"
+                                        id="markAllReadBtn"
+                                        style="font-size: 0.8rem; white-space: nowrap;">
                                         <i class="bi bi-check-all me-1"></i>Đánh dấu tất cả
                                     </button>
                                 </div>
                             </li>
-                            <li><hr class="dropdown-divider my-0"></li>
-                            
+                            <li>
+                                <hr class="dropdown-divider my-0">
+                            </li>
+
                             <!-- Notifications List -->
                             <li id="notificationsList" style="max-height: 400px; overflow-y: auto;">
                                 <div class="text-center py-5" id="notificationsLoading">
@@ -1008,9 +1034,11 @@
                                     <div class="text-muted small mt-2">Không có thông báo mới</div>
                                 </div>
                             </li>
-                            
+
                             <!-- Footer -->
-                            <li><hr class="dropdown-divider my-0"></li>
+                            <li>
+                                <hr class="dropdown-divider my-0">
+                            </li>
                             <li class="notification-footer">
                                 <a href="{{ route('admin.dashboard') }}" class="dropdown-item text-center py-2 text-primary" id="viewAllNotifications">
                                     <i class="bi bi-arrow-right-circle me-1"></i>
@@ -1022,8 +1050,8 @@
 
                     <!-- Tài khoản -->
                     <div class="dropdown">
-                        <a class="admin-user-dropdown dropdown-toggle text-decoration-none text-white d-flex align-items-center" 
-                           data-bs-toggle="dropdown" role="button">
+                        <a class="admin-user-dropdown dropdown-toggle text-decoration-none text-white d-flex align-items-center"
+                            data-bs-toggle="dropdown" role="button">
                             <i class="bi bi-person-circle me-2 fs-5"></i>
                             <span class="d-none d-md-inline">{{ Auth::user()->name ?? 'Admin' }}</span>
                         </a>
@@ -1038,7 +1066,9 @@
                                     <i class="bi bi-gear me-2"></i> Settings
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
@@ -1067,71 +1097,76 @@
                 class="admin-sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-house-door-fill"></i> Dashboard
             </a>
-            
+
             <a href="{{ route('admin.categories.list') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                 <i class="bi bi-folder-plus"></i> Danh mục
             </a>
-            
+
             <a href="{{ route('admin.home-categories.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.home-categories.*') ? 'active' : '' }}">
                 <i class="bi bi-grid-fill"></i> Danh mục trang chủ
             </a>
-            
+
             <a href="{{ route('admin.products.list') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> Sản phẩm
             </a>
-            
+
             <a href="{{ route('admin.orders.list') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                 <i class="bi bi-cart-fill"></i> Đơn hàng
             </a>
-            
+
+            <a href="{{ route('admin.contact-info.index') }}"
+            class="admin-sidebar-link {{ request()->routeIs('admin.contact-info.*') ? 'active' : '' }}">
+                <i class="bi bi-headset me-2"></i></i>Liên hệ nhanh
+            </a>
+
             <a href="{{ route('admin.contacts.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}">
                 <i class="bi bi-envelope"></i> Liên hệ
             </a>
-            
+
             <a href="{{ route('admin.chatbox.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.chatbox.*') ? 'active' : '' }}">
                 <i class="bi bi-chat-dots-fill"></i> Chatbox
                 @php
-                    $unreadChatCount = \App\Models\ChatSession::where('unread_count', '>', 0)->count();
+                $unreadChatCount = \App\Models\ChatSession::where('unread_count', '>', 0)->count();
                 @endphp
                 @if ($unreadChatCount > 0)
-                    <span class="admin-sidebar-badge">{{ $unreadChatCount }}</span>
+                <span class="admin-sidebar-badge">{{ $unreadChatCount }}</span>
                 @endif
             </a>
-            
+
             <a href="{{ route('admin.blogs.list') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
                 <i class="bi bi-list-ul"></i> Danh sách bài viết
             </a>
-            
+
             <a href="{{ route('admin.comments.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                 <i class="bi bi-chat-left-text-fill"></i> Quản lý bình luận
             </a>
-            
+
             <a href="{{ route('admin.notifications.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
                 <i class="bi bi-bell-fill"></i> Thông báo
                 @php
-                    $unreadCount = \App\Models\Notification::where('user_id', auth()->id())
-                        ->where('is_read', false)
-                        ->count();
+                $unreadCount = \App\Models\Notification::where('user_id', auth()->id())
+                ->where('is_read', false)
+                ->count();
                 @endphp
                 @if($unreadCount > 0)
-                    <span class="admin-sidebar-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                <span class="admin-sidebar-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
                 @endif
             </a>
-            
+
             <a href="{{ route('admin.banners.list') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                 <i class="bi bi-image-fill"></i> Quản lý Banner
             </a>
-            
+
             <!-- Quản lý tài khoản -->
             <div class="admin-dropdown-item {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
                 <a href="#" class="admin-sidebar-link {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
@@ -1156,18 +1191,18 @@
             </a>
 
             @php
-                $pendingDeposits = \App\Models\DepositRequest::where('status', 'pending')->count();
-                $pendingWithdraws = \App\Models\WithdrawRequest::whereIn('status', ['pending', 'processing'])->count();
-                $totalPending = $pendingDeposits + $pendingWithdraws;
+            $pendingDeposits = \App\Models\DepositRequest::where('status', 'pending')->count();
+            $pendingWithdraws = \App\Models\WithdrawRequest::whereIn('status', ['pending', 'processing'])->count();
+            $totalPending = $pendingDeposits + $pendingWithdraws;
             @endphp
             <a href="{{ route('admin.wallet.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
                 <i class="bi bi-wallet2"></i> Quản lý Ví
                 @if ($totalPending > 0)
-                    <span class="admin-sidebar-badge">{{ $totalPending > 99 ? '99+' : $totalPending }}</span>
+                <span class="admin-sidebar-badge">{{ $totalPending > 99 ? '99+' : $totalPending }}</span>
                 @endif
             </a>
-            
+
             <a href="{{ route('admin.shipping.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.shipping.*') ? 'active' : '' }}">
                 <i class="bi bi-truck"></i> Cài đặt vận chuyển
@@ -1184,7 +1219,7 @@
     <footer class="admin-footer">
         <div class="admin-footer-content">
             <i class="bi bi-meteor me-2"></i>
-            © 2025 Meteor-Shop — Admin Panel | 
+            © 2025 Meteor-Shop — Admin Panel |
             <span class="ms-2">Powered by Laravel & Tailwind CSS</span>
         </div>
     </footer>
@@ -1226,13 +1261,13 @@
 
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
-            
+
             if (currentScroll > 50) {
                 adminHeader.classList.add('scrolled');
             } else {
                 adminHeader.classList.remove('scrolled');
             }
-            
+
             lastScroll = currentScroll;
         });
 
@@ -1240,7 +1275,7 @@
         const mobileMenuToggle = document.getElementById('mobileMenuToggle');
         const adminSidebar = document.getElementById('adminSidebar');
         let mobileOverlay = document.querySelector('.mobile-overlay');
-        
+
         if (!mobileOverlay) {
             mobileOverlay = document.createElement('div');
             mobileOverlay.className = 'mobile-overlay';
@@ -1249,9 +1284,9 @@
 
         function toggleMobileMenu() {
             if (!adminSidebar) return;
-            
+
             const isOpen = adminSidebar.classList.contains('mobile-open');
-            
+
             if (isOpen) {
                 adminSidebar.classList.remove('mobile-open');
                 mobileOverlay.classList.remove('show');
@@ -1292,13 +1327,13 @@
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     const parent = this.closest('.admin-dropdown-item');
                     if (!parent) return;
-                    
+
                     const isActive = parent.classList.contains('active');
                     const submenu = parent.querySelector('.admin-submenu');
-                    
+
                     // Close all other dropdowns
                     document.querySelectorAll('.admin-dropdown-item').forEach(dropdown => {
                         if (dropdown !== parent) {
@@ -1309,7 +1344,7 @@
                             }
                         }
                     });
-                    
+
                     // Toggle current dropdown
                     if (isActive) {
                         parent.classList.remove('active');
@@ -1343,7 +1378,7 @@
                     const size = Math.max(rect.width, rect.height);
                     const x = e.clientX - rect.left - size / 2;
                     const y = e.clientY - rect.top - size / 2;
-                    
+
                     ripple.style.cssText = `
                         position: absolute;
                         width: ${size}px;
@@ -1355,11 +1390,11 @@
                         pointer-events: none;
                         animation: ripple 0.6s ease-out;
                     `;
-                    
+
                     this.style.position = 'relative';
                     this.style.overflow = 'hidden';
                     this.appendChild(ripple);
-                    
+
                     setTimeout(() => ripple.remove(), 600);
                 });
             });
@@ -1408,7 +1443,7 @@
                     markAllReadBtn: document.getElementById('markAllReadBtn'),
                     viewAllBtn: document.getElementById('viewAllNotifications')
                 };
-                
+
                 this.state = {
                     notifications: [],
                     unreadCount: 0,
@@ -1418,21 +1453,21 @@
                     cacheKey: 'admin_notifications_cache',
                     cacheExpiry: 30000 // 30 seconds
                 };
-                
+
                 this.init();
             }
 
             init() {
                 if (!this.elements.btn) return;
-                
+
                 // Load badge count immediately on page load
                 this.loadBadgeCount();
-                
+
                 // Load full notifications when dropdown opens
                 this.elements.btn.addEventListener('shown.bs.dropdown', () => {
                     this.loadNotifications(true);
                 });
-                
+
                 // Mark all as read
                 if (this.elements.markAllReadBtn) {
                     this.elements.markAllReadBtn.addEventListener('click', (e) => {
@@ -1441,7 +1476,7 @@
                         this.markAllAsRead();
                     });
                 }
-                
+
                 // View all notifications
                 if (this.elements.viewAllBtn) {
                     this.elements.viewAllBtn.addEventListener('click', (e) => {
@@ -1449,10 +1484,10 @@
                         window.location.href = '{{ route("admin.notifications.index") }}';
                     });
                 }
-                
+
                 // Auto-refresh with debounce
                 this.startAutoRefresh();
-                
+
                 // Handle click outside
                 this.handleClickOutside();
             }
@@ -1472,11 +1507,11 @@
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     });
-                    
+
                     if (!response.ok) throw new Error('Network response was not ok');
-                    
+
                     const data = await response.json();
-                    
+
                     if (data.success) {
                         const count = data.totalUnread || 0;
                         this.updateBadge(count);
@@ -1491,7 +1526,7 @@
             // Load full notifications
             async loadNotifications(showLoading = false) {
                 if (this.state.isLoading) return;
-                
+
                 // Check cache first
                 const cached = this.getCachedData();
                 if (cached && cached.notifications && !this.isCacheExpired(cached.timestamp)) {
@@ -1499,22 +1534,22 @@
                     this.state.unreadCount = cached.unreadCount;
                     this.renderNotifications();
                     this.updateBadge(cached.unreadCount);
-                    
+
                     // Still fetch in background for fresh data
                     this.loadNotificationsFromAPI(showLoading, false);
                     return;
                 }
-                
+
                 await this.loadNotificationsFromAPI(showLoading, true);
             }
 
             async loadNotificationsFromAPI(showLoading = false, updateUI = true) {
                 this.state.isLoading = true;
-                
+
                 if (showLoading && this.elements.loading) {
                     this.elements.loading.style.display = 'block';
                 }
-                
+
                 try {
                     const response = await fetch('{{ route("admin.dashboard.notifications") }}', {
                         method: 'GET',
@@ -1524,21 +1559,21 @@
                             'Cache-Control': 'no-cache'
                         }
                     });
-                    
+
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                    
+
                     const data = await response.json();
-                    
+
                     if (data.success) {
                         this.state.notifications = data.notifications || [];
                         this.state.unreadCount = data.totalUnread || 0;
                         this.state.lastFetchTime = Date.now();
-                        
+
                         // Cache the data
                         this.cacheData(data.notifications, this.state.unreadCount);
-                        
+
                         if (updateUI) {
                             this.renderNotifications();
                             this.updateBadge(this.state.unreadCount);
@@ -1587,10 +1622,10 @@
             renderNotificationItem(notif) {
                 const unreadClass = notif.unread ? '' : 'read';
                 const level = notif.level || 'info';
-                const unreadDot = notif.unread 
-                    ? '<span class="unread-dot"></span>' 
-                    : '';
-                
+                const unreadDot = notif.unread ?
+                    '<span class="unread-dot"></span>' :
+                    '';
+
                 return `
                     <div class="notification-item ${unreadClass}" 
                          data-notification-id="${notif.id}"
@@ -1617,13 +1652,13 @@
             async handleNotificationClick(item) {
                 const link = item.getAttribute('data-link');
                 const notificationId = item.getAttribute('data-notification-id');
-                
+
                 // Mark as read on server (only if it's a database notification ID, not dynamic ID)
                 // Dynamic notifications (order_123, review_456) don't exist in database
                 if (notificationId && !item.classList.contains('read')) {
                     // Check if it's a numeric ID (database notification) or string ID (dynamic notification)
                     const isNumericId = /^\d+$/.test(notificationId);
-                    
+
                     if (isNumericId) {
                         try {
                             await fetch(`{{ route('admin.notifications.read', ':id') }}`.replace(':id', notificationId), {
@@ -1639,10 +1674,10 @@
                         }
                     }
                 }
-                
+
                 // Mark as read in UI (works for both database and dynamic notifications)
                 this.markAsRead(item, notificationId);
-                
+
                 // Navigate if link is valid
                 if (link && link !== '#') {
                     // Small delay for visual feedback
@@ -1654,18 +1689,18 @@
 
             markAsRead(item, notificationId = null) {
                 if (item.classList.contains('read')) return;
-                
+
                 item.classList.add('read');
                 const unreadDot = item.querySelector('.unread-dot');
                 if (unreadDot) {
                     unreadDot.style.animation = 'fadeOut 0.3s ease-out';
                     setTimeout(() => unreadDot.remove(), 300);
                 }
-                
+
                 // Update count
                 this.state.unreadCount = Math.max(0, this.state.unreadCount - 1);
                 this.updateBadge(this.state.unreadCount);
-                
+
                 // Update in notifications array
                 if (notificationId) {
                     const notif = this.state.notifications.find(n => n.id === notificationId);
@@ -1685,7 +1720,7 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                         }
                     });
-                    
+
                     if (response.ok) {
                         document.querySelectorAll('.notification-item:not(.read)').forEach(item => {
                             const notificationId = item.getAttribute('data-notification-id');
@@ -1704,21 +1739,21 @@
 
             updateBadge(count) {
                 if (!this.elements.badge) return;
-                
+
                 const previousCount = parseInt(this.elements.badge.textContent) || 0;
                 const headerCount = document.getElementById('notificationHeaderCount');
-                
+
                 if (count > 0) {
                     const displayCount = count > 99 ? '99+' : count;
                     this.elements.badge.textContent = displayCount;
                     this.elements.badge.style.display = 'inline-block';
-                    
+
                     // Update header count
                     if (headerCount) {
                         headerCount.textContent = displayCount;
                         headerCount.style.display = 'inline-block';
                     }
-                    
+
                     // Animation when count changes
                     if (previousCount !== count && previousCount > 0) {
                         this.elements.badge.style.animation = 'badgePulse 0.5s ease-out';
@@ -1765,7 +1800,7 @@
                 if (this.state.refreshInterval) {
                     clearInterval(this.state.refreshInterval);
                 }
-                
+
                 // Refresh every 60 seconds, but only if page is visible
                 this.state.refreshInterval = setInterval(() => {
                     if (!document.hidden) {
@@ -1777,7 +1812,7 @@
             handleClickOutside() {
                 document.addEventListener('click', (e) => {
                     if (this.elements.dropdown && this.elements.btn) {
-                        if (!this.elements.dropdown.contains(e.target) && 
+                        if (!this.elements.dropdown.contains(e.target) &&
                             !this.elements.btn.contains(e.target)) {
                             const bsDropdown = bootstrap.Dropdown.getInstance(this.elements.btn);
                             if (bsDropdown && bsDropdown._isShown()) {
@@ -1858,19 +1893,19 @@
                         <i class="bi bi-x"></i>
                     </button>
                 `;
-                
+
                 document.body.appendChild(toast);
-                
+
                 // Trigger animation
                 setTimeout(() => toast.classList.add('show'), 10);
-                
+
                 // Auto remove
                 setTimeout(() => {
                     toast.classList.remove('show');
                     setTimeout(() => toast.remove(), 300);
                 }, duration);
             }
-            
+
             static getIcon(type) {
                 const icons = {
                     info: 'bi-info-circle-fill',
@@ -1880,7 +1915,7 @@
                 };
                 return icons[type] || icons.info;
             }
-            
+
             static escapeHtml(text) {
                 const div = document.createElement('div');
                 div.textContent = text;
@@ -1892,7 +1927,7 @@
         let notificationManager;
         document.addEventListener('DOMContentLoaded', function() {
             notificationManager = new NotificationManager();
-            
+
             // Listen for new notifications (for realtime updates)
             let previousUnreadCount = 0;
             setInterval(async () => {
@@ -1912,7 +1947,6 @@
                 }
             }, 30000); // Check every 30 seconds
         });
-
     </script>
 
     @stack('scripts')

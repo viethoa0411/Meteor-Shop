@@ -40,6 +40,7 @@ class ShippingSetting extends Model
         'fast_label',
         'installation_fee',
         'same_order_discount_percent',
+        'same_product_discount_percent',
         'volume_price_per_m3',
         'min_shipping_fee',
         'conversion_factor',
@@ -72,6 +73,7 @@ class ShippingSetting extends Model
         'fast_surcharge_value' => 'decimal:0',
         'installation_fee' => 'decimal:0',
         'same_order_discount_percent' => 'decimal:2',
+        'same_product_discount_percent' => 'decimal:2',
         'volume_price_per_m3' => 'decimal:0',
         'min_shipping_fee' => 'decimal:0',
         'conversion_factor' => 'integer',
@@ -121,6 +123,7 @@ class ShippingSetting extends Model
                 'free_shipping_enabled' => true,
                 'installation_fee' => 0,
                 'same_order_discount_percent' => 0,
+                'same_product_discount_percent' => 0,
                 'volume_price_per_m3' => 5000,
                 'min_shipping_fee' => 30000,
                 'conversion_factor' => 5000,
@@ -212,8 +215,35 @@ class ShippingSetting extends Model
                 $weightBlockKg
             );
 
-            // Nhân với khoảng cách và số lượng
-            $itemTotalFee = $itemFee * $distanceKm * $quantity;
+            // Tính phí ban đầu cho 1 sản phẩm (đã nhân với km)
+            // F = phí vận chuyển 1 sản phẩm đầu tiên
+            $itemFeePerUnit = $itemFee * $distanceKm;
+
+            // Áp dụng giảm giá khi mua nhiều sản phẩm cùng loại (quantity > 1)
+            // Công thức: Nếu q = 1: Phí = F
+            //            Nếu q ≥ 2: Phí = F + (q - 1) × F × r
+            // Trong đó: r = tỷ lệ tính phí cho sản phẩm tiếp theo
+            //           r = (100 - same_product_discount_percent) / 100
+            if ($quantity > 1 && $this->same_product_discount_percent > 0) {
+                // Tính tỷ lệ r: nếu giảm 50% thì r = 0.5, nếu giảm 10% thì r = 0.9
+                $r = (100 - (float)$this->same_product_discount_percent) / 100;
+                
+                // Công thức: F + (q - 1) × F × r
+                $itemTotalFee = $itemFeePerUnit + (($quantity - 1) * $itemFeePerUnit * $r);
+                
+                Log::debug('Shipping: Áp dụng giảm giá sản phẩm cùng loại', [
+                    'quantity' => $quantity,
+                    'item_fee_per_unit' => $itemFeePerUnit,
+                    'discount_percent' => $this->same_product_discount_percent,
+                    'rate_r' => $r,
+                    'item_total_fee' => $itemTotalFee,
+                    'formula' => "F + (q - 1) × F × r = {$itemFeePerUnit} + ({$quantity} - 1) × {$itemFeePerUnit} × {$r}",
+                ]);
+            } else {
+                // Không có giảm giá hoặc quantity = 1: nhân với số lượng như bình thường
+                $itemTotalFee = $itemFeePerUnit * $quantity;
+            }
+            
             $totalStandardFee += $itemTotalFee;
 
             Log::debug('Shipping: Tính phí cho item', [
@@ -223,52 +253,30 @@ class ShippingSetting extends Model
                 'weight_kg' => $weightKg,
                 'quantity' => $quantity,
                 'item_fee' => $itemFee,
+                'item_fee_per_unit' => $itemFeePerUnit,
                 'distance_km' => $distanceKm,
                 'item_total_fee' => $itemTotalFee,
             ]);
         }
 
-        // Phí tiêu chuẩn ban đầu (trước khi giảm giá)
+        // Phí tiêu chuẩn (đã áp dụng giảm giá sản phẩm cùng loại cho từng item trong vòng lặp)
         $standardFee = $totalStandardFee;
 
         // Áp dụng phí tối thiểu
         $minShippingFee = (float)($this->min_shipping_fee ?? 30000);
         $standardFee = max($standardFee, $minShippingFee);
 
-        Log::info('Shipping: Tổng phí tiêu chuẩn (trước giảm giá)', [
+        Log::info('Shipping: Tổng phí tiêu chuẩn (sau khi áp dụng giảm giá sản phẩm cùng loại)', [
             'total_standard_fee' => $standardFee,
             'items_count' => count($items),
             'distance_km' => $distanceKm,
         ]);
-
-        // Áp dụng giảm giá cùng đơn hàng nếu có nhiều sản phẩm (từ 2 sản phẩm trở lên)
-        // Giảm giá dựa vào phí vận chuyển BAN ĐẦU (trước khi áp dụng phí tối thiểu)
-        $sameOrderDiscount = 0;
-        $originalFee = $totalStandardFee; // Phí ban đầu (chưa áp dụng min)
-        
-        if (count($items) > 1 && $this->same_order_discount_percent > 0) {
-            // Tính giảm giá dựa vào phí ban đầu
-            $sameOrderDiscount = ($originalFee * (float)$this->same_order_discount_percent) / 100;
-            $standardFee = max(0, $standardFee - $sameOrderDiscount);
-            
-            // Đảm bảo không nhỏ hơn phí tối thiểu sau khi giảm giá
-            $standardFee = max($standardFee, $minShippingFee);
-            
-            Log::info('Shipping: Áp dụng giảm giá cùng đơn hàng', [
-                'items_count' => count($items),
-                'original_fee' => $originalFee,
-                'discount_percent' => $this->same_order_discount_percent,
-                'discount_amount' => $sameOrderDiscount,
-                'standard_fee_after_discount' => $standardFee,
-            ]);
-        }
 
         $surcharge = $this->calculateSurcharge($method, $standardFee);
 
         return [
             'standard_fee' => $standardFee,
             'surcharge' => $surcharge,
-            'same_order_discount' => $sameOrderDiscount,
             'total' => max(0, $standardFee + $surcharge),
         ];
     }

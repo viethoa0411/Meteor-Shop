@@ -146,7 +146,7 @@
                             {{-- Phương thức thanh toán --}}
                             <div class="mb-3">
                                 <label class="form-label">Phương thức thanh toán <span class="text-danger">*</span></label>
-                                <div class="form-check mb-2">
+                                <div class="form-check mb-2" id="cod-payment-option">
                                     <input class="form-check-input" type="radio" name="payment_method" id="cash"
                                         value="cash" {{ old('payment_method', 'cash') == 'cash' ? 'checked' : '' }} required>
                                     <label class="form-check-label" for="cash">
@@ -169,6 +169,9 @@
                                 @error('payment_method')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
+                                <div id="cod-restriction-message" class="alert alert-warning mt-2" style="display:none;">
+                                    <small><i class="bi bi-info-circle me-1"></i>Đơn hàng trên 10 triệu chỉ được thanh toán online.</small>
+                                </div>
                             </div>
 
                             {{-- Ghi chú --}}
@@ -257,10 +260,20 @@
                             <strong class="text-success" id="discount-amount">- 0 đ</strong>
                         </div>
 
+                        @php
+                            $defaultInstallationFee = $shippingSettings->installation_fee ?? 0;
+                        @endphp
+                        @if($defaultInstallationFee > 0)
+                        <div class="mb-2 d-flex justify-content-between" id="installation-row">
+                            <span>Phí lắp đặt:</span>
+                            <strong id="installation-fee">{{ number_format($defaultInstallationFee, 0, ',', '.') }} đ</strong>
+                        </div>
+                        @else
                         <div class="mb-2 d-flex justify-content-between" id="installation-row" style="display:none;">
                             <span>Phí lắp đặt:</span>
                             <strong id="installation-fee">0 đ</strong>
                         </div>
+                        @endif
                         <div class="mb-3 pt-2 border-top d-flex justify-content-between">
                             <span class="fs-5 fw-bold">Tổng cộng:</span>
                             <span class="fs-5 fw-bold text-danger" id="total-amount">
@@ -356,8 +369,9 @@
         <script>
             let currentDiscount = 0;
             let appliedCode = '';
-            let installationFee = 0;
-            let isInstallationSelected = false;
+            let installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+            let isInstallationSelected = {{ (($shippingSettings->installation_fee ?? 0) > 0) ? 'true' : 'false' }};
+            const COD_LIMIT = 10000000; // 10 triệu
             let shippingCalculationTimeout = null;
             let quantityUpdateTimeout = null;
 
@@ -813,6 +827,10 @@
                         subtotalDisplayEl.textContent = currentSubtotal.toLocaleString('vi-VN') + ' đ';
                     }
 
+                    // Cập nhật hiển thị COD và tổng tiền
+                    updatePaymentMethodDisplay();
+                    updateTotalDisplay();
+
                     updateTotalDisplay();
                     
                     // Debounce shipping calculation
@@ -977,6 +995,36 @@
                     });
                 }
 
+                // Hàm cập nhật hiển thị phương thức thanh toán (ẩn COD nếu > 10 triệu)
+                function updatePaymentMethodDisplay() {
+                    const codOption = document.getElementById('cod-payment-option');
+                    const codRadio = document.getElementById('cash');
+                    const momoRadio = document.getElementById('momo');
+                    const codMessage = document.getElementById('cod-restriction-message');
+                    const totalAmount = (currentSubtotal - currentDiscount) + currentShippingFee + installationFee;
+
+                    if (codOption && codRadio && momoRadio) {
+                        if (totalAmount > COD_LIMIT) {
+                            // Ẩn COD và hiển thị thông báo
+                            codOption.style.display = 'none';
+                            if (codMessage) codMessage.style.display = 'block';
+                            
+                            // Nếu đang chọn COD, tự động chuyển sang Momo
+                            if (codRadio.checked) {
+                                if (momoRadio) {
+                                    momoRadio.checked = true;
+                                    codRadio.required = false;
+                                }
+                            }
+                        } else {
+                            // Hiển thị COD và ẩn thông báo
+                            codOption.style.display = 'block';
+                            if (codMessage) codMessage.style.display = 'none';
+                            codRadio.required = true;
+                        }
+                    }
+                }
+
                 // Hàm cập nhật hiển thị tổng tiền
                 function updateTotalDisplay() {
                     const total = Math.max(0, (currentSubtotal - currentDiscount) + currentShippingFee + installationFee);
@@ -991,7 +1039,8 @@
                             : currentShippingFee.toLocaleString('vi-VN') + ' đ';
                     }
                     if (installationRow && installationFeeEl) {
-                        if (isInstallationSelected && installationFee > 0) {
+                        // Luôn hiển thị phí lắp đặt nếu có giá
+                        if (installationFee > 0) {
                             installationRow.style.display = 'flex';
                             installationFeeEl.textContent = installationFee.toLocaleString('vi-VN') + ' đ';
                         } else {
@@ -1001,20 +1050,21 @@
                     if (totalAmountEl) {
                         totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
                     }
+                    
+                    // Cập nhật hiển thị phương thức thanh toán
+                    updatePaymentMethodDisplay();
                 }
 
-                // Xử lý checkbox lắp đặt
+                // Xử lý checkbox lắp đặt (giữ lại để tương thích, nhưng phí lắp đặt luôn được tính)
                 const installationCheckbox = document.getElementById('installation-checkbox');
                 if (installationCheckbox) {
-                    // Lấy phí lắp đặt từ server
-                    fetch('{{ route("admin.shipping.index") }}')
-                        .then(() => {
-                            // Giả sử phí lắp đặt được lấy từ một API hoặc từ biến PHP
-                            installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
-                        })
-                        .catch(() => {
-                            installationFee = 0;
-                        });
+                    // Phí lắp đặt mặc định luôn được áp dụng nếu có giá
+                    const installationFeeInput = document.getElementById('installation_fee_input');
+                    if (installationFeeInput && installationFee > 0) {
+                        installationFeeInput.value = installationFee;
+                        installationCheckbox.checked = true;
+                        isInstallationSelected = true;
+                    }
 
                     installationCheckbox.addEventListener('change', function() {
                         isInstallationSelected = this.checked;
@@ -1029,6 +1079,9 @@
                         updateTotalDisplay();
                     });
                 }
+                
+                // Khởi tạo hiển thị khi trang load
+                updateTotalDisplay();
 
                 // Lắng nghe sự kiện thay đổi địa chỉ - Đã gộp vào sự kiện change ở trên
 
