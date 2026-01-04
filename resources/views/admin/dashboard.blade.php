@@ -4,7 +4,7 @@
 @section('content')
 
     {{-- ========== 1. HEADER DASHBOARD ========== --}}
-    <section class="mb-4">
+    <section class="dashboard-section">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div>
                 <h4 class="fw-bold mb-1 d-flex align-items-center gap-2">
@@ -21,7 +21,7 @@
     </section>
 
     {{-- ========== 2. KPI SUMMARY SECTION (TOP KPIs) ========== --}}
-    <section class="mb-4">
+    <section class="dashboard-section">
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
             {{-- 🔵 1. KPI Tổng Doanh Thu (Premium Design) --}}
@@ -41,14 +41,14 @@
                                     <i class="bi bi-cash-coin" style="font-size: 1.3rem;"></i>
                                 </div>
                             </div>
-                            
+
                             {{-- Main Value --}}
                             <div class="mb-2">
                                 <h2 class="fw-bold mb-0 kpi-main-value">
                                         {{ number_format($totalCompletedRevenue) }} ₫
                                 </h2>
                                 </div>
-                            
+
                             {{-- Sub Info --}}
                             <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -60,9 +60,9 @@
                                     <strong>{{ number_format($monthlyTarget) }} ₫</strong>
                                 </div>
                             </div>
-                            
+
                             {{-- Tooltip trigger --}}
-                            <div class="kpi-tooltip-trigger" data-bs-toggle="tooltip" data-bs-placement="top" 
+                            <div class="kpi-tooltip-trigger" data-bs-toggle="tooltip" data-bs-placement="top"
                                  title="Doanh thu đã hoàn thành từ tất cả đơn hàng có trạng thái 'completed'">
                                 <i class="bi bi-info-circle" style="font-size: 0.65rem; opacity: 0.7;"></i>
                             </div>
@@ -88,14 +88,14 @@
                                     <i class="bi bi-cart-check-fill" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
-                            
+
                             {{-- Main Value --}}
                             <div class="mb-2">
                                 <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 1.5rem; line-height: 1.2;">
                                     {{ number_format($totalOrders) }}
                                 </h2>
                             </div>
-                            
+
                             {{-- Sub Info --}}
                             <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -133,14 +133,14 @@
                                     <i class="bi bi-people-fill" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
-                            
+
                             {{-- Main Value --}}
                             <div class="mb-2">
                                 <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 1.5rem; line-height: 1.2;">
                                     {{ number_format($totalUsers) }}
                                 </h2>
                             </div>
-                            
+
                             {{-- Sub Info với Badge Gradient --}}
                             <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -150,10 +150,10 @@
                                     @if($userGrowth !== null)
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-white" style="opacity: 0.9;">Thay đổi:</span>
-                                    <span class="badge bg-white {{ $userGrowth > 0 ? 'text-success' : ($userGrowth < 0 ? 'text-danger' : 'text-secondary') }}" 
+                                    <span class="badge bg-white {{ $userGrowth > 0 ? 'text-success' : ($userGrowth < 0 ? 'text-danger' : 'text-secondary') }}"
                                           style="font-size: 0.6rem; font-weight: 600; padding: 0.2rem 0.4rem;"
-                                          data-bs-toggle="tooltip" 
-                                          data-bs-placement="top" 
+                                          data-bs-toggle="tooltip"
+                                          data-bs-placement="top"
                                           title="Người dùng mới trong tháng này">
                                             {{ $userGrowth > 0 ? '+' : '' }}{{ $userGrowth }}% so với tháng trước
                                         </span>
@@ -182,14 +182,14 @@
                                     <i class="bi bi-box-seam" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
-                            
+
                             {{-- Main Value --}}
                             <div class="mb-2">
                                 <h2 class="fw-bold mb-0 kpi-main-value text-white" style="font-size: 1.5rem; line-height: 1.2;">
                                     {{ number_format($totalProducts) }}
                                 </h2>
                             </div>
-                            
+
                             {{-- Sub Info với Badge Xanh --}}
                             <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -238,14 +238,14 @@
                                     <i class="bi bi-check-circle-fill" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
-                            
+
                             {{-- Main Value với Progress Donut Mini --}}
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <div class="kpi-donut-mini" style="width: 45px; height: 45px; position: relative;">
                                     <svg width="45" height="45" style="transform: rotate(-90deg);">
                                         <circle cx="22.5" cy="22.5" r="18" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="4"></circle>
-                                        <circle cx="22.5" cy="22.5" r="18" fill="none" stroke="#fff" stroke-width="4" 
-                                                stroke-dasharray="{{ 2 * 3.14159 * 18 }}" 
+                                        <circle cx="22.5" cy="22.5" r="18" fill="none" stroke="#fff" stroke-width="4"
+                                                stroke-dasharray="{{ 2 * 3.14159 * 18 }}"
                                                 stroke-dashoffset="{{ 2 * 3.14159 * 18 * (1 - $completeRate / 100) }}"
                                                 style="transition: stroke-dashoffset 0.5s ease;"></circle>
                                     </svg>
@@ -259,7 +259,7 @@
                                     </h2>
                                 </div>
                             </div>
-                            
+
                             {{-- Sub Info --}}
                             <div class="d-flex flex-column gap-0" style="font-size: 0.65rem;">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -280,17 +280,17 @@
     </section>
 
     {{-- ========== 2.5. QUICK ACTIONS SECTION ========== --}}
-    <section class="mb-4">
+    <section class="dashboard-section">
         <div class="card shadow-sm border-0 quick-actions-wrapper">
             <div class="card-body p-4">
                 <h5 class="fw-bold mb-4 quick-actions-title" style="font-size: 1.1rem;">Thao tác nhanh</h5>
                 <div class="row g-3">
                     {{-- 1. Tạo sản phẩm --}}
                     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                        <a href="{{ route('admin.products.create') }}" 
+                        <a href="{{ route('admin.products.create') }}"
                            class="quick-action-card text-decoration-none"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
                            title="Thêm sản phẩm mới vào cửa hàng">
                             <div class="quick-action-icon quick-action-blue">
                                 <i class="bi bi-box-seam"></i>
@@ -302,10 +302,10 @@
 
                     {{-- 2. Tạo danh mục --}}
                     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                        <a href="{{ route('admin.categories.create') }}" 
+                        <a href="{{ route('admin.categories.create') }}"
                            class="quick-action-card text-decoration-none"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
                            title="Tạo danh mục mới">
                             <div class="quick-action-icon quick-action-purple">
                                 <i class="bi bi-folder-plus"></i>
@@ -317,10 +317,10 @@
 
                     {{-- 3. Thêm người dùng --}}
                     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                        <a href="{{ route('admin.account.users.create') }}" 
+                        <a href="{{ route('admin.account.users.create') }}"
                            class="quick-action-card text-decoration-none"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
                            title="Thêm tài khoản người dùng hệ thống">
                             <div class="quick-action-icon quick-action-yellow">
                                 <i class="bi bi-person-plus-fill"></i>
@@ -332,10 +332,10 @@
 
                     {{-- 4. Quản lý bình luận --}}
                     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                        <a href="{{ route('admin.comments.index') }}" 
+                        <a href="{{ route('admin.comments.index') }}"
                            class="quick-action-card text-decoration-none"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
                            title="Xem và duyệt bình luận">
                             <div class="quick-action-icon quick-action-cyan">
                                 <i class="bi bi-chat-dots-fill"></i>
@@ -347,10 +347,10 @@
 
                     {{-- 5. Quản lý voucher --}}
                     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                        <a href="{{ route('admin.promotions.list') }}" 
+                        <a href="{{ route('admin.promotions.list') }}"
                            class="quick-action-card text-decoration-none"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
                            title="Tạo và quản lý mã giảm giá">
                             <div class="quick-action-icon quick-action-pink">
                                 <i class="bi bi-ticket-perforated-fill"></i>
@@ -362,10 +362,10 @@
 
                     {{-- 6. Quản lý ví --}}
                     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                        <a href="{{ route('admin.wallet.index') }}" 
+                        <a href="{{ route('admin.wallet.index') }}"
                            class="quick-action-card text-decoration-none"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
                            title="Quản lý ví người dùng / tiền hoàn">
                             <div class="quick-action-icon quick-action-green">
                                 <i class="bi bi-wallet-fill"></i>
@@ -380,7 +380,7 @@
     </section>
 
     {{-- ========== 3. CHARTS & ANALYTICS AREA ========== --}}
-    <section class="mb-4">
+    <section class="dashboard-section">
         <div class="row g-3">
             {{-- Combined Chart: Doanh thu & Đơn hàng theo thời gian --}}
             <div class="col-12 col-lg-8">
@@ -516,7 +516,7 @@
                     <div class="card-footer bg-white border-top">
                         <small class="text-muted">
                             <i class="bi bi-info-circle"></i>
-                            Tổng số đơn: <strong id="orderStatusTotal">0</strong> đơn | 
+                            Tổng số đơn: <strong id="orderStatusTotal">0</strong> đơn |
                             Khoảng thời gian: <span id="orderStatusPeriod">-</span>
                         </small>
                     </div>
@@ -588,7 +588,7 @@
     </section>
 
     {{-- ========== 4. CATEGORY REVENUE & TOP CUSTOMERS SECTION (1:1) ========== --}}
-    <section class="mb-4">
+    <section class="dashboard-section">
         <div class="row g-3">
             {{-- Card A: Biểu đồ Doanh thu theo Danh mục --}}
             <div class="col-12 col-lg-6">
@@ -714,7 +714,7 @@
     </section>
 
     {{-- ========== 5. TOP PRODUCTS SECTION ========== --}}
-    <section class="mb-4">
+    <section class="dashboard-section">
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm" style="border-radius: 16px;">
@@ -793,7 +793,7 @@
     </section>
 
     {{-- ========== 6. COMMENTS & USERS TABLES SECTION (1:1) ========== --}}
-    <section class="mb-4">
+    <section class="dashboard-section">
         <div class="row g-3">
             {{-- Card A: Bảng Bình luận (Comments Table) --}}
             <div class="col-12 col-lg-6">
@@ -928,7 +928,7 @@
 
     <style>
         /* ========== RESPONSIVE FOUNDATION - PROFESSIONAL SYSTEM ========== */
-        
+
         /* Root Variables for Responsive Design */
         :root {
             --base-font-size: 16px;
@@ -940,29 +940,29 @@
             --kpi-card-min-height: 150px;
             --chart-min-height: clamp(250px, 40vw, 380px);
         }
-        
+
         /* Fluid Typography System */
         .kpi-main-value {
             font-size: clamp(1rem, 2vw + 0.3rem, 1.5rem) !important;
         }
-        
+
         .card-header-responsive h6 {
             font-size: clamp(0.9rem, 1.2vw + 0.5rem, 1.1rem);
         }
-        
+
         .card-header-responsive small {
             font-size: clamp(0.7rem, 0.8vw + 0.3rem, 0.875rem);
         }
-        
+
         /* Fluid Spacing */
-        section.mb-4 {
-            margin-bottom: var(--section-spacing) !important;
+        .dashboard-section {
+            margin-bottom: var(--section-spacing);
         }
-        
+
         .card-header-responsive {
             padding: var(--card-padding) !important;
         }
-        
+
         /* Zoom-Aware Responsive Design */
         @media (min-resolution: 1.5dppx) {
             /* High DPI displays */
@@ -970,22 +970,22 @@
                 --base-font-size: 15px;
             }
         }
-        
+
         @media (min-resolution: 2dppx) {
             /* Retina displays */
             :root {
                 --base-font-size: 14px;
             }
         }
-        
+
         /* Container Queries Support (Progressive Enhancement) */
         /* Note: Container queries are experimental, using media queries as fallback */
         .kpi-cards-container {
             /* Future: container-type: inline-size; */
         }
-        
+
         /* Comprehensive Breakpoint System */
-        
+
         /* Extra Extra Small (xxs) - < 320px - Very small phones */
         @media (max-width: 319.98px) {
             :root {
@@ -993,31 +993,31 @@
                 --section-spacing: 0.75rem;
                 --card-padding: 10px;
             }
-            
+
             .kpi-main-value {
                 font-size: 0.9rem !important;
             }
-            
+
             .kpi-card-premium .card-body {
                 padding: 0.75rem !important;
                 min-height: 130px !important;
                 max-height: 130px !important;
             }
-            
+
             .card-header-responsive {
                 padding: 10px !important;
             }
-            
+
             .btn-group-sm .btn {
                 font-size: 0.55rem;
                 padding: 0.1rem 0.2rem;
             }
-            
+
             #revenueOrdersChart {
                 min-height: 200px !important;
             }
         }
-        
+
         /* Extra Small (xs) - 320px - 374px - Small phones */
         @media (min-width: 320px) and (max-width: 374.98px) {
             :root {
@@ -1026,7 +1026,7 @@
                 --card-padding: 12px;
             }
         }
-        
+
         /* Small (sm) - 375px - 575px - Phones */
         @media (min-width: 375px) and (max-width: 575.98px) {
             :root {
@@ -1035,7 +1035,7 @@
                 --card-padding: 14px;
             }
         }
-        
+
         /* Medium (md) - 576px - 767px - Large phones / Small tablets portrait */
         @media (min-width: 576px) and (max-width: 767.98px) {
             :root {
@@ -1044,7 +1044,7 @@
                 --card-padding: 18px;
             }
         }
-        
+
         /* Large (lg) - 768px - 991px - Tablets */
         @media (min-width: 768px) and (max-width: 991.98px) {
             :root {
@@ -1053,7 +1053,7 @@
                 --card-padding: 20px;
             }
         }
-        
+
         /* Extra Large (xl) - 992px - 1199px - Small desktops */
         @media (min-width: 992px) and (max-width: 1199.98px) {
             :root {
@@ -1062,7 +1062,7 @@
                 --card-padding: 22px;
             }
         }
-        
+
         /* Extra Extra Large (xxl) - >= 1200px - Large desktops */
         @media (min-width: 1200px) {
             :root {
@@ -1071,7 +1071,7 @@
                 --card-padding: 24px;
             }
         }
-        
+
         /* Ultra Wide - >= 1400px - Ultra wide monitors */
         @media (min-width: 1400px) {
             :root {
@@ -1079,16 +1079,16 @@
                 --section-spacing: 2.25rem;
                 --card-padding: 28px;
             }
-            
+
             .container-fluid,
             main {
                 max-width: 1600px;
                 margin: 0 auto;
             }
         }
-        
+
         /* Zoom Level Responsive Design */
-        
+
         /* Zoom Out Scenarios */
         @media (min-width: 1400px) {
             /* Large screens with zoom out */
@@ -1096,12 +1096,12 @@
                 min-height: 150px;
                 max-height: 150px;
             }
-            
+
             #revenueOrdersChart {
                 min-height: 420px;
             }
         }
-        
+
         /* Zoom In Scenarios - Smaller effective viewport */
         @media (max-width: 991.98px) {
             /* When zoomed in, ensure content doesn't break */
@@ -1109,12 +1109,12 @@
                 min-width: 0;
                 flex: 1 1 auto;
             }
-            
+
             .table {
                 font-size: clamp(0.75rem, 1vw + 0.5rem, 0.875rem);
             }
         }
-        
+
         /* Height-based Media Queries for Landscape */
         @media (max-height: 600px) and (orientation: landscape) {
             .category-revenue-card-responsive,
@@ -1122,29 +1122,29 @@
                 height: auto !important;
                 min-height: 280px;
             }
-            
+
             #revenueOrdersChart {
                 min-height: 220px !important;
             }
-            
+
             .comments-table-wrapper,
             .users-table-wrapper {
                 max-height: 200px;
                 height: 200px;
             }
         }
-        
+
         @media (max-height: 500px) and (orientation: landscape) {
             .kpi-card-premium .card-body {
                 min-height: 100px !important;
                 padding: 0.75rem !important;
             }
-            
+
             .card-header-responsive {
                 padding: 10px !important;
             }
         }
-        
+
         /* Aspect Ratio Based Queries */
         @media (aspect-ratio: 16/9) {
             /* Wide screens */
@@ -1153,7 +1153,7 @@
                 width: 20%;
             }
         }
-        
+
         @media (aspect-ratio: 4/3) {
             /* Traditional monitors */
             .row-cols-lg-4 > * {
@@ -1161,7 +1161,7 @@
                 width: 25%;
             }
         }
-        
+
         /* Touch Device Optimizations */
         @media (hover: none) and (pointer: coarse) {
             /* Touch devices */
@@ -1172,22 +1172,22 @@
                 min-height: 44px;
                 min-width: 44px;
             }
-            
+
             .btn-sm {
                 min-height: 36px;
             }
-            
+
             .kpi-card-premium:hover {
                 transform: none;
             }
-            
+
             /* Larger touch targets */
             .table th,
             .table td {
                 padding: 0.75rem 0.5rem;
             }
         }
-        
+
         /* Mouse Device Optimizations */
         @media (hover: hover) and (pointer: fine) {
             /* Mouse devices - enable hover effects */
@@ -1195,7 +1195,7 @@
                 transform: translateY(-5px) scale(1.02);
             }
         }
-        
+
         /* Reduced Motion */
         @media (prefers-reduced-motion: reduce) {
             *,
@@ -1207,30 +1207,30 @@
                 scroll-behavior: auto !important;
             }
         }
-        
+
         /* High Contrast Mode */
         @media (prefers-contrast: high) {
             .kpi-card-premium {
                 border: 2px solid currentColor;
             }
-            
+
             .btn-outline-primary,
             .btn-outline-secondary {
                 border-width: 2px;
             }
-            
+
             .table {
                 border: 1px solid;
             }
         }
-        
+
         /* Dark Mode with Reduced Motion */
         @media (prefers-color-scheme: dark) and (prefers-reduced-motion: reduce) {
             body.dark .kpi-card-premium {
                 transition: none;
             }
         }
-        
+
         /* Print Optimizations */
         @media print {
             * {
@@ -1238,16 +1238,16 @@
                 color: black !important;
                 box-shadow: none !important;
             }
-            
+
             .kpi-card-premium {
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
-            
+
             .card {
                 border: 1px solid #000;
             }
-            
+
             .btn-group,
             .dropdown,
             .table-search-input,
@@ -1255,7 +1255,7 @@
                 display: none;
             }
         }
-        
+
         /* Stat Card Styles */
         .stat-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1364,7 +1364,7 @@
             padding: 1rem 1.25rem !important;
             overflow: hidden;
         }
-        
+
         /* ========== ICON STYLES ========== */
         /* Icon Glow cho Revenue - Fluid Sizing */
         .kpi-icon-glow {
@@ -1379,7 +1379,7 @@
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
         }
-        
+
         .kpi-icon-glow i {
             font-size: clamp(0.9rem, 1.2vw + 0.3rem, 1.3rem) !important;
         }
@@ -1402,7 +1402,7 @@
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
         }
-        
+
         .kpi-icon-circle-glow i {
             font-size: clamp(0.85rem, 1.1vw + 0.3rem, 1.2rem) !important;
         }
@@ -1426,7 +1426,7 @@
             transition: all 0.3s ease;
             animation: kpi-icon-pulse 2s ease-in-out infinite;
         }
-        
+
         .kpi-icon-animated i {
             font-size: clamp(0.85rem, 1.1vw + 0.3rem, 1.2rem) !important;
         }
@@ -1459,7 +1459,7 @@
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
-        
+
         .kpi-icon-neon i {
             font-size: clamp(0.85rem, 1.1vw + 0.3rem, 1.2rem) !important;
         }
@@ -1482,7 +1482,7 @@
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
         }
-        
+
         .kpi-icon-check-circle i {
             font-size: clamp(0.85rem, 1.1vw + 0.3rem, 1.2rem) !important;
         }
@@ -2299,7 +2299,7 @@
             min-width: 100% !important;
             font-size: 0.8rem;
         }
-        
+
         .top-products-table-compact th {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             font-weight: 600;
@@ -2309,26 +2309,26 @@
             letter-spacing: 0.5px;
             border-bottom: 2px solid #dee2e6;
         }
-        
+
         .top-products-table-compact th,
         .top-products-table-compact td {
             vertical-align: middle;
             padding: 10px 12px;
             white-space: nowrap;
         }
-        
+
         /* Xử lý text quá dài trong Top Products Table */
         .top-products-table-compact td {
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         /* Cột tên sản phẩm - cho phép wrap nhưng có max-width */
         .top-products-table-compact td:nth-child(2) {
             white-space: normal;
             max-width: 200px;
         }
-        
+
         .product-name-top {
             max-width: 200px;
             overflow: hidden;
@@ -2336,83 +2336,83 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         .product-category-top {
             max-width: 200px;
         }
-        
+
         /* Các cột số - đảm bảo không bị overflow */
         .top-products-table-compact td:nth-child(n+3) {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         /* Row styling với better visual hierarchy */
         .top-products-table-compact tbody tr {
             transition: all 0.2s ease;
             border-bottom: 1px solid #f1f3f5;
         }
-        
+
         .top-products-table-compact tbody tr:hover {
             background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
             transform: translateX(2px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
-        
+
         .top-products-table-compact tbody tr:last-child {
             border-bottom: none;
         }
-        
+
         body.dark .top-products-table-compact th {
             background: linear-gradient(135deg, #2b2b2b 0%, #1f1f1f 100%);
             color: #e9ecef;
             border-bottom-color: #444;
         }
-        
+
         body.dark .top-products-table-compact tbody tr {
             border-bottom-color: #333;
         }
-        
+
         body.dark .top-products-table-compact tbody tr:hover {
             background: linear-gradient(90deg, #2b2b2b 0%, #1f1f1f 100%);
         }
-        
+
         /* Giảm min-width cho các cột */
         .top-products-th-image {
             min-width: 90px !important;
             width: 90px;
         }
-        
+
         .top-products-th-name {
             min-width: 150px !important;
             max-width: 200px;
         }
-        
+
         .top-products-th-quantity {
             min-width: 140px !important;
         }
-        
+
         .top-products-th-revenue {
             min-width: 160px !important;
         }
-        
+
         .top-products-th-contribution {
             min-width: 180px !important;
         }
-        
+
         .top-products-th-conversion {
             min-width: 80px !important;
         }
-        
+
         .top-products-th-stock {
             min-width: 70px !important;
         }
-        
+
         .top-products-th-sub {
             min-width: 70px !important;
         }
-        
+
         /* Ranking Badge */
         .product-rank-badge {
             display: inline-flex;
@@ -2426,30 +2426,30 @@
             margin-right: 8px;
             flex-shrink: 0;
         }
-        
+
         .product-rank-badge.rank-1 {
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             color: #92400e;
             box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
         }
-        
+
         .product-rank-badge.rank-2 {
             background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
             color: #374151;
             box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
         }
-        
+
         .product-rank-badge.rank-3 {
             background: linear-gradient(135deg, #cd7f32 0%, #e6a057 100%);
             color: #78350f;
             box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
         }
-        
+
         .product-rank-badge.rank-other {
             background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
             color: #6b7280;
         }
-        
+
         /* Product Image với better styling */
         .product-thumbnail-top {
             width: 50px;
@@ -2461,13 +2461,13 @@
             border: 2px solid #e5e7eb;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .product-thumbnail-top:hover {
             transform: scale(1.1);
             border-color: #3b82f6;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
-        
+
         /* Product Name với better typography */
         .product-name-top {
             font-weight: 600;
@@ -2478,12 +2478,12 @@
             line-height: 1.4;
             margin-bottom: 4px;
         }
-        
+
         .product-name-top:hover {
             color: #3b82f6;
             text-decoration: underline;
         }
-        
+
         .product-category-top {
             font-size: 0.7rem;
             color: #6b7280;
@@ -2492,19 +2492,19 @@
             align-items: center;
             gap: 4px;
         }
-        
+
         .product-category-top::before {
             content: "📁";
             font-size: 0.65rem;
         }
-        
+
         /* Product Info Container */
         .product-info-container {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        
+
         .product-info-text {
             flex: 1;
             min-width: 0;
@@ -2540,7 +2540,7 @@
             color: #991b1b;
             border: 1px solid #ef4444;
         }
-        
+
         /* Conversion Badge */
         .conversion-badge {
             display: inline-flex;
@@ -2551,25 +2551,25 @@
             font-weight: 600;
             font-size: 0.75rem;
         }
-        
+
         .conversion-badge.high {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
             color: #1e40af;
             border: 1px solid #3b82f6;
         }
-        
+
         .conversion-badge.medium {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             color: #92400e;
             border: 1px solid #f59e0b;
         }
-        
+
         .conversion-badge.low {
             background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
             color: #991b1b;
             border: 1px solid #ef4444;
         }
-        
+
         /* Progress Bar cho Tỷ lệ đóng góp */
         .contribution-progress {
             display: inline-flex;
@@ -2577,7 +2577,7 @@
             gap: 6px;
             min-width: 80px;
         }
-        
+
         .contribution-progress-bar-wrapper {
             flex: 1;
             height: 6px;
@@ -2586,21 +2586,21 @@
             overflow: hidden;
             position: relative;
         }
-        
+
         .contribution-progress-bar {
             height: 100%;
             border-radius: 3px;
             transition: width 0.3s ease;
         }
-        
+
         .contribution-progress-bar.estimated {
             background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
         }
-        
+
         .contribution-progress-bar.completed {
             background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
         }
-        
+
         .contribution-progress-text {
             font-weight: 600;
             font-size: 0.75rem;
@@ -2608,18 +2608,18 @@
             min-width: 35px;
             text-align: right;
         }
-        
+
         /* Revenue với better styling */
         .revenue-value {
             font-weight: 700;
             font-size: 0.85rem;
             color: #059669;
         }
-        
+
         .revenue-value.estimated {
             color: #2563eb;
         }
-        
+
         /* Quantity với icons */
         .quantity-value {
             display: inline-flex;
@@ -2628,7 +2628,7 @@
             font-weight: 600;
             font-size: 0.85rem;
         }
-        
+
         .quantity-value::before {
             content: "📦";
             font-size: 0.7rem;
@@ -2645,31 +2645,31 @@
         body.dark .product-category-top {
             color: #9ca3af;
         }
-        
+
         body.dark .top-products-table-compact tbody tr:hover {
             background: linear-gradient(90deg, #2b2b2b 0%, #1f1f1f 100%);
         }
-        
+
         body.dark .revenue-value {
             color: #34d399;
         }
-        
+
         body.dark .revenue-value.estimated {
             color: #60a5fa;
         }
-        
+
         body.dark .contribution-progress-bar-wrapper {
             background: #374151;
         }
-        
+
         body.dark .contribution-progress-text {
             color: #d1d5db;
         }
-        
+
         body.dark .quantity-value {
             color: #e9ecef;
         }
-        
+
         /* Responsive adjustments cho ranking badge */
         @media (max-width: 1199.98px) {
             .product-rank-badge {
@@ -2678,13 +2678,13 @@
                 font-size: 0.7rem;
                 margin-right: 6px;
             }
-            
+
             .product-thumbnail-top {
                 width: 45px;
                 height: 45px;
             }
         }
-        
+
         @media (max-width: 767.98px) {
             .product-rank-badge {
                 width: 22px;
@@ -2692,29 +2692,29 @@
                 font-size: 0.65rem;
                 margin-right: 4px;
             }
-            
+
             .product-thumbnail-top {
                 width: 40px;
                 height: 40px;
             }
-            
+
             .contribution-progress {
                 min-width: 60px;
             }
-            
+
             .contribution-progress-text {
                 min-width: 30px;
                 font-size: 0.7rem;
             }
         }
-        
+
         /* Animation cho progress bars */
         @keyframes progressBarAnimation {
             from {
                 width: 0;
             }
         }
-        
+
         .contribution-progress-bar {
             animation: progressBarAnimation 0.8s ease-out;
         }
@@ -2740,13 +2740,13 @@
             height: 12px;
             width: 0; /* Ẩn hoàn toàn scrollbar dọc */
         }
-        
+
         /* Ẩn scrollbar dọc nhưng vẫn cho phép scroll */
         .inventory-table-wrapper::-webkit-scrollbar:vertical {
             width: 0 !important;
             display: none;
         }
-        
+
         /* Chỉ hiển thị scrollbar ngang */
         .inventory-table-wrapper::-webkit-scrollbar:horizontal {
             height: 12px;
@@ -2757,7 +2757,7 @@
             border-radius: 10px;
             margin: 0 10px;
         }
-        
+
         /* Chỉ hiển thị track cho scrollbar ngang */
         .inventory-table-wrapper::-webkit-scrollbar-track:horizontal {
             background: #f1f1f1;
@@ -2769,7 +2769,7 @@
             transition: background 0.3s;
             min-width: 50px;
         }
-        
+
         /* Chỉ hiển thị thumb cho scrollbar ngang */
         .inventory-table-wrapper::-webkit-scrollbar-thumb:horizontal {
             background: linear-gradient(90deg, #3b82f6, #60a5fa);
@@ -2792,14 +2792,14 @@
         #inventoryTable td {
             padding: 10px 16px;
         }
-        
+
         /* Xử lý tên sản phẩm quá dài - cột đầu tiên */
         #inventoryTable td:first-child {
             max-width: 300px;
             white-space: normal;
             word-wrap: break-word;
         }
-        
+
         #inventoryTable td:first-child .fw-bold {
             display: block;
             max-width: 100%;
@@ -2808,12 +2808,12 @@
             white-space: nowrap;
             line-height: 1.4;
         }
-        
+
         /* Các cột khác giữ nguyên nowrap */
         #inventoryTable td:not(:first-child) {
             white-space: nowrap;
         }
-        
+
         /* Đảm bảo mỗi dòng có chiều cao cố định */
         #inventoryTable tbody tr {
             height: 60px;
@@ -2958,14 +2958,14 @@
             height: 8px;
             width: 0; /* Ẩn hoàn toàn scrollbar dọc */
         }
-        
+
         /* Ẩn scrollbar dọc nhưng vẫn cho phép scroll */
         .comments-table-wrapper::-webkit-scrollbar:vertical,
         .users-table-wrapper::-webkit-scrollbar:vertical {
             width: 0 !important;
             display: none;
         }
-        
+
         /* Chỉ hiển thị scrollbar ngang */
         .comments-table-wrapper::-webkit-scrollbar:horizontal,
         .users-table-wrapper::-webkit-scrollbar:horizontal {
@@ -2977,7 +2977,7 @@
             background: #f1f1f1;
             border-radius: 4px;
         }
-        
+
         /* Chỉ hiển thị track cho scrollbar ngang */
         .comments-table-wrapper::-webkit-scrollbar-track:horizontal,
         .users-table-wrapper::-webkit-scrollbar-track:horizontal {
@@ -2990,7 +2990,7 @@
             border-radius: 4px;
             transition: background 0.2s;
         }
-        
+
         /* Chỉ hiển thị thumb cho scrollbar ngang */
         .comments-table-wrapper::-webkit-scrollbar-thumb:horizontal,
         .users-table-wrapper::-webkit-scrollbar-thumb:horizontal {
@@ -3010,7 +3010,7 @@
         }
 
         /* ========== XỬ LÝ TEXT QUÁ DÀI TRONG CÁC BẢNG ========== */
-        
+
         /* Comments & Users Tables - Xử lý text overflow */
         #commentsTable th,
         #commentsTable td,
@@ -3018,13 +3018,13 @@
         #usersTable td {
             white-space: nowrap;
         }
-        
+
         /* Comments Table - Cột User (cột 1) */
         #commentsTable td:nth-child(1) {
             max-width: 180px;
             min-width: 180px;
         }
-        
+
         .comment-user-name {
             max-width: 140px;
             overflow: hidden;
@@ -3032,7 +3032,7 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         .comment-user-email {
             max-width: 140px;
             overflow: hidden;
@@ -3040,14 +3040,14 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         /* Comments Table - Cột Nội dung (cột 2) */
         #commentsTable td:nth-child(2) {
             max-width: 200px;
             min-width: 200px;
             white-space: normal;
         }
-        
+
         .comment-content-preview {
             max-width: 200px;
             overflow: hidden;
@@ -3057,13 +3057,13 @@
             -webkit-box-orient: vertical;
             word-wrap: break-word;
         }
-        
+
         /* Comments Table - Cột Sản phẩm (cột 3) */
         #commentsTable td:nth-child(3) {
             max-width: 150px;
             min-width: 150px;
         }
-        
+
         .product-name-comment {
             max-width: 100px;
             overflow: hidden;
@@ -3071,13 +3071,13 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         /* Users Table - Cột Tên (cột 2) */
         #usersTable td:nth-child(2) {
             max-width: 150px;
             min-width: 150px;
         }
-        
+
         .user-name {
             max-width: 150px;
             overflow: hidden;
@@ -3085,13 +3085,13 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         /* Users Table - Cột Email (cột 3) */
         #usersTable td:nth-child(3) {
             max-width: 150px;
             min-width: 150px;
         }
-        
+
         .user-email {
             max-width: 150px;
             overflow: hidden;
@@ -3099,12 +3099,12 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         /* Top Products Table - Xử lý tên sản phẩm */
         .top-products-th-name {
             max-width: 200px;
         }
-        
+
         .product-name-top {
             max-width: 200px;
             overflow: hidden;
@@ -3112,13 +3112,13 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         /* Top Customers Table - Xử lý tên khách hàng */
         #topCustomersTable td:nth-child(1) {
             max-width: 200px;
             min-width: 200px;
         }
-        
+
         .customer-name,
         .customer-email {
             max-width: 150px;
@@ -3127,29 +3127,29 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         .customer-info-container {
             display: flex;
             align-items: center;
             gap: 10px;
             min-width: 0;
         }
-        
+
         .customer-info-text {
             flex: 1;
             min-width: 0;
         }
-        
+
         /* Inventory Table - Đã có xử lý, nhưng cải thiện thêm */
         #inventoryTable td:first-child {
             max-width: 300px;
             min-width: 300px;
         }
-        
+
         #inventoryTable td:first-child .fw-bold {
             max-width: 280px;
         }
-        
+
         /* Revenue values - Xử lý số quá dài */
         .revenue-value {
             max-width: 120px;
@@ -3158,7 +3158,7 @@
             white-space: nowrap;
             display: inline-block;
         }
-        
+
         /* Quantity values */
         .quantity-value {
             max-width: 100px;
@@ -3167,7 +3167,7 @@
             white-space: nowrap;
             display: inline-block;
         }
-        
+
         /* Status badges - Đảm bảo không bị overflow */
         .status-badge {
             max-width: 120px;
@@ -3175,7 +3175,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
+
         /* Product category - Xử lý text dài */
         .product-category-top {
             max-width: 200px;
@@ -3184,7 +3184,7 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         /* SKU trong Inventory */
         #inventoryTable td:first-child .small {
             max-width: 280px;
@@ -3193,40 +3193,40 @@
             white-space: nowrap;
             display: block;
         }
-        
+
         /* Top Customers - Revenue và Percent */
         #topCustomersTable td:nth-child(3) {
             max-width: 120px;
         }
-        
+
         #topCustomersTable td:nth-child(4) {
             max-width: 80px;
         }
-        
+
         /* Đảm bảo tất cả các ô có tooltip khi text bị truncate */
         [title] {
             cursor: help;
         }
-        
+
         /* Responsive cho Top Customers */
         @media (max-width: 767.98px) {
             #topCustomersTable td:nth-child(1) {
                 max-width: 150px;
                 min-width: 150px;
             }
-            
+
             .customer-name,
             .customer-email {
                 max-width: 100px;
             }
         }
-        
+
         @media (max-width: 575.98px) {
             #topCustomersTable td:nth-child(1) {
                 max-width: 120px;
                 min-width: 120px;
             }
-            
+
             .customer-name,
             .customer-email {
                 max-width: 80px;
@@ -3237,45 +3237,45 @@
         .table-action-btn {
             transition: all 0.2s ease;
         }
-        
+
         .table-action-btn:hover {
             background-color: #f8f9fa;
             border-color: #dee2e6;
             transform: scale(1.05);
         }
-        
+
         /* Dark mode adjustments */
         body.dark .user-name,
         body.dark .comment-user-name {
             color: #f3f4f6;
         }
-        
+
         body.dark .user-email,
         body.dark .comment-user-email {
             color: #9ca3af;
         }
-        
+
         body.dark .comment-content-preview {
             color: #d1d5db;
         }
-        
+
         body.dark .comment-content-preview:hover {
             color: #60a5fa;
         }
-        
+
         body.dark .product-name-comment {
             color: #e9ecef;
         }
-        
+
         body.dark .product-name-comment:hover {
             color: #60a5fa;
         }
-        
+
         body.dark .table-action-btn:hover {
             background-color: #2b2b2b;
             border-color: #444;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 767.98px) {
             .comment-avatar,
@@ -3284,103 +3284,103 @@
                 height: 32px;
                 font-size: 12px;
             }
-            
+
             .user-avatar {
                 width: 36px;
                 height: 36px;
                 font-size: 13px;
             }
-            
+
             /* Giảm max-width cho mobile */
             #commentsTable td:nth-child(1) {
                 max-width: 120px;
                 min-width: 120px;
             }
-            
+
             .comment-user-name,
             .comment-user-email {
                 max-width: 80px;
             }
-            
+
             #commentsTable td:nth-child(2) {
                 max-width: 150px;
                 min-width: 150px;
             }
-            
+
             .comment-content-preview {
                 max-width: 150px;
                 font-size: 0.75rem;
             }
-            
+
             #commentsTable td:nth-child(3) {
                 max-width: 120px;
                 min-width: 120px;
             }
-            
+
             .product-name-comment {
                 max-width: 80px;
             }
-            
+
             #usersTable td:nth-child(2) {
                 max-width: 120px;
                 min-width: 120px;
             }
-            
+
             .user-name {
                 max-width: 120px;
             }
-            
+
             #usersTable td:nth-child(3) {
                 max-width: 120px;
                 min-width: 120px;
             }
-            
+
             .user-email {
                 max-width: 120px;
             }
-            
+
             .product-thumbnail {
                 width: 35px;
                 height: 35px;
             }
-            
+
             .status-badge {
                 font-size: 0.65rem;
                 padding: 4px 8px;
                 max-width: 80px;
             }
-            
+
             .revenue-value {
                 max-width: 90px;
                 font-size: 0.75rem;
             }
-            
+
             .quantity-value {
                 max-width: 70px;
                 font-size: 0.75rem;
             }
         }
-        
+
         /* Small Mobile */
         @media (max-width: 575.98px) {
             .comment-user-name,
             .comment-user-email {
                 max-width: 60px;
             }
-            
+
             .comment-content-preview {
                 max-width: 120px;
             }
-            
+
             .product-name-comment {
                 max-width: 60px;
             }
-            
+
             .user-name,
             .user-email {
                 max-width: 100px;
             }
-            
+
             .revenue-value {
                 max-width: 70px;
                 font-size: 0.7rem;
@@ -3388,7 +3388,7 @@
         }
 
         /* ========== COMMENTS & USERS TABLES UI/UX IMPROVEMENTS ========== */
-        
+
         /* Table Headers với better styling */
         #commentsTable thead th,
         #usersTable thead th {
@@ -3401,44 +3401,44 @@
             border-bottom: 2px solid #dee2e6;
             padding: 12px 10px;
         }
-        
+
         #commentsTable thead th i,
         #usersTable thead th i {
             color: #6b7280;
             font-size: 0.7rem;
         }
-        
+
         body.dark #commentsTable thead th,
         body.dark #usersTable thead th {
             background: linear-gradient(135deg, #2b2b2b 0%, #1f1f1f 100%);
             color: #e9ecef;
             border-bottom-color: #444;
         }
-        
+
         body.dark #commentsTable thead th i,
         body.dark #usersTable thead th i {
             color: #9ca3af;
         }
-        
+
         /* Row styling với better visual hierarchy */
         #commentsTable tbody tr,
         #usersTable tbody tr {
             transition: all 0.2s ease;
             border-bottom: 1px solid #f1f3f5;
         }
-        
+
         #commentsTable tbody tr:hover,
         #usersTable tbody tr:hover {
             background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
             transform: translateX(2px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
-        
+
         body.dark #commentsTable tbody tr:hover,
         body.dark #usersTable tbody tr:hover {
             background: linear-gradient(90deg, #2b2b2b 0%, #1f1f1f 100%);
         }
-        
+
         /* Avatar với better styling */
         .comment-avatar,
         .user-avatar {
@@ -3456,7 +3456,7 @@
             box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
             transition: all 0.3s ease;
         }
-        
+
         .comment-avatar:hover,
         .user-avatar:hover {
             transform: scale(1.1);
@@ -3468,7 +3468,7 @@
             height: 42px;
             font-size: 15px;
         }
-        
+
         /* User Info Container */
         .user-info-container,
         .comment-user-info {
@@ -3476,13 +3476,13 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .user-info-text,
         .comment-user-text {
             flex: 1;
             min-width: 0;
         }
-        
+
         .user-name,
         .comment-user-name {
             font-weight: 600;
@@ -3491,7 +3491,7 @@
             margin-bottom: 2px;
             line-height: 1.3;
         }
-        
+
         .user-email,
         .comment-user-email {
             font-size: 0.7rem;
@@ -3500,7 +3500,7 @@
             align-items: center;
             gap: 4px;
         }
-        
+
         .user-email::before,
         .comment-user-email::before {
             content: "✉";
@@ -3521,11 +3521,11 @@
             color: #374151;
             transition: color 0.2s ease;
         }
-        
+
         .comment-content-preview:hover {
             color: #3b82f6;
         }
-        
+
         /* Product Thumbnail trong Comments */
         .product-thumbnail {
             width: 45px;
@@ -3537,20 +3537,20 @@
             border: 2px solid #e5e7eb;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .product-thumbnail:hover {
             transform: scale(1.1);
             border-color: #3b82f6;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
-        
+
         /* Product Info trong Comments */
         .product-info-comment {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .product-name-comment {
             font-weight: 600;
             font-size: 0.8rem;
@@ -3559,7 +3559,7 @@
             transition: color 0.2s ease;
             line-height: 1.3;
         }
-        
+
         .product-name-comment:hover {
             color: #3b82f6;
             text-decoration: underline;
@@ -3578,7 +3578,7 @@
             letter-spacing: 0.3px;
             white-space: nowrap;
         }
-        
+
         .status-badge::before {
             font-size: 0.65rem;
         }
@@ -3588,7 +3588,7 @@
             color: #065f46;
             border: 1px solid #10b981;
         }
-        
+
         .status-approved::before {
             content: "✓";
         }
@@ -3598,7 +3598,7 @@
             color: #92400e;
             border: 1px solid #f59e0b;
         }
-        
+
         .status-pending::before {
             content: "⏱";
         }
@@ -3608,7 +3608,7 @@
             color: #991b1b;
             border: 1px solid #ef4444;
         }
-        
+
         .status-rejected::before {
             content: "✗";
         }
@@ -3618,7 +3618,7 @@
             color: #374151;
             border: 1px solid #9ca3af;
         }
-        
+
         .status-hidden::before {
             content: "👁";
         }
@@ -3628,7 +3628,7 @@
             color: #065f46;
             border: 1px solid #10b981;
         }
-        
+
         .status-active::before {
             content: "✓";
         }
@@ -3638,17 +3638,17 @@
             color: #991b1b;
             border: 1px solid #ef4444;
         }
-        
+
         .status-banned::before {
             content: "🚫";
         }
-        
+
         .status-unverified {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             color: #92400e;
             border: 1px solid #f59e0b;
         }
-        
+
         .status-unverified::before {
             content: "⚠";
         }
@@ -3892,7 +3892,7 @@
         }
 
         /* ========== RESPONSIVE IMPROVEMENTS - COMPREHENSIVE UI/UX ========== */
-        
+
         /* Tablet (768px - 991px) */
         @media (max-width: 991.98px) {
             /* KPI Cards - Tablet */
@@ -3900,11 +3900,11 @@
                 padding: 1.25rem !important;
                 min-height: 160px !important;
             }
-            
+
             .kpi-main-value {
                 font-size: 1.75rem !important;
             }
-            
+
             .kpi-icon-glow,
             .kpi-icon-circle-glow,
             .kpi-icon-animated,
@@ -3914,93 +3914,93 @@
                 height: 45px;
                 font-size: 1.4rem !important;
             }
-            
+
             /* Charts - Tablet */
             #revenueOrdersChart {
                 min-height: 300px !important;
             }
-            
+
             .chart-container {
                 min-height: 250px !important;
             }
-            
+
             /* Button Groups - Tablet */
             .btn-group-sm .btn {
                 font-size: 0.75rem;
                 padding: 0.25rem 0.5rem;
             }
-            
+
             /* Card Headers - Tablet */
             .card-header h6 {
                 font-size: 1rem;
             }
-            
+
             .card-header small {
                 font-size: 0.75rem;
             }
-            
+
             /* Quick Actions - Tablet */
             .quick-action-card {
                 padding: 1.25rem 0.75rem;
             }
-            
+
             .quick-action-icon {
                 width: 55px;
                 height: 55px;
                 font-size: 1.6rem;
             }
-            
+
             /* Tables - Tablet */
             .comments-table-wrapper,
             .users-table-wrapper {
                 max-height: 320px;
                 height: 320px;
             }
-            
+
             .inventory-table-wrapper {
                 max-height: 280px;
             }
         }
-        
+
         /* Mobile (576px - 767px) */
         @media (max-width: 767.98px) {
             /* Section Spacing - Mobile */
             section.mb-4 {
                 margin-bottom: 1.5rem !important;
             }
-            
+
             /* Header - Mobile */
             section.mb-4 h4 {
                 font-size: 1.25rem;
             }
-            
+
             section.mb-4 p {
                 font-size: 0.875rem;
             }
-            
+
             /* KPI Cards - Mobile */
             .row-cols-2 .col {
                 margin-bottom: 0.75rem;
             }
-            
+
             .kpi-card-premium .card-body {
                 padding: 1rem !important;
                 min-height: 140px !important;
             }
-            
+
             .kpi-main-value {
                 font-size: 1.5rem !important;
                 line-height: 1.1 !important;
             }
-            
+
             .kpi-card-premium .card-body p {
                 font-size: 0.7rem !important;
             }
-            
+
             .kpi-card-premium .card-body .d-flex.flex-column.gap-1 {
                 font-size: 0.65rem !important;
             }
-            
+
             .kpi-icon-glow,
             .kpi-icon-circle-glow,
             .kpi-icon-animated,
@@ -4010,47 +4010,47 @@
                 height: 38px;
                 font-size: 1.1rem !important;
             }
-            
+
             .kpi-donut-mini {
                 width: 45px !important;
                 height: 45px !important;
             }
-            
+
             .kpi-donut-mini svg {
                 width: 45px;
                 height: 45px;
             }
-            
+
             /* Charts - Mobile */
             .col-lg-8,
             .col-lg-4 {
                 margin-bottom: 1rem;
             }
-            
+
             #revenueOrdersChart {
                 min-height: 280px !important;
             }
-            
+
             .chart-container {
                 min-height: 220px !important;
             }
-            
+
             /* Card Headers - Mobile */
             .card-header {
                 padding: 1rem !important;
             }
-            
+
             .card-header h6 {
                 font-size: 0.95rem;
                 margin-bottom: 0.5rem;
             }
-            
+
             .card-header small {
                 font-size: 0.7rem;
                 display: block;
                 margin-top: 0.25rem;
             }
-            
+
             /* Button Groups - Mobile */
             .revenue-orders-btn-group,
             .order-status-btn-group {
@@ -4059,7 +4059,7 @@
                 display: flex;
                 gap: 0.25rem;
             }
-            
+
             .revenue-orders-btn-group .btn,
             .order-status-btn-group .btn {
                 font-size: 0.7rem;
@@ -4068,118 +4068,118 @@
                 min-width: calc(50% - 0.125rem);
                 border-radius: 0.375rem !important;
             }
-            
+
             .revenue-orders-btn-group .btn:last-child,
             .order-status-btn-group .btn:last-child {
                 min-width: 100%;
                 margin-top: 0.25rem;
             }
-            
+
             /* Revenue Orders Filters - Mobile */
             .revenue-orders-filters {
                 flex-direction: column;
                 align-items: stretch !important;
                 width: 100%;
             }
-            
+
             .revenue-orders-filters > * {
                 width: 100%;
                 margin-bottom: 0.5rem;
             }
-            
+
             .revenue-orders-filters > *:last-child {
                 margin-bottom: 0;
             }
-            
+
             /* Date Range Picker - Mobile */
             .revenue-orders-custom-range {
                 flex-direction: column;
                 width: 100%;
                 margin-top: 0.5rem;
             }
-            
+
             .revenue-orders-custom-range input,
             .revenue-orders-custom-range button {
                 width: 100% !important;
                 margin-bottom: 0.5rem;
             }
-            
+
             .revenue-orders-custom-range span {
                 display: none;
             }
-            
+
             /* Form Selects - Mobile */
             .form-select-sm {
                 width: 100% !important;
                 margin-top: 0.5rem;
             }
-            
+
             /* Quick Actions - Mobile */
             .quick-action-card {
                 padding: 1rem 0.5rem;
             }
-            
+
             .quick-action-icon {
                 width: 48px;
                 height: 48px;
                 font-size: 1.4rem;
                 margin-bottom: 0.5rem;
             }
-            
+
             .quick-action-title {
                 font-size: 0.75rem;
                 margin-bottom: 0.15rem;
             }
-            
+
             .quick-action-subtitle {
                 font-size: 0.6rem;
             }
-            
+
             /* Tables - Mobile */
             .card-body.p-0 {
                 padding: 0 !important;
             }
-            
+
             .comments-table-wrapper,
             .users-table-wrapper {
                 max-height: 300px;
                 height: 300px;
             }
-            
+
             .inventory-table-wrapper {
                 max-height: 240px;
             }
-            
+
             /* Table Headers - Mobile */
             .card-header .d-flex.flex-wrap {
                 flex-direction: column;
                 align-items: flex-start !important;
             }
-            
+
             .card-header .d-flex.gap-2 {
                 width: 100%;
                 margin-top: 0.75rem;
             }
-            
+
             .card-header .form-select-sm,
             .card-header .input-group {
                 width: 100% !important;
                 margin-bottom: 0.5rem;
             }
-            
+
             /* Card Footer - Mobile */
             .card-footer .row {
                 margin: 0;
             }
-            
+
             .card-footer .col-md-6 {
                 margin-bottom: 0.75rem;
             }
-            
+
             .card-footer .col-md-6:last-child {
                 margin-bottom: 0;
             }
-            
+
             /* Inventory Table - Mobile */
             .inventory-table-wrapper {
                 font-size: 0.875rem;
@@ -4187,15 +4187,15 @@
                 overflow-x: auto !important;
                 overflow-y: auto !important;
             }
-            
+
             #inventoryTable {
                 min-width: 600px !important;
             }
-            
+
             .inventory-table-wrapper td {
                 padding: 0.5rem 0.25rem !important;
             }
-            
+
             /* Inventory filter - Mobile */
             .inventory-filter-wrapper {
                 width: 100% !important;
@@ -4204,53 +4204,53 @@
                 flex-wrap: nowrap !important;
                 overflow: hidden;
             }
-            
+
             .inventory-filter-wrapper .table-search-input {
                 flex: 1 1 auto !important;
                 min-width: 0 !important;
                 max-width: calc(100% - 140px) !important;
             }
-            
+
             .inventory-filter-wrapper .table-search-input .form-control {
                 min-width: 0 !important;
                 font-size: 0.875rem !important;
             }
-            
+
             .inventory-filter-wrapper .table-filter-select {
                 flex: 0 0 auto !important;
                 min-width: 120px !important;
                 max-width: 140px !important;
                 font-size: 0.875rem !important;
             }
-            
+
             /* Card header - Mobile */
             .card-header {
                 padding: 12px 16px !important;
                 overflow: hidden !important;
             }
-            
+
             .card-header > div {
                 width: 100% !important;
                 max-width: 100% !important;
             }
-            
+
             /* Top Products/Customers - Mobile */
             .product-thumbnail-top {
                 width: 35px;
                 height: 35px;
             }
-            
+
             /* Order Status Table - Mobile */
             .order-status-table-wrapper {
                 font-size: 0.8rem;
             }
-            
+
             .order-status-table th,
             .order-status-table td {
                 padding: 0.5rem 0.25rem !important;
             }
         }
-        
+
         /* Small Mobile (max-width: 575px) */
         @media (max-width: 575.98px) {
             /* KPI Cards - Small Mobile */
@@ -4258,11 +4258,11 @@
                 padding: 0.875rem !important;
                 min-height: 130px !important;
             }
-            
+
             .kpi-main-value {
                 font-size: 1.25rem !important;
             }
-            
+
             .kpi-icon-glow,
             .kpi-icon-circle-glow,
             .kpi-icon-animated,
@@ -4272,16 +4272,16 @@
                 height: 35px;
                 font-size: 1rem !important;
             }
-            
+
             /* Charts - Small Mobile */
             #revenueOrdersChart {
                 min-height: 250px !important;
             }
-            
+
             .chart-container {
                 min-height: 200px !important;
             }
-            
+
             /* Button Groups - Small Mobile */
             .revenue-orders-btn-group .btn,
             .order-status-btn-group .btn {
@@ -4289,106 +4289,106 @@
                 padding: 0.15rem 0.3rem;
                 min-width: calc(33.333% - 0.1rem);
             }
-            
+
             .revenue-orders-btn-group .btn:last-child,
             .order-status-btn-group .btn:last-child {
                 min-width: 100%;
             }
-            
+
             /* Quick Actions - Small Mobile */
             .quick-action-card {
                 padding: 0.875rem 0.375rem;
             }
-            
+
             .quick-action-icon {
                 width: 42px;
                 height: 42px;
                 font-size: 1.2rem;
             }
-            
+
             .quick-action-title {
                 font-size: 0.7rem;
             }
-            
+
             .quick-action-subtitle {
                 font-size: 0.55rem;
             }
-            
+
             /* Tables - Small Mobile */
             .comments-table-wrapper,
             .users-table-wrapper {
                 max-height: 280px;
                 height: 280px;
             }
-            
+
             .inventory-table-wrapper {
                 max-height: 220px;
             }
-            
+
             /* Card Headers - Small Mobile */
             .card-header {
                 padding: 0.875rem !important;
             }
-            
+
             .card-header h6 {
                 font-size: 0.9rem;
             }
-            
+
             /* Footer - Small Mobile */
             .card-footer {
                 padding: 0.75rem !important;
             }
-            
+
             .card-footer small {
                 font-size: 0.7rem;
             }
-            
+
             .card-footer strong {
                 font-size: 0.9rem;
             }
         }
-        
+
         /* Extra Small Mobile (max-width: 375px) */
         @media (max-width: 374.98px) {
             /* KPI Cards - Extra Small */
             .kpi-main-value {
                 font-size: 1.1rem !important;
             }
-            
+
             .kpi-card-premium .card-body {
                 padding: 0.75rem !important;
                 min-height: 120px !important;
             }
-            
+
             /* Charts - Extra Small */
             #revenueOrdersChart {
                 min-height: 220px !important;
             }
-            
+
             /* Button Groups - Extra Small */
             .btn-group-sm .btn {
                 font-size: 0.6rem;
                 padding: 0.1rem 0.25rem;
             }
         }
-        
+
         /* Landscape Mobile (max-width: 767px and orientation: landscape) */
         @media (max-width: 767.98px) and (orientation: landscape) {
             .kpi-card-premium .card-body {
                 min-height: 120px !important;
             }
-            
+
             #revenueOrdersChart {
                 min-height: 200px !important;
             }
-            
+
             .comments-table-wrapper,
             .users-table-wrapper {
                 max-height: 200px;
                 height: 200px;
             }
         }
-        
+
         /* Print Styles */
         @media print {
             .kpi-card-premium,
@@ -4397,13 +4397,13 @@
                 break-inside: avoid;
                 page-break-inside: avoid;
             }
-            
+
             .btn-group,
             .dropdown {
                 display: none;
             }
         }
-        
+
         /* Accessibility Improvements */
         @media (prefers-reduced-motion: reduce) {
             *,
@@ -4414,45 +4414,45 @@
                 transition-duration: 0.01ms !important;
             }
         }
-        
+
         /* High Contrast Mode */
         @media (prefers-contrast: high) {
             .kpi-card-premium {
                 border: 2px solid currentColor;
             }
-            
+
             .btn-outline-primary,
             .btn-outline-secondary {
                 border-width: 2px;
             }
         }
-        
+
         /* Dark Mode Responsive Adjustments */
         @media (max-width: 767.98px) {
             body.dark .kpi-card-premium {
                 background: linear-gradient(135deg, #2b2b2b 0%, #1f1f1f 100%);
             }
-            
+
             body.dark .card {
                 background-color: #1f1f1f;
                 border-color: #444;
             }
-            
+
             body.dark .card-header {
                 background-color: #2b2b2b !important;
                 border-bottom-color: #444;
             }
         }
-        
+
         /* Additional UI/UX Improvements */
-        
+
         /* Smooth Transitions */
         .card,
         .kpi-card-premium,
         .quick-action-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         /* Focus States for Accessibility */
         .btn:focus-visible,
         .form-select:focus-visible,
@@ -4460,14 +4460,14 @@
             outline: 2px solid #3b82f6;
             outline-offset: 2px;
         }
-        
+
         /* Loading States */
         .spinner-border-sm {
             width: 1rem;
             height: 1rem;
             border-width: 0.15em;
         }
-        
+
         /* Better Touch Targets for Mobile */
         @media (max-width: 767.98px) {
             .btn,
@@ -4476,61 +4476,61 @@
             .form-control {
                 min-height: 44px; /* iOS recommended touch target */
             }
-            
+
             .btn-sm {
                 min-height: 36px;
             }
         }
-        
+
         /* Improved Scrollbar for Better UX */
         .inventory-table-wrapper::-webkit-scrollbar,
         .comments-table-wrapper::-webkit-scrollbar,
         .users-table-wrapper::-webkit-scrollbar {
             height: 6px;
         }
-        
+
         .inventory-table-wrapper::-webkit-scrollbar-thumb,
         .comments-table-wrapper::-webkit-scrollbar-thumb,
         .users-table-wrapper::-webkit-scrollbar-thumb {
             background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
             border-radius: 3px;
         }
-        
+
         .inventory-table-wrapper::-webkit-scrollbar-thumb:hover,
         .comments-table-wrapper::-webkit-scrollbar-thumb:hover,
         .users-table-wrapper::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
         }
-        
+
         /* Card Shadows - Subtle but Effective */
         .card {
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
-        
+
         .card:hover {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        
+
         /* Better Text Contrast */
         .text-muted {
             color: #6b7280 !important;
         }
-        
+
         body.dark .text-muted {
             color: #9ca3af !important;
         }
-        
+
         /* Improved Badge Styling */
         .badge {
             font-weight: 500;
             padding: 0.35em 0.65em;
         }
-        
+
         /* Section Spacing Consistency */
         section {
             scroll-margin-top: 80px; /* Account for sticky navbar */
         }
-        
+
         /* Improved Form Controls */
         .form-select-sm,
         .form-control-sm {
@@ -4538,54 +4538,54 @@
             border: 1px solid #d1d5db;
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
-        
+
         .form-select-sm:focus,
         .form-control-sm:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
         }
-        
+
         body.dark .form-select-sm,
         body.dark .form-control-sm {
             background-color: #1f1f1f;
             border-color: #444;
             color: #e9ecef;
         }
-        
+
         body.dark .form-select-sm:focus,
         body.dark .form-control-sm:focus {
             border-color: #3b82f6;
             background-color: #1f1f1f;
         }
-        
+
         /* ========== RESPONSIVE PROFESSIONAL IMPROVEMENTS ========== */
-        
+
         /* Card Headers Responsive */
         .card-header-responsive {
             padding: 20px 24px;
         }
-        
+
         /* Category Revenue & Top Customers Cards */
         .category-revenue-card-responsive,
         .top-customers-card-responsive {
             height: 420px;
         }
-        
+
         /* Form Selects & Inputs Responsive */
         .revenue-orders-select {
             width: auto;
             min-width: 100px;
         }
-        
+
         .table-filter-select {
             width: auto;
             min-width: 120px;
         }
-        
+
         .table-search-input {
             width: 200px;
         }
-        
+
         /* Inventory filter wrapper - luôn giữ trên cùng một dòng */
         .inventory-filter-wrapper {
             flex-wrap: nowrap !important;
@@ -4594,59 +4594,59 @@
             overflow: hidden;
             box-sizing: border-box;
         }
-        
+
         .inventory-filter-wrapper .table-search-input {
             flex: 1 1 auto;
             min-width: 0;
             max-width: 100%;
             overflow: hidden;
         }
-        
+
         .inventory-filter-wrapper .table-search-input .form-control {
             min-width: 0;
             width: 100%;
         }
-        
+
         .inventory-filter-wrapper .table-filter-select {
             flex: 0 0 auto;
             min-width: 120px;
             max-width: 180px;
             white-space: nowrap;
         }
-        
+
         /* Card header - đảm bảo không tràn */
         .card-header {
             overflow: hidden;
             box-sizing: border-box;
         }
-        
+
         .card-header > div {
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
         }
-        
+
         /* Responsive Breakpoints - Mobile First Approach */
-        
+
         /* Extra Small Devices (phones, < 576px) */
         @media (max-width: 575.98px) {
             /* Card Headers */
             .card-header-responsive {
                 padding: 12px 16px !important;
             }
-            
+
             .card-header-responsive h6 {
                 font-size: 0.95rem;
                 margin-bottom: 0.75rem;
             }
-            
+
             /* Category & Customers Cards */
             .category-revenue-card-responsive,
             .top-customers-card-responsive {
                 height: auto !important;
                 min-height: 350px;
             }
-            
+
             /* Form Controls */
             .revenue-orders-select,
             .table-filter-select {
@@ -4654,13 +4654,13 @@
                 min-width: 100% !important;
                 margin-top: 0.5rem;
             }
-            
+
             .table-search-input {
                 width: 100% !important;
                 max-width: 100% !important;
                 margin-top: 0.5rem;
             }
-            
+
             /* Inventory filter wrapper - responsive - luôn giữ trên cùng một dòng */
             .inventory-filter-wrapper {
                 width: 100% !important;
@@ -4670,7 +4670,7 @@
                 overflow: hidden;
                 box-sizing: border-box;
             }
-            
+
             .inventory-filter-wrapper .table-search-input {
                 flex: 1 1 auto !important;
                 min-width: 0 !important;
@@ -4678,174 +4678,174 @@
                 margin-top: 0 !important;
                 overflow: hidden;
             }
-            
+
             .inventory-filter-wrapper .table-search-input .form-control {
                 min-width: 0 !important;
                 width: 100% !important;
             }
-            
+
             .inventory-filter-wrapper .table-filter-select {
                 flex: 0 0 auto !important;
                 min-width: 120px !important;
                 max-width: 160px !important;
                 margin-top: 0 !important;
             }
-            
+
             /* Card header responsive */
             .card-header {
                 overflow: hidden !important;
                 box-sizing: border-box;
             }
-            
+
             .card-header > div {
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box;
             }
-            
+
             /* Button Groups - Stack vertically */
             .revenue-orders-btn-group,
             .order-status-btn-group {
                 flex-direction: column;
                 width: 100%;
             }
-            
+
             .revenue-orders-btn-group .btn,
             .order-status-btn-group .btn {
                 width: 100%;
                 margin-bottom: 0.25rem;
                 border-radius: 0.375rem !important;
             }
-            
+
             .revenue-orders-btn-group .btn:last-child,
             .order-status-btn-group .btn:last-child {
                 margin-bottom: 0;
             }
-            
+
             /* Charts */
             #revenueOrdersChart {
                 min-height: 250px !important;
             }
-            
+
             /* Card Footer */
             .card-footer {
                 padding: 0.75rem !important;
                 font-size: 0.8rem;
             }
-            
+
             .card-footer .row {
                 flex-direction: column;
             }
-            
+
             .card-footer .col-md-6 {
                 margin-bottom: 0.75rem;
             }
-            
+
             .card-footer .col-md-6:last-child {
                 margin-bottom: 0;
             }
         }
-        
+
         /* ========== CHARTS RESPONSIVE ========== */
         .chart-responsive {
             min-height: var(--chart-min-height);
             width: 100%;
             position: relative;
         }
-        
+
         /* Chart responsive adjustments for different zoom levels */
         @media (min-width: 1400px) {
             .chart-responsive {
                 min-height: 420px;
             }
         }
-        
+
         @media (max-width: 991.98px) {
             .chart-responsive {
                 min-height: clamp(250px, 35vw, 320px);
             }
         }
-        
+
         @media (max-width: 767.98px) {
             .chart-responsive {
                 min-height: clamp(220px, 40vw, 280px);
             }
         }
-        
+
         @media (max-width: 575.98px) {
             .chart-responsive {
                 min-height: clamp(200px, 45vw, 250px);
             }
         }
-        
+
         /* ========== CUSTOM DATE RANGE PICKERS RESPONSIVE ========== */
-        
+
         .custom-date-range-picker {
             width: 100%;
         }
-        
+
         .custom-date-range-wrapper {
             flex-wrap: wrap;
         }
-        
+
         .custom-date-input {
             width: auto;
             min-width: 140px;
         }
-        
+
         .custom-date-separator {
             white-space: nowrap;
         }
-        
+
         /* Mobile */
         @media (max-width: 767.98px) {
             .custom-date-range-wrapper {
                 flex-direction: column;
                 align-items: stretch !important;
             }
-            
+
             .custom-date-range-wrapper > * {
                 width: 100%;
                 margin-bottom: 0.5rem;
             }
-            
+
             .custom-date-range-wrapper > *:last-child {
                 margin-bottom: 0;
             }
-            
+
             .custom-date-input {
                 width: 100% !important;
                 min-width: 100% !important;
             }
-            
+
             .custom-date-separator {
                 display: none;
             }
         }
-        
+
         /* Small Mobile */
         @media (max-width: 575.98px) {
             .custom-date-range-picker {
                 margin-top: 0.75rem !important;
             }
-            
+
             .custom-date-range-wrapper {
                 gap: 0.5rem;
             }
         }
-        
+
         /* Small Devices (landscape phones, >= 576px) */
         @media (min-width: 576px) and (max-width: 767.98px) {
             .card-header-responsive {
                 padding: 16px 20px;
             }
-            
+
             .category-revenue-card-responsive,
             .top-customers-card-responsive {
                 height: auto !important;
                 min-height: 380px;
             }
-            
+
             /* Inventory filter responsive - luôn giữ trên cùng một dòng */
             .inventory-filter-wrapper {
                 width: 100% !important;
@@ -4855,66 +4855,66 @@
                 overflow: hidden;
                 box-sizing: border-box;
             }
-            
+
             .inventory-filter-wrapper .table-search-input {
                 flex: 1 1 auto !important;
                 min-width: 0 !important;
                 max-width: calc(100% - 170px) !important;
                 overflow: hidden;
             }
-            
+
             .inventory-filter-wrapper .table-search-input .form-control {
                 min-width: 0 !important;
                 width: 100% !important;
             }
-            
+
             .inventory-filter-wrapper .table-filter-select {
                 flex: 0 0 auto !important;
                 min-width: 120px !important;
                 max-width: 170px !important;
             }
-            
+
             /* Inventory table responsive */
             #inventoryTable {
                 min-width: 700px !important;
             }
-            
+
             .inventory-table-wrapper {
                 max-width: 100% !important;
                 overflow-x: auto !important;
             }
-            
+
             .revenue-orders-select {
                 min-width: 90px;
             }
-            
+
             .table-filter-select {
                 min-width: 110px;
             }
-            
+
             .table-search-input {
                 width: 180px;
             }
         }
-        
+
         /* Medium Devices (tablets, >= 768px) */
         @media (min-width: 768px) and (max-width: 991.98px) {
             .card-header-responsive {
                 padding: 18px 22px;
             }
-            
+
             .category-revenue-card-responsive,
             .top-customers-card-responsive {
                 height: 400px;
             }
-            
+
             /* KPI Cards - 4 columns on tablet */
             .row-cols-md-3 > * {
                 flex: 0 0 auto;
                 width: 25%;
             }
         }
-        
+
         /* Large Devices (desktops, >= 992px) */
         @media (min-width: 992px) {
             .category-revenue-card-responsive,
@@ -4922,7 +4922,7 @@
                 height: 420px;
             }
         }
-        
+
         /* Extra Large Devices (large desktops, >= 1200px) */
         @media (min-width: 1200px) {
             /* KPI Cards - 5 columns on xl */
@@ -4931,7 +4931,7 @@
                 width: 20%;
             }
         }
-        
+
         /* Landscape Orientation */
         @media (max-width: 991.98px) and (orientation: landscape) {
             .category-revenue-card-responsive,
@@ -4939,34 +4939,34 @@
                 height: auto !important;
                 min-height: 300px;
             }
-            
+
             #revenueOrdersChart {
                 min-height: 250px !important;
             }
         }
-        
+
         /* Print Styles */
         @media print {
             .card-header-responsive {
                 padding: 12px;
             }
-            
+
             .btn-group,
             .dropdown,
             .table-search-input,
             .table-filter-select {
                 display: none;
             }
-            
+
             .category-revenue-card-responsive,
             .top-customers-card-responsive {
                 height: auto !important;
                 page-break-inside: avoid;
             }
         }
-        
+
         /* ========== TABLES RESPONSIVE IMPROVEMENTS ========== */
-        
+
         /* Top Products Table */
         .top-products-table-wrapper {
             overflow-x: auto;
@@ -4975,87 +4975,87 @@
             scrollbar-color: #cbd5e1 #f1f5f9;
             width: 100%;
         }
-        
+
         .top-products-table-wrapper::-webkit-scrollbar {
             height: 6px;
         }
-        
+
         .top-products-table-wrapper::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 3px;
         }
-        
+
         .top-products-table-wrapper::-webkit-scrollbar-thumb {
             background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
             border-radius: 3px;
         }
-        
+
         .top-products-table-wrapper::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
         }
-        
+
         /* Đảm bảo bảng vừa với container - không scroll ngang nếu có thể */
         @media (min-width: 1200px) {
             .top-products-table-compact {
                 table-layout: auto;
             }
-            
+
             .top-products-th-name {
                 max-width: none;
             }
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 1199.98px) {
             .top-products-table-compact {
                 font-size: 0.75rem;
             }
-            
+
             .top-products-table-compact th,
             .top-products-table-compact td {
                 padding: 6px 8px;
             }
-            
+
             .product-thumbnail-top {
                 width: 40px;
                 height: 40px;
             }
-            
+
             .top-products-th-image {
                 min-width: 50px !important;
                 width: 50px;
             }
-            
+
             .top-products-th-name {
                 min-width: 120px !important;
                 max-width: 180px;
             }
-            
+
             .top-products-th-quantity {
                 min-width: 120px !important;
             }
-            
+
             .top-products-th-revenue {
                 min-width: 140px !important;
             }
-            
+
             .top-products-th-contribution {
                 min-width: 160px !important;
             }
-            
+
             .top-products-th-conversion {
                 min-width: 70px !important;
             }
-            
+
             .top-products-th-stock {
                 min-width: 60px !important;
             }
-            
+
             .top-products-th-sub {
                 min-width: 60px !important;
             }
         }
-        
+
         /* Inventory Table */
         .inventory-table-wrapper {
             overflow-x: auto;
@@ -5065,30 +5065,30 @@
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 transparent;
         }
-        
+
         .inventory-table-wrapper::-webkit-scrollbar {
             height: 8px;
             width: 0;
         }
-        
+
         .inventory-table-wrapper::-webkit-scrollbar:horizontal {
             height: 8px;
         }
-        
+
         .inventory-table-wrapper::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 4px;
         }
-        
+
         .inventory-table-wrapper::-webkit-scrollbar-thumb {
             background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
             border-radius: 4px;
         }
-        
+
         .inventory-table-wrapper::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
         }
-        
+
         /* Comments & Users Tables */
         .comments-table-wrapper,
         .users-table-wrapper {
@@ -5098,35 +5098,35 @@
             scrollbar-width: thin;
             scrollbar-color: #cbd5e1 transparent;
         }
-        
+
         .comments-table-wrapper::-webkit-scrollbar,
         .users-table-wrapper::-webkit-scrollbar {
             height: 8px;
             width: 0;
         }
-        
+
         .comments-table-wrapper::-webkit-scrollbar:horizontal,
         .users-table-wrapper::-webkit-scrollbar:horizontal {
             height: 8px;
         }
-        
+
         .comments-table-wrapper::-webkit-scrollbar-track,
         .users-table-wrapper::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 4px;
         }
-        
+
         .comments-table-wrapper::-webkit-scrollbar-thumb,
         .users-table-wrapper::-webkit-scrollbar-thumb {
             background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
             border-radius: 4px;
         }
-        
+
         .comments-table-wrapper::-webkit-scrollbar-thumb:hover,
         .users-table-wrapper::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
         }
-        
+
         /* Table Responsive - Mobile */
         @media (max-width: 767.98px) {
             /* Hide some columns on mobile for better UX */
@@ -5140,40 +5140,40 @@
             #topProductsTable td:nth-child(8) {
                 display: none;
             }
-            
+
             /* Adjust table min-widths for mobile */
             .top-products-table-compact {
                 min-width: 600px;
                 font-size: 0.7rem;
             }
-            
+
             .top-products-table-compact th,
             .top-products-table-compact td {
                 padding: 5px 6px;
             }
-            
+
             #inventoryTable {
                 min-width: 500px;
             }
-            
+
             #commentsTable {
                 min-width: 700px;
             }
-            
+
             #usersTable {
                 min-width: 800px;
             }
-            
+
             /* Table font sizes */
             .table {
                 font-size: 0.875rem;
             }
-            
+
             .table th,
             .table td {
                 padding: 0.5rem 0.375rem;
             }
-            
+
             /* Sticky headers */
             .table thead th {
                 position: sticky;
@@ -5182,51 +5182,51 @@
                 z-index: 10;
                 box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
             }
-            
+
             body.dark .table thead th {
                 background: #1f1f1f;
             }
         }
-        
+
         /* Table Responsive - Small Mobile */
         @media (max-width: 575.98px) {
             .top-products-table-compact {
                 min-width: 500px;
                 font-size: 0.65rem;
             }
-            
+
             .top-products-table-compact th,
             .top-products-table-compact td {
                 padding: 4px 5px;
             }
-            
+
             .product-thumbnail-top {
                 width: 35px;
                 height: 35px;
             }
-            
+
             #inventoryTable {
                 min-width: 400px;
             }
-            
+
             #commentsTable {
                 min-width: 600px;
             }
-            
+
             #usersTable {
                 min-width: 700px;
             }
-            
+
             .table {
                 font-size: 0.8rem;
             }
-            
+
             .table th,
             .table td {
                 padding: 0.4rem 0.25rem;
             }
         }
-        
+
         /* Table Footer Responsive */
         @media (max-width: 767.98px) {
             .card-footer .d-flex {
@@ -5234,12 +5234,12 @@
                 align-items: flex-start !important;
                 gap: 0.5rem;
             }
-            
+
             .card-footer .d-flex > * {
                 width: 100%;
             }
         }
-        
+
         /* ========== APEXCHARTS MENU STYLES ========== */
         /* Fix menu background và text color để không bị trùng */
         .apexcharts-menu {
@@ -5251,7 +5251,7 @@
             min-width: 160px !important;
             z-index: 10000 !important;
         }
-        
+
         .apexcharts-menu-item {
             color: #374151 !important;
             background: transparent !important;
@@ -5265,34 +5265,67 @@
             width: 100% !important;
             display: block !important;
         }
-        
+
         .apexcharts-menu-item:hover {
             background: #f3f4f6 !important;
             color: #111827 !important;
         }
-        
+
         .apexcharts-menu-item:active {
             background: #e5e7eb !important;
         }
-        
+
         /* Dark mode support */
         body.dark .apexcharts-menu {
             background: #1f2937 !important;
             border-color: #374151 !important;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
         }
-        
+
         body.dark .apexcharts-menu-item {
             color: #e5e7eb !important;
         }
-        
+
         body.dark .apexcharts-menu-item:hover {
             background: #374151 !important;
             color: #ffffff !important;
         }
-        
+
         body.dark .apexcharts-menu-item:active {
             background: #4b5563 !important;
+        }
+
+        /* CUSTOM DASHBOARD FIXES */
+        /* Dashboard specific section spacing */
+        .dashboard-section {
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        /* Fix KPI card responsiveness */
+        .kpi-card-premium {
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kpi-card-body-responsive {
+            flex: 1;
+            padding: clamp(1rem, 1.5vw, 1.5rem) !important;
+        }
+
+        .kpi-main-value {
+            font-size: clamp(1.2rem, 2vw, 1.8rem) !important;
+        }
+
+        /* Fix Table responsiveness */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Toast notification fix */
+        .toast-container {
+            z-index: 9999;
         }
     </style>
 
@@ -5301,6 +5334,51 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        // Global Toast Function
+        window.showToast = function(message, type = 'success') {
+            // Check if toast container exists
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+
+            const toastId = 'toast-' + Date.now();
+            const bgColor = type === 'success' ? 'bg-success' : (type === 'error' ? 'bg-danger' : 'bg-info');
+
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white ${bgColor} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+            const toastElement = document.getElementById(toastId);
+            // Use Bootstrap Toast if available, otherwise simple fallback
+            if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+                const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+                toast.show();
+                toastElement.addEventListener('hidden.bs.toast', () => {
+                    toastElement.remove();
+                });
+            } else {
+                // Simple fallback
+                toastElement.classList.add('show');
+                setTimeout(() => {
+                    toastElement.classList.remove('show');
+                    setTimeout(() => toastElement.remove(), 300);
+                }, 3000);
+            }
+        };
+
         document.addEventListener("DOMContentLoaded", function() {
             // Counter Animation cho số liệu thống kê
             function animateCounter(element, target, duration = 2000) {
@@ -5351,7 +5429,7 @@
 
         window.addEventListener("theme-changed", () => {
             isDark = document.documentElement.classList.contains("dark");
-            
+
             // Update order growth chart
             if (orderGrowthChart) {
                 orderGrowthChart.options.scales.x.ticks.color = textColor();
@@ -5364,7 +5442,7 @@
         const orderGrowthCtx = document.getElementById('orderGrowthChart');
         let orderGrowthChart = null;
 
-        if (orderGrowthCtx) {
+        if (orderGrowthCtx && typeof Chart !== 'undefined') {
             const orderGrowthData = @json($growthChartData);
             const orderGrowthLabels = @json($growthChartLabels);
 
@@ -5512,7 +5590,7 @@
                     const to = revenueOrdersToInput.value;
                     if (from) params.append('from', from);
                     if (to) params.append('to', to);
-                    
+
                     // Validate custom date range
                     if (from && to && new Date(from) > new Date(to)) {
                         alert('Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc!');
@@ -5521,13 +5599,13 @@
                 }
 
                 const response = await fetch(`${baseUrl}?${params.toString()}`);
-                
+
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('API Error:', response.status, errorText);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
 
                 // Validate data
@@ -5541,7 +5619,7 @@
                 }
 
                 const { labels, revenue, orders, total_revenue, total_orders, change_revenue, change_orders } = data;
-                
+
                 // Handle empty data - allow empty arrays but show message
                 if (labels.length === 0) {
                     revenueOrdersChartEl.innerHTML = '<div class="alert alert-info m-3 text-center">Không có dữ liệu trong thời gian này. Hãy chọn mốc khác.</div>';
@@ -5788,7 +5866,7 @@
                     setTimeout(initRevenueOrdersChart, 100);
                 }
             }
-            
+
             // Kiểm tra nếu ApexCharts đã load
             if (typeof ApexCharts !== 'undefined') {
                 initRevenueOrdersChart();
@@ -5851,7 +5929,7 @@
         const orderStatusPeriodEl = document.getElementById('orderStatusPeriod');
         const orderStatusDateRangeEl = document.getElementById('orderStatusDateRange');
         const orderStatusRangeButtons = document.querySelectorAll('[data-status-range]');
-        
+
         let orderStatusChart = null;
         let currentStatusRange = '30';
         let chartEventListenersAdded = false; // Flag để tránh duplicate event listeners
@@ -5872,18 +5950,18 @@
             try {
                 const baseUrl = "{{ url('/admin/api/dashboard/order-status-ratio') }}";
                 const response = await fetch(`${baseUrl}?range=${range}`);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const result = await response.json();
-                
+
                 // Kiểm tra dữ liệu hợp lệ
                 if (!result || typeof result !== 'object') {
                     throw new Error('Invalid response format');
                 }
-                
+
                 const { total_orders, from, to, data } = result;
 
                 // Kiểm tra data có tồn tại và là array
@@ -5900,7 +5978,7 @@
                 const toDate = new Date(to).toLocaleDateString('vi-VN');
                 orderStatusPeriodEl.textContent = `${fromDate} - ${toDate}`;
                 }
-                
+
                 // Update date range text
                 if (orderStatusDateRangeEl) {
                 const rangeTexts = {
@@ -5920,7 +5998,7 @@
                             <td colspan="5" class="text-center text-muted py-3">Không có đơn hàng phát sinh</td>
                         </tr>
                     `;
-                    
+
                     // Render biểu đồ trắng toàn vẹn khi không có dữ liệu
                     const emptyChartOptions = {
                         type: 'doughnut',
@@ -5982,7 +6060,7 @@
                             }
                         }
                     };
-                    
+
                     if (orderStatusChart) {
                         // Đảm bảo đồng bộ dữ liệu
                         orderStatusChart.data.labels = ['Không có dữ liệu'];
@@ -6030,14 +6108,16 @@
                         orderStatusChart.update();
                     } else {
                         if (orderStatusCtx) {
-                            orderStatusChart = new Chart(orderStatusCtx, emptyChartOptions);
-                            orderStatusChart.data._statusData = [];
-                            
-                            // Thêm event listener cho hover trên canvas (chỉ thêm 1 lần)
-                            if (!chartEventListenersAdded) {
-                                orderStatusCtx.addEventListener('mousemove', handleChartHover);
-                                orderStatusCtx.addEventListener('mouseleave', handleChartLeave);
-                                chartEventListenersAdded = true;
+                            if (typeof Chart !== 'undefined') {
+                                orderStatusChart = new Chart(orderStatusCtx, emptyChartOptions);
+                                orderStatusChart.data._statusData = [];
+
+                                // Thêm event listener cho hover trên canvas (chỉ thêm 1 lần)
+                                if (!chartEventListenersAdded) {
+                                    orderStatusCtx.addEventListener('mousemove', handleChartHover);
+                                    orderStatusCtx.addEventListener('mouseleave', handleChartLeave);
+                                    chartEventListenersAdded = true;
+                                }
                             }
                         }
                     }
@@ -6052,11 +6132,11 @@
                     const count = item.count || 0;
                     const ratio = item.ratio || 0;
                     const trend = item.trend || 0;
-                    
+
                     const trendIcon = trend > 0 ? '↑' : trend < 0 ? '↓' : '→';
                     const trendColor = trend > 0 ? '#10B981' : trend < 0 ? '#EF4444' : '#6B7280';
                     const trendText = trend !== 0 ? `${trendIcon} ${Math.abs(trend)}%` : '→ 0%';
-                    
+
                     return `
                         <tr class="order-status-row" data-status="${status}">
                             <td class="order-status-color">
@@ -6154,21 +6234,21 @@
 
                 // Lưu data vào biến để dùng trong hover (đảm bảo đồng bộ)
                 const statusDataForHover = [...data]; // Tạo copy để tránh reference issues
-                
+
                 // Hàm xử lý hover trên chart
                 function handleChartHover(e) {
                     const chart = orderStatusChart;
                     if (!chart) return;
-                    
+
                     const activeElements = chart.getElementsAtEventForMode(e, 'point', { intersect: true }, false);
                     // Luôn sử dụng data từ chart để đảm bảo đồng bộ
                     const statusData = chart.data._statusData || [];
-                    
+
                     if (activeElements.length > 0) {
                         const index = activeElements[0].index;
                         if (statusData && statusData[index]) {
                             const status = statusData[index].status;
-                            
+
                             // Highlight row tương ứng
                             document.querySelectorAll('.order-status-row').forEach(row => {
                                 if (row.dataset.status === status) {
@@ -6189,7 +6269,7 @@
                         });
                     }
                 }
-                
+
                 function handleChartLeave() {
                     // Reset tất cả rows khi rời khỏi chart
                     document.querySelectorAll('.order-status-row').forEach(row => {
@@ -6197,7 +6277,7 @@
                         row.style.fontWeight = '';
                     });
                 }
-                
+
                 if (orderStatusChart) {
                     // Đảm bảo đồng bộ dữ liệu giữa chart và table
                     orderStatusChart.data.labels = [...labels]; // Tạo copy
@@ -6207,7 +6287,7 @@
                     }
                     // Cập nhật statusData để đồng bộ với chart data
                     orderStatusChart.data._statusData = [...statusDataForHover];
-                    
+
                     // Cập nhật tooltip options để hiển thị đúng khi có dữ liệu
                     if (orderStatusChart.options && orderStatusChart.options.plugins && orderStatusChart.options.plugins.tooltip) {
                         orderStatusChart.options.plugins.tooltip.enabled = true;
@@ -6256,13 +6336,13 @@
                             }
                         };
                     }
-                    
+
                     orderStatusChart.update();
                 } else {
-                    if (orderStatusCtx && labels.length > 0 && chartData.length > 0) {
+                    if (orderStatusCtx && labels.length > 0 && chartData.length > 0 && typeof Chart !== 'undefined') {
                     orderStatusChart = new Chart(orderStatusCtx, chartOptions);
                         orderStatusChart.data._statusData = [...statusDataForHover]; // Tạo copy để đồng bộ
-                    
+
                     // Thêm event listener cho hover trên canvas (chỉ thêm 1 lần)
                         if (!chartEventListenersAdded) {
                     orderStatusCtx.addEventListener('mousemove', handleChartHover);
@@ -6274,7 +6354,7 @@
 
                 // Custom tooltip implementation
                 let tooltipElement = null;
-                
+
                 function createTooltip(text, x, y) {
                     if (!tooltipElement) {
                         tooltipElement = document.createElement('div');
@@ -6308,7 +6388,7 @@
                     tooltipElement.style.display = 'block';
                     tooltipElement.style.opacity = '0';
                     tooltipElement.style.transform = 'translateY(-5px)';
-                    
+
                     // Trigger animation
                     setTimeout(() => {
                         if (tooltipElement) {
@@ -6317,7 +6397,7 @@
                         }
                     }, 10);
                 }
-                
+
                 function hideTooltip() {
                     if (tooltipElement) {
                         tooltipElement.style.opacity = '0';
@@ -6338,7 +6418,7 @@
                     const newRow = row.cloneNode(true);
                     row.parentNode.replaceChild(newRow, row);
                 });
-                
+
                 document.querySelectorAll('.order-status-row').forEach((row, index) => {
                     // Click để navigate
                     row.addEventListener('click', function() {
@@ -6346,7 +6426,7 @@
                         // Navigate to orders list with status filter
                         window.location.href = `{{ route('admin.orders.list') }}?order_status=${status}&order_filter_type=date_range&order_start_date=${from}&order_end_date=${to}`;
                     });
-                    
+
                     // Hover vào row để highlight trên chart và hiển thị tooltip
                     row.addEventListener('mouseenter', function(e) {
                         const tooltipText = this.dataset.tooltipText;
@@ -6354,7 +6434,7 @@
                             const rect = this.getBoundingClientRect();
                             createTooltip(tooltipText, rect.right, rect.top + rect.height / 2);
                         }
-                        
+
                         // Highlight segment trên chart - sử dụng data từ chart để đảm bảo đồng bộ
                         if (orderStatusChart && orderStatusChart.data._statusData) {
                             const status = this.dataset.status;
@@ -6365,41 +6445,41 @@
                             }
                         }
                     });
-                    
+
                     row.addEventListener('mousemove', function(e) {
                         const tooltipText = this.dataset.tooltipText;
                         if (tooltipText && tooltipElement) {
                             const rect = this.getBoundingClientRect();
                             const tooltipWidth = tooltipElement.offsetWidth || 200;
                             const tooltipHeight = tooltipElement.offsetHeight || 50;
-                            
+
                             // Đảm bảo tooltip không bị tràn ra ngoài màn hình
                             let left = rect.right + 15;
                             let top = rect.top + rect.height / 2 - tooltipHeight / 2;
-                            
+
                             // Kiểm tra nếu tooltip tràn ra bên phải
                             if (left + tooltipWidth > window.innerWidth) {
                                 left = rect.left - tooltipWidth - 15;
                             }
-                            
+
                             // Kiểm tra nếu tooltip tràn ra phía trên
                             if (top < 0) {
                                 top = 10;
                             }
-                            
+
                             // Kiểm tra nếu tooltip tràn ra phía dưới
                             if (top + tooltipHeight > window.innerHeight) {
                                 top = window.innerHeight - tooltipHeight - 10;
                             }
-                            
+
                             tooltipElement.style.left = left + 'px';
                             tooltipElement.style.top = top + 'px';
                         }
                     });
-                    
+
                     row.addEventListener('mouseleave', function() {
                         hideTooltip();
-                        
+
                         // Reset chart highlight
                         if (orderStatusChart) {
                             orderStatusChart.setActiveElements([]);
@@ -6451,7 +6531,7 @@
         const categoryTotalRevenueActualEl = document.getElementById('categoryTotalRevenueActual');
         const categoryTopCategoryEstimatedEl = document.getElementById('categoryTopCategoryEstimated');
         const categoryTopCategoryActualEl = document.getElementById('categoryTopCategoryActual');
-        
+
         let categoryRevenueChart = null;
         let currentCategoryRange = '30';
 
@@ -6469,19 +6549,19 @@
                 }
 
                 const response = await fetch(url);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                
+
                 if (result.success && result.data) {
-                    const { 
-                        categories, 
-                        estimated_values, 
-                        actual_values, 
-                        estimated_percent, 
+                    const {
+                        categories,
+                        estimated_values,
+                        actual_values,
+                        estimated_percent,
                         actual_percent,
                         total_estimated,
                         total_actual
@@ -6490,13 +6570,13 @@
                     // Update footer
                     categoryTotalRevenueEstimatedEl.textContent = new Intl.NumberFormat('vi-VN').format(total_estimated) + ' ₫';
                     categoryTotalRevenueActualEl.textContent = new Intl.NumberFormat('vi-VN').format(total_actual) + ' ₫';
-                    
+
                     // Tìm danh mục bán chạy nhất (theo dự tính)
                     const topEstimatedIndex = estimated_values.indexOf(Math.max(...estimated_values));
                     if (topEstimatedIndex >= 0 && categories[topEstimatedIndex]) {
                         categoryTopCategoryEstimatedEl.textContent = `Dự tính: ${categories[topEstimatedIndex]} (${estimated_percent[topEstimatedIndex]}%)`;
                     }
-                    
+
                     // Tìm danh mục bán chạy nhất (theo thực tế)
                     const topActualIndex = actual_values.indexOf(Math.max(...actual_values));
                     if (topActualIndex >= 0 && categories[topActualIndex]) {
@@ -6539,13 +6619,13 @@
                                             const index = context.dataIndex;
                                             const datasetLabel = context.dataset.label;
                                             let percentValue = 0;
-                                            
+
                                             if (datasetLabel === 'Doanh thu dự tính') {
                                                 percentValue = estimated_percent[index] || 0;
                                             } else {
                                                 percentValue = actual_percent[index] || 0;
                                             }
-                                            
+
                                             return [
                                                 `Danh mục: ${categories[index]}`,
                                                 `${datasetLabel}: ${new Intl.NumberFormat('vi-VN').format(value)} đ`,
@@ -6587,12 +6667,27 @@
                         categoryRevenueChart.data.datasets[0].data = estimated_values;
                         categoryRevenueChart.data.datasets[1].data = actual_values;
                         categoryRevenueChart.update();
-                    } else {
+                    } else if (typeof Chart !== 'undefined') {
                         categoryRevenueChart = new Chart(categoryRevenueCtx, chartOptions);
                     }
                 }
             } catch (e) {
                 console.error('Error loading category revenue:', e);
+                if (typeof window.showToast === 'function') {
+                    window.showToast('Lỗi tải dữ liệu doanh thu danh mục: ' + e.message, 'error');
+                }
+                if (categoryRevenueCtx) {
+                    const parent = categoryRevenueCtx.parentElement;
+                    if (parent) {
+                        parent.innerHTML = `
+                            <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                                <i class="bi bi-exclamation-triangle fs-1 mb-2 text-danger"></i>
+                                <span>Không thể tải biểu đồ</span>
+                                <small class="text-secondary">${e.message}</small>
+                            </div>
+                        `;
+                    }
+                }
             }
         }
 
@@ -6602,10 +6697,10 @@
                 btn.addEventListener('click', function() {
                     categoryRangeButtons.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    
+
                     const range = this.dataset.categoryRange;
                     currentCategoryRange = range;
-                    
+
                     if (range === 'custom') {
                         categoryDateRangePicker.style.display = 'block';
                     } else {
@@ -6632,7 +6727,7 @@
         const customersRangeButtons = document.querySelectorAll('[data-customers-range]');
         const customersTotalCountEl = document.getElementById('customersTotalCount');
         const customersDateRangeTextEl = document.getElementById('customersDateRangeText');
-        
+
         let currentCustomersRange = '30';
 
         async function loadTopCustomers(range = '30') {
@@ -6659,13 +6754,13 @@
                 }
 
                 const response = await fetch(url);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                
+
                 if (result.success && result.data) {
                     const users = result.data.users || [];
                     const totalRevenue = result.data.totalRevenue || 0;
@@ -6684,7 +6779,7 @@
                     topCustomersTableBody.innerHTML = users.map((user, index) => {
                         const avatarInitial = user.name ? user.name.charAt(0).toUpperCase() : '?';
                         const totalFormatted = new Intl.NumberFormat('vi-VN').format(user.total);
-                        
+
                         return `
                             <tr class="customer-row" data-user-id="${user.id || ''}">
                                 <td>
@@ -6729,10 +6824,13 @@
                 }
             } catch (e) {
                 console.error('Error loading top customers:', e);
+                if (typeof window.showToast === 'function') {
+                    window.showToast('Lỗi tải dữ liệu khách hàng: ' + e.message, 'error');
+                }
                 topCustomersTableBody.innerHTML = `
                     <tr>
                         <td colspan="4" class="text-center text-danger py-4">
-                            <i class="bi bi-exclamation-triangle"></i> Lỗi tải dữ liệu
+                            <i class="bi bi-exclamation-triangle"></i> Lỗi tải dữ liệu: ${e.message}
                         </td>
                     </tr>
                 `;
@@ -6745,10 +6843,10 @@
                 btn.addEventListener('click', function() {
                     customersRangeButtons.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    
+
                     const range = this.dataset.customersRange;
                     currentCustomersRange = range;
-                    
+
                     if (range === 'custom') {
                         customersDateRangePicker.style.display = 'block';
                     } else {
@@ -6775,7 +6873,7 @@
         const topProductsDateFrom = document.getElementById('topProductsDateFrom');
         const topProductsDateTo = document.getElementById('topProductsDateTo');
         const topProductsDateRangeApply = document.getElementById('topProductsDateRangeApply');
-        
+
         let currentTopProductsRange = '30';
         let currentTopProductsFrom = null;
         let currentTopProductsTo = null;
@@ -6804,12 +6902,12 @@
                     limit: 5,
                     _t: Date.now(),
                 });
-                
+
                 if (range === 'custom' && from && to) {
                     params.append('from', from);
                     params.append('to', to);
                 }
-                
+
                 url += '?' + params.toString();
 
                 const response = await fetch(url, {
@@ -6818,23 +6916,23 @@
                         'Cache-Control': 'no-cache',
                     }
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                
-                
+
+
                 if (!result.success) {
                     throw new Error(result.message || 'Lỗi từ server');
                 }
-                
+
                 if (result.success && result.data) {
                     const products = result.data.items || [];
                     const totalRevenueEstimated = result.data.total_revenue_estimated || 0;
                     const totalRevenueCompleted = result.data.total_revenue_completed || 0;
-                    
+
 
                     if (products.length === 0) {
                         topProductsTableBody.innerHTML = `
@@ -6861,29 +6959,29 @@
                         const categoryEscaped = escapeHtml(product.category);
                         const imageUrl = product.image || '/images/placeholder.png';
                         const rank = index + 1;
-                        
+
                         // Dự tính
                         const soldEstimated = product.sold_estimated || 0;
                         const revenueEstimated = product.revenue_estimated || 0;
                         const percentEstimated = product.percent_estimated || 0;
-                        
+
                         // Thực tế
                         const soldCompleted = product.sold_completed || 0;
                         const revenueCompleted = product.revenue_completed || 0;
                         const percentCompleted = product.percent_completed || 0;
-                        
+
                         // Tỷ lệ chuyển đổi
                         const conversionRate = product.conversion_rate || 0;
-                        
+
                         // Stock
                         const stock = product.stock || 0;
-                        
+
                         // Ranking badge
                         let rankBadgeClass = 'product-rank-badge rank-other';
                         if (rank === 1) rankBadgeClass = 'product-rank-badge rank-1';
                         else if (rank === 2) rankBadgeClass = 'product-rank-badge rank-2';
                         else if (rank === 3) rankBadgeClass = 'product-rank-badge rank-3';
-                        
+
                         // Stock badge class
                         let stockBadgeClass = 'stock-badge ';
                         let stockBadgeText = '';
@@ -6897,11 +6995,11 @@
                             stockBadgeClass += 'low';
                             stockBadgeText = '🔴 ' + stock;
                         }
-                        
+
                         // Format revenue (không có đ ở cuối, sẽ thêm trong HTML)
                         const revenueEstimatedFormatted = new Intl.NumberFormat('vi-VN').format(revenueEstimated);
                         const revenueCompletedFormatted = new Intl.NumberFormat('vi-VN').format(revenueCompleted);
-                        
+
                         // Conversion badge
                         let conversionBadgeClass = 'conversion-badge ';
                         if (conversionRate >= 5) {
@@ -6911,11 +7009,11 @@
                         } else {
                             conversionBadgeClass += 'low';
                         }
-                        
+
                         // Progress bar width (max 100%)
                         const progressEstimatedWidth = Math.min(percentEstimated, 100);
                         const progressCompletedWidth = Math.min(percentCompleted, 100);
-                        
+
                         return `
                             <tr class="product-row" data-product-id="${product.id}" style="cursor: pointer;" onclick="window.location.href='{{ url('/admin/products/show') }}/${product.id}'">
                                 <td>
@@ -6973,7 +7071,7 @@
                         <div>Dự tính: <strong>${new Intl.NumberFormat('vi-VN').format(totalRevenueEstimated)} đ</strong></div>
                         <div>Thực tế: <strong>${new Intl.NumberFormat('vi-VN').format(totalRevenueCompleted)} đ</strong></div>
                     `;
-                    
+
                     // Update date range text
                     let dateRangeText = '';
                     if (range === 'custom' && from && to) {
@@ -7005,25 +7103,25 @@
         // Chỉ lấy các button trong top products section để tránh conflict với các section khác
         const topProductsSection = document.querySelector('#topProductsTableBody')?.closest('section');
         const topProductsRangeButtons = topProductsSection ? topProductsSection.querySelectorAll('[data-range]') : [];
-        
+
         topProductsRangeButtons.forEach(btn => {
             btn.addEventListener('click', function() {
                 const range = this.getAttribute('data-range');
                 currentTopProductsRange = range;
                 currentTopProductsFrom = null;
                 currentTopProductsTo = null;
-                
+
                 // Update active state - chỉ trong top products section
                 topProductsRangeButtons.forEach(b => {
                     b.classList.remove('active');
                 });
                 this.classList.add('active');
-                
+
                 // Hide custom date range
                 if (topProductsDateRangeGroup) {
                     topProductsDateRangeGroup.classList.add('d-none');
                 }
-                
+
                 loadTopProducts(range);
             });
         });
@@ -7040,21 +7138,21 @@
             topProductsDateRangeApply.addEventListener('click', function() {
                 const from = topProductsDateFrom?.value;
                 const to = topProductsDateTo?.value;
-                
+
                 if (!from || !to) {
                     alert('Vui lòng chọn đầy đủ ngày bắt đầu và kết thúc');
                     return;
                 }
-                
+
                 if (new Date(from) > new Date(to)) {
                     alert('Ngày bắt đầu không được lớn hơn ngày kết thúc');
                     return;
                 }
-                
+
                 currentTopProductsRange = 'custom';
                 currentTopProductsFrom = from;
                 currentTopProductsTo = to;
-                
+
                 // Update active state - chỉ trong top products section
                 const topProductsSection = topProductsTableBody?.closest('section');
                 if (topProductsSection) {
@@ -7063,7 +7161,7 @@
                     });
                 }
                 topProductsCustomRangeBtn.classList.add('active');
-                
+
                 loadTopProducts('custom', from, to);
             });
         }
@@ -7085,7 +7183,7 @@
         const commentsSearch = document.getElementById('commentsSearch');
         const commentsSearchBtn = document.getElementById('commentsSearchBtn');
         const commentsTotalCountEl = document.getElementById('commentsTotalCount');
-        
+
         let currentCommentsStatus = '';
         let currentCommentsSearch = '';
         let allCommentsData = [];
@@ -7109,14 +7207,14 @@
                     per_page: 1000, // Load tất cả dữ liệu
                     _t: Date.now(), // Cache busting timestamp
                 });
-                
+
                 if (currentCommentsStatus) {
                     params.append('status', currentCommentsStatus);
                 }
                 if (currentCommentsSearch) {
                     params.append('search', currentCommentsSearch);
                 }
-                
+
                 url += '?' + params.toString();
 
                 const response = await fetch(url, {
@@ -7125,13 +7223,13 @@
                         'Cache-Control': 'no-cache',
                     }
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                
+
                 if (result.success && result.data) {
                     allCommentsData = result.data.data || [];
                     const pagination = result.data;
@@ -7155,10 +7253,13 @@
                 }
             } catch (e) {
                 console.error('Error loading comments:', e);
+                if (typeof window.showToast === 'function') {
+                    window.showToast('Lỗi tải bình luận: ' + e.message, 'error');
+                }
                 commentsTableBody.innerHTML = `
                     <tr>
                         <td colspan="6" class="text-center text-danger py-4">
-                            <i class="bi bi-exclamation-triangle"></i> Lỗi tải dữ liệu
+                            <i class="bi bi-exclamation-triangle"></i> Lỗi tải dữ liệu: ${e.message}
                         </td>
                     </tr>
                 `;
@@ -7204,7 +7305,7 @@
                         const productNameEscaped = escapeHtml(comment.product_name || 'N/A');
                         const userNameEscaped = escapeHtml(comment.user_name || 'N/A');
                         const userEmailEscaped = escapeHtml(comment.user_email || '');
-                        
+
                         return `
                             <tr class="comment-row" data-comment-id="${comment.id}">
                                 <td>
@@ -7330,7 +7431,7 @@
                     'rejected': 'Đã từ chối',
                     'hidden': 'Đã ẩn'
                 };
-                
+
                 let dropdownHTML = '';
                 if (newStatus !== 'approved') {
                     dropdownHTML += `<li><a class="dropdown-item" href="#" onclick="approveComment(${commentId}); return false;"><i class="bi bi-check-circle text-success me-2"></i>Duyệt</a></li>`;
@@ -7348,7 +7449,7 @@
         // Action functions cho Comments với optimistic update
         async function approveComment(id) {
             if (!confirm('Bạn có chắc muốn duyệt bình luận này?')) return;
-            
+
             // Tìm row và lưu trạng thái cũ
             const row = document.querySelector(`tr[data-comment-id="${id}"]`);
             let oldStatus = 'pending';
@@ -7361,11 +7462,11 @@
                     else oldStatus = 'pending';
                 }
             }
-            
+
             // Optimistic update - update UI ngay lập tức
             updateCommentStatusOptimistically(id, 'approved', oldStatus);
             showToast('Đang xử lý...', 'info');
-            
+
             // Disable button và show loading
             const dropdownItem = document.querySelector(`[onclick*="approveComment(${id})"]`);
             const originalHtml = dropdownItem ? dropdownItem.innerHTML : null;
@@ -7377,7 +7478,7 @@
                     icon.className = 'bi bi-hourglass-split me-2';
                 }
             }
-            
+
             try {
                 const response = await fetch(`{{ url('/admin/api/dashboard/comments') }}/${id}/approve`, {
                     method: 'POST',
@@ -7419,7 +7520,7 @@
 
         async function rejectComment(id) {
             if (!confirm('Bạn có chắc muốn từ chối bình luận này?')) return;
-            
+
             // Tìm row và lưu trạng thái cũ
             const row = document.querySelector(`tr[data-comment-id="${id}"]`);
             let oldStatus = 'pending';
@@ -7432,11 +7533,11 @@
                     else oldStatus = 'pending';
                 }
             }
-            
+
             // Optimistic update - update UI ngay lập tức
             updateCommentStatusOptimistically(id, 'rejected', oldStatus);
             showToast('Đang xử lý...', 'info');
-            
+
             const dropdownItem = document.querySelector(`[onclick*="rejectComment(${id})"]`);
             const originalHtml = dropdownItem ? dropdownItem.innerHTML : null;
             if (dropdownItem) {
@@ -7447,7 +7548,7 @@
                     icon.className = 'bi bi-hourglass-split me-2';
                 }
             }
-            
+
             try {
                 const response = await fetch(`{{ url('/admin/api/dashboard/comments') }}/${id}/reject`, {
                     method: 'POST',
@@ -7488,7 +7589,7 @@
 
         async function deleteComment(id) {
             if (!confirm('Bạn có chắc muốn xóa bình luận này? Hành động này không thể hoàn tác.')) return;
-            
+
             // Tìm row và lưu trạng thái cũ
             const row = document.querySelector(`tr[data-comment-id="${id}"]`);
             let oldStatus = 'pending';
@@ -7501,7 +7602,7 @@
                     else oldStatus = 'pending';
                 }
             }
-            
+
             // Optimistic update - ẩn row ngay lập tức
             if (row) {
                 row.style.opacity = '0.5';
@@ -7511,7 +7612,7 @@
                 }, 300);
             }
             showToast('Đang xóa...', 'info');
-            
+
             const dropdownItem = document.querySelector(`[onclick*="deleteComment(${id})"]`);
             const originalHtml = dropdownItem ? dropdownItem.innerHTML : null;
             if (dropdownItem) {
@@ -7522,7 +7623,7 @@
                     icon.className = 'bi bi-hourglass-split me-2';
                 }
             }
-            
+
             try {
                 const response = await fetch(`{{ url('/admin/api/dashboard/comments') }}/${id}`, {
                     method: 'DELETE',
@@ -7578,10 +7679,10 @@
 
             // Tìm row và lưu trạng thái hiện tại
             const row = document.querySelector(`tr[data-comment-id="${lastAction.id}"]`);
-            const currentStatus = row ? row.querySelector('.status-badge')?.classList.contains('status-approved') ? 'approved' : 
-                row.querySelector('.status-badge')?.classList.contains('status-rejected') ? 'rejected' : 
+            const currentStatus = row ? row.querySelector('.status-badge')?.classList.contains('status-approved') ? 'approved' :
+                row.querySelector('.status-badge')?.classList.contains('status-rejected') ? 'rejected' :
                 row.querySelector('.status-badge')?.classList.contains('status-hidden') ? 'hidden' : 'pending' : 'pending';
-            
+
             // Optimistic update - rollback UI ngay lập tức
             if (lastAction.action === 'delete' && row) {
                 row.style.display = '';
@@ -7592,7 +7693,7 @@
             } else if (row) {
                 updateCommentStatusOptimistically(lastAction.id, lastAction.old_status, currentStatus);
             }
-            
+
             showToast('Đang hoàn tác...', 'info');
 
             try {
@@ -7645,7 +7746,7 @@
         const usersSearch = document.getElementById('usersSearch');
         const usersSearchBtn = document.getElementById('usersSearchBtn');
         const usersTotalCountEl = document.getElementById('usersTotalCount');
-        
+
         let currentUsersStatus = '';
         let currentUsersSearch = '';
         let allUsersData = [];
@@ -7668,24 +7769,24 @@
                 const params = new URLSearchParams({
                     per_page: 1000, // Load tất cả dữ liệu
                 });
-                
+
                 if (currentUsersStatus) {
                     params.append('status', currentUsersStatus);
                 }
                 if (currentUsersSearch) {
                     params.append('search', currentUsersSearch);
                 }
-                
+
                 url += '?' + params.toString();
 
                 const response = await fetch(url);
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                
+
                 if (result.success && result.data) {
                     allUsersData = result.data.data || [];
                     const pagination = result.data;
@@ -7733,7 +7834,7 @@
                             'banned': 'Đã khóa',
                             'unverified': 'Unverified'
                         };
-                        
+
                         return `
                             <tr class="user-row" data-user-id="${user.id}">
                                 <td>
@@ -7816,7 +7917,7 @@
 
         async function banUser(id) {
             if (!confirm('Bạn có chắc muốn khóa người dùng này?')) return;
-            
+
             const dropdownItem = document.querySelector(`[onclick*="banUser(${id})"]`);
             const originalHtml = dropdownItem ? dropdownItem.innerHTML : null;
             if (dropdownItem) {
@@ -7827,7 +7928,7 @@
                     icon.className = 'bi bi-hourglass-split me-2';
                 }
             }
-            
+
             try {
                 const response = await fetch(`{{ url('/admin/api/dashboard/users') }}/${id}/ban`, {
                     method: 'POST',
@@ -7862,7 +7963,7 @@
 
         async function unbanUser(id) {
             if (!confirm('Bạn có chắc muốn mở khóa người dùng này?')) return;
-            
+
             const dropdownItem = document.querySelector(`[onclick*="unbanUser(${id})"]`);
             const originalHtml = dropdownItem ? dropdownItem.innerHTML : null;
             if (dropdownItem) {
@@ -7873,7 +7974,7 @@
                     icon.className = 'bi bi-hourglass-split me-2';
                 }
             }
-            
+
             try {
                 const response = await fetch(`{{ url('/admin/api/dashboard/users') }}/${id}/unban`, {
                     method: 'POST',
@@ -7916,7 +8017,7 @@
                     tooltipInstance.dispose();
                 }
             });
-            
+
             // Initialize new tooltips
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -7976,7 +8077,7 @@
         const inventoryStatusFilter = document.getElementById('inventoryStatusFilter');
         const inventoryTotalEl = document.getElementById('inventoryTotal');
         const inventoryFilterInfoEl = document.getElementById('inventoryFilterInfo');
-        
+
         let allInventoryData = []; // Lưu tất cả dữ liệu để filter
         let filteredInventoryData = [];
 
@@ -8001,23 +8102,26 @@
                 const response = await fetch(url, {
                     cache: 'no-cache',
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                
+
                 if (!result.success) {
                     throw new Error(result.message || 'Lỗi khi tải dữ liệu');
                 }
-                
+
                 if (result.success && result.data) {
                     allInventoryData = result.data.items || [];
                     filterInventoryData();
                 }
             } catch (e) {
                 console.error('Error loading inventory:', e);
+                if (typeof window.showToast === 'function') {
+                    window.showToast('Lỗi tải kho hàng: ' + e.message, 'error');
+                }
                 inventoryTableBody.innerHTML = `
                     <tr>
                         <td colspan="5" class="text-center text-danger py-4">
@@ -8032,18 +8136,18 @@
         function filterInventoryData() {
             const searchTerm = inventorySearch?.value.toLowerCase() || '';
             const statusFilter = inventoryStatusFilter?.value || '';
-            
+
             filteredInventoryData = allInventoryData.filter(item => {
-                const matchSearch = !searchTerm || 
+                const matchSearch = !searchTerm ||
                     item.name.toLowerCase().includes(searchTerm) ||
                     (item.sku && item.sku.toLowerCase().includes(searchTerm)) ||
                     (item.category && item.category.toLowerCase().includes(searchTerm));
-                
+
                 const matchStatus = !statusFilter || item.stock_status === statusFilter;
-                
+
                 return matchSearch && matchStatus;
             });
-            
+
             renderInventoryTable();
             updateInventoryFooter();
         }
@@ -8060,7 +8164,7 @@
                 `;
                 return;
             }
-            
+
             // Hiển thị tất cả sản phẩm, có thể scroll lên xuống để xem
             const displayData = filteredInventoryData;
 
@@ -8075,17 +8179,17 @@
             inventoryTableBody.innerHTML = displayData.map(item => {
                 const productNameEscaped = escapeHtml(item.name);
                 const skuEscaped = escapeHtml(item.sku || '');
-                
+
                 const stock = item.stock || 0;
                 const sold = item.sold_quantity || 0;
-                
+
                 // Stock status badge
                 const stockStatusBadge = `
                     <span class="badge" style="background-color: ${item.stock_status_color}; color: white;">
                         ${item.stock_status_label}
                     </span>
                 `;
-                
+
                 return `
                     <tr class="inventory-row" data-product-id="${item.id}" style="cursor: pointer;" onclick="window.location.href='{{ url('/admin/products/show') }}/${item.id}'">
                         <td title="${productNameEscaped}">
@@ -8115,7 +8219,7 @@
                     </tr>
                 `;
             }).join('');
-            
+
             // Update footer
             updateInventoryFooter();
         }
@@ -8124,15 +8228,15 @@
         function updateInventoryFooter() {
             const inventoryTotalEl = document.getElementById('inventoryTotal');
             const inventoryFilterInfoEl = document.getElementById('inventoryFilterInfo');
-            
+
             if (inventoryTotalEl) {
                 inventoryTotalEl.textContent = filteredInventoryData.length;
             }
-            
+
             if (inventoryFilterInfoEl) {
                 const searchTerm = inventorySearch?.value || '';
                 const statusFilter = inventoryStatusFilter?.value || '';
-                
+
                 if (searchTerm || statusFilter) {
                     inventoryFilterInfoEl.textContent = `Đã lọc: ${filteredInventoryData.length} sản phẩm`;
                 } else {
@@ -8162,12 +8266,8 @@
         if (inventoryTableBody) {
             loadInventory();
         }
-<<<<<<< HEAD
-        // Toggle filter options based on filter type
-=======
 
         // Toggle filter options based on filter type (with null guards)
->>>>>>> origin/update_dashboard
         function toggleFilterOptions() {
             const filterTypeEl = document.getElementById('order_filter_type');
             const monthGroup = document.getElementById('filter_month_group');
@@ -8176,11 +8276,11 @@
             if (!filterTypeEl || !monthGroup || !dateRangeGroup) return;
 
             const filterType = filterTypeEl.value || '';
-            
+
             // Hide all groups first
             monthGroup.style.display = 'none';
             dateRangeGroup.style.display = 'none';
-            
+
             // Show relevant group
             if (filterType === 'month') {
                 monthGroup.style.display = 'flex';
@@ -8202,10 +8302,10 @@
             document.getElementById('order_start_date').value = '';
             document.getElementById('order_end_date').value = '';
             document.getElementById('order_status').value = 'all';
-            
+
             // Toggle filter options
             toggleFilterOptions();
-            
+
             // Xóa các hidden input filter doanh thu
             const form = document.getElementById('orderFilterForm');
             const hiddenInputs = form.querySelectorAll('input[type="hidden"]');
