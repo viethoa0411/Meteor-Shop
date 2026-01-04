@@ -3,7 +3,7 @@
 @section('title', 'Thanh toán')
 
 @section('content')
-    <div class="container py-5">
+    <div class="py-5">
         {{-- Breadcrumb --}}
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb" style="background:transparent; padding:0;">
@@ -151,7 +151,6 @@
                                         value="cash" {{ old('payment_method', 'cash') == 'cash' ? 'checked' : '' }} required>
                                     <label class="form-check-label" for="cash">
                                         <strong>Thanh toán khi nhận hàng</strong>
-
                                     </label>
                                 </div>
 
@@ -342,6 +341,16 @@
 
     @push('head')
         <style>
+            /* Ẩn mũi tên tăng giảm của input number */
+            input[type=number]::-webkit-inner-spin-button, 
+            input[type=number]::-webkit-outer-spin-button { 
+                -webkit-appearance: none; 
+                margin: 0; 
+            }
+            input[type=number] {
+                -moz-appearance: textfield;
+            }
+
             /* Responsive cho checkout summary */
             @media (max-width: 991.98px) {
                 .checkout-summary-card {
@@ -1057,57 +1066,60 @@
 
                     if (!cashRadio) return;
 
-                    // Ngưỡng 5.000.000 đ
-                    const threshold = 5000000;
+                    // Ngưỡng 10.000.000 đ
+                    const threshold = 10000000;
 
                     if (total > threshold) {
                         // 1. Chuyển sang Momo nếu đang chọn COD
                         if (cashRadio.checked) {
                             if (momoRadio) {
                                 momoRadio.checked = true;
+                                cashRadio.required = false; // Bỏ required của cash nếu chuyển sang momo
                             } else {
                                 cashRadio.checked = false;
                             }
                         }
 
-                        // 2. Disable và style lại COD
-                        cashRadio.disabled = true;
+                        // 2. Ẩn COD và hiển thị thông báo
+                        // Ẩn toàn bộ container của COD
                         if (cashContainer) {
-                            cashContainer.classList.add('opacity-50');
-                            cashContainer.title = "Không hỗ trợ thanh toán khi nhận hàng cho đơn trên 5 triệu";
+                            cashContainer.style.display = 'none';
                         }
-
-                        // 3. Thêm dòng thông báo nhỏ ngay dưới label (thay vì alert box to)
-                        let warningText = document.getElementById(warningId);
-                        if (!warningText && cashLabel) {
-                            warningText = document.createElement('div');
-                            warningText.id = warningId;
-                            warningText.className = 'alert alert-danger py-1 px-2 mt-2 mb-0 d-inline-block small fw-bold';
-                            warningText.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Chỉ hỗ trợ đơn hàng dưới 5.000.000đ';
-                            cashLabel.parentNode.appendChild(warningText);
-                        } else if (warningText) {
-                            warningText.style.display = 'block';
+                        
+                        // Hiển thị alert box (tương tự trang cart)
+                        const codMessage = document.getElementById('cod-restriction-message');
+                        if (codMessage) {
+                            codMessage.style.display = 'block';
+                        } else {
+                             // Nếu chưa có element thông báo thì tạo mới hoặc dùng warningText logic cũ
+                             let warningText = document.getElementById(warningId);
+                             if (!warningText && cashLabel) {
+                                // Fallback nếu không có #cod-restriction-message
+                                warningText = document.createElement('div');
+                                warningText.id = warningId;
+                                warningText.className = 'alert alert-danger py-1 px-2 mt-2 mb-0 d-inline-block small fw-bold';
+                                warningText.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Chỉ hỗ trợ đơn hàng dưới 10.000.000đ';
+                                cashLabel.parentNode.appendChild(warningText);
+                             } else if (warningText) {
+                                 warningText.style.display = 'block';
+                             }
                         }
-
-                        // Xóa style cũ nếu có (đề phòng)
-                        if (cashLabel) {
-                            cashLabel.style.textDecoration = 'none';
-                            cashLabel.classList.remove('text-muted'); // opacity ở container đã đủ làm mờ
-                        }
-
-                        // Xóa alert box cũ (nếu còn từ code trước)
-                        const oldMsg = document.getElementById('cod-disabled-msg');
-                        if (oldMsg) oldMsg.remove();
 
                     } else {
                         // Enable lại
                         cashRadio.disabled = false;
+                        cashRadio.required = true; // Bật lại required
+
                         if (cashContainer) {
+                            cashContainer.style.display = 'block';
                             cashContainer.classList.remove('opacity-50');
                             cashContainer.removeAttribute('title');
                         }
 
-                        // Ẩn warning text
+                        // Ẩn warning text/message
+                        const codMessage = document.getElementById('cod-restriction-message');
+                        if (codMessage) codMessage.style.display = 'none';
+
                         const warningText = document.getElementById(warningId);
                         if (warningText) warningText.style.display = 'none';
 
