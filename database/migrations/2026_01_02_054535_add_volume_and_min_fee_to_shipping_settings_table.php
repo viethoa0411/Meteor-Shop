@@ -12,6 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('shipping_settings', function (Blueprint $table) {
+            if (!Schema::hasColumn('shipping_settings', 'same_order_discount_percent')) {
+                $table->decimal('same_order_discount_percent', 5, 2)->default(0)->after('installation_fee');
+            }
+
             if (!Schema::hasColumn('shipping_settings', 'volume_price_per_m3')) {
                 $table->decimal('volume_price_per_m3', 10, 0)->default(5000)->after('same_order_discount_percent')
                     ->comment('Phí vận chuyển cho mỗi sản phẩm tiếp theo (sau SP đầu tiên)');
@@ -34,6 +38,9 @@ return new class extends Migration
             }
             if (Schema::hasColumn('shipping_settings', 'min_shipping_fee')) {
                 $table->dropColumn('min_shipping_fee');
+            }
+            if (Schema::hasColumn('shipping_settings', 'same_order_discount_percent')) {
+                $table->dropColumn('same_order_discount_percent');
             }
         });
     }

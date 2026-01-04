@@ -164,6 +164,7 @@ class CheckoutController extends Controller
                     'size'       => $item['size'] ?? null,
                     'product'    => $product,
                     'variant'    => $variant,
+                    'slug'       => $product->slug,
                 ];
             }
 
