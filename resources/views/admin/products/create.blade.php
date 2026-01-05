@@ -141,15 +141,15 @@
                             <div class="row g-3 mt-2">
                                 <div class="col-md-3">
                                     <input type="number" id="length" step="100" class="form-control"
-                                        placeholder="Chiều dài (mm) - VD: 1000">
+                                        placeholder="Chiều dài (cm) - VD: 1000">
                                 </div>
                                 <div class="col-md-3">
                                     <input type="number" id="width" step="100" class="form-control"
-                                        placeholder="Chiều rộng (mm) - VD: 1000">
+                                        placeholder="Chiều rộng (cm) - VD: 1000">
                                 </div>
                                 <div class="col-md-3">
                                     <input type="number" id="height" step="100" class="form-control"
-                                        placeholder="Chiều cao (mm) - VD: 1000">
+                                        placeholder="Chiều cao (cm) - VD: 1000">
                                 </div>
                             </div>
                             <div class="row g-3 mt-2">
