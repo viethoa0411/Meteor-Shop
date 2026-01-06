@@ -13,26 +13,26 @@ return new class extends Migration
     {
         Schema::table('blogs', function (Blueprint $table) {
             if (!Schema::hasColumn('blogs', 'published_at')) {
-                $table->timestamp('published_at')->nullable()->after('status');
+            $table->timestamp('published_at')->nullable()->after('status');
             }
             if (!Schema::hasColumn('blogs', 'view_count')) {
-                $table->unsignedBigInteger('view_count')->default(0)->after('published_at');
+            $table->unsignedBigInteger('view_count')->default(0)->after('published_at');
             }
             if (!Schema::hasColumn('blogs', 'seo_title')) {
-                $table->string('seo_title')->nullable()->after('view_count');
+            $table->string('seo_title')->nullable()->after('view_count');
             }
             if (!Schema::hasColumn('blogs', 'seo_description')) {
-                $table->text('seo_description')->nullable()->after('seo_title');
+            $table->text('seo_description')->nullable()->after('seo_title');
             }
             if (!Schema::hasColumn('blogs', 'canonical_url')) {
-                $table->string('canonical_url')->nullable()->after('seo_description');
+            $table->string('canonical_url')->nullable()->after('seo_description');
             }
             if (!Schema::hasColumn('blogs', 'noindex')) {
-                $table->boolean('noindex')->default(false)->after('canonical_url');
+            $table->boolean('noindex')->default(false)->after('canonical_url');
             }
             // deleted_at đã được thêm bằng migration riêng, tránh trùng cột
             if (!Schema::hasColumn('blogs', 'deleted_at')) {
-                $table->softDeletes()->after('updated_at');
+            $table->softDeletes()->after('updated_at');
             }
         });
     }
