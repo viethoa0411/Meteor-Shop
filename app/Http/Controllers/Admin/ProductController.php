@@ -78,13 +78,13 @@ class ProductController extends Controller
             'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
             'status' => 'required|in:active,inactive',
 
-            // Validate biến thể
-            'variants' => 'nullable|array',
-            'variants.*.color_name' => 'nullable|string|max:50',
-            'variants.*.color_code' => 'nullable|string|max:20',
-            'variants.*.length' => 'nullable|numeric|min:0',
-            'variants.*.width' => 'nullable|numeric|min:0',
-            'variants.*.height' => 'nullable|numeric|min:0',
+            // Validate biến thể - BẮT BUỘC phải có ít nhất 1 biến thể
+            'variants' => 'required|array|min:1',
+            'variants.*.color_name' => 'required|string|max:50',
+            'variants.*.color_code' => 'required|string|max:20',
+            'variants.*.length' => 'required|numeric|min:0',
+            'variants.*.width' => 'required|numeric|min:0',
+            'variants.*.height' => 'required|numeric|min:0',
             'variants.*.weight' => 'nullable|numeric|min:0',
             'variants.*.stock' => 'required|integer|min:0',
             'variants.*.price' => 'nullable|numeric|min:0',
@@ -93,6 +93,15 @@ class ProductController extends Controller
              // weight: cho phép null hoặc số >= 0
             'variants.*.weight' => 'nullable|numeric|min:0',
             'variants.*.weight_unit' => 'required_with:variants.*.weight|in:g,kg,lb',
+        ], [
+            'variants.required' => 'Vui lòng thêm ít nhất một biến thể cho sản phẩm.',
+            'variants.min' => 'Sản phẩm phải có ít nhất một biến thể.',
+            'variants.*.color_name.required' => 'Vui lòng nhập tên màu cho biến thể.',
+            'variants.*.color_code.required' => 'Vui lòng chọn mã màu cho biến thể.',
+            'variants.*.length.required' => 'Vui lòng nhập chiều dài cho biến thể.',
+            'variants.*.width.required' => 'Vui lòng nhập chiều rộng cho biến thể.',
+            'variants.*.height.required' => 'Vui lòng nhập chiều cao cho biến thể.',
+            'variants.*.stock.required' => 'Vui lòng nhập số lượng tồn kho cho biến thể.',
         ]);
 
         //  Upload ảnh đại diện
@@ -132,22 +141,20 @@ class ProductController extends Controller
             }
         }
 
-        // 🧩 Lưu biến thể kèm tồn kho riêng
-        if ($request->has('variants')) {
-            foreach ($request->variants as $variant) {
-                $product->variants()->create([
-                    'color_name' => $variant['color_name'] ?? null,
-                    'color_code' => $variant['color_code'] ?? null,
-                    'length'     => $variant['length'] ?? null,
-                    'width'      => $variant['width'] ?? null,
-                    'height'     => $variant['height'] ?? null,
-                    'weight'     => $variant['weight'] ?? 0,
-                    'stock'      => $variant['stock'] ?? 0,
-                    'price'      => $variant['price'] ?? $request->price,
-                    'weight_unit'=> $variant['weight_unit'] ?? 'kg',
-                    'weight'     => $variant['weight'] ?? null,
-                ]);
-            }
+        // 🧩 Lưu biến thể kèm tồn kho riêng (BẮT BUỘC phải có)
+        foreach ($request->variants as $variant) {
+            $product->variants()->create([
+                'color_name' => $variant['color_name'] ?? null,
+                'color_code' => $variant['color_code'] ?? null,
+                'length'     => $variant['length'] ?? null,
+                'width'      => $variant['width'] ?? null,
+                'height'     => $variant['height'] ?? null,
+                'weight'     => $variant['weight'] ?? 0,
+                'stock'      => $variant['stock'] ?? 0,
+                'price'      => $variant['price'] ?? $request->price,
+                'weight_unit'=> $variant['weight_unit'] ?? 'kg',
+                'weight'     => $variant['weight'] ?? null,
+            ]);
         }
         return redirect()->route('admin.products.list')
             ->with('success', 'Thêm sản phẩm thành công 🎉');
@@ -420,6 +427,26 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+        
+        // Kiểm tra xem sản phẩm có trong đơn hàng nào không
+        $orderDetails = $product->orderDetails()->with('order')->get();
+        
+        if ($orderDetails->count() > 0) {
+            // Lấy danh sách các order_id duy nhất
+            $orderIds = $orderDetails->pluck('order_id')->unique()->values();
+            
+            // Kiểm tra tất cả đơn hàng chứa sản phẩm này đã giao thành công chưa
+            $ordersNotDelivered = \App\Models\Order::whereIn('id', $orderIds)
+                ->whereNotIn('order_status', ['delivered', 'completed'])
+                ->exists();
+            
+            if ($ordersNotDelivered) {
+                return redirect()->route('admin.products.list')
+                    ->with('error', 'Không thể xóa sản phẩm này vì có đơn hàng chưa giao thành công. Vui lòng đợi tất cả đơn hàng được giao thành công (trạng thái "Đã giao" hoặc "Hoàn thành") trước khi xóa.');
+            }
+        }
+        
+        // Nếu tất cả đơn hàng đã giao thành công hoặc không có đơn hàng nào, cho phép xóa
         $product->delete();
         return redirect()->route('admin.products.list')->with('success', 'Đã xoá sản phẩm!');
     }
