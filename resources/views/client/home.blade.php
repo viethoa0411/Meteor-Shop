@@ -379,38 +379,90 @@
             </script>
         @endpush
 
-        {{-- danh mục theo đồ --}}
-        <div style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
-            <div class="room" style="padding-top: 25px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px">
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=11" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
-
+        {{-- danh mục theo đồ (lấy từ categories trong database) --}}
+        @if(isset($homeProductCategories) && $homeProductCategories->count() > 0)
+            <div style="padding: 40px 20px 50px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom:18px;">
+                    <div>
+                        <h2 style="font-size:22px; font-weight:600; margin:0; color:#111;">Danh mục theo đồ</h2>
+                        <p style="margin:6px 0 0; font-size:14px; color:#666;">
+                            Lựa chọn nhanh theo từng loại sản phẩm nội thất.
+                        </p>
                     </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Sofa</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=21" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Giường</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=31" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Bàn làm việc</h4>
                 </div>
 
+                <div class="category-slider" data-visible="3"
+                    style="position:relative; display:flex; align-items:center; gap:12px;">
+                    <button type="button"
+                        class="cat-nav cat-prev"
+                        aria-label="Danh mục trước"
+                        style="width:34px; height:34px; border-radius:50%; border:none; background:rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#444; transition:.2s; flex-shrink:0;">
+                        ‹
+                    </button>
+
+                    <div class="category-track"
+                        style="display:flex; gap:16px; overflow:hidden; padding:4px 2px; width:100%;">
+                        @foreach ($homeProductCategories as $category)
+                            <a href="{{ route('client.product.category', $category->slug) }}"
+                                class="category-card"
+                                style="flex:0 0 calc(100%/3 - 12px); max-width:calc(100%/3 - 12px); text-decoration:none; color:inherit;">
+                                <div
+                                    style="overflow:hidden; border-radius:10px; border:1px solid #e5e7eb; background:#f9fafb;">
+                                    <img src="{{ $category->image ? asset('categories/images/' . $category->image) : 'https://via.placeholder.com/800x1200?text=Category' }}"
+                                        alt="{{ $category->name }}"
+                                        style="width: 100%; aspect-ratio:2/3; display:block; object-fit:cover; transition:transform .7s ease;">
+                                </div>
+                                <h4
+                                    style="font-size:18px; font-weight:600; color:#111827; text-align:center; padding:10px 0 4px; margin:0;">
+                                    {{ $category->name }}
+                                </h4>
+                                <p style="font-size:13px; color:#6b7280; text-align:center; margin:0 0 4px;">
+                                    Khám phá sản phẩm phù hợp.
+                                </p>
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <button type="button"
+                        class="cat-nav cat-next"
+                        aria-label="Danh mục tiếp theo"
+                        style="width:34px; height:34px; border-radius:50%; border:none; background:rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#444; transition:.2s; flex-shrink:0;">
+                        ›
+                    </button>
+                </div>
+
+                <style>
+                    .category-slider .category-card:hover img {
+                        transform: scale(1.08);
+                    }
+
+                    .category-slider .cat-nav:hover {
+                        background: rgba(0, 0, 0, 0.12);
+                        color: #111;
+                    }
+
+                    @media (max-width: 992px) {
+                        .category-slider .category-card {
+                            flex: 0 0 calc(100%/2 - 10px) !important;
+                            max-width: calc(100%/2 - 10px) !important;
+                        }
+                    }
+
+                    @media (max-width: 640px) {
+                        .category-slider .category-card {
+                            flex: 0 0 100% !important;
+                            max-width: 100% !important;
+                        }
+
+                        .category-slider .cat-nav {
+                            display: none !important;
+                        }
+                    }
+                </style>
             </div>
-        </div>
-        {{-- end  --}}
+        @endif
+        {{-- end --}}
 
         {{--  Sản phẩm bán chạy --}}
         <div class="product" style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
@@ -486,44 +538,61 @@
         {{--  --}}
 
 
-        {{-- danh mục theo loại phòng --}}
-        <div style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
-            <div class="room" style="padding-top: 25px; display:grid; grid-template-columns:repeat(4,1fr); gap:16px">
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=11" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=scale(1)'">
+        {{-- danh mục theo loại phòng (lấy từ categories trong database) --}}
+        @if(isset($homeRoomCategories) && $homeRoomCategories->count() > 0)
+            <div style="padding: 40px 20px 60px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom:18px;">
+                    <div>
+                        <h2 style="font-size:22px; font-weight:600; margin:0; color:#111;">Danh mục theo loại phòng</h2>
+                        <p style="margin:6px 0 0; font-size:14px; color:#666;">
+                            Gợi ý các không gian tiêu biểu: khách, ngủ, ăn, làm việc.
+                        </p>
                     </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng khách</h4>
                 </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=121" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=scale(1)'">
+
+                <div class="category-slider" data-visible="4"
+                    style="position:relative; display:flex; align-items:center; gap:12px;">
+                    <button type="button"
+                        class="cat-nav cat-prev"
+                        aria-label="Danh mục trước"
+                        style="width:34px; height:34px; border-radius:50%; border:none; background:rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#444; transition:.2s; flex-shrink:0;">
+                        ‹
+                    </button>
+
+                    <div class="category-track"
+                        style="display:flex; gap:16px; overflow:hidden; padding:4px 2px; width:100%;">
+                        @foreach ($homeRoomCategories as $category)
+                            <a href="{{ route('client.product.category', $category->slug) }}"
+                                class="category-card"
+                                style="flex:0 0 calc(100%/4 - 12px); max-width:calc(100%/4 - 12px); text-decoration:none; color:inherit;">
+                                <div
+                                    style="overflow:hidden; border-radius:10px; border:1px solid #e5e7eb; background:#f9fafb;">
+                                    <img src="{{ $category->image ? asset('categories/images/' . $category->image) : 'https://via.placeholder.com/800x1200?text=Category' }}"
+                                        alt="{{ $category->name }}"
+                                        style="width: 100%; aspect-ratio:2/3; display:block; object-fit:cover; transition:transform .7s ease;">
+                                </div>
+                                <h4
+                                    style="font-size:18px; font-weight:600; color:#111827; text-align:center; padding:10px 0 4px; margin:0;">
+                                    {{ $category->name }}
+                                </h4>
+                                <p style="font-size:13px; color:#6b7280; text-align:center; margin:0 0 4px;">
+                                    Sắp xếp nội thất theo không gian sống.
+                                </p>
+                            </a>
+                        @endforeach
                     </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng ngủ</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=131" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng ăn</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=41" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng làm việc</h4>
+
+                    <button type="button"
+                        class="cat-nav cat-next"
+                        aria-label="Danh mục tiếp theo"
+                        style="width:34px; height:34px; border-radius:50%; border:none; background:rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#444; transition:.2s; flex-shrink:0;">
+                        ›
+                    </button>
                 </div>
             </div>
-        </div>
-        {{-- end  --}}
+        @endif
+        {{-- end --}}
 
         {{-- goc chia sẻ --}}
         <div class="container" style="max-width:1200px; margin:0 auto; padding:40px 15px;">
@@ -725,6 +794,45 @@
 
                 // Bắt đầu auto slide ngay khi load
                 startAuto();
+
+                // Slider danh mục (theo đồ / theo phòng)
+                const categorySliders = document.querySelectorAll('.category-slider');
+                categorySliders.forEach(slider => {
+                    const track = slider.querySelector('.category-track');
+                    const cards = slider.querySelectorAll('.category-card');
+                    const prev = slider.querySelector('.cat-prev');
+                    const next = slider.querySelector('.cat-next');
+                    const visible = parseInt(slider.getAttribute('data-visible') || '3', 10);
+
+                    if (!track || cards.length === 0 || !prev || !next) {
+                        return;
+                    }
+
+                    if (cards.length <= visible) {
+                        prev.style.display = 'none';
+                        next.style.display = 'none';
+                        return;
+                    }
+
+                    const getScrollAmount = () => {
+                        const firstCard = cards[0];
+                        const rect = firstCard.getBoundingClientRect();
+                        const styles = window.getComputedStyle(track);
+                        const gap = parseFloat(styles.columnGap || styles.gap || '16');
+                        return rect.width + gap;
+                    };
+
+                    const scroll = (direction) => {
+                        const amount = getScrollAmount();
+                        track.scrollBy({
+                            left: direction * amount,
+                            behavior: 'smooth'
+                        });
+                    };
+
+                    prev.addEventListener('click', () => scroll(-1));
+                    next.addEventListener('click', () => scroll(1));
+                });
             });
         </script>
 

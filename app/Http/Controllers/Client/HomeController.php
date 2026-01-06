@@ -36,10 +36,19 @@ class HomeController extends Controller
             ->where('status', 1)
             ->get();
 
-        // Dùng riêng cho block "danh mục theo đồ" trên trang home
-        $homeCategories = $cate
-            ->where('parent_id', null)   // nếu muốn chỉ lấy danh mục cha
-            ->take(6);                   // lấy 6 danh mục
+        // Dùng cho các block danh mục có hình ảnh trên trang chủ
+        $homeCategories = Category::query()
+            ->select(['id', 'name', 'slug', 'image'])
+            ->where('status', 1)
+            ->whereNotNull('image')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        // 3 danh mục theo đồ (Sofa, Giường, Bàn làm việc, ...)
+        $homeProductCategories = $homeCategories->take(3);
+
+        // 4 danh mục theo loại phòng (Phòng khách, Phòng ngủ, ...)
+        $homeRoomCategories = $homeCategories->slice(3, 4);
 
         $banners = Banner::active()
             ->orderBy('sort_order', 'asc')
@@ -66,6 +75,8 @@ class HomeController extends Controller
             'banners',
             'latestBlogs',
             'homeCategories',
+            'homeProductCategories',
+            'homeRoomCategories',
             'wishlistIds'
         ));
     }
