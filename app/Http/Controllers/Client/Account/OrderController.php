@@ -11,6 +11,8 @@ use App\Models\Order;
 use App\Models\OrderLog;
 use App\Models\ClientWallet;
 use App\Models\WalletTransaction;
+use App\Models\Product;
+use App\Models\ProductVariant;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +90,23 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
+            // Hoàn lại số lượng sản phẩm
+            foreach ($order->items as $item) {
+                if (!empty($item->variant_id)) {
+                    // Hoàn lại số lượng cho biến thể
+                    $variant = ProductVariant::find($item->variant_id);
+                    if ($variant) {
+                        $variant->increment('stock', $item->quantity);
+                    }
+                } else {
+                    // Hoàn lại số lượng cho sản phẩm chính
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('stock', $item->quantity);
+                    }
+                }
+            }
+
             // Hoàn tiền vào ví nếu đã thanh toán bằng wallet
             $refundMessage = '';
             if ($order->payment_method === 'wallet' && $order->payment_status === 'paid') {

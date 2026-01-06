@@ -92,6 +92,12 @@
                                 @endif
                             </strong>
                         </div>
+                        @if (($order->installation_fee ?? 0) > 0)
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span>Phí lắp đặt:</span>
+                                <strong>{{ number_format($order->installation_fee, 0, ',', '.') }} đ</strong>
+                            </div>
+                        @endif
                         @if (($order->discount_amount ?? 0) > 0)
                             <div class="mb-2 d-flex justify-content-between text-danger">
                                 <span>Giảm giá:</span>

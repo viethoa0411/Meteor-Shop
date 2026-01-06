@@ -358,10 +358,15 @@ class CheckoutController extends Controller
         );
         $shippingFee = $shippingCalculation['fee'];
 
-        // Lấy phí lắp đặt
+        // Lấy phí lắp đặt từ hidden input hoặc checkbox
         $installationFee = 0;
-        if ($request->has('installation') && $request->installation) {
-            $installationFee = 100000;
+        if ($request->has('installation_fee')) {
+            // Ưu tiên đọc từ hidden input (giá trị thực tế từ JavaScript)
+            $installationFee = (float) $request->installation_fee;
+        } elseif ($request->has('installation') && $request->installation) {
+            // Fallback: nếu không có hidden input, đọc từ checkbox và lấy giá từ settings
+            $shippingSettings = \App\Models\ShippingSetting::getSettings();
+            $installationFee = (float) ($shippingSettings->installation_fee ?? 0);
         }
 
         // Lấy số tiền giảm (nếu đã áp dụng promotion trước đó)

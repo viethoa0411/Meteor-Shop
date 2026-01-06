@@ -142,7 +142,7 @@
                             $installationFee = $checkoutSession['installation_fee'] ?? 0;
                             $hasInstallation = $checkoutSession['has_installation'] ?? false;
                         @endphp
-                        @if ($hasInstallation && $installationFee > 0)
+                        @if ($installationFee > 0)
                             <div class="mb-2 d-flex justify-content-between">
                                 <span>Phí lắp đặt:</span>
                                 <strong>{{ number_format($installationFee, 0, ',', '.') }} đ</strong>
