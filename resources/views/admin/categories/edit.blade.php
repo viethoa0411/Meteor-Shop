@@ -16,7 +16,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.categories.update', $category->id) }}" method="POST">
+        <form action="{{ route('admin.categories.update', $category->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -29,6 +29,23 @@
             <div class="mb-3">
                 <label for="slug" class="form-label">Slug</label>
                 <input type="text" name="slug" class="form-control" value="{{ old('slug', $category->slug) }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Hình ảnh</label>
+                @if($category->image)
+                    <div class="mb-2">
+                        <img src="{{ asset('categories/images/' . $category->image) }}" 
+                             alt="{{ $category->name }}" 
+                             class="img-thumbnail" 
+                             style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                    </div>
+                @endif
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                <small class="form-text text-muted">Định dạng: JPEG, PNG, JPG, GIF, WEBP. Tối đa 2MB. Để trống nếu không muốn thay đổi.</small>
+                <div class="mt-2">
+                    <img id="imagePreview" src="" alt="Preview" style="max-width: 200px; max-height: 200px; display: none;" class="img-thumbnail">
+                </div>
             </div>
 
             <div class="mb-3">
@@ -54,6 +71,21 @@
             <button type="submit" class="btn btn-primary">Cập nhật</button>
             <a href="{{ route('admin.categories.list') }}" class="btn btn-secondary">Hủy</a>
         </form>
+
+        <script>
+            document.getElementById('image').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('imagePreview');
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
 
     </div>
 @endsection

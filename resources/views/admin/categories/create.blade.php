@@ -16,7 +16,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.categories.store') }}" method="POST">
+    <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-3">
@@ -27,6 +27,15 @@
         <div class="mb-3">
             <label for="slug" class="form-label">Slug (tự tạo nếu để trống)</label>
             <input type="text" class="form-control" id="slug" name="slug" placeholder="vd: ao-nam-thoi-trang">
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Hình ảnh</label>
+            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            <small class="form-text text-muted">Định dạng: JPEG, PNG, JPG, GIF, WEBP. Tối đa 2MB.</small>
+            <div class="mt-2">
+                <img id="imagePreview" src="" alt="Preview" style="max-width: 200px; max-height: 200px; display: none;" class="img-thumbnail">
+            </div>
         </div>
 
         <div class="mb-3">
@@ -50,5 +59,20 @@
         <button type="submit" class="btn btn-success">Thêm danh mục</button>
         <a href="{{ route('admin.categories.list') }}" class="btn btn-secondary">Quay lại</a>
     </form>
+
+    <script>
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 </div>
 @endsection

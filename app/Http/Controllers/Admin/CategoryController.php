@@ -54,17 +54,27 @@ class CategoryController extends Controller
             'slug' => 'nullable|string|unique:categories,slug',
             'parent_id' => 'nullable|exists:categories,id',
             'status' => 'required|in:active,inactive',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // Tạo slug tự động nếu chưa nhập
         $slug = $request->slug ?: Str::slug($request->name);
 
-        Category::create([
+        $data = [
             'name' => $request->name,
             'slug' => $slug,
             'parent_id' => $request->parent_id,
             'status' => $request->status,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('categories/images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
+        Category::create($data);
 
         return redirect()->route('admin.categories.list')
             ->with('success', 'Thêm danh mục thành công!');
@@ -92,14 +102,27 @@ class CategoryController extends Controller
             'slug' => 'nullable|string|unique:categories,slug,' . $category->id,
             'parent_id' => 'nullable|exists:categories,id',
             'status' => 'required|in:active,inactive',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        $category->update([
+        $data = [
             'name' => $request->name,
             'slug' => $request->slug ?: \Illuminate\Support\Str::slug($request->name),
             'parent_id' => $request->parent_id,
             'status' => $request->status,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            if ($category->image && file_exists(public_path('categories/images/' . $category->image))) {
+                unlink(public_path('categories/images/' . $category->image));
+            }
+            $image = $request->file('image');
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('categories/images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
+        $category->update($data);
 
         return redirect()->route('admin.categories.list')
             ->with('success', 'Cập nhật danh mục thành công!');
@@ -117,6 +140,10 @@ class CategoryController extends Controller
         if ($category->children()->count() > 0) {
             return redirect()->route('admin.categories.list')
                 ->with('error', 'Không thể xoá danh mục vì vẫn còn danh mục con!');
+        }
+
+        if ($category->image && file_exists(public_path('categories/images/' . $category->image))) {
+            unlink(public_path('categories/images/' . $category->image));
         }
 
         $category->delete();

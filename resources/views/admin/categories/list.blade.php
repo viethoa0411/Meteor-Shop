@@ -90,6 +90,7 @@
                     <thead>
                         <tr>
                             <th>STT</th>
+                            <th>Hình ảnh</th>
                             <th>Tên danh mục</th>
                             <th>Danh mục cha</th>
                             <th>Trạng thái</th>
@@ -100,6 +101,16 @@
                         @foreach ($categories as $category)
                             <tr>
                                 <td data-label="STT">{{ $loop->iteration }}</td>
+                                <td data-label="Hình ảnh">
+                                    @if($category->image)
+                                        <img src="{{ asset('categories/images/' . $category->image) }}" 
+                                             alt="{{ $category->name }}" 
+                                             class="img-thumbnail" 
+                                             style="width: 60px; height: 60px; object-fit: cover;">
+                                    @else
+                                        <span class="text-muted">—</span>
+                                    @endif
+                                </td>
                                 <td data-label="Tên danh mục">{{ $category->name }}</td>
                                 <td data-label="Danh mục cha">{{ $category->parent?->name ?? 'Không có' }}</td>
                                 <td data-label="Trạng thái">
