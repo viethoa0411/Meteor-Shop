@@ -23,7 +23,9 @@ class OrderController extends Controller
     {
         $userId = $request->user()->id;
         $status = $request->get('status', 'all');
-        $ordersQuery = Order::with(['items.product', 'walletTransactions'])
+        $ordersQuery = Order::with(['items.product' => function($query) {
+            $query->withTrashed(); // Load cả sản phẩm đã bị xóa
+        }, 'walletTransactions'])
             ->ownedBy($userId)
             ->status($status)
             ->latest('order_date')
@@ -53,7 +55,9 @@ class OrderController extends Controller
     public function show(Request $request, Order $order)
     {
         $this->authorizeOwnership($request->user()->id, $order);
-        $order->loadMissing(['items.product', 'walletTransactions']);
+        $order->loadMissing(['items.product' => function($query) {
+            $query->withTrashed(); // Load cả sản phẩm đã bị xóa
+        }, 'walletTransactions']);
 
         return view('client.account.orders.show', compact('order'));
     }
