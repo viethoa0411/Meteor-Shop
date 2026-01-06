@@ -6,224 +6,299 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Blog;
 use App\Models\User;
+use App\Models\PostCategory;
+use App\Models\PostTag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class BlogController extends Controller
 {
-    // Hiển thị danh sách bài viết với tìm kiếm và lọc
+    /**
+     * Hiển thị danh sách bài viết với tìm kiếm và lọc nâng cao
+     */
     public function list(Request $request)
     {
-        // Bước 1: Tạo query với quan hệ user
-        $query = Blog::with('user');
+        $query = Blog::with(['user']);
 
-        // Bước 2: Lọc theo trạng thái (mặc định là 'all')
+        // Lọc theo trạng thái
         $status = $request->get('status', 'all');
-        
-         if ($status !== 'all') {
-            // Nếu không phải 'all' thì lọc theo status cụ thể
-            // 'active' = published, 'inactive' = draft hoặc archived
-            if ($status === 'active') {
+        if ($status !== 'all') {
+            if ($status === 'published') {
                 $query->where('status', 'published');
-            } elseif ($status === 'inactive') {
-                $query->whereIn('status', ['draft', 'archived']);
-            } else {
-                $query->where('status', $status);
+            } elseif ($status === 'draft') {
+                $query->where('status', 'draft');
+            } elseif ($status === 'scheduled') {
+                $query->where('status', 'published')
+                    ->where('published_at', '>', now());
+            } elseif ($status === 'archived') {
+                $query->where('status', 'archived');
             }
         }
 
-        // Bước 3: Xử lý tìm kiếm (nếu có)
+        // Tìm kiếm
         if ($request->has('keyword') && $request->keyword != '') {
             $keyword = $request->keyword;
-            // Tìm kiếm theo tiêu đề HOẶC excerpt HOẶC slug
             $query->where(function ($q) use ($keyword) {
                 $q->where('title', 'like', "%{$keyword}%")
                     ->orWhere('excerpt', 'like', "%{$keyword}%")
                     ->orWhere('slug', 'like', "%{$keyword}%");
             });
         }
-        
-        // Bước 4: Sắp xếp theo ID giảm dần và phân trang
-        $blogs = $query->orderBy('id', 'desc')->paginate(7);
 
-        // Bước 5: Giữ lại từ khóa tìm kiếm và status khi chuyển trang
-        $blogs->appends($request->only(['keyword', 'status']));
-
-        // Bước 6: Trả về view với dữ liệu danh sách blog
-        return view('admin.blogs.list', compact('blogs'));
-    }
-    // Hiển thị form tạo bài viết mới
-    public function create()
-    {
-        return view('admin.blogs.create');
-    }
-    // Lưu bài viết mới vào database
-    public function store(Request $request)
-    {
-
-      // Validate dữ liệu đầu vào
-        $validated = $request->validate([
-            'title'     => 'required|string|min:3|max:255',
-            'content'   => 'required|string|min:10',
-            'excerpt'   => 'nullable|string|max:500',
-            'status'    => 'required|in:active,inactive',
-            'author'    => 'required|string|min:2',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048|dimensions:min_width=100,min_height=100',
-        ], [
-            'title.required' => 'Tiêu đề là bắt buộc.',
-            'title.min' => 'Tiêu đề phải có ít nhất 3 ký tự.',
-            'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
-            'title.string' => 'Tiêu đề phải là chuỗi ký tự.',
-            'content.required' => 'Nội dung là bắt buộc.',
-            'content.min' => 'Nội dung phải có ít nhất 10 ký tự.',
-            'content.string' => 'Nội dung phải là chuỗi ký tự.',
-            'excerpt.string' => 'Mô tả ngắn phải là chuỗi ký tự.',
-            'excerpt.max' => 'Mô tả ngắn không được vượt quá 500 ký tự.',
-            'status.required' => 'Trạng thái là bắt buộc.',
-            'status.in' => 'Trạng thái không hợp lệ. Chỉ chấp nhận: hoạt động hoặc dừng hoạt động.',
-            'author.required' => 'Tác giả là bắt buộc.',
-            'author.min' => 'Tác giả phải có ít nhất 2 ký tự.',
-            'author.string' => 'Tác giả phải là chuỗi ký tự.',
-            'thumbnail.image' => 'File phải là hình ảnh.',
-            'thumbnail.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif, webp.',
-            'thumbnail.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
-            'thumbnail.dimensions' => 'Hình ảnh phải có kích thước tối thiểu 100x100 pixel.',
-        ]);
-
-         // Tìm user theo tên hoặc email
-        $author = trim($request->author);
-        $user = User::where('name', $author)
-            ->orWhere('email', $author)
-            ->first();
-
-        if (!$user) {
-            return back()->withInput()->withErrors(['author' => 'Không tìm thấy tác giả với tên hoặc email: ' . $author]);
+        // Lọc theo author
+        if ($request->has('author') && $request->author != '') {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('users.id', $request->author);
+            });
         }
 
-        // Map status: active -> published, inactive -> draft
-        $dbStatus = $request->status === 'active' ? 'published' : 'draft';
+        // Lọc theo date range
+        if ($request->has('date_from') && $request->date_from != '') {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->has('date_to') && $request->date_to != '') {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
 
-        $imageName = null;
+        // Sắp xếp
+        $sortBy = $request->get('sort_by', 'id');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $allowedSorts = ['id', 'title', 'created_at', 'published_at', 'view_count', 'updated_at'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('id', 'desc');
+        }
 
-        // Xử lý upload ảnh thumbnail
-        if ($request->hasFile('thumbnail')) {
-            try {
+        $blogs = $query->paginate(15);
+        $blogs->appends($request->only(['keyword', 'status', 'category', 'author', 'date_from', 'date_to', 'sort_by', 'sort_order']));
+
+        // Lấy dữ liệu cho filters
+        $authors = User::whereHas('blogs')->orderBy('name')->get();
+
+        return view('admin.blogs.list', compact('blogs', 'authors'));
+    }
+
+    /**
+     * Hiển thị form tạo bài viết mới
+     */
+    public function create()
+    {
+        $users = User::orderBy('name')->get();
+        
+        return view('admin.blogs.create', compact('users'));
+    }
+
+    /**
+     * Lưu bài viết mới vào database
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title'           => 'required|string|min:3|max:255',
+            'slug'            => 'nullable|string|max:255|unique:blogs,slug',
+            'content'         => 'required|string|min:10',
+            'excerpt'         => 'nullable|string|max:500',
+            'status'          => 'required|in:draft,published,scheduled',
+            'author_id'       => 'required|exists:users,id',
+            'thumbnail'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'published_at'    => 'nullable|date',
+            'seo_title'       => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:160',
+            'noindex'         => 'boolean',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Xử lý slug
+            $slug = $request->slug ?: Str::slug($request->title);
+            if (empty($slug)) {
+                $slug = 'blog-' . time();
+            }
+
+            $originalSlug = $slug;
+            $count = 1;
+            while (Blog::where('slug', $slug)->exists()) {
+                $slug = $originalSlug . '-' . $count;
+                $count++;
+            }
+
+            // Xử lý published_at
+            $publishedAt = null;
+            if ($request->status === 'published') {
+                $publishedAt = $request->published_at ?: now();
+            } elseif ($request->status === 'scheduled') {
+                $publishedAt = $request->published_at;
+            }
+
+            // Upload thumbnail
+            $imageName = null;
+            if ($request->hasFile('thumbnail')) {
                 $image = $request->file('thumbnail');
                 $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $destination = public_path('blogs/images');
 
-                // Tạo thư mục nếu chưa tồn tại
                 if (!File::exists($destination)) {
                     File::makeDirectory($destination, 0777, true);
                 }
 
                 $image->move($destination, $imageName);
-            } catch (\Exception $e) {
-                return back()->withInput()->with('error', 'Lỗi upload ảnh: ' . $e->getMessage());
             }
-        }
 
-        // Tạo slug unique
-        $slug = Str::slug($request->title);
-        if (empty($slug)) {
-            $slug = 'blog-' . time();
-        }
-
-        $originalSlug = $slug;
-        $count = 1;
-
-        while (Blog::where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $count;
-            $count++;
-        }
-
-        // Lưu bài viết vào database
-        try {
+            // Tạo bài viết
             $blog = Blog::create([
-                'user_id'   => $user->id,
-                'title'     => $request->title,
-                'slug'      => $slug,
-                'excerpt'   => $request->excerpt ?? Str::limit(strip_tags($request->getContent), 150),
-                'content'   => $request->getContent,
-                'status'    => $dbStatus,
-                'thumbnail' => $imageName,
+                'user_id'         => $request->author_id,
+                'title'           => $request->title,
+                'slug'            => $slug,
+                'excerpt'         => $request->excerpt ?? Str::limit(strip_tags($request->content), 150),
+                'content'         => $request->content,
+                'status'          => $request->status === 'scheduled' ? 'published' : $request->status,
+                'published_at'    => $publishedAt,
+                'thumbnail'       => $imageName,
+                'seo_title'       => $request->seo_title,
+                'seo_description' => $request->seo_description,
+                'canonical_url'   => $request->canonical_url,
+                'noindex'         => $request->has('noindex') ? true : false,
             ]);
 
+            DB::commit();
+
+            // Clear cache
+            Cache::forget('blog_list');
+            
             return redirect()->route('admin.blogs.list')->with('success', 'Thêm bài viết thành công!');
         } catch (\Exception $e) {
-            // Xóa ảnh nếu lưu thất bại
-            if ($imageName && file_exists(public_path('blogs/images/' . $imageName))) {
+            DB::rollBack();
+            if (isset($imageName) && file_exists(public_path('blogs/images/' . $imageName))) {
                 unlink(public_path('blogs/images/' . $imageName));
             }
             return back()->withInput()->with('error', 'Lỗi lưu database: ' . $e->getMessage());
         }
     }
 
-    // Hiển thị form chỉnh sửa bài viết
+    /**
+     * Autosave draft
+     */
+    public function autosave(Request $request)
+    {
+        $validated = $request->validate([
+            'title'   => 'nullable|string|max:255',
+            'content' => 'nullable|string',
+            'excerpt' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $blog = null;
+            if ($request->has('blog_id')) {
+                $blog = Blog::find($request->blog_id);
+            }
+
+            if ($blog) {
+                // Update existing draft
+                $blog->update([
+                    'title'   => $request->title ?: $blog->title,
+                    'content' => $request->content ?: $blog->content,
+                    'excerpt' => $request->excerpt ?: $blog->excerpt,
+                    'status'  => 'draft',
+                ]);
+            } else {
+                // Create new draft
+                $blog = Blog::create([
+                    'user_id' => auth()->id(),
+                    'title'   => $request->title ?: 'Untitled',
+                    'slug'    => 'draft-' . time(),
+                    'content' => $request->content ?: '',
+                    'excerpt' => $request->excerpt,
+                    'status'  => 'draft',
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'blog_id' => $blog->id,
+                'message' => 'Đã lưu tự động',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi autosave: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Hiển thị form chỉnh sửa bài viết
+     */
     public function edit($id)
     {
-        $blog = Blog::with('user')->findOrFail($id);
-        // Map status từ database sang form: published -> active, draft/archived -> inactive
-        $blog->form_status = $blog->status === 'published' ? 'active' : 'inactive';
-        return view('admin.blogs.edit', compact('blog'));
+        $blog = Blog::with(['user'])->findOrFail($id);
+        $users = User::orderBy('name')->get();
+        
+        return view('admin.blogs.edit', compact('blog', 'users'));
     }
-    // Cập nhật bài viết trong database
-    // Cập nhật bài viết trong database
+
+    /**
+     * Cập nhật bài viết trong database
+     */
     public function update(Request $request, $id)
     {
         $blog = Blog::findOrFail($id);
 
-        // Validate dữ liệu đầu vào
         $validated = $request->validate([
-            'title'     => 'required|string|min:3|max:255',
-            'content'   => 'required|string|min:10',
-            'excerpt'   => 'nullable|string|max:500',
-            'status'    => 'required|in:active,inactive',
-            'author'    => 'required|string|min:2',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048|dimensions:min_width=100,min_height=100',
-        ], [
-            'title.required' => 'Vui lòng nhập dữ liệu.',
-            'title.min' => 'Tiêu đề phải có ít nhất 3 ký tự.',
-            'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
-            'title.string' => 'Tiêu đề phải là chuỗi ký tự.',
-            'content.required' => 'Vui lòng nhập dữ liệu.',
-            'content.min' => 'Nội dung phải có ít nhất 10 ký tự.',
-            'content.string' => 'Nội dung phải là chuỗi ký tự.',
-            'excerpt.string' => 'Mô tả ngắn phải là chuỗi ký tự.',
-            'excerpt.max' => 'Mô tả ngắn không được vượt quá 500 ký tự.',
-            'status.required' => 'Vui lòng nhập dữ liệu.',
-            'status.in' => 'Trạng thái không hợp lệ. Chỉ chấp nhận: hoạt động hoặc dừng hoạt động.',
-            'author.required' => 'Vui lòng nhập dữ liệu.',
-            'author.min' => 'Tác giả phải có ít nhất 2 ký tự.',
-            'author.string' => 'Tác giả phải là chuỗi ký tự.',
-            'thumbnail.image' => 'File phải là hình ảnh.',
-            'thumbnail.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif, webp.',
-            'thumbnail.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
-            'thumbnail.dimensions' => 'Hình ảnh phải có kích thước tối thiểu 100x100 pixel.',
+            'title'           => 'required|string|min:3|max:255',
+            'slug'            => 'nullable|string|max:255|unique:blogs,slug,' . $id,
+            'content'         => 'required|string|min:10',
+            'excerpt'         => 'nullable|string|max:500',
+            'status'          => 'required|in:draft,published,scheduled',
+            'author_id'       => 'required|exists:users,id',
+            'thumbnail'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'published_at'    => 'nullable|date',
+            'seo_title'       => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:160',
+            'canonical_url'   => 'nullable|url|max:255',
+            'noindex'         => 'boolean',
         ]);
 
-        // Tìm user theo tên hoặc email
-        $author = trim($request->author);
-        $user = User::where('name', $author)
-            ->orWhere('email', $author)
-            ->first();
+        DB::beginTransaction();
+        try {
+            $oldSlug = $blog->slug;
 
-        if (!$user) {
-            return back()->withInput()->withErrors(['author' => 'Không tìm thấy tác giả với tên hoặc email: ' . $author]);
-        }
+            // Xử lý slug
+            $slug = $request->slug ?: Str::slug($request->title);
+            if (empty($slug)) {
+                $slug = 'blog-' . time();
+            }
 
-        // Map status: active -> published, inactive -> draft
-        $dbStatus = $request->status === 'active' ? 'published' : 'draft';
+            if ($slug !== $blog->slug) {
+                $originalSlug = $slug;
+                $count = 1;
+                while (Blog::where('slug', $slug)->where('id', '!=', $blog->id)->exists()) {
+                    $slug = $originalSlug . '-' . $count;
+                    $count++;
+                }
+            }
 
-        $imageName = $blog->thumbnail;
+            // Xử lý published_at
+            $publishedAt = $blog->published_at;
+            if ($request->status === 'published') {
+                $publishedAt = $request->published_at ?: ($blog->published_at ?: now());
+            } elseif ($request->status === 'scheduled') {
+                $publishedAt = $request->published_at;
+            } elseif ($request->status === 'draft') {
+                $publishedAt = null;
+            }
 
-        // Xử lý upload ảnh mới
-        if ($request->hasFile('thumbnail')) {
-            try {
-                // Xóa ảnh cũ nếu có
-                $oldPath = public_path('blogs/images/' . $blog->thumbnail);
-                if ($blog->thumbnail && file_exists($oldPath)) {
-                    unlink($oldPath);
+            // Upload thumbnail mới
+            $imageName = $blog->thumbnail;
+            if ($request->hasFile('thumbnail')) {
+                // Xóa ảnh cũ
+                if ($blog->thumbnail) {
+                    $oldPath = public_path('blogs/images/' . $blog->thumbnail);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
                 }
 
                 // Upload ảnh mới
@@ -231,83 +306,157 @@ class BlogController extends Controller
                 $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
                 $destination = public_path('blogs/images');
 
-                // Tạo thư mục nếu chưa tồn tại
                 if (!File::exists($destination)) {
                     File::makeDirectory($destination, 0777, true);
                 }
 
                 $image->move($destination, $imageName);
-            } catch (\Exception $e) {
-                return back()->withInput()->with('error', 'Lỗi upload ảnh: ' . $e->getMessage());
-            }
-        }
-
-        // Tạo slug unique nếu title thay đổi
-        $slug = $blog->slug;
-        if ($request->title !== $blog->title) {
-            $slug = Str::slug($request->title);
-
-            if (empty($slug)) {
-                $slug = 'blog-' . time();
             }
 
-            $originalSlug = $slug;
-            $count = 1;
-
-            while (Blog::where('slug', $slug)->where('id', '!=', $blog->id)->exists()) {
-                $slug = $originalSlug . '-' . $count;
-                $count++;
-            }
-        }
-
-        // Map status: active -> published, inactive -> draft
-        $dbStatus = $request->status === 'active' ? 'published' : 'draft';
-
-        // Cập nhật bài viết
-        try {
+            // Cập nhật bài viết
             $blog->update([
-                'user_id'   => $user->id,
-                'title'     => $request->title,
-                'slug'      => $slug,
-                'excerpt'   => $request->excerpt ?? Str::limit(strip_tags($request->getContent), 150),
-                'content'   => $request->getContent,
-                'status'    => $dbStatus,
-                'thumbnail' => $imageName,
+                'user_id'         => $request->author_id,
+                'title'           => $request->title,
+                'slug'            => $slug,
+                'excerpt'         => $request->excerpt ?? Str::limit(strip_tags($request->content), 150),
+                'content'         => $request->content,
+                'status'          => $request->status === 'scheduled' ? 'published' : $request->status,
+                'published_at'    => $publishedAt,
+                'thumbnail'       => $imageName,
+                'seo_title'       => $request->seo_title,
+                'seo_description' => $request->seo_description,
+                'canonical_url'   => $request->canonical_url,
+                'noindex'         => $request->has('noindex') ? true : false,
             ]);
+
+            DB::commit();
+
+            // Clear cache
+            Cache::forget('blog_list');
+            if ($oldSlug !== $slug) {
+                // TODO: Tạo redirect 301 nếu slug thay đổi
+                Cache::forget('blog_' . $oldSlug);
+            }
 
             return redirect()->route('admin.blogs.list')->with('success', 'Cập nhật bài viết thành công!');
         } catch (\Exception $e) {
+            DB::rollBack();
             return back()->withInput()->with('error', 'Lỗi cập nhật: ' . $e->getMessage());
         }
     }
-    // Hiển thị chi tiết bài viết
+
+    /**
+     * Preview bài viết
+     */
+    public function preview($id)
+    {
+        $blog = Blog::with(['user'])->findOrFail($id);
+        
+        // Render frontend view (giả sử có route frontend)
+        return view('client.blogs.show', compact('blog'))->with('isPreview', true);
+    }
+
+    /**
+     * Hiển thị chi tiết bài viết
+     */
     public function show($id)
     {
-        $blog = Blog::with('user')->findOrFail($id);
+        $blog = Blog::with(['user'])->findOrFail($id);
         return view('admin.blogs.show', compact('blog'));
     }
-    // Xóa bài viết
+
+    /**
+     * Xóa bài viết (soft delete)
+     */
     public function destroy($id)
     {
         try {
             $blog = Blog::findOrFail($id);
 
-            // Xóa ảnh thumbnail nếu có
-            if ($blog->thumbnail) {
-                $path = public_path('blogs/images/' . $blog->thumbnail);
-                if (file_exists($path)) {
-                    unlink($path);
-                }
-            }
-
+            // Soft delete
             $blog->delete();
+
+            // Clear cache
+            Cache::forget('blog_list');
+            Cache::forget('blog_' . $blog->slug);
 
             return redirect()->route('admin.blogs.list')->with('success', 'Đã xóa bài viết thành công!');
         } catch (\Exception $e) {
             return redirect()->route('admin.blogs.list')->with('error', 'Lỗi khi xóa bài viết: ' . $e->getMessage());
         }
     }
-    
 
-    
+    /**
+     * Bulk actions
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:publish,unpublish,delete',
+            'ids'    => 'required|array',
+            'ids.*'  => 'exists:blogs,id',
+        ]);
+
+        try {
+            $blogs = Blog::whereIn('id', $request->ids);
+
+            switch ($request->action) {
+                case 'publish':
+                    $blogs->update([
+                        'status'       => 'published',
+                        'published_at' => now(),
+                    ]);
+                    $message = 'Đã publish ' . count($request->ids) . ' bài viết!';
+                    break;
+
+                case 'unpublish':
+                    $blogs->update([
+                        'status' => 'draft',
+                    ]);
+                    $message = 'Đã unpublish ' . count($request->ids) . ' bài viết!';
+                    break;
+
+                case 'delete':
+                    $blogs->delete();
+                    $message = 'Đã xóa ' . count($request->ids) . ' bài viết!';
+                    break;
+            }
+
+            // Clear cache
+            Cache::forget('blog_list');
+
+            return redirect()->route('admin.blogs.list')->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.blogs.list')->with('error', 'Lỗi: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Toggle status
+     */
+    public function toggleStatus($id)
+    {
+        try {
+            $blog = Blog::findOrFail($id);
+            $newStatus = $blog->status === 'published' ? 'draft' : 'published';
+            
+            $blog->update([
+                'status'       => $newStatus,
+                'published_at' => $newStatus === 'published' ? ($blog->published_at ?: now()) : null,
+            ]);
+
+            Cache::forget('blog_list');
+
+            return response()->json([
+                'success' => true,
+                'status'  => $newStatus,
+                'message' => 'Đã cập nhật trạng thái!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

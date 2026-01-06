@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\OrderAnalyticsController;
 use App\Http\Controllers\Admin\OrderReturnController;
 
 use App\Http\Controllers\Admin\Blog\BlogController;
+use App\Http\Controllers\Admin\Blog\PostCategoryController;
+use App\Http\Controllers\Admin\Blog\PostTagController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\Contact\ContactController;
 use App\Http\Controllers\Admin\PromotionController;
@@ -215,10 +217,33 @@ Route::middleware(['admin'])
             Route::get('/', [BlogController::class, 'list'])->name('list');
             Route::get('/create', [BlogController::class, 'create'])->name('create');
             Route::post('/store', [BlogController::class, 'store'])->name('store');
+            Route::post('/autosave', [BlogController::class, 'autosave'])->name('autosave');
             Route::get('/edit/{id}', [BlogController::class, 'edit'])->name('edit');
             Route::put('/update/{id}', [BlogController::class, 'update'])->name('update');
             Route::get('/show/{id}', [BlogController::class, 'show'])->name('show');
+            Route::get('/preview/{id}', [BlogController::class, 'preview'])->name('preview');
+            // Hỗ trợ cả POST (form) và DELETE (trường hợp browser gửi nhầm method)
+            Route::match(['post', 'delete'], '/bulk-action', [BlogController::class, 'bulkAction'])->name('bulk-action');
+            Route::post('/toggle-status/{id}', [BlogController::class, 'toggleStatus'])->name('toggle-status');
             Route::delete('/delete/{id}', [BlogController::class, 'destroy'])->name('destroy');
+        });
+
+        /* Post Categories */
+        Route::prefix('post-categories')->name('post-categories.')->group(function () {
+            Route::get('/', [PostCategoryController::class, 'index'])->name('index');
+            Route::post('/store', [PostCategoryController::class, 'store'])->name('store');
+            Route::put('/update/{id}', [PostCategoryController::class, 'update'])->name('update');
+            Route::post('/update-sort-order', [PostCategoryController::class, 'updateSortOrder'])->name('update-sort-order');
+            Route::delete('/delete/{id}', [PostCategoryController::class, 'destroy'])->name('destroy');
+        });
+
+        /* Post Tags */
+        Route::prefix('post-tags')->name('post-tags.')->group(function () {
+            Route::get('/', [PostTagController::class, 'index'])->name('index');
+            Route::post('/store', [PostTagController::class, 'store'])->name('store');
+            Route::put('/update/{id}', [PostTagController::class, 'update'])->name('update');
+            Route::delete('/delete/{id}', [PostTagController::class, 'destroy'])->name('destroy');
+            Route::get('/search', [PostTagController::class, 'search'])->name('search');
         });
 
         /* Banners */
