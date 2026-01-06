@@ -32,21 +32,22 @@
                     @foreach ($cart as $id => $item)
                         @php
                             $maxStock = $item['max_stock'] ?? 0;
+                            $isDeleted = $item['is_deleted'] ?? false;
                             $isOutOfStock = $maxStock < 1;
                             $isNotEnough = $maxStock < $item['quantity'];
                         @endphp
-                        <tr id="row-{{ $id }}" class="{{ $isOutOfStock ? 'table-secondary' : '' }}">
+                        <tr id="row-{{ $id }}" class="{{ ($isOutOfStock || $isDeleted) ? 'table-secondary' : '' }}">
                             <td class="text-center">
                                 <input type="checkbox" name="selected[]" value="{{ $id }}"
                                     class="cart-item-checkbox"
                                     data-id="{{ $id }}"
                                     data-subtotal="{{ $item['price'] * $item['quantity'] }}"
-                                    {{ $isOutOfStock ? 'disabled' : 'checked' }}>
+                                    {{ ($isOutOfStock || $isDeleted) ? 'disabled' : 'checked' }}>
                             </td>
 
                             <td>
                                 <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/70x70?text=No+Image' }}"
-                                    width="70" alt="{{ $item['name'] }}" style="{{ $isOutOfStock ? 'opacity: 0.5' : '' }}">
+                                    width="70" alt="{{ $item['name'] }}" style="{{ ($isOutOfStock || $isDeleted) ? 'opacity: 0.5' : '' }}">
                             </td>
 
                             <td>
@@ -59,7 +60,12 @@
                                         <span class="ms-2">Size: <strong>{{ $item['size'] }}</strong></span>
                                     @endif
                                 </div>
-                                @if ($isOutOfStock)
+                                @if ($isDeleted)
+                                    <div class="alert alert-warning p-2 mt-2 mb-0" style="font-size: 0.85em;">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                        <strong>Sản phẩm ngừng sản xuất.</strong> Khách cần đặt vui lòng liên hệ.
+                                    </div>
+                                @elseif ($isOutOfStock)
                                     <div class="text-danger fw-bold small mt-1">Hết hàng</div>
                                 @elseif ($isNotEnough)
                                     <div class="text-danger fw-bold small mt-1">Kho chỉ còn {{ $maxStock }}</div>
