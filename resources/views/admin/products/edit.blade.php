@@ -200,9 +200,10 @@
                                                 $variantHasOrders = $v->hasOrders();
                                             @endphp
                                             <div class="col-md-3">
-                                                <label class="form-label">Tên màu</label>
+                                                <label class="form-label">Tên màu <span class="text-danger">*</span></label>
                                                 <input name="variants[{{ $idx }}][color_name]"
                                                     class="form-control"
+                                                    required
                                                     value="{{ old('variants.' . $idx . '.color_name', $v->color_name) }}"
                                                     {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
                                                 @if (($hasOrders ?? false) && $variantHasOrders)
@@ -211,9 +212,10 @@
                                             </div>
 
                                             <div class="col-md-3">
-                                                <label class="form-label">Mã màu</label>
+                                                <label class="form-label">Mã màu <span class="text-danger">*</span></label>
                                                 <input type="color" name="variants[{{ $idx }}][color_code]"
                                                     class="form-control form-control-color"
+                                                    required
                                                     value="{{ old('variants.' . $idx . '.color_code', $v->color_code) }}"
                                                     {{ ($hasOrders ?? false) && $variantHasOrders ? 'disabled' : '' }}>
                                                 @if (($hasOrders ?? false) && $variantHasOrders)
@@ -224,8 +226,8 @@
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Dài (mm)</label>
-                                                <input type="number" step="100"
+                                                <label>Dài (cm)</label>
+                                                <input type="number" step="10"
                                                     name="variants[{{ $idx }}][length]" class="form-control"
                                                     value="{{ old('variants.' . $idx . '.length', (float)$v->length) }}"
                                                     {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
@@ -233,16 +235,16 @@
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Rộng (mm)</label>
-                                                <input type="number" step="100"
+                                                <label>Rộng (cm)</label>
+                                                <input type="number" step="10"
                                                     name="variants[{{ $idx }}][width]" class="form-control"
                                                     value="{{ old('variants.' . $idx . '.width', (float)$v->width) }}"
                                                     {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label>Cao (mm)</label>
-                                                <input type="number" step="100"
+                                                <label>Cao (cm)</label>
+                                                <input type="number" step="10"
                                                     name="variants[{{ $idx }}][height]" class="form-control"
                                                     value="{{ old('variants.' . $idx . '.height', (float)$v->height) }}"
                                                     placeholder="VD: 0.8">
@@ -324,14 +326,14 @@
                     <div class="row g-3">
                         
                         <div class="col-md-3">
-                            <label class="form-label">Tên màu</label>
-                            <input name="variants[new_${newVariantIndex}][color_name]" class="form-control">
+                            <label class="form-label">Tên màu <span class="text-danger">*</span></label>
+                            <input name="variants[new_${newVariantIndex}][color_name]" class="form-control" required>
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label">Mã màu</label>
+                            <label class="form-label">Mã màu <span class="text-danger">*</span></label>
                             <input type="color" name="variants[new_${newVariantIndex}][color_code]"
-                                class="form-control form-control-color">
+                                class="form-control form-control-color" required>
                         </div>
 
                         <div class="col-md-2">

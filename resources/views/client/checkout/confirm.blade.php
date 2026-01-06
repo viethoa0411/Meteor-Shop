@@ -140,9 +140,14 @@
                         </div>
                         @php
                             $installationFee = $checkoutSession['installation_fee'] ?? 0;
-                            $hasInstallation = $checkoutSession['has_installation'] ?? false;
+                            if ($installationFee <= 0 && !empty($checkoutSession['has_installation'])) {
+                                $installationFee = $shippingSettings->installation_fee ?? 0;
+                                if ($installationFee <= 0) {
+                                    $installationFee = 100000;
+                                }
+                            }
                         @endphp
-                        @if ($hasInstallation && $installationFee > 0)
+                        @if ($installationFee > 0)
                             <div class="mb-2 d-flex justify-content-between">
                                 <span>Phí lắp đặt:</span>
                                 <strong>{{ number_format($installationFee, 0, ',', '.') }} đ</strong>
@@ -169,7 +174,18 @@
                             </button>
                         </form>
 
-                        <a href="{{ route('client.checkout.index') }}" class="btn btn-outline-secondary w-100">
+                        @php
+                            $backUrl = route('client.checkout.index', ['type' => $checkoutSession['type'] ?? 'buy_now']);
+                            if (($checkoutSession['type'] ?? 'buy_now') === 'buy_now') {
+                                $backUrl = route('client.checkout.index', [
+                                    'type' => 'buy_now',
+                                    'product_id' => $checkoutSession['product_id'] ?? null,
+                                    'variant_id' => $checkoutSession['variant_id'] ?? null,
+                                    'qty' => $checkoutSession['quantity'] ?? 1,
+                                ]);
+                            }
+                        @endphp
+                        <a href="{{ $backUrl }}" class="btn btn-outline-secondary w-100">
                             <i class="bi bi-arrow-left me-2"></i>Quay lại chỉnh sửa
                         </a>
                     </div>

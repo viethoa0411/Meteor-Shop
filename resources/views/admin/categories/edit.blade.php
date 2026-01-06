@@ -16,7 +16,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.categories.update', $category->id) }}" method="POST">
+        <form action="{{ route('admin.categories.update', $category->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -41,6 +41,17 @@
                         </option>
                     @endforeach
                 </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Ảnh danh mục</label>
+                @if ($category->image)
+                    <div class="mb-2">
+                        <img src="{{ asset('storage/' . $category->image) }}" alt="Ảnh danh mục hiện tại" style="max-height: 120px; border:1px solid #e9ecef; border-radius:6px;">
+                    </div>
+                @endif
+                <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                <small class="form-text text-muted">Hỗ trợ: jpg, jpeg, png, webp (≤ 4MB)</small>
             </div>
 
             <div class="mb-3">

@@ -1168,10 +1168,18 @@
                 if (installationCheckbox) {
                     // Phí lắp đặt mặc định luôn được áp dụng nếu có giá
                     const installationFeeInput = document.getElementById('installation_fee_input');
-                    if (installationFeeInput && installationFee > 0) {
-                        installationFeeInput.value = installationFee;
-                        installationCheckbox.checked = true;
-                        isInstallationSelected = true;
+                    if (installationFeeInput) {
+                        if (fixedInstallationFee > 0) {
+                            installationFee = fixedInstallationFee;
+                            installationFeeInput.value = installationFee;
+                            installationCheckbox.checked = true;
+                            isInstallationSelected = true;
+                        } else {
+                            installationFee = 0;
+                            installationFeeInput.value = 0;
+                            installationCheckbox.checked = false;
+                            isInstallationSelected = false;
+                        }
                     }
 
                     installationCheckbox.addEventListener('change', function() {

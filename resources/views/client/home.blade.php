@@ -50,7 +50,6 @@
                             </div>
                         @endforeach
                     </div>
-
                 </div>
 
                 @if ($banners->count() > 1)
@@ -382,32 +381,21 @@
         {{-- danh mục theo đồ --}}
         <div style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
             <div class="room" style="padding-top: 25px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px">
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=11" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
-
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Sofa</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=21" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Giường</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=31" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Bàn làm việc</h4>
-                </div>
-
+                @forelse ($homeCategories as $c)
+                    <a href="{{ route('client.product.category', $c->slug) }}" style="text-decoration:none; color:inherit">
+                        <div>
+                            <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
+                                <img src="{{ $c->image ? asset('storage/' . $c->image) : 'https://picsum.photos/800/1200?text=Category' }}"
+                                    alt="{{ $c->name }}"
+                                    style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
+                                    onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                            </div>
+                            <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">{{ $c->name }}</h4>
+                        </div>
+                    </a>
+                @empty
+                    <p style="padding-left:20px;">Chưa có danh mục để hiển thị.</p>
+                @endforelse
             </div>
         </div>
         {{-- end  --}}
@@ -453,84 +441,30 @@
         </div>
         {{-- end --}}
 
-        {{-- bai content 1 --}}
-        <div
-            style="display: flex; width:100%; height:130vh; gap:24px;padding:100px 10px 100px 0; box-sizing:border-box; background-color: rgb(1,49,49)">
-            <div style="width: 50%; height:100%;overflow:hidden;">
-                <img src="https://picsum.photos/1000/800?random=1"
-                    style="width:100%; height: 100%; object-fit:cover;transition:1s;"
-                    onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'">
-            </div>
-
-            <div
-                style="width: 50%; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:20px; text-align:center;">
-                <div style="width: 70%; height:40vh;overflow:hidden; border-radius:10px">
-                    <img src="https://picsum.photos/600/400?random=2" style="width:100%; height: 100%; object-fit:cover">
-                </div>
-                <div>
-                    <h2 style="font-size:24px; font-weight:600; margin:12px 0; color:#fff">Phong cách hiện đại</h2>
-                    <p style="color: #cecece; fonr-size:14px; line-height:1.6; margin-bottom:20px; margin:50px">
-                        Khám phá bộ sưu tập nội thất mới nhất mang đậm hơi thở đương đại.
-                        Ra đời vào năm 2024, là một trong những thương hiệu tiên phong
-                        trong ngành nội thất, với nguồn cảm hứng văn hóa Việt và gu thẩm mỹ
-                        tinh tế. Qua 26 năm hoạt động, Nhà Xinh luôn chú trọng đổi mới để
-                        duy trì vị thế là thương hiệu nội thất hàng đầu tại Việt Nam.
-                    </p>
-                    <button
-                        style="background: #393939; color:#fff; border:none; padding:10px 24px; border-radius: 6px; cursor: pointer; transition:.3s "
-                        onmouseover="this.style.background=#444" onmouseout="this.style.background='#222'">Xem
-                        ngay</button>
-                </div>
-            </div>
-        </div>
-        {{--  --}}
-
-
         {{-- danh mục theo loại phòng --}}
         <div style="padding-bottom: 50px; padding-left:20px; padding-right:20px">
             <div class="room" style="padding-top: 25px; display:grid; grid-template-columns:repeat(4,1fr); gap:16px">
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=11" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng khách</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=121" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng ngủ</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=131" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng ăn</h4>
-                </div>
-                <div>
-                    <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
-                        <img src="https://picsum.photos/800/1200?random=41" alt=""
-                            style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
-                            onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=scale(1)'">
-                    </div>
-                    <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">Phòng làm việc</h4>
-                </div>
+                @forelse ($homeParentCategories as $c)
+                    <a href="{{ route('client.product.category', $c->slug) }}" style="text-decoration:none; color:inherit">
+                        <div>
+                            <div style="overflow: hidden; border:1px solid #ccc; border-radius:6px;">
+                                <img src="{{ $c->image ? asset('storage/' . $c->image) : 'https://picsum.photos/800/1200?text=Category' }}"
+                                    alt="{{ $c->name }}"
+                                    style="width: 100%; aspect-ratio:2/3;display:block;transition:.8s;cursor: pointer;"
+                                    onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                            </div>
+                            <h4 style="font-size:20px; color:#313131; text-align:center; padding:10px 0;">{{ $c->name }}</h4>
+                        </div>
+                    </a>
+                @empty
+                    <p style="padding-left:20px;">Chưa có danh mục cha để hiển thị.</p>
+                @endforelse
             </div>
         </div>
         {{-- end  --}}
 
         {{-- goc chia sẻ --}}
         <div class="container" style="max-width:1200px; margin:0 auto; padding:40px 15px;">
-
-            <div style="text-align:center; margin-bottom:30px;">
-                <h2 style="font-size: 28px; font-weight:700; margin:0;">Góc Cảm Hứng</h2>
-            </div>
 
             <div class="row g-4 justify-content-center">
                 @foreach ($latestBlogs as $blog)

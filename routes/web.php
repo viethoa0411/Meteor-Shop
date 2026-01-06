@@ -215,7 +215,7 @@ Route::middleware(['admin'])
             Route::get('/', [BlogController::class, 'list'])->name('list');
             Route::get('/create', [BlogController::class, 'create'])->name('create');
             Route::post('/store', [BlogController::class, 'store'])->name('store');
-            Route::get('/edit/{id}', [BlogController::class, 'edit'])->name('edit');
+            Route::get('/edit/{id}', [BlogController::class, 'edit'])->name(name: 'edit');
             Route::put('/update/{id}', [BlogController::class, 'update'])->name('update');
             Route::get('/show/{id}', [BlogController::class, 'show'])->name('show');
             Route::delete('/delete/{id}', [BlogController::class, 'destroy'])->name('destroy');

@@ -79,8 +79,8 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
 
             // Validate biến thể
-            'variants' => 'nullable|array',
-            'variants.*.color_name' => 'nullable|string|max:50',
+            'variants' => 'required|array|min:1',
+            'variants.*.color_name' => 'required|string|max:50',
             'variants.*.color_code' => 'nullable|string|max:20',
             'variants.*.length' => 'nullable|numeric|min:0',
             'variants.*.width' => 'nullable|numeric|min:0',
@@ -207,10 +207,10 @@ class ProductController extends Controller
         }
 
 
-         // Validate biến thể
+        // Validate biến thể
         $request->validate([
-            'variants.*.color_name' => $hasOrders ? 'nullable' : 'required',
-            'variants.*.color_code' => $hasOrders ? 'nullable' : 'required',
+            'variants.*.color_name' => 'required|string|max:50',
+            'variants.*.color_code' => 'required|string|max:20',
             'variants.*.stock' => 'required|numeric|min:0',
             'variants.*.length' => $hasOrders ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
             'variants.*.width' => $hasOrders ? 'nullable|numeric|min:0' : 'required|numeric|min:0',

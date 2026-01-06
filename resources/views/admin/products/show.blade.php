@@ -159,7 +159,7 @@
                                                 <td>
                                                     @if ($v->length || $v->width || $v->height)
                                                         {{ (float)$v->length ?? '—' }} × {{ (float)$v->width ?? '—' }} ×
-                                                        {{ (float)$v->height ?? '—' }} mm
+                                                        {{ (float)$v->height ?? '—' }} cm
                                                     @else
                                                         —
                                                     @endif

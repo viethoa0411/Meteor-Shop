@@ -119,7 +119,7 @@
                     </div>
                     <div class="card-body">
                         <p class="mb-1 fw-semibold">{{ $order->customer_name ?? 'N/A' }}</p>
-                        <p class="text-muted mb-1">{{ $order->shipping_phone ?? 'N/A' }}</p>
+                        <p class="text-muted mb-1">{{ $order->shipping_phone ?? $order->customer_phone ?? 'N/A' }}</p>
                         <p class="text-muted mb-0">{{ $order->shipping_address ?? 'N/A' }}</p>
                         @if ($order->shipping_city || $order->shipping_district || $order->shipping_ward)
                             <p class="text-muted small mb-0 mt-1">
@@ -134,8 +134,9 @@
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Tạm tính</span>
-                            <span>{{ number_format($order->total_price ?? 0, 0, ',', '.') }} đ</span>
+                            <span>Giá sản phẩm</span>
+                            @php $firstItem = $order->items->first(); @endphp
+                            <span>{{ number_format($firstItem ? $firstItem->price : 0, 0, ',', '.') }} đ</span>
                         </div>
                         @if ($order->discount_amount > 0)
                             <div class="d-flex justify-content-between mb-2">
@@ -148,10 +149,24 @@
                             <span>Phí vận chuyển</span>
                             <span>{{ number_format($order->shipping_fee ?? 0, 0, ',', '.') }} đ</span>
                         </div>
+                        @if(($order->installation_fee ?? 0) > 0)
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Phí lắp đặt</span>
+                                <span>{{ number_format($order->installation_fee, 0, ',', '.') }} đ</span>
+                            </div>
+                        @endif
                         <hr>
                         <div class="d-flex justify-content-between fw-bold">
                             <span>Tổng cộng</span>
-                            <span>{{ number_format($order->final_total, 0, ',', '.') }} đ</span>
+                            @php
+                                $subtotal = $order->sub_total ?? ($order->total_price ?? 0);
+                                $discount = $order->discount_amount ?? 0;
+                                $shipping = $order->shipping_fee ?? 0;
+                                $installation = $order->installation_fee ?? 0;
+                                $computedTotal = max(0, $subtotal - $discount + $shipping + $installation);
+                            @endphp
+                            <span>{{ number_format($computedTotal, 0, ',', '.') }} đ</span>
                         </div>
                     </div>
                 </div>
@@ -198,7 +213,8 @@
                                 </div>
                             @endif
                             @if ($order->payment_method === 'momo' && $order->payment_status !== 'paid' && $order->order_status !== 'cancelled')
-                                <a href="{{ route('client.checkout.momo_payment_page', $order->order_code) }}" class="btn text-white me-2" style="background-color: #a50064; border-color: #a50064;">
+                                <a href="{{ route('client.checkout.momo_payment_page', $order->order_code) }}"
+                                    class="btn text-white me-2" style="background-color: #a50064; border-color: #a50064;">
                                     <i class="bi bi-qr-code me-1"></i> Thanh toán
                                 </a>
                             @endif

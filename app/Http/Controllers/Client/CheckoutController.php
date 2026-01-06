@@ -358,10 +358,14 @@ class CheckoutController extends Controller
         );
         $shippingFee = $shippingCalculation['fee'];
 
-        // Lấy phí lắp đặt
-        $installationFee = 0;
-        if ($request->has('installation') && $request->installation) {
-            $installationFee = 100000;
+        $installationFee = (float)($request->input('installation_fee', 0));
+        $installationSelected = ($request->has('installation') && $request->installation) || ($installationFee > 0);
+        if ($installationSelected && $installationFee <= 0) {
+            $settings = ShippingSetting::getSettings();
+            $installationFee = (float)($settings->installation_fee ?? 0);
+            if ($installationFee <= 0) {
+                $installationFee = 100000;
+            }
         }
 
         // Lấy số tiền giảm (nếu đã áp dụng promotion trước đó)
@@ -385,7 +389,7 @@ class CheckoutController extends Controller
 
         $checkoutSession['shipping_fee']      = $shippingFee;
         $checkoutSession['installation_fee']  = $installationFee;
-        $checkoutSession['has_installation']  = $request->has('installation') && $request->installation;
+        $checkoutSession['has_installation']  = $installationSelected || ($installationFee > 0);
         $checkoutSession['notes']             = $request->notes;
         $checkoutSession['discount_amount']   = $discountAmount;
 
@@ -520,6 +524,7 @@ class CheckoutController extends Controller
 
                 'shipping_ward'    => $checkoutSession['shipping_ward'],
                 'shipping_address' => $checkoutSession['shipping_address'],
+                'shipping_phone'   => $checkoutSession['customer_phone'],
                 'shipping_method'  => $checkoutSession['shipping_method'],
                 'shipping_fee'     => $checkoutSession['shipping_fee'],
                 'installation_fee' => $checkoutSession['installation_fee'] ?? 0,

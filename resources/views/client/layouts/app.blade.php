@@ -805,10 +805,11 @@
             padding-left: 24px;
             padding-right: 24px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+            text-align: center;
         }
 
         .footer-copyright {
@@ -1301,10 +1302,8 @@
                             @endforeach
                         </ul>
                     </li>
-                    <li><a href="#">Bộ sưu tập</a></li>
                     <li><a href="{{ route('client.contact.list') }}">Thiết kế nội thất</a></li>
                     <li><a href="{{ route('client.blogs.list') }}">Bài viết</a></li>
-                    <li><a href="#">Góc chia sẻ</a></li>
                 </ul>
             </div>
         </nav>
@@ -1510,16 +1509,8 @@
         <div class="footer-bottom">
             <div class="footer-bottom-content">
                 <div class="footer-copyright">
-                    © <strong>{{ date('Y') }}</strong> METEOR SHOP. Tất cả quyền được bảo lưu.
+                    © <strong>{{ date('Y') }}</strong> Bản quyền của Meteor 
                 </div>
-                <div class="footer-payment-methods">
-                    <span class="footer-payment-text">Chấp nhận thanh toán:</span>
-                    <div class="footer-payment-icon">COD</div>
-                    <div class="footer-payment-icon">VNPay</div>
-                    <div class="footer-payment-icon">MoMo</div>
-                    <div class="footer-payment-icon">ZaloPay</div>
-                </div>
-
             </div>
         </div>
     </footer>

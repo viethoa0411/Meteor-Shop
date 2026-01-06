@@ -16,7 +16,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.categories.store') }}" method="POST">
+    <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-3">
@@ -27,6 +27,12 @@
         <div class="mb-3">
             <label for="slug" class="form-label">Slug (tự tạo nếu để trống)</label>
             <input type="text" class="form-control" id="slug" name="slug" placeholder="vd: ao-nam-thoi-trang">
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Ảnh danh mục</label>
+            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            <small class="form-text text-muted">Hỗ trợ: jpg, jpeg, png, webp (≤ 4MB)</small>
         </div>
 
         <div class="mb-3">

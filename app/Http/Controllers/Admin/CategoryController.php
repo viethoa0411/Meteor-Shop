@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
@@ -54,14 +55,21 @@ class CategoryController extends Controller
             'slug' => 'nullable|string|unique:categories,slug',
             'parent_id' => 'nullable|exists:categories,id',
             'status' => 'required|in:active,inactive',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
 
         // Tạo slug tự động nếu chưa nhập
         $slug = $request->slug ?: Str::slug($request->name);
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('categories', 'public');
+        }
+
         Category::create([
             'name' => $request->name,
             'slug' => $slug,
+            'image' => $imagePath,
             'parent_id' => $request->parent_id,
             'status' => $request->status,
         ]);
@@ -92,13 +100,23 @@ class CategoryController extends Controller
             'slug' => 'nullable|string|unique:categories,slug,' . $category->id,
             'parent_id' => 'nullable|exists:categories,id',
             'status' => 'required|in:active,inactive',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
+
+        $imagePath = $category->image;
+        if ($request->hasFile('image')) {
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $imagePath = $request->file('image')->store('categories', 'public');
+        }
 
         $category->update([
             'name' => $request->name,
             'slug' => $request->slug ?: \Illuminate\Support\Str::slug($request->name),
             'parent_id' => $request->parent_id,
             'status' => $request->status,
+            'image' => $imagePath,
         ]);
 
         return redirect()->route('admin.categories.list')

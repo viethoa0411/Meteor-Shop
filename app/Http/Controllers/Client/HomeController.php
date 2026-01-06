@@ -19,6 +19,12 @@ class HomeController extends Controller
         $newProducts = Product::query()
             ->select(['id', 'name',  'slug', 'price', 'image', 'status', 'created_at'])
             ->where('status', 1) // chỉ lấy sản phẩm đang active
+            ->where(function ($query) {
+                $query->where('stock', '>', 0)
+                    ->orWhereHas('variants', function ($q) {
+                        $q->where('stock', '>', 0);
+                    });
+            })
             ->orderByDesc('created_at') //lấy 4 cái ngày tạo mới nhất giảm dần
             ->limit(4) // lấy 4cp
             ->get();
@@ -26,20 +32,30 @@ class HomeController extends Controller
         $outstandingProducts = Product::query()
             ->select(['id', 'name', 'slug', 'stock', 'price', 'image', 'status', 'created_at'])
             ->where('status', 1)
+            ->where(function ($query) {
+                $query->where('stock', '>', 0)
+                    ->orWhereHas('variants', function ($q) {
+                        $q->where('stock', '>', 0);
+                    });
+            })
             ->orderByDesc('stock')
             ->limit(4)
             ->get();
 
         // Dùng cho menu/header
         $cate = Category::query()
-            ->select(['id', 'name', 'slug', 'description', 'parent_id', 'status'])
+            ->select(['id', 'name', 'slug', 'description', 'parent_id', 'status', 'image'])
             ->where('status', 1)
             ->get();
 
         // Dùng riêng cho block "danh mục theo đồ" trên trang home
         $homeCategories = $cate
-            ->where('parent_id', null)   // nếu muốn chỉ lấy danh mục cha
-            ->take(6);                   // lấy 6 danh mục
+            ->where('parent_id', '!=', null)
+            ->take(3);
+
+        $homeParentCategories = $cate
+            ->where('parent_id', null)
+            ->take(4);
 
         $banners = Banner::active()
             ->orderBy('sort_order', 'asc')
@@ -66,6 +82,7 @@ class HomeController extends Controller
             'banners',
             'latestBlogs',
             'homeCategories',
+            'homeParentCategories',
             'wishlistIds'
         ));
     }

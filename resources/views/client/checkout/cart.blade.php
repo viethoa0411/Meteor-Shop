@@ -616,6 +616,7 @@
                 const subtotal = {{ $subtotal }};
                 let currentShippingFee = 0;
                 let installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                const fixedInstallationFee = {{ $shippingSettings->installation_fee ?? 0 }};
                 let isInstallationSelected =
                     {{ ($shippingSettings->installation_fee ?? 0) > 0 ? 'true' : 'false' }};
                 const COD_LIMIT = 10000000; // 10 triệu

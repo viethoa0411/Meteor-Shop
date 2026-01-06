@@ -112,6 +112,16 @@ class OrderController extends Controller
                 }
             }
 
+            foreach ($order->items as $item) {
+                if (!empty($item->variant_id)) {
+                    \App\Models\ProductVariant::where('id', $item->variant_id)
+                        ->update(['stock' => \DB::raw('COALESCE(stock, 0) + ' . (int)$item->quantity)]);
+                } else {
+                    \App\Models\Product::where('id', $item->product_id)
+                        ->update(['stock' => \DB::raw('COALESCE(stock, 0) + ' . (int)$item->quantity)]);
+                }
+            }
+
             $order->update([
                 'order_status' => 'cancelled',
                 'cancel_reason' => $request->reason,

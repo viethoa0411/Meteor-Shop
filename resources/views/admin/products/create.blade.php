@@ -129,11 +129,11 @@
                             <h4 class="mt-4">Biến thể sản phẩm</h4>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label>Tên màu</label>
-                                    <input type="text" id="color_name" class="form-control" placeholder="VD: Xám nhạt">
+                                    <label>Tên màu <span class="text-danger">*</span></label>
+                                    <input type="text" id="color_name" class="form-control" placeholder="VD: Xám nhạt" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label>Màu (HEX)</label>
+                                    <label>Màu (HEX) <span class="text-danger">*</span></label>
                                     <input type="color" id="color_code" class="form-control form-control-color"
                                         value="#000000">
                                 </div>
@@ -141,15 +141,15 @@
                             <div class="row g-3 mt-2">
                                 <div class="col-md-3">
                                     <input type="number" id="length" step="100" class="form-control"
-                                        placeholder="Chiều dài (mm) - VD: 1000">
+                                        placeholder="Chiều dài (cm) - VD: 100">
                                 </div>
                                 <div class="col-md-3">
                                     <input type="number" id="width" step="100" class="form-control"
-                                        placeholder="Chiều rộng (mm) - VD: 1000">
+                                        placeholder="Chiều rộng (cm) - VD: 100">
                                 </div>
                                 <div class="col-md-3">
                                     <input type="number" id="height" step="100" class="form-control"
-                                        placeholder="Chiều cao (mm) - VD: 1000">
+                                        placeholder="Chiều cao (cm) - VD: 100">
                                 </div>
                             </div>
                             <div class="row g-3 mt-2">
@@ -194,11 +194,28 @@
             const addBtn = document.getElementById('add_variant');
             const variantList = document.getElementById('variant-list');
             const hiddenVariants = document.getElementById('hidden-variants');
+            const productCreateForm = document.getElementById('productCreateForm');
             let idx = 0;
+
+            if (productCreateForm) {
+                productCreateForm.addEventListener('submit', function() {
+                    // Remove required from helper inputs to avoid blocking submission
+                    const cName = document.getElementById('color_name');
+                    if (cName) cName.removeAttribute('required');
+                });
+            }
 
             addBtn.addEventListener('click', function() {
                 try {
-                const colorName = document.getElementById('color_name').value.trim();
+                const colorNameInput = document.getElementById('color_name');
+                const colorName = colorNameInput.value.trim();
+                
+                if (!colorName) {
+                    alert('Vui lòng nhập tên màu!');
+                    colorNameInput.focus();
+                    return;
+                }
+
                 const colorCode = document.getElementById('color_code').value.trim();
                 const length = document.getElementById('length').value.trim();
                 const width = document.getElementById('width').value.trim();
