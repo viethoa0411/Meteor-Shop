@@ -28,10 +28,14 @@ class CartController extends Controller
 
             if ($cartModel) {
                 foreach ($cartModel->items as $ci) {
-                    $product = $ci->product;
+                    // Load sản phẩm kể cả đã bị xóa (soft delete)
+                    $product = Product::withTrashed()->find($ci->product_id);
                     $variant = $ci->variant;
+                    
+                    // Kiểm tra sản phẩm đã bị xóa chưa
+                    $isDeleted = $product && $product->trashed();
 
-                    $stock = $variant ? ($variant->stock ?? 0) : ($product->stock ?? 0);
+                    $stock = $variant ? ($variant->stock ?? 0) : ($product ? ($product->stock ?? 0) : 0);
 
                     $cart[$ci->id] = [
                         'product_id' => $ci->product_id,
@@ -39,7 +43,7 @@ class CartController extends Controller
                         'name'       => $product ? $product->name : ($ci->product_id ?? 'Sản phẩm'),
                         'price'      => (float) $ci->price,
                         'quantity'   => (int) $ci->quantity,
-                        'max_stock'  => (int) $stock,
+                        'max_stock'  => $isDeleted ? 0 : (int) $stock, // Nếu đã xóa thì stock = 0
                         'color'      => $ci->color ?? ($variant->color_name ?? null),
                         'size'       => $ci->size ?? (
                             $variant && $variant->length && $variant->width && $variant->height
@@ -48,6 +52,7 @@ class CartController extends Controller
                         ),
                         'image'      => $product?->image,
                         'category'   => $product?->category,
+                        'is_deleted' => $isDeleted, // Đánh dấu sản phẩm đã bị xóa
                     ];
                 }
 
@@ -80,10 +85,13 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
 
         foreach ($cart as $id => &$item) {
-            $product = Product::with('category')->find($item['product_id'] ?? null);
+            // Load sản phẩm kể cả đã bị xóa (soft delete)
+            $product = Product::withTrashed()->with('category')->find($item['product_id'] ?? null);
             $stock = 0;
+            $isDeleted = false;
 
             if ($product) {
+                $isDeleted = $product->trashed(); // Kiểm tra sản phẩm đã bị xóa chưa
                 $stock = $product->stock ?? 0;
                 $item['image']    = $product->image;
                 $item['category'] = $product->category ?? null;
@@ -104,7 +112,8 @@ class CartController extends Controller
                 $item['category'] = $item['category'] ?? null;
             }
 
-            $item['max_stock'] = $stock;
+            $item['max_stock'] = $isDeleted ? 0 : $stock; // Nếu đã xóa thì stock = 0
+            $item['is_deleted'] = $isDeleted; // Đánh dấu sản phẩm đã bị xóa
 
             $item['color'] = $item['color'] ?? null;
             $item['size']  = $item['size'] ?? null;
