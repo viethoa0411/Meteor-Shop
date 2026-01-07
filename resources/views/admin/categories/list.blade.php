@@ -4,13 +4,7 @@
 @section('content')
     <div class="container-fluid py-4">
 
-        {{-- Thông báo --}}
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+
 
         {{-- Tiêu đề --}}
         <div class="card border-0 shadow-sm mb-4 bg-body">
@@ -117,11 +111,10 @@
                                         </a>
                                         <form action="{{ route('admin.categories.destroy', $category->id) }}"
                                             method="POST"
-                                            onsubmit="return confirm('Bạn có chắc chắn muốn xoá danh mục này không?');"
                                             class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Xóa</button>
+                                            <button type="button" class="btn btn-sm btn-danger btn-delete" data-name="{{ $category->name }}"><i class="bi bi-trash"></i> Xóa</button>
                                         </form>
                                     </div>
                                 </td>
@@ -176,4 +169,35 @@
         </style>
 
     </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // SweetAlert2 cho nút xóa
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const form = this.closest('form');
+                const name = this.getAttribute('data-name') || 'mục này';
+
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: `Bạn có chắc chắn muốn xóa "${name}" không?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa ngay',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+@endpush
 @endsection

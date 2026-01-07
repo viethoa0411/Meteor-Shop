@@ -3,19 +3,7 @@
 
 @section('content')
     <div class="container-fluid py-4">
-        {{-- Thông báo --}}
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+
 
         {{-- Tiêu đề --}}
         <div class="card border-0 shadow-sm mb-4">
@@ -205,19 +193,17 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <form action="{{ route('admin.banners.duplicate', $banner->id) }}"
-                                                    method="POST" class="d-inline"
-                                                    onsubmit="return confirm('Tạo bản sao banner này?');">
+                                                    method="POST" class="d-inline">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-secondary" title="Nhân đôi">
+                                                    <button type="button" class="btn btn-sm btn-secondary btn-duplicate" data-title="{{ $banner->title }}" title="Nhân đôi">
                                                         <i class="bi bi-files"></i>
                                                     </button>
                                                 </form>
                                                 <form action="{{ route('admin.banners.destroy', $banner->id) }}"
-                                                    method="POST" class="d-inline"
-                                                    onsubmit="return confirm('Bạn có chắc chắn muốn xóa banner này?');">
+                                                    method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Xóa">
+                                                    <button type="button" class="btn btn-sm btn-danger btn-delete" data-title="{{ $banner->title }}" title="Xóa">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
@@ -262,6 +248,56 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
         <script>
+            // SweetAlert2 for Delete
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.btn-delete').forEach(button => {
+                    button.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const form = this.closest('form');
+                        const title = this.getAttribute('data-title') || 'mục này';
+
+                        Swal.fire({
+                            title: 'Xác nhận xóa?',
+                            text: `Bạn có chắc chắn muốn xóa "${title}" không?`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Xóa ngay',
+                            cancelButtonText: 'Hủy'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
+                });
+
+                // SweetAlert2 for Duplicate
+                document.querySelectorAll('.btn-duplicate').forEach(button => {
+                    button.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const form = this.closest('form');
+                        const title = this.getAttribute('data-title') || 'mục này';
+
+                        Swal.fire({
+                            title: 'Xác nhận nhân bản?',
+                            text: `Tạo bản sao cho "${title}"?`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Nhân bản',
+                            cancelButtonText: 'Hủy'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
+                });
+            });
+
             // Select all checkbox
             const selectAllCheckbox = document.getElementById('selectAll');
             if (selectAllCheckbox) {
@@ -284,7 +320,7 @@
                 const checkboxes = document.querySelectorAll('.banner-checkbox');
                 const checked = document.querySelectorAll('.banner-checkbox:checked');
                 const selectAll = document.getElementById('selectAll');
-                
+
                 if (selectAll && checkboxes.length > 0) {
                     selectAll.checked = checked.length === checkboxes.length;
                     selectAll.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
@@ -296,9 +332,9 @@
                 const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
                 const bulkActiveBtn = document.getElementById('bulkActiveBtn');
                 const bulkInactiveBtn = document.getElementById('bulkInactiveBtn');
-                
+
                 const disabled = checked === 0;
-                
+
                 if (bulkDeleteBtn) {
                     bulkDeleteBtn.disabled = disabled;
                     if (checked > 0) {
@@ -307,7 +343,7 @@
                         bulkDeleteBtn.innerHTML = '<i class="bi bi-trash"></i> Xóa đã chọn';
                     }
                 }
-                
+
                 if (bulkActiveBtn) {
                     bulkActiveBtn.disabled = disabled;
                     if (checked > 0) {
@@ -316,7 +352,7 @@
                         bulkActiveBtn.innerHTML = '<i class="bi bi-check-circle"></i> Kích hoạt';
                     }
                 }
-                
+
                 if (bulkInactiveBtn) {
                     bulkInactiveBtn.disabled = disabled;
                     if (checked > 0) {
@@ -344,7 +380,7 @@
                     const form = document.getElementById('bulkActionForm');
                     // Clear form trước khi thêm input mới
                     form.querySelectorAll('input[name="ids[]"]').forEach(input => input.remove());
-                    
+
                     checked.forEach(cb => {
                         const input = document.createElement('input');
                         input.type = 'hidden';
@@ -370,7 +406,7 @@
                     // Clear form trước khi thêm input mới
                     form.querySelectorAll('input[name="ids[]"]').forEach(input => input.remove());
                     form.querySelectorAll('input[name="status"]').forEach(input => input.remove());
-                    
+
                     checked.forEach(cb => {
                         const input = document.createElement('input');
                         input.type = 'hidden';
@@ -401,7 +437,7 @@
                     // Clear form trước khi thêm input mới
                     form.querySelectorAll('input[name="ids[]"]').forEach(input => input.remove());
                     form.querySelectorAll('input[name="status"]').forEach(input => input.remove());
-                    
+
                     checked.forEach(cb => {
                         const input = document.createElement('input');
                         input.type = 'hidden';
@@ -487,7 +523,7 @@
                             // Show loading state
                             const oldIndex = evt.oldIndex;
                             const newIndex = evt.newIndex;
-                            
+
                             // Only update if position changed
                             if (oldIndex !== newIndex) {
                                 fetch('{{ route("admin.banners.updateSortOrder") }}', {

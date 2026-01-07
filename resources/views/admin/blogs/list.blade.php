@@ -139,12 +139,7 @@
         }
     </style>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+
 
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
@@ -160,7 +155,7 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                
+
                 {{-- Bộ lọc trạng thái --}}
                 <div class="d-flex gap-1 align-items-center">
                     <a href="{{ route('admin.blogs.list', ['status' => 'all'] + request()->except('status')) }}"
@@ -254,11 +249,10 @@
                                         <i class="bi bi-pencil-square"></i> Sửa
                                     </a>
 
-                                    <form action="{{ route('admin.blogs.destroy', $blog->id) }}" method="POST"
-                                        onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này không?');">
+                                    <form action="{{ route('admin.blogs.destroy', $blog->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">
+                                        <button type="button" class="btn btn-sm btn-danger btn-delete" data-name="{{ $blog->title }}">
                                             <i class="bi bi-trash"></i> Xóa
                                         </button>
                                     </form>
@@ -277,5 +271,36 @@
             {{ $blogs->links('pagination::bootstrap-5') }}
         </div>
     @endif
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // SweetAlert2 cho nút xóa
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const form = this.closest('form');
+                const name = this.getAttribute('data-name') || 'mục này';
+
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: `Bạn có chắc chắn muốn xóa "${name}" không?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa ngay',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+@endpush
 @endsection
 

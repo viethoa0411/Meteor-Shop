@@ -132,12 +132,7 @@
     }
 </style>
 
-@if (session('success'))
-<div class="alert alert-success">{{ session('success') }}</div>
-@endif
-@if (session('error'))
-<div class="alert alert-danger">{{ session('error') }}</div>
-@endif
+
 
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
@@ -255,11 +250,10 @@
                             <i class="bi bi-shield-lock"></i> Thay đổi thông tin
                         </a>
 
-                        <form action="{{ route('admin.account.admin.destroy', $user->id) }}" method="POST"
-                            onsubmit="return confirm('Bạn có chắc muốn ẩn người dùng này không?');">
+                        <form action="{{ route('admin.account.admin.destroy', $user->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">
+                            <button type="button" class="btn btn-sm btn-danger btn-delete" data-name="{{ $user->name }}">
                                 <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
                             </button>
                         </form>
@@ -280,4 +274,34 @@
     {{ $users->links('pagination::bootstrap-5') }}
 </div>
 @endif
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // SweetAlert2 cho nút xóa
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const form = this.closest('form');
+                const name = this.getAttribute('data-name') || 'người dùng này';
+
+                Swal.fire({
+                    title: 'Xác nhận ẩn tài khoản?',
+                    text: `Bạn có chắc chắn muốn ẩn tài khoản "${name}" không?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ẩn ngay',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+@endpush
 @endsection

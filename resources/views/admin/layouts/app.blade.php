@@ -14,6 +14,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {{-- SweetAlert2 CSS --}}
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -1632,7 +1634,7 @@
                     '';
 
                 return `
-                    <div class="notification-item ${unreadClass}" 
+                    <div class="notification-item ${unreadClass}"
                          data-notification-id="${notif.id}"
                          data-type="${notif.type}"
                          data-level="${level}"
@@ -1955,7 +1957,23 @@
                 }
             }, 30000); // Check every 30 seconds
         });
+
+        // Flash Messages from Session
+        @if(session('success'))
+            document.addEventListener('DOMContentLoaded', function() {
+                ToastNotification.show("{{ session('success') }}", 'success', 5000);
+            });
+        @endif
+
+        @if(session('error'))
+            document.addEventListener('DOMContentLoaded', function() {
+                ToastNotification.show("{{ session('error') }}", 'danger', 8000);
+            });
+        @endif
     </script>
+
+    {{-- SweetAlert2 JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('scripts')
 </body>

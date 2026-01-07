@@ -4,13 +4,7 @@
 @section('content')
     <div class="container-fluid py-4">
 
-        {{-- Thông báo --}}
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+
 
         {{-- Tiêu đề --}}
         <div class="card border-0 shadow-sm mb-4">
@@ -132,10 +126,9 @@
                                     <a href="{{ route('admin.products.edit', $product->id) }}"
                                         class="btn btn-info btn-sm">Sửa</a>
 
-                                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
-                                        onsubmit="return confirm('Xoá sản phẩm này?')" class="d-inline">
+                                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
-                                        <button class="btn btn-danger btn-sm">Xóa</button>
+                                        <button type="button" class="btn btn-danger btn-sm btn-delete" data-name="{{ $product->name }}">Xóa</button>
                                     </form>
                                 </td>
 
@@ -151,4 +144,35 @@
         @endif
 
     </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // SweetAlert2 cho nút xóa
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const form = this.closest('form');
+                const name = this.getAttribute('data-name') || 'mục này';
+
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: `Bạn có chắc chắn muốn xóa "${name}" không?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa ngay',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+@endpush
 @endsection
