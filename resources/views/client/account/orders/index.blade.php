@@ -294,8 +294,11 @@
                                     SL: {{ $item->quantity }} x {{ number_format($item->price, 0, ',', '.') }} đ
                                 </div>
                             </div>
-                            <div class="fw-semibold">
-                                {{ number_format($item->subtotal, 0, ',', '.') }} đ
+                            <div class="d-flex flex-column align-items-end gap-2">
+                                <div class="fw-semibold">
+                                    {{ number_format($item->subtotal, 0, ',', '.') }} đ
+                                </div>
+
                             </div>
                         </div>
                     @empty
@@ -344,9 +347,12 @@
                                             SL: {{ $item->quantity }} x {{ number_format($item->price, 0, ',', '.') }} đ
                                         </div>
                                     </div>
-                                    <div class="fw-semibold">
-                                        {{ number_format($item->subtotal, 0, ',', '.') }} đ
+                                    <div class="d-flex flex-column align-items-end gap-2">
+                                        <div class="fw-semibold">
+                                            {{ number_format($item->subtotal, 0, ',', '.') }} đ
                                     </div>
+
+                                </div>
                                 </div>
                             @endforeach
                         </div>
@@ -419,10 +425,16 @@
                     {{-- Nút: Đánh giá --}}
 
                     @if ($order->canReview())
-                        <button class="btn btn-outline-success" type="button">
-                            <i class="bi bi-star me-1"></i> Đánh giá
-                        </button>
+                        @php
+                            $firstProductSlug = $order->items->first()->product->slug ?? null;
+                        @endphp
+                        @if ($firstProductSlug)
+                            <a href="{{ route('client.product.detail', $firstProductSlug) }}?open_review=1" class="btn btn-outline-success">
+                                <i class="bi bi-star me-1"></i> Đánh giá
+                            </a>
+                        @endif
                     @endif
+
                     {{-- Logic Yêu cầu đổi trả (Sử dụng flex-column và min-height để tránh lệch nút) --}}
                     @if ($order->canReturn())
                         @php
