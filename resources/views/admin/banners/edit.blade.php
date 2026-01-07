@@ -39,8 +39,6 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-<<<<<<< HEAD
-=======
 
                             {{-- Mô tả --}}
                             <div class="mb-3">
@@ -51,8 +49,6 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
->>>>>>> origin/Trang_Chu_Client
                             {{-- Link --}}
                             <div class="mb-3">
                                 <label for="link" class="form-label">Liên kết (URL)</label>
@@ -134,17 +130,10 @@
                                 @enderror
 
                                 {{-- Preview ảnh hiện tại --}}
-<<<<<<< HEAD
                                 @if ($banner->image)
                                     <div class="mt-3">
                                         <label class="form-label">Ảnh hiện tại:</label>
                                         <img src="{{ asset('storage/' . ltrim($banner->image, '/')) }}" alt="Current"
-=======
-                                @if ($banner->image_url)
-                                    <div class="mt-3">
-                                        <label class="form-label">Ảnh hiện tại:</label>
-                                        <img src="{{ $banner->image_url }}" alt="Current"
->>>>>>> origin/Trang_Chu_Client
                                             class="img-fluid rounded shadow-sm" style="max-height: 300px; width: 100%; object-fit: contain;"
                                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light p-3 rounded text-center\'><i class=\'bi bi-image text-muted\' style=\'font-size: 2rem;\'></i><p class=\'text-muted mt-2 mb-0\'>Ảnh không tồn tại</p></div>';">
                                     </div>
