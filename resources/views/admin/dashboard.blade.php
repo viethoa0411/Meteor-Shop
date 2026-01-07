@@ -745,26 +745,16 @@
                             <table class="table table-sm table-hover mb-0 top-products-table-compact" id="topProductsTable">
                                 <thead style="position: sticky; top: 0; background: white; z-index: 10;">
                                     <tr>
-                                        <th rowspan="2" class="top-products-th-image" style="vertical-align: middle;">Hình ảnh</th>
-                                        <th rowspan="2" class="top-products-th-name" style="vertical-align: middle;">Tên sản phẩm & danh mục</th>
-                                        <th colspan="2" class="text-center top-products-th-quantity">Số lượng</th>
-                                        <th colspan="2" class="text-end top-products-th-revenue">Doanh thu</th>
-                                        <th colspan="2" class="text-center top-products-th-contribution">Tỷ lệ đóng góp</th>
-                                        <th rowspan="2" class="text-center top-products-th-conversion" style="vertical-align: middle;">Tỷ lệ chuyển đổi</th>
-                                        <th rowspan="2" class="text-center top-products-th-stock" style="vertical-align: middle;">Tồn kho</th>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-center top-products-th-sub" style="font-weight: 500; color: #6b7280;">Dự tính</th>
-                                        <th class="text-center top-products-th-sub" style="font-weight: 500; color: #6b7280;">Thực tế</th>
-                                        <th class="text-end top-products-th-sub" style="font-weight: 500; color: #6b7280;">Dự tính</th>
-                                        <th class="text-end top-products-th-sub" style="font-weight: 500; color: #6b7280;">Thực tế</th>
-                                        <th class="text-center top-products-th-sub" style="font-weight: 500; color: #6b7280;">Dự tính</th>
-                                        <th class="text-center top-products-th-sub" style="font-weight: 500; color: #6b7280;">Thực tế</th>
+                                        <th class="top-products-th-stt" style="vertical-align: middle; width: 50px;">STT</th>
+                                        <th class="top-products-th-image" style="vertical-align: middle;">Hình ảnh</th>
+                                        <th class="top-products-th-name" style="vertical-align: middle;">Tên sản phẩm & danh mục</th>
+                                        <th class="text-end top-products-th-revenue" style="vertical-align: middle;">Doanh thu</th>
+                                        <th class="text-center top-products-th-stock" style="vertical-align: middle;">Tồn kho</th>
                                     </tr>
                                 </thead>
                                 <tbody id="topProductsTableBody">
                                     <tr>
-                                        <td colspan="10" class="text-center text-muted py-4">
+                                        <td colspan="5" class="text-center text-muted py-4">
                                             <div class="spinner-border spinner-border-sm" role="status"></div>
                                             <span class="ms-2">Đang tải...</span>
                                         </td>
@@ -792,139 +782,6 @@
         </div>
     </section>
 
-    {{-- ========== 6. COMMENTS & USERS TABLES SECTION (1:1) ========== --}}
-    <section class="dashboard-section">
-        <div class="row g-3">
-            {{-- Card A: Bảng Bình luận (Comments Table) --}}
-            <div class="col-12 col-lg-6">
-                <div class="card shadow-sm comments-table-card" style="border-radius: 16px;">
-                    <div class="card-header bg-white card-header-responsive" style="border-bottom: 1px solid #e5e7eb;">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-                            <h6 class="fw-semibold mb-0">Bình luận mới nhất</h6>
-                            <div class="d-flex gap-2">
-                                {{-- Filter trạng thái --}}
-                                <select class="form-select form-select-sm table-filter-select" id="commentsStatusFilter">
-                                    <option value="">Tất cả</option>
-                                    <option value="approved">Đã duyệt</option>
-                                    <option value="pending">Chờ duyệt</option>
-                                    <option value="rejected">Đã từ chối</option>
-                                    <option value="hidden">Đã ẩn</option>
-                                </select>
-                                {{-- Tìm kiếm --}}
-                                <div class="input-group input-group-sm table-search-input">
-                                    <input type="text" class="form-control" id="commentsSearch" placeholder="Tìm kiếm...">
-                                    <button class="btn btn-outline-secondary" type="button" id="commentsSearchBtn">
-                                        <i class="bi bi-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        {{-- Bảng dữ liệu --}}
-                        <div class="comments-table-wrapper">
-                            <table class="table table-sm table-hover mb-0" id="commentsTable">
-                                <thead style="position: sticky; top: 0; background: white; z-index: 10;">
-                                    <tr>
-                                        <th style="min-width: 180px; white-space: nowrap;"><i class="bi bi-person me-1"></i>User</th>
-                                        <th style="min-width: 200px; white-space: nowrap;"><i class="bi bi-chat-text me-1"></i>Nội dung</th>
-                                        <th style="min-width: 150px; white-space: nowrap;"><i class="bi bi-box-seam me-1"></i>Sản phẩm</th>
-                                        <th style="min-width: 120px; white-space: nowrap;"><i class="bi bi-clock me-1"></i>Ngày</th>
-                                        <th style="min-width: 100px; white-space: nowrap;"><i class="bi bi-info-circle me-1"></i>Trạng thái</th>
-                                        <th style="min-width: 120px; white-space: nowrap;"><i class="bi bi-gear me-1"></i>Hành động</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="commentsTableBody">
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">
-                                            <div class="spinner-border spinner-border-sm" role="status"></div>
-                                            <span class="ms-2">Đang tải...</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        {{-- Footer --}}
-                        <div class="border-top p-3 bg-light">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    Tổng số: <strong id="commentsTotalCount">0</strong> bình luận
-                                </small>
-                                <small class="text-muted">
-                                    Vuốt chuột lên xuống để xem tất cả bình luận
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Card B: Bảng Users (Users Table) --}}
-            <div class="col-12 col-lg-6">
-                <div class="card shadow-sm users-table-card" style="border-radius: 16px;">
-                    <div class="card-header bg-white card-header-responsive" style="border-bottom: 1px solid #e5e7eb;">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-                            <h6 class="fw-semibold mb-0">Người dùng mới nhất</h6>
-                            <div class="d-flex gap-2">
-                                {{-- Filter trạng thái --}}
-                                <select class="form-select form-select-sm table-filter-select" id="usersStatusFilter">
-                                    <option value="">Tất cả</option>
-                                    <option value="active">Hoạt động</option>
-                                    <option value="banned">Đã khóa</option>
-                                    <option value="unverified">Chưa xác thực</option>
-                                </select>
-                                {{-- Tìm kiếm --}}
-                                <div class="input-group input-group-sm table-search-input">
-                                    <input type="text" class="form-control" id="usersSearch" placeholder="Tìm kiếm...">
-                                    <button class="btn btn-outline-secondary" type="button" id="usersSearchBtn">
-                                        <i class="bi bi-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        {{-- Bảng dữ liệu --}}
-                        <div class="users-table-wrapper">
-                            <table class="table table-sm table-hover mb-0" id="usersTable" style="min-width: 100%;">
-                                <thead style="position: sticky; top: 0; background: white; z-index: 10;">
-                                    <tr>
-                                        <th style="min-width: 50px;"><i class="bi bi-person-circle me-1"></i>Avatar</th>
-                                        <th style="min-width: 150px;"><i class="bi bi-person me-1"></i>Tên</th>
-                                        <th style="min-width: 150px;"><i class="bi bi-envelope me-1"></i>Email</th>
-                                        <th class="text-center" style="min-width: 80px;"><i class="bi bi-cart me-1"></i>Số đơn</th>
-                                        <th class="text-end" style="min-width: 120px;"><i class="bi bi-cash-coin me-1"></i>Tổng chi tiêu</th>
-                                        <th style="min-width: 120px;"><i class="bi bi-calendar me-1"></i>Ngày tạo</th>
-                                        <th style="min-width: 100px;"><i class="bi bi-info-circle me-1"></i>Trạng thái</th>
-                                        <th style="min-width: 120px;"><i class="bi bi-gear me-1"></i>Hành động</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usersTableBody">
-                                    <tr>
-                                        <td colspan="8" class="text-center text-muted py-4">
-                                            <div class="spinner-border spinner-border-sm" role="status"></div>
-                                            <span class="ms-2">Đang tải...</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        {{-- Footer --}}
-                        <div class="border-top p-3 bg-light">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    Tổng số: <strong id="usersTotalCount">0</strong> người dùng
-                                </small>
-                                <small class="text-muted">
-                                    Vuốt chuột lên xuống để xem tất cả người dùng
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <style>
         /* ========== RESPONSIVE FOUNDATION - PROFESSIONAL SYSTEM ========== */
@@ -6888,7 +6745,7 @@
             // Show loading
             topProductsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="10" class="text-center text-muted py-4">
+                    <td colspan="5" class="text-center text-muted py-4">
                         <div class="spinner-border spinner-border-sm" role="status"></div>
                         <span class="ms-2">Đang tải...</span>
                     </td>
@@ -6937,7 +6794,7 @@
                     if (products.length === 0) {
                         topProductsTableBody.innerHTML = `
                             <tr>
-                                <td colspan="10" class="text-center text-muted py-4">Không có dữ liệu</td>
+                                <td colspan="5" class="text-center text-muted py-4">Không có dữ liệu</td>
                             </tr>
                         `;
                         topProductsTotalRevenueEl.innerHTML = '<div>Dự tính: <strong>0 đ</strong></div><div>Thực tế: <strong>0 đ</strong></div>';
@@ -7016,9 +6873,11 @@
 
                         return `
                             <tr class="product-row" data-product-id="${product.id}" style="cursor: pointer;" onclick="window.location.href='{{ url('/admin/products/show') }}/${product.id}'">
+                                <td class="text-center align-middle">
+                                    <span class="${rankBadgeClass}" style="position: static; transform: none;">${rank}</span>
+                                </td>
                                 <td>
                                     <div class="product-info-container">
-                                        <span class="${rankBadgeClass}" title="Xếp hạng #${rank}">${rank}</span>
                                         <img src="${escapeHtml(imageUrl)}" alt="${productNameEscaped}" class="product-thumbnail-top" onerror="this.onerror=null; this.src='/images/placeholder.png';" title="Xem chi tiết sản phẩm">
                                     </div>
                                 </td>
@@ -7028,36 +6887,8 @@
                                         <div class="product-category-top">${categoryEscaped}</div>
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <div class="quantity-value" title="Số lượng dự tính">${soldEstimated}</div>
-                                </td>
-                                <td class="text-center">
-                                    <div class="quantity-value" title="Số lượng thực tế">${soldCompleted}</div>
-                                </td>
                                 <td class="text-end">
-                                    <div class="revenue-value estimated" title="Doanh thu dự tính">${revenueEstimatedFormatted} ₫</div>
-                                </td>
-                                <td class="text-end">
-                                    <div class="revenue-value" title="Doanh thu thực tế">${revenueCompletedFormatted} ₫</div>
-                                </td>
-                                <td class="text-center">
-                                    <div class="contribution-progress" title="Tỷ lệ đóng góp dự tính: ${percentEstimated}%">
-                                        <div class="contribution-progress-bar-wrapper">
-                                            <div class="contribution-progress-bar estimated" style="width: ${progressEstimatedWidth}%"></div>
-                                        </div>
-                                        <span class="contribution-progress-text">${percentEstimated}%</span>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <div class="contribution-progress" title="Tỷ lệ đóng góp thực tế: ${percentCompleted}%">
-                                        <div class="contribution-progress-bar-wrapper">
-                                            <div class="contribution-progress-bar completed" style="width: ${progressCompletedWidth}%"></div>
-                                        </div>
-                                        <span class="contribution-progress-text">${percentCompleted}%</span>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <span class="${conversionBadgeClass}" title="Tỷ lệ chuyển đổi: ${conversionRate}%">${conversionRate}%</span>
+                                    <span class="fw-bold">${revenueCompletedFormatted} đ</span>
                                 </td>
                                 <td class="text-center">
                                     <span class="${stockBadgeClass}" title="Tồn kho: ${stock} sản phẩm">${stockBadgeText}</span>
@@ -7091,7 +6922,7 @@
                 console.error('Error loading top products:', e);
                 topProductsTableBody.innerHTML = `
                     <tr>
-                        <td colspan="10" class="text-center text-danger py-4">
+                        <td colspan="5" class="text-center text-danger py-4">
                             <i class="bi bi-exclamation-triangle"></i> Lỗi tải dữ liệu: ${e.message}
                         </td>
                     </tr>
