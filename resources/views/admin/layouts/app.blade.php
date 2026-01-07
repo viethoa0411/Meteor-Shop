@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -986,16 +987,13 @@
                     <!-- Notifications -->
                     <div class="dropdown position-relative">
 
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
-                            id="notificationBadge"
-                            style="font-size: 0.65rem; display: none;">
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
+                            id="notificationBadge" style="font-size: 0.65rem; display: none;">
                             0
                         </span>
-                        <button class="admin-header-btn position-relative" type="button"
-                            id="notificationsBtn"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                            title="Notifications">
+                        <button class="admin-header-btn position-relative" type="button" id="notificationsBtn"
+                            data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
                             <i class="bi bi-bell-fill"></i>
 
                         </button>
@@ -1008,11 +1006,11 @@
                                     <h6 class="mb-0 fw-bold d-flex align-items-center">
                                         <i class="bi bi-bell-fill me-2"></i>
                                         <span>Thông báo</span>
-                                        <span class="badge bg-primary ms-2" id="notificationHeaderCount" style="display: none; font-size: 0.7rem;">0</span>
+                                        <span class="badge bg-primary ms-2" id="notificationHeaderCount"
+                                            style="display: none; font-size: 0.7rem;">0</span>
                                     </h6>
                                     <button class="btn btn-sm btn-link text-decoration-none p-0 text-muted"
-                                        id="markAllReadBtn"
-                                        style="font-size: 0.8rem; white-space: nowrap;">
+                                        id="markAllReadBtn" style="font-size: 0.8rem; white-space: nowrap;">
                                         <i class="bi bi-check-all me-1"></i>Đánh dấu tất cả
                                     </button>
                                 </div>
@@ -1040,7 +1038,8 @@
                                 <hr class="dropdown-divider my-0">
                             </li>
                             <li class="notification-footer">
-                                <a href="{{ route('admin.dashboard') }}" class="dropdown-item text-center py-2 text-primary" id="viewAllNotifications">
+                                <a href="{{ route('admin.dashboard') }}"
+                                    class="dropdown-item text-center py-2 text-primary" id="viewAllNotifications">
                                     <i class="bi bi-arrow-right-circle me-1"></i>
                                     <small class="fw-semibold">Xem tất cả thông báo</small>
                                 </a>
@@ -1055,7 +1054,8 @@
                             <i class="bi bi-person-circle me-2 fs-5"></i>
                             <span class="d-none d-md-inline">{{ Auth::user()->name ?? 'Admin' }}</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px; margin-top: 10px;">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0"
+                            style="min-width: 200px; margin-top: 10px;">
                             <li>
                                 <a href="" class="dropdown-item py-2">
                                     <i class="bi bi-person me-2"></i> Profile
@@ -1103,11 +1103,6 @@
                 <i class="bi bi-folder-plus"></i> Danh mục
             </a>
 
-            <a href="{{ route('admin.home-categories.index') }}"
-                class="admin-sidebar-link {{ request()->routeIs('admin.home-categories.*') ? 'active' : '' }}">
-                <i class="bi bi-grid-fill"></i> Danh mục trang chủ
-            </a>
-
             <a href="{{ route('admin.products.list') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> Sản phẩm
@@ -1118,58 +1113,60 @@
                 <i class="bi bi-cart-fill"></i> Đơn hàng
             </a>
 
-            <a href="{{ route('admin.contact-info.index') }}"
-            class="admin-sidebar-link {{ request()->routeIs('admin.contact-info.*') ? 'active' : '' }}">
-                <i class="bi bi-headset me-2"></i></i>Liên hệ nhanh
-            </a>
-
-            <a href="{{ route('admin.contacts.index') }}"
-                class="admin-sidebar-link {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}">
-                <i class="bi bi-envelope"></i> Liên hệ
+            <a href="{{ route('admin.notifications.index') }}"
+                class="admin-sidebar-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
+                <i class="bi bi-bell-fill"></i> Thông báo
+                @php
+                    $unreadCount = \App\Models\Notification::where('user_id', auth()->id())
+                        ->where('is_read', false)
+                        ->count();
+                @endphp
+                @if ($unreadCount > 0)
+                    <span class="admin-sidebar-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.chatbox.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.chatbox.*') ? 'active' : '' }}">
                 <i class="bi bi-chat-dots-fill"></i> Chatbox
                 @php
-                $unreadChatCount = \App\Models\ChatSession::where('unread_count', '>', 0)->count();
+                    $unreadChatCount = \App\Models\ChatSession::where('unread_count', '>', 0)->count();
                 @endphp
                 @if ($unreadChatCount > 0)
-                <span class="admin-sidebar-badge">{{ $unreadChatCount }}</span>
+                    <span class="admin-sidebar-badge">{{ $unreadChatCount }}</span>
                 @endif
+            </a>
+
+            <a href="{{ route('admin.promotions.list') }}"
+                class="admin-sidebar-link {{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}">
+                <i class="bi bi-ticket-perforated"></i> Voucher
+            </a>
+
+
+            <a href="{{ route('admin.banners.list') }}"
+                class="admin-sidebar-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+                <i class="bi bi-image-fill"></i> Banner
+            </a>
+
+            <a href="{{ route('admin.contacts.index') }}"
+                class="admin-sidebar-link {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}">
+                <i class="bi bi-envelope"></i> Thiết kế
             </a>
 
             <a href="{{ route('admin.blogs.list') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.blogs.*') ? 'active' : '' }}">
-                <i class="bi bi-list-ul"></i> Danh sách bài viết
+                <i class="bi bi-list-ul"></i>Bài viết
             </a>
 
             <a href="{{ route('admin.comments.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
-                <i class="bi bi-chat-left-text-fill"></i> Quản lý bình luận
-            </a>
-
-            <a href="{{ route('admin.notifications.index') }}"
-                class="admin-sidebar-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
-                <i class="bi bi-bell-fill"></i> Thông báo
-                @php
-                $unreadCount = \App\Models\Notification::where('user_id', auth()->id())
-                ->where('is_read', false)
-                ->count();
-                @endphp
-                @if($unreadCount > 0)
-                <span class="admin-sidebar-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
-                @endif
-            </a>
-
-            <a href="{{ route('admin.banners.list') }}"
-                class="admin-sidebar-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
-                <i class="bi bi-image-fill"></i> Quản lý Banner
+                <i class="bi bi-chat-left-text-fill"></i>Bình luận
             </a>
 
             <!-- Quản lý tài khoản -->
             <div class="admin-dropdown-item {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
-                <a href="#" class="admin-sidebar-link {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
+                <a href="#"
+                    class="admin-sidebar-link {{ request()->routeIs('admin.account.*') ? 'active' : '' }}">
                     <i class="bi bi-people-fill"></i> Quản lý tài khoản
                     <i class="bi bi-chevron-right"></i>
                 </a>
@@ -1185,27 +1182,27 @@
                 </div>
             </div>
 
-            <a href="{{ route('admin.promotions.list') }}"
-                class="admin-sidebar-link {{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}">
-                <i class="bi bi-ticket-perforated"></i> Quản lý Voucher
-            </a>
-
             @php
-            $pendingDeposits = \App\Models\DepositRequest::where('status', 'pending')->count();
-            $pendingWithdraws = \App\Models\WithdrawRequest::whereIn('status', ['pending', 'processing'])->count();
-            $totalPending = $pendingDeposits + $pendingWithdraws;
+                $pendingDeposits = \App\Models\DepositRequest::where('status', 'pending')->count();
+                $pendingWithdraws = \App\Models\WithdrawRequest::whereIn('status', ['pending', 'processing'])->count();
+                $totalPending = $pendingDeposits + $pendingWithdraws;
             @endphp
             <a href="{{ route('admin.wallet.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.wallet.*') ? 'active' : '' }}">
                 <i class="bi bi-wallet2"></i> Quản lý Ví
                 @if ($totalPending > 0)
-                <span class="admin-sidebar-badge">{{ $totalPending > 99 ? '99+' : $totalPending }}</span>
+                    <span class="admin-sidebar-badge">{{ $totalPending > 99 ? '99+' : $totalPending }}</span>
                 @endif
             </a>
 
             <a href="{{ route('admin.shipping.index') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.shipping.*') ? 'active' : '' }}">
                 <i class="bi bi-truck"></i> Cài đặt vận chuyển
+            </a>
+
+            <a href="{{ route('admin.contact-info.index') }}"
+                class="admin-sidebar-link {{ request()->routeIs('admin.contact-info.*') ? 'active' : '' }}">
+                <i class="bi bi-headset me-2"></i></i>Liên hệ nhanh
             </a>
         </aside>
 
@@ -1365,14 +1362,16 @@
             });
 
             // Add smooth scroll to sidebar links
-            document.querySelectorAll('.admin-sidebar-link:not(.admin-dropdown-item > .admin-sidebar-link), .admin-submenu-link').forEach(link => {
-                link.addEventListener('click', function() {
-                    // Close mobile menu if open
-                    if (window.innerWidth <= 768 && adminSidebar) {
-                        toggleMobileMenu();
-                    }
+            document.querySelectorAll(
+                    '.admin-sidebar-link:not(.admin-dropdown-item > .admin-sidebar-link), .admin-submenu-link')
+                .forEach(link => {
+                    link.addEventListener('click', function() {
+                        // Close mobile menu if open
+                        if (window.innerWidth <= 768 && adminSidebar) {
+                            toggleMobileMenu();
+                        }
+                    });
                 });
-            });
 
             // Add ripple effect to buttons
             document.querySelectorAll('.admin-header-btn, .admin-user-dropdown').forEach(button => {
@@ -1421,7 +1420,8 @@
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                if (window.innerWidth > 768 && adminSidebar && adminSidebar.classList.contains('mobile-open')) {
+                if (window.innerWidth > 768 && adminSidebar && adminSidebar.classList.contains(
+                        'mobile-open')) {
                     toggleMobileMenu();
                 }
             }, 250);
@@ -1485,7 +1485,7 @@
                 if (this.elements.viewAllBtn) {
                     this.elements.viewAllBtn.addEventListener('click', (e) => {
                         e.preventDefault();
-                        window.location.href = '{{ route("admin.notifications.index") }}';
+                        window.location.href = '{{ route('admin.notifications.index') }}';
                     });
                 }
 
@@ -1504,7 +1504,7 @@
                         this.updateBadge(cached.badgeCount);
                     }
 
-                    const response = await fetch('{{ route("admin.dashboard.notifications") }}?badge_only=1', {
+                    const response = await fetch('{{ route('admin.dashboard.notifications') }}?badge_only=1', {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
@@ -1555,7 +1555,7 @@
                 }
 
                 try {
-                    const response = await fetch('{{ route("admin.dashboard.notifications") }}', {
+                    const response = await fetch('{{ route('admin.dashboard.notifications') }}', {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
@@ -1612,7 +1612,8 @@
                     this.elements.empty.style.display = 'none';
                 }
 
-                this.elements.list.innerHTML = this.state.notifications.map(notif => this.renderNotificationItem(notif)).join('');
+                this.elements.list.innerHTML = this.state.notifications.map(notif => this.renderNotificationItem(notif))
+                    .join('');
 
                 // Add click handlers with event delegation
                 this.elements.list.addEventListener('click', (e) => {
@@ -1665,12 +1666,14 @@
 
                     if (isNumericId) {
                         try {
-                            await fetch(`{{ route('admin.notifications.read', ':id') }}`.replace(':id', notificationId), {
+                            await fetch(`{{ route('admin.notifications.read', ':id') }}`.replace(':id',
+                                notificationId), {
                                 method: 'POST',
                                 headers: {
                                     'Accept': 'application/json',
                                     'X-Requested-With': 'XMLHttpRequest',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                        ?.getAttribute('content') || ''
                                 }
                             });
                         } catch (error) {
@@ -1716,12 +1719,13 @@
 
             async markAllAsRead() {
                 try {
-                    const response = await fetch('{{ route("admin.notifications.read-all") }}', {
+                    const response = await fetch('{{ route('admin.notifications.read-all') }}', {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                                'content') || ''
                         }
                     });
 
