@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'auto_approve' => false,
+    'auto_approve' => true,
     'auto_verify_buyer' => true,
     'allow_images' => true,
     'max_images' => 5,

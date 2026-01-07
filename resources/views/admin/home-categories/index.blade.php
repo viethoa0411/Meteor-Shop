@@ -62,9 +62,9 @@
                                 <tr>
                                     <td>
                                         @if ($category->image)
-                                            <img src="{{ asset('storage/' . $category->image) }}" 
+                                            <img src="{{ asset('storage/' . $category->image) }}"
                                                 alt="{{ $category->name }}"
-                                                class="img-thumbnail" 
+                                                class="img-thumbnail"
                                                 style="width: 60px; height: 60px; object-fit: cover;">
                                         @else
                                             <div class="bg-light d-flex align-items-center justify-content-center"

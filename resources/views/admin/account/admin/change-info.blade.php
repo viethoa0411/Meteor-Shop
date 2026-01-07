@@ -12,13 +12,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <!-- Thông báo thành công -->
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
+
 
             <!-- Lỗi validate -->
             @if($errors->any())
