@@ -221,11 +221,10 @@
 
                                             <div class="col-md-2">
                                                 <label>Dài (cm)</label>
-                                                <input type="number" step="10"
+                                                <input type="number" step="1"
                                                     name="variants[{{ $idx }}][length]" class="form-control"
                                                     value="{{ old('variants.' . $idx . '.length', (float)$v->length) }}"
                                                     {{ ($hasOrders ?? false) && $variantHasOrders ? 'readonly' : '' }}>
-
                                             </div>
 
                                             <div class="col-md-2">
@@ -261,7 +260,7 @@
 
                                             <div class="col-md-2 mt-3">
                                                 <label>Giá (VNĐ)</label>
-                                                <input type="number" step="100000" min="0"
+                                                <input type="number" step="1" min="0"
                                                     name="variants[{{ $idx }}][price]" class="form-control"
                                                     value="{{ old('variants.' . $idx . '.price', (float)($v->price ?? $product->price)) }}"
                                                     placeholder="Giá biến thể">

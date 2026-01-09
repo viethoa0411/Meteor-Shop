@@ -97,7 +97,16 @@
                                         SL: {{ $item->quantity }} x {{ number_format($item->price, 0, ',', '.') }} đ
                                     </div>
                                 </div>
-                                <div class="fw-semibold">{{ number_format($item->subtotal, 0, ',', '.') }} đ</div>
+                                <div class="d-flex flex-column align-items-end gap-2">
+                                    <div class="fw-semibold">{{ number_format($item->subtotal, 0, ',', '.') }} đ</div>
+                                    @if ($order->order_status === 'completed' && $productSlug)
+                                        <a href="{{ route('client.product.detail', $productSlug) }}?open_review=1"
+                                            class="btn btn-sm btn-outline-primary py-1 px-2"
+                                            style="font-size: 0.85rem;">
+                                            <i class="bi bi-star me-1"></i>Đánh giá
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
                         @endforeach
                     </div>

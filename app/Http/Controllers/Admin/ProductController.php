@@ -164,7 +164,20 @@ class ProductController extends Controller
             'images'      // load tất cả ảnh phụ
         ])->findOrFail($id);
 
-        return view('admin.products.show', compact('product'));
+        // Tính toán thống kê
+        $query = $product->orderDetails()
+            ->join('orders', 'order_details.order_id', '=', 'orders.id')
+            ->whereNotIn('orders.status', ['cancelled', 'returned']);
+
+        $soldQuantity = (clone $query)->sum('order_details.quantity');
+        $revenue = (clone $query)->sum('order_details.subtotal');
+
+        // Tính tổng tồn kho
+        $totalStock = $product->variants->count() > 0 
+            ? $product->variants->sum('stock') 
+            : $product->stock;
+
+        return view('admin.products.show', compact('product', 'soldQuantity', 'revenue', 'totalStock'));
     }
 
 
@@ -420,6 +433,11 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
+
+        if ($product->hasOrders()) {
+            return redirect()->route('admin.products.list')->with('error', 'Không thể xóa sản phẩm đã có đơn hàng!');
+        }
+
         $product->delete();
         return redirect()->route('admin.products.list')->with('success', 'Đã xoá sản phẩm!');
     }

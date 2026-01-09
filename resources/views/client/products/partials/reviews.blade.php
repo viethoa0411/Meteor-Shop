@@ -186,8 +186,8 @@
                                         Nhận xét <span class="text-danger">*</span>
                                     </label>
                                     <div class="textarea-wrapper">
-                                        <textarea name="comment" id="reviewComment" class="form-control review-textarea" rows="5" 
-                                              placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..." 
+                                        <textarea name="comment" id="reviewComment" class="form-control review-textarea" rows="5"
+                                              placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
                                                   required minlength="20" maxlength="1000"
                                                   aria-label="Nhận xét đánh giá"
                                                   aria-describedby="charCountHelp"></textarea>
@@ -218,12 +218,12 @@
                                     <div class="mb-4">
                                         <label class="form-label fw-semibold mb-3 d-flex align-items-center">
                                             <i class="bi bi-images me-2 text-primary"></i>
-                                            Hình ảnh 
+                                            Hình ảnh
                                             <span class="badge bg-primary ms-2">{{ $maxImages }} ảnh tối đa</span>
                                         </label>
                                         <div class="upload-area" id="uploadArea">
-                                            <input type="file" name="images[]" id="reviewImages" 
-                                                   class="d-none" multiple accept="image/jpeg,image/jpg,image/png,image/webp" 
+                                            <input type="file" name="images[]" id="reviewImages"
+                                                   class="d-none" multiple accept="image/jpeg,image/jpg,image/png,image/webp"
                                                    data-max="{{ $maxImages }}">
                                             <div class="upload-content">
                                                 <div class="upload-icon-wrapper">
@@ -233,7 +233,7 @@
                                                 <div class="upload-text-content">
                                                     <h6 class="upload-title">Kéo thả ảnh vào đây</h6>
                                                     <p class="upload-subtitle">
-                                                        hoặc 
+                                                        hoặc
                                                         <span class="upload-link" onclick="document.getElementById('reviewImages').click()">
                                                             <i class="bi bi-folder2-open me-1"></i>Chọn ảnh từ máy tính
                                                         </span>
@@ -270,7 +270,7 @@
                                             <div class="preview-grid" id="previewContainer"></div>
                                             <div id="uploadProgress" class="mt-3" style="display: none;">
                                                 <div class="progress progress-modern">
-                                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
                                                          role="progressbar" style="width: 0%"></div>
                                                 </div>
                                                 <small class="text-muted d-block mt-2 text-center">
@@ -307,27 +307,27 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content bg-transparent border-0 position-relative">
             <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" style="z-index: 1051; background: rgba(0,0,0,0.5); border-radius: 50%; padding: 0.5rem;"></button>
-            
+
             <div class="lightbox-container position-relative">
                 <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" onclick="lightboxPrev()" style="display: none;">
                     <i class="bi bi-chevron-left"></i>
                 </button>
-                
+
                 <div class="lightbox-image-wrapper text-center">
                     <img id="lightboxImage" src="" alt="Review image" class="img-fluid rounded shadow-lg" style="max-height: 85vh; object-fit: contain;">
                 </div>
-                
+
                 <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" onclick="lightboxNext()" style="display: none;">
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </div>
-            
+
             <div class="lightbox-counter position-absolute bottom-0 start-50 translate-middle-x mb-3" id="lightboxCounter" style="display: none; background: rgba(0,0,0,0.7); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600;"></div>
         </div>
     </div>
 </div>
 
-@push('styles')
+@push('head')
 <style>
     /* ========= REVIEWS SECTION ========= */
     .reviews-section {
@@ -517,7 +517,7 @@
         min-height: 200px;
         position: relative;
     }
-    
+
     /* Loading State */
     .reviews-loading {
         display: flex;
@@ -527,13 +527,13 @@
         padding: 4rem 2rem;
         min-height: 300px;
     }
-    
+
     .loading-spinner {
         display: flex;
         gap: 0.5rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .spinner-ring {
         width: 12px;
         height: 12px;
@@ -541,15 +541,15 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         animation: spinner-bounce 1.4s ease-in-out infinite both;
     }
-    
+
     .spinner-ring:nth-child(1) {
         animation-delay: -0.32s;
     }
-    
+
     .spinner-ring:nth-child(2) {
         animation-delay: -0.16s;
     }
-    
+
     @keyframes spinner-bounce {
         0%, 80%, 100% {
             transform: scale(0);
@@ -560,7 +560,7 @@
             opacity: 1;
         }
     }
-    
+
     .loading-text {
         color: #64748b;
         font-size: 0.95rem;
@@ -582,7 +582,7 @@
         overflow: hidden;
         animation: fadeInUp 0.5s ease-out;
     }
-    
+
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -634,7 +634,7 @@
         transition: all 0.3s ease;
         position: relative;
     }
-    
+
     .review-avatar::after {
         content: '';
         position: absolute;
@@ -653,7 +653,7 @@
         transform: scale(1.03);
         box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
     }
-    
+
     .review-item:hover .review-avatar::after {
         opacity: 1;
     }
@@ -666,11 +666,11 @@
         line-height: 1.5;
         transition: color 0.2s ease;
     }
-    
+
     .review-user-name:hover {
         color: #667eea;
     }
-    
+
 
     .review-verified-badge {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -686,12 +686,12 @@
         transition: all 0.3s ease;
         border: none;
     }
-    
+
     .review-verified-badge:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
-    
+
     .review-verified-badge i {
         font-size: 0.875rem;
     }
@@ -719,7 +719,7 @@
         overflow: visible;
         max-width: 100%;
     }
-    
+
     .review-content .review-images-grid {
         margin-top: 0.75rem;
         display: flex !important;
@@ -745,22 +745,22 @@
         max-width: 100%;
         white-space: nowrap;
     }
-    
+
     /* Scrollbar styling cho review-images-grid */
     .review-images-grid::-webkit-scrollbar {
         height: 6px;
     }
-    
+
     .review-images-grid::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 10px;
     }
-    
+
     .review-images-grid::-webkit-scrollbar-thumb {
         background: #cbd5e1;
         border-radius: 10px;
     }
-    
+
     .review-images-grid::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
     }
@@ -801,7 +801,7 @@
         transform: translateY(-1px) scale(1.2);
         z-index: 10;
     }
-    
+
     .review-image-item:hover .image-wrapper {
         border-color: #667eea;
         box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
@@ -832,7 +832,7 @@
         box-sizing: border-box;
         vertical-align: middle;
     }
-    
+
     .review-image-item img {
         width: 90px !important;
         height: 90px !important;
@@ -846,7 +846,7 @@
         border-radius: 0;
         flex-shrink: 0;
     }
-    
+
     /* Force tất cả ảnh trong review-images-grid */
     .review-images-grid .review-image-item {
         display: inline-block !important;
@@ -854,7 +854,7 @@
         flex-shrink: 0 !important;
         flex-grow: 0 !important;
     }
-    
+
     .review-images-grid .review-image-item .image-wrapper,
     .review-images-grid .review-image-item .image-wrapper img {
         width: 90px !important;
@@ -862,7 +862,7 @@
         max-width: 90px !important;
         max-height: 90px !important;
     }
-    
+
     .review-image-item img.image-error {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         display: flex;
@@ -873,7 +873,7 @@
         padding: 0.5rem;
         text-align: center;
     }
-    
+
 
     .review-date {
         color: #64748b;
@@ -935,74 +935,103 @@
         font-size: 0.9rem;
     }
 
-    /* Rating Input - Professional Design */
+    /* Rating Input - Clean & Professional Design */
     .rating-input-wrapper {
-        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        background: #fff;
         border-radius: 16px;
         padding: 1.5rem;
-        border: 2px solid #e9ecef;
+        border: 1px solid #e2e8f0;
+        text-align: center;
         transition: all 0.3s ease;
+        position: relative;
     }
 
     .rating-input-wrapper:hover {
-        border-color: #667eea;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .rating-input-wrapper.is-invalid {
         border-color: #dc3545;
-        background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+        background: #fff5f5;
     }
 
     .rating-input {
-        display: flex;
+        display: inline-flex;
         flex-direction: row-reverse;
         justify-content: center;
-        gap: 0.75rem;
+        gap: 0.5rem;
         margin-bottom: 1rem;
+        position: relative;
+        padding: 5px;
     }
 
+    /* Hide radio buttons absolutely */
     .rating-input input[type="radio"] {
-        display: none;
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        appearance: none;
+        -webkit-appearance: none;
     }
 
     .rating-input label {
-        font-size: 2.75rem;
-        color: #dee2e6;
+        font-size: 3rem;
+        color: #e2e8f0;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        outline: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        display: inline-block;
+        padding: 0 2px;
     }
 
-    .rating-input label:focus-visible {
-        outline: 2px solid #667eea;
-        outline-offset: 2px;
-        border-radius: 4px;
-    }
-
+    /* Hover and Checked States */
     .rating-input label:hover,
-    .rating-input label:hover ~ label {
-        color: #ffc107;
-        transform: scale(1.15) rotate(5deg);
-        filter: drop-shadow(0 4px 8px rgba(255, 193, 7, 0.4));
+    .rating-input label:hover ~ label,
+    .rating-input input[type="radio"]:checked ~ label {
+        color: #fbbf24; /* Amber-400 */
     }
 
-    .rating-input input[type="radio"]:checked ~ label,
-    .rating-input input[type="radio"]:checked ~ label ~ label {
-        color: #ffc107;
+    /* Hover Animation - Subtle */
+    .rating-input label:hover {
         transform: scale(1.1);
-        filter: drop-shadow(0 4px 8px rgba(255, 193, 7, 0.5));
+    }
+
+    .rating-input label:hover ~ label {
+        transform: scale(1.05);
+    }
+
+    /* Checked Animation - Subtle Pop */
+    .rating-input input[type="radio"]:checked + label {
+        transform: scale(1.15);
+        animation: starPopSubtle 0.3s ease-out;
+    }
+
+    @keyframes starPopSubtle {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.25); }
+        100% { transform: scale(1.15); }
     }
 
     .rating-text {
-        text-align: center;
-        min-height: 24px;
+        min-height: 28px;
+        margin-top: 0.75rem;
     }
 
     #ratingText {
-        font-weight: 500;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #64748b;
         transition: all 0.3s ease;
+        display: inline-block;
+        padding: 0.25rem 1rem;
+    }
+    
+    #ratingText.highlight {
+        color: #d97706; /* Amber-600 */
+        transform: scale(1.02);
     }
 
     /* Review Form Modal */
@@ -1035,7 +1064,7 @@
         color: white;
         backdrop-filter: blur(10px);
     }
-    
+
     /* Textarea Wrapper */
     .textarea-wrapper {
         position: relative;
@@ -1283,21 +1312,21 @@
         overflow-y: hidden;
         align-items: flex-start;
     }
-    
+
     .preview-grid::-webkit-scrollbar {
         height: 6px;
     }
-    
+
     .preview-grid::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 10px;
     }
-    
+
     .preview-grid::-webkit-scrollbar-thumb {
         background: #667eea;
         border-radius: 10px;
     }
-    
+
     .preview-grid::-webkit-scrollbar-thumb:hover {
         background: #764ba2;
     }
@@ -1365,7 +1394,7 @@
         z-index: 0;
         box-sizing: border-box !important;
     }
-    
+
     #previewContainer {
         display: flex !important;
         flex-wrap: nowrap !important;
@@ -1375,7 +1404,7 @@
         overflow-y: hidden;
         align-items: flex-start;
     }
-    
+
     #previewContainer > div {
         width: 50px !important;
         height: 50px !important;
@@ -1386,21 +1415,21 @@
         flex-shrink: 0 !important;
         flex-grow: 0 !important;
     }
-    
+
     #previewContainer::-webkit-scrollbar {
         height: 6px;
     }
-    
+
     #previewContainer::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 10px;
     }
-    
+
     #previewContainer::-webkit-scrollbar-thumb {
         background: #667eea;
         border-radius: 10px;
     }
-    
+
     #previewContainer::-webkit-scrollbar-thumb:hover {
         background: #764ba2;
     }
@@ -1456,7 +1485,7 @@
         border-radius: 12px;
         overflow: hidden;
     }
-    
+
     .lightbox-container {
         position: relative;
         min-height: 400px;
@@ -1464,7 +1493,7 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     .lightbox-image-wrapper {
         flex: 1;
         padding: 2rem;
@@ -1478,7 +1507,7 @@
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         transition: opacity 0.3s ease;
     }
-    
+
     .lightbox-nav {
         position: absolute;
         top: 50%;
@@ -1498,26 +1527,26 @@
         z-index: 1050;
         backdrop-filter: blur(10px);
     }
-    
+
     .lightbox-nav:hover {
         background: rgba(255, 255, 255, 0.3);
         border-color: rgba(255, 255, 255, 0.5);
         transform: translateY(-50%) scale(1.1);
     }
-    
+
     .lightbox-nav:disabled {
         opacity: 0.3;
         cursor: not-allowed;
     }
-    
+
     .lightbox-prev {
         left: 20px;
     }
-    
+
     .lightbox-next {
         right: 20px;
     }
-    
+
     .lightbox-counter {
         z-index: 1051;
         font-size: 0.9rem;
@@ -1534,7 +1563,7 @@
         margin: 2rem 0;
         animation: fadeIn 0.5s ease-out;
     }
-    
+
     @keyframes fadeIn {
         from {
             opacity: 0;
@@ -1559,14 +1588,14 @@
         margin: 0;
         line-height: 1.6;
     }
-    
+
     /* Review Actions */
     .review-actions {
         padding-top: 1rem;
         border-top: 1px solid #f1f5f9;
         margin-top: 1rem;
     }
-    
+
     .review-actions .btn {
         font-size: 0.8125rem;
         padding: 0.375rem 0.75rem;
@@ -1574,12 +1603,12 @@
         transition: all 0.2s ease;
         font-weight: 500;
     }
-    
+
     .review-actions .btn:hover {
         transform: translateY(-1px);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    
+
     .review-actions .btn-helpful.active,
     .review-actions .btn-helpful.btn-primary {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1631,7 +1660,7 @@
             flex-wrap: nowrap !important;
             flex-direction: row !important;
         }
-        
+
         .review-image-item {
             width: 90px !important;
             min-width: 90px !important;
@@ -1639,12 +1668,12 @@
             height: 90px !important;
             flex-shrink: 0 !important;
         }
-        
+
         .review-image-item .image-wrapper {
             width: 90px;
             height: 90px;
         }
-        
+
 
         .review-filters {
             padding: 1rem;
@@ -1668,28 +1697,28 @@
             padding: 1.25rem;
             border-radius: 12px;
         }
-        
+
         .review-avatar {
             width: 48px;
             height: 48px;
             font-size: 1.1rem;
         }
-        
+
         .review-user-name {
             font-size: 0.9375rem;
         }
-        
+
         .review-content {
             font-size: 0.875rem;
             line-height: 1.7;
         }
-        
+
         .review-images-grid {
             gap: 0.25rem;
             flex-wrap: nowrap !important;
             flex-direction: row !important;
         }
-        
+
         .review-image-item {
             width: 90px !important;
             min-width: 90px !important;
@@ -1697,18 +1726,18 @@
             height: 90px !important;
             flex-shrink: 0 !important;
         }
-        
+
         .review-image-item .image-wrapper {
             width: 90px;
             height: 90px;
         }
-        
-        
+
+
         .review-actions {
             flex-direction: column;
             gap: 0.5rem;
         }
-        
+
         .review-actions .btn {
             width: 100%;
             justify-content: center;
@@ -1735,7 +1764,7 @@
         if (updateCheckInterval) {
             clearInterval(updateCheckInterval);
         }
-        
+
         updateCheckInterval = setInterval(async () => {
             // Chỉ check khi tab đang active
             if (document.visibilityState === 'visible') {
@@ -1743,7 +1772,7 @@
                     const checkUrl = `{{ route('client.product.reviews.check-updates', $product->slug) }}?last_check=${lastUpdateCheck}`;
                     const response = await fetch(checkUrl);
                     const data = await response.json();
-                    
+
                     if (data.has_updates) {
                         console.log('Reviews updated, reloading silently...');
                         // Reload reviews silently (không scroll to top)
@@ -1768,10 +1797,39 @@
     document.addEventListener('DOMContentLoaded', function() {
         loadReviews();
         startUpdateChecker();
-        
+
+        // Check for open_review param to auto-open review modal
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('open_review')) {
+            // Activate the reviews tab if it exists
+            const reviewsTabBtn = document.getElementById('reviews-tab');
+            if (reviewsTabBtn) {
+                const tabTrigger = new bootstrap.Tab(reviewsTabBtn);
+                tabTrigger.show();
+            }
+
+            const btnWriteReview = document.getElementById('btnWriteReview');
+            const reviewsSection = document.getElementById('reviewsSection');
+
+            if (reviewsSection) {
+                // Scroll to reviews section immediately
+                // Wait a bit for the tab to switch
+                setTimeout(() => {
+                    reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 200);
+            }
+
+            if (btnWriteReview) {
+                // Open modal after a short delay to allow scrolling
+                setTimeout(() => {
+                    btnWriteReview.click();
+                }, 1000);
+            }
+        }
+
         // Không gọi initReviewForm ở đây vì modal chưa được render
         // Sẽ gọi khi modal được mở
-        
+
         // Force resize images on load
         setTimeout(() => {
             try {
@@ -1780,13 +1838,55 @@
                 console.warn('Error resizing images on load:', e);
             }
         }, 500);
+
+        // Rating Text Logic - Lung Linh
+        const ratingInputs = document.querySelectorAll('input[name="rating"]');
+        const ratingText = document.getElementById('ratingText');
+        const ratingLabels = {
+            1: 'Tệ',
+            2: 'Không hài lòng',
+            3: 'Bình thường',
+            4: 'Hài lòng',
+            5: 'Tuyệt vời'
+        };
+
+        if (ratingInputs.length > 0 && ratingText) {
+            ratingInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const val = this.value;
+                    if (ratingLabels[val]) {
+                        ratingText.textContent = ratingLabels[val];
+                        ratingText.classList.add('highlight');
+
+                        // Add sparkle effect class to wrapper if desired, but CSS handles it nicely
+                    }
+                });
+
+                // Hover effects
+                const label = document.querySelector(`label[for="${input.id}"]`);
+                if (label) {
+                    label.addEventListener('mouseenter', () => {
+                        ratingText.textContent = ratingLabels[input.value];
+                    });
+                    label.addEventListener('mouseleave', () => {
+                        const checked = document.querySelector('input[name="rating"]:checked');
+                        if (checked) {
+                            ratingText.textContent = ratingLabels[checked.value];
+                        } else {
+                            ratingText.textContent = 'Chọn số sao từ 1 đến 5';
+                            ratingText.classList.remove('highlight');
+                        }
+                    });
+                }
+            });
+        }
     });
 
     // Stop checker khi page unload
     window.addEventListener('beforeunload', function() {
         stopUpdateChecker();
     });
-    
+
     // Observer để resize images khi có thay đổi
     if (typeof MutationObserver !== 'undefined') {
         const observer = new MutationObserver(function(mutations) {
@@ -1796,7 +1896,7 @@
                 console.warn('Error resizing images in observer:', e);
             }
         });
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             const reviewsList = document.getElementById('reviews-list');
             if (reviewsList) {
@@ -1813,7 +1913,7 @@
         currentPage = page;
         const reviewsList = document.getElementById('reviews-list');
         const pagination = document.getElementById('reviews-pagination');
-        
+
         if (!append) {
             reviewsList.innerHTML = `
                 <div class="reviews-loading">
@@ -1870,7 +1970,7 @@
                     console.error('reviews-list element not found');
                     return;
                 }
-                
+
                 if (data.status === 'success') {
                     try {
                         if (append) {
@@ -1885,33 +1985,33 @@
                             // Normal mode - replace all
                             renderReviews(data.data.reviews || []);
                         }
-                        
+
                         if (data.data && data.data.pagination) {
                             renderPagination(data.data.pagination);
                         }
-                        
+
                         if (!append && data.data) {
                             updateSummary(data.data);
-                            
+
                             // Scroll to reviews section (only if not silent)
                             if (!silent) {
                                 const reviewsSection = document.getElementById('reviewsSection');
                                 if (reviewsSection && page === 1) {
-                                    reviewsSection.scrollIntoView({ 
+                                    reviewsSection.scrollIntoView({
                                         behavior: 'smooth',
                                         block: 'start'
                                     });
                                 }
                             }
                         }
-                        
+
                         // Re-enable load more button
                         const loadMoreBtn = document.querySelector('.btn-load-more');
                         if (loadMoreBtn) {
                             loadMoreBtn.disabled = false;
                             loadMoreBtn.innerHTML = '<i class="bi bi-arrow-down me-1"></i>Tải thêm đánh giá';
                         }
-                        
+
                         // Force resize images to 90px
                         setTimeout(() => {
                             try {
@@ -1973,7 +2073,7 @@
             if (review.images && Array.isArray(review.images) && review.images.length > 0) {
                 // Lọc bỏ các image rỗng hoặc null
                 const validImages = review.images.filter(img => img && img.trim() !== '');
-                
+
                 if (validImages.length > 0) {
                     imagesHtml = '<div class="review-images-grid">';
                     validImages.forEach((img, index) => {
@@ -1982,8 +2082,8 @@
                         imagesHtml += `
                         <div class="review-image-item" onclick="openReviewLightbox('${safeImg}', ${index})" aria-label="Xem ảnh đánh giá" role="button">
                             <div class="image-wrapper">
-                                <img src="${safeImg}" 
-                                     alt="Review image ${index + 1}" 
+                                <img src="${safeImg}"
+                                     alt="Review image ${index + 1}"
                                      loading="lazy"
                                      onerror="handleImageError(this, '${safeImg}');">
                             </div>
@@ -2030,10 +2130,10 @@
             const isVerified = review.is_verified_buyer || false;
             const helpfulCount = review.helpful_count || 0;
             const isHelpful = review.is_helpful || false;
-            
+
             // Determine button classes based on helpful status
-            const helpfulButtonClass = isHelpful 
-                ? 'btn btn-sm btn-primary btn-helpful' 
+            const helpfulButtonClass = isHelpful
+                ? 'btn btn-sm btn-primary btn-helpful'
                 : 'btn btn-sm btn-outline-primary btn-helpful';
 
             html += `
@@ -2085,11 +2185,11 @@
         try {
             const imageWrappers = document.querySelectorAll('.review-image-item .image-wrapper');
             const images = document.querySelectorAll('.review-image-item img');
-            
+
             if (imageWrappers.length === 0 && images.length === 0) {
                 return; // No images to resize
             }
-            
+
             imageWrappers.forEach(wrapper => {
                 if (wrapper) {
                     wrapper.style.width = '90px';
@@ -2100,7 +2200,7 @@
                     wrapper.style.maxHeight = '90px';
                 }
             });
-            
+
             images.forEach(img => {
                 if (img) {
                     img.style.width = '90px';
@@ -2120,12 +2220,12 @@
     // Render reviews
     function renderReviews(reviews) {
         const reviewsList = document.getElementById('reviews-list');
-        
+
         if (!reviewsList) {
             console.error('reviews-list element not found');
             return;
         }
-        
+
         if (!reviews || reviews.length === 0) {
             reviewsList.innerHTML = `
                 <div class="empty-reviews">
@@ -2140,7 +2240,7 @@
             // Add fade-in animation
             reviewsList.style.opacity = '0';
             reviewsList.innerHTML = renderReviewsHTML(reviews);
-            
+
             // Force resize images to 90px
             setTimeout(() => {
                 try {
@@ -2149,7 +2249,7 @@
                     console.warn('Error resizing images:', e);
                 }
             }, 100);
-            
+
             // Trigger animation
             setTimeout(() => {
                 reviewsList.style.transition = 'opacity 0.3s ease-in';
@@ -2189,16 +2289,16 @@
     // Render pagination
     function renderPagination(pagination) {
         const paginationEl = document.getElementById('reviews-pagination');
-        
+
         if (pagination.last_page <= 1) {
             paginationEl.classList.add('d-none');
             return;
         }
 
         paginationEl.classList.remove('d-none');
-        
+
         let html = '<nav><ul class="pagination justify-content-center">';
-        
+
         // Previous button
         if (pagination.current_page > 1) {
             html += `
@@ -2248,7 +2348,7 @@
         btn.addEventListener('click', function() {
             document.querySelectorAll('.review-filter').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            
+
             // Reset về all rating và empty filter khi chọn sort
             const sortValue = this.dataset.sort;
             if (sortValue) {
@@ -2265,7 +2365,7 @@
                     currentSort = 'newest';
                 }
             }
-            
+
             loadReviews(1);
         });
     });
@@ -2274,14 +2374,14 @@
     document.getElementById('btnWriteReview')?.addEventListener('click', function() {
         const modalElement = document.getElementById('writeReviewModal');
         if (!modalElement) return;
-        
+
         const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        
+
         // Khởi tạo form khi modal được mở (nếu chưa khởi tạo)
         modalElement.addEventListener('shown.bs.modal', function() {
             initReviewForm();
         }, { once: true });
-        
+
         modal.show();
     });
 
@@ -2305,21 +2405,21 @@
         // Character count with progress bar and validation
         const charCountBar = document.getElementById('charCountBar');
         const minCharWarning = document.getElementById('minCharWarning');
-        
+
         if (textarea && charCount) {
             textarea.addEventListener('input', function() {
                 const length = this.value.length;
                 const maxLength = 1000;
                 const minLength = 20;
-                
+
                 // Update count
                 charCount.textContent = length;
-                
+
                 // Update progress bar
                 if (charCountBar) {
                     const percentage = Math.min((length / maxLength) * 100, 100);
                     charCountBar.style.width = percentage + '%';
-                    
+
                     // Change color based on percentage
                     if (percentage >= 90) {
                         charCountBar.style.background = 'linear-gradient(90deg, #dc3545 0%, #c82333 100%)';
@@ -2331,7 +2431,7 @@
                         charCountBar.style.background = 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)';
                     }
                 }
-                
+
                 // Show/hide min character warning
                 if (minCharWarning) {
                     if (length > 0 && length < minLength) {
@@ -2348,7 +2448,7 @@
                         }
                     }
                 }
-                
+
                 // Update textarea border color
                 if (length >= minLength && length <= maxLength) {
                     textarea.classList.remove('is-invalid');
@@ -2361,11 +2461,11 @@
                 }
             });
         }
-        
+
         // Rating text update
         const ratingText = document.getElementById('ratingText');
         const ratingInputs = form.querySelectorAll('input[name="rating"]');
-        
+
         if (ratingInputs && ratingText) {
             ratingInputs.forEach(input => {
                 input.addEventListener('change', function() {
@@ -2428,19 +2528,19 @@
             // Lấy lại các element mỗi lần để đảm bảo chúng tồn tại
             const previewContainer = document.getElementById('previewContainer');
             const imagePreview = document.getElementById('imagePreview');
-            
+
             if (!previewContainer || !imagePreview) {
                 console.error('Preview container không tìm thấy. previewContainer:', previewContainer, 'imagePreview:', imagePreview);
                 alert('Không thể hiển thị preview ảnh. Vui lòng thử lại.');
                 return;
             }
-            
+
             console.log('Handling image files:', files.length, 'files');
 
             const maxImages = parseInt(imageInput.dataset.max) || 5;
             const maxSize = 2 * 1024 * 1024; // 2MB
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            
+
             let validFiles = [];
             let currentCount = previewContainer.children.length;
 
@@ -2490,7 +2590,7 @@
                         </div>
                     `;
                     previewContainer.appendChild(div);
-                    
+
                     // Force resize immediately and after append
                     const img = div.querySelector('img');
                     const previewItem = div.querySelector('.preview-item');
@@ -2500,19 +2600,19 @@
                     if (previewItem) {
                         previewItem.setAttribute('style', 'width: 50px !important; height: 50px !important; min-width: 50px !important; min-height: 50px !important; max-width: 50px !important; max-height: 50px !important; flex-shrink: 0 !important; flex-grow: 0 !important; position: relative; border-radius: 10px; overflow: hidden;');
                     }
-                    
+
                     // Force resize after append
                     setTimeout(() => {
                         forceResizePreviewImages();
                     }, 10);
                     imagePreview.classList.remove('d-none');
-                    
+
                     // Update image count
                     const imageCount = document.getElementById('imageCount');
                     if (imageCount) {
                         imageCount.textContent = previewContainer.children.length;
                     }
-                    
+
                     console.log('Preview added. Total previews:', previewContainer.children.length);
                 };
                 reader.onerror = function(error) {
@@ -2549,7 +2649,7 @@
                 } else {
                 alert('Vui lòng chọn đánh giá sao');
                 }
-                
+
                 // Highlight rating input
                 ratingInputs.forEach(input => {
                     input.closest('.rating-input-wrapper')?.classList.add('is-invalid');
@@ -2574,7 +2674,7 @@
                 } else {
                 alert('Vui lòng viết tối thiểu 20 ký tự');
                 }
-                
+
                 // Highlight textarea
                 if (textarea) {
                     textarea.classList.add('is-invalid');
@@ -2596,7 +2696,7 @@
             }
 
             const formData = new FormData(form);
-            
+
             fetch(reviewStoreUrl, {
                 method: 'POST',
                 headers: {
@@ -2615,7 +2715,7 @@
             .then(data => {
                 if (data.status === 'success') {
                     const modal = bootstrap.Modal.getInstance(document.getElementById('writeReviewModal'));
-                    
+
                     // Show success message
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
@@ -2632,10 +2732,10 @@
                         alert(data.message || 'Cảm ơn bạn đã đánh giá!');
                         if (modal) modal.hide();
                     }
-                    
+
                     // Reset form
                     resetReviewForm();
-                    
+
                     // Reload reviews after a delay
                     setTimeout(() => {
                         loadReviews(1);
@@ -2646,7 +2746,7 @@
             })
             .catch(err => {
                 console.error('Error submitting review:', err);
-                
+
                 // Show error message
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
@@ -2667,21 +2767,21 @@
                 }
             });
         });
-        
+
         // Reset review form function
         function resetReviewForm() {
             const form = document.getElementById('review-form');
             if (!form) return;
-            
+
             form.reset();
-            
+
             // Reset rating
             const ratingInputs = form.querySelectorAll('input[name="rating"]');
             ratingInputs.forEach(input => {
                 input.checked = false;
                 input.closest('.rating-input-wrapper')?.classList.remove('is-invalid');
             });
-            
+
             // Reset rating text
             const ratingText = document.getElementById('ratingText');
             if (ratingText) {
@@ -2689,29 +2789,29 @@
                 ratingText.style.color = '';
                 ratingText.style.fontWeight = '';
             }
-            
+
             // Reset textarea
             const textarea = form.querySelector('textarea[name="comment"]');
             if (textarea) {
                 textarea.value = '';
                 textarea.classList.remove('is-valid', 'is-invalid');
             }
-            
+
             // Reset character count
             const charCount = document.getElementById('charCount');
             const charCountBar = document.getElementById('charCountBar');
             const minCharWarning = document.getElementById('minCharWarning');
-            
+
             if (charCount) charCount.textContent = '0';
             if (charCountBar) charCountBar.style.width = '0%';
             if (minCharWarning) minCharWarning.style.display = 'none';
-            
+
             // Reset images
             const previewContainer = document.getElementById('previewContainer');
             const imagePreview = document.getElementById('imagePreview');
             const imageInput = document.getElementById('reviewImages');
             const imageCount = document.getElementById('imageCount');
-            
+
             if (previewContainer) previewContainer.innerHTML = '';
             if (imagePreview) imagePreview.classList.add('d-none');
             if (imageInput) imageInput.value = '';
@@ -2724,11 +2824,11 @@
         btn.closest('div').remove();
         const previewContainer = document.getElementById('previewContainer');
         const imageCount = document.getElementById('imageCount');
-        
+
         if (imageCount) {
             imageCount.textContent = previewContainer ? previewContainer.children.length : 0;
         }
-        
+
         if (previewContainer && previewContainer.children.length === 0) {
             document.getElementById('imagePreview').classList.add('d-none');
         }
@@ -2740,19 +2840,19 @@
         const imagePreview = document.getElementById('imagePreview');
         const imageInput = document.getElementById('reviewImages');
         const imageCount = document.getElementById('imageCount');
-        
+
         if (previewContainer) {
             previewContainer.innerHTML = '';
         }
-        
+
         if (imagePreview) {
             imagePreview.classList.add('d-none');
         }
-        
+
         if (imageInput) {
             imageInput.value = '';
         }
-        
+
         if (imageCount) {
             imageCount.textContent = '0';
         }
@@ -2764,19 +2864,19 @@
         const imagePreview = document.getElementById('imagePreview');
         const imageInput = document.getElementById('reviewImages');
         const imageCount = document.getElementById('imageCount');
-        
+
         if (previewContainer) {
             previewContainer.innerHTML = '';
         }
-        
+
         if (imagePreview) {
             imagePreview.classList.add('d-none');
         }
-        
+
         if (imageInput) {
             imageInput.value = '';
         }
-        
+
         if (imageCount) {
             imageCount.textContent = '0';
         }
@@ -2787,7 +2887,7 @@
         // Disable button during request to prevent double clicks
         const originalDisabled = button.disabled;
         button.disabled = true;
-        
+
         fetch(`/reviews/${reviewId}/helpful`, {
             method: 'POST',
             headers: {
@@ -2803,7 +2903,7 @@
                 const icon = button.querySelector('i');
                 const textSpan = button.querySelector('.helpful-text');
                 const countSpan = button.querySelector('.helpful-count');
-                
+
                 if (isHelpful) {
                     // User just liked - show active state
                 button.classList.add('btn-primary');
@@ -2827,18 +2927,18 @@
                         textSpan.textContent = 'Hữu ích';
                     }
                 }
-                
+
                 // Update count
                 if (countSpan) {
                     countSpan.textContent = `(${data.helpful_count || 0})`;
                 }
-                
+
                 // Show toast notification
                 showToast(data.message, 'success');
             } else {
                 // Re-enable button on error
                 button.disabled = originalDisabled;
-                
+
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'error',
@@ -2960,7 +3060,7 @@
     // Share review
     function shareReview(reviewId) {
         const url = `${window.location.origin}${window.location.pathname}#review-${reviewId}`;
-        
+
         // Try native share API first (mobile/desktop with share support)
         if (navigator.share) {
             navigator.share({
@@ -2984,7 +3084,7 @@
             copyToClipboard(url);
         }
     }
-    
+
     // Helper function to copy to clipboard
     function copyToClipboard(text) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -3002,7 +3102,7 @@
             fallbackCopyToClipboard(text);
         }
     }
-    
+
     // Fallback copy method for older browsers
     function fallbackCopyToClipboard(text) {
         const textArea = document.createElement('textarea');
@@ -3013,7 +3113,7 @@
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
             const successful = document.execCommand('copy');
             if (successful) {
@@ -3068,7 +3168,7 @@
                         forceResizePreviewImages();
                     }, 100);
                 });
-                
+
                 // Add MutationObserver to auto-resize when preview container changes
                 const previewContainer = document.getElementById('previewContainer');
                 if (previewContainer) {
@@ -3081,7 +3181,7 @@
                             }
                         });
                     });
-                    
+
                     observer.observe(previewContainer, {
                         childList: true,
                         subtree: true
@@ -3095,9 +3195,9 @@
     function simulateUploadProgress() {
         const progressBar = document.querySelector('#uploadProgress .progress-bar');
         const progressContainer = document.getElementById('uploadProgress');
-        
+
         if (!progressBar || !progressContainer) return;
-        
+
         progressContainer.style.display = 'block';
         let progress = 0;
         const interval = setInterval(() => {
@@ -3117,7 +3217,7 @@
     function handleImageError(imgElement, originalSrc) {
         console.warn('Image failed to load:', originalSrc);
         console.warn('Image element:', imgElement);
-        
+
         // Thử lại với URL khác nếu có thể
         if (originalSrc && originalSrc.includes('/storage/')) {
             // Thử với base URL khác hoặc retry
@@ -3128,26 +3228,26 @@
                 return;
             }
         }
-        
+
         imgElement.onerror = null; // Prevent infinite loop
         // Hiển thị placeholder nhưng vẫn giữ URL gốc để user có thể thấy
         imgElement.classList.add('image-error');
         imgElement.style.objectFit = 'contain';
         imgElement.style.backgroundColor = '#f8f9fa';
         imgElement.alt = 'Hình ảnh không tải được: ' + originalSrc;
-        
+
         // Thêm tooltip để user biết URL
         imgElement.title = 'Không thể tải hình ảnh. URL: ' + originalSrc;
     }
-    
+
     // Open lightbox with image gallery (reviews only, tách biệt với lightbox sản phẩm)
     let currentImageIndex = 0;
     let currentImageList = [];
-    
+
     function openReviewLightbox(imageSrc, index = 0) {
         const lightbox = document.getElementById('reviewImageLightbox');
         const lightboxImage = document.getElementById('lightboxImage');
-        
+
         // Lấy tất cả images từ review hiện tại
         const reviewItem = event.target.closest('.review-item');
         if (reviewItem) {
@@ -3161,20 +3261,20 @@
             currentImageList = [imageSrc];
             currentImageIndex = 0;
         }
-        
+
         // Hiển thị image
         showLightboxImage(currentImageIndex);
-        
+
         const modal = new bootstrap.Modal(lightbox);
         modal.show();
     }
-    
+
     function showLightboxImage(index) {
         if (currentImageList.length === 0) return;
-        
+
         const lightboxImage = document.getElementById('lightboxImage');
         const imageSrc = currentImageList[index];
-        
+
         // Show loading
         lightboxImage.style.opacity = '0.5';
         lightboxImage.onload = function() {
@@ -3184,33 +3284,33 @@
             this.src = '/images/placeholder.jpg';
             this.style.opacity = '1';
         };
-        
+
         // Convert relative path to full URL if needed
         if (!imageSrc.startsWith('http') && !imageSrc.startsWith('/')) {
             lightboxImage.src = '/' + imageSrc;
         } else {
             lightboxImage.src = imageSrc;
         }
-        
+
         // Update navigation buttons
         updateLightboxNavigation();
     }
-    
+
     function updateLightboxNavigation() {
         const prevBtn = document.getElementById('lightboxPrev');
         const nextBtn = document.getElementById('lightboxNext');
         const counter = document.getElementById('lightboxCounter');
-        
+
         if (prevBtn) {
             prevBtn.style.display = currentImageList.length > 1 ? 'block' : 'none';
             prevBtn.disabled = currentImageIndex === 0;
         }
-        
+
         if (nextBtn) {
             nextBtn.style.display = currentImageList.length > 1 ? 'block' : 'none';
             nextBtn.disabled = currentImageIndex === currentImageList.length - 1;
         }
-        
+
         if (counter && currentImageList.length > 1) {
             counter.textContent = `${currentImageIndex + 1} / ${currentImageList.length}`;
             counter.style.display = 'block';
@@ -3218,21 +3318,21 @@
             counter.style.display = 'none';
         }
     }
-    
+
     function lightboxPrev() {
         if (currentImageIndex > 0) {
             currentImageIndex--;
             showLightboxImage(currentImageIndex);
         }
     }
-    
+
     function lightboxNext() {
         if (currentImageIndex < currentImageList.length - 1) {
             currentImageIndex++;
             showLightboxImage(currentImageIndex);
         }
     }
-    
+
     // Keyboard navigation
     document.addEventListener('keydown', function(e) {
         const lightbox = document.getElementById('reviewImageLightbox');
