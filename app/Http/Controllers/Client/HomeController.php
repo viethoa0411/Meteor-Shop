@@ -18,7 +18,7 @@ class HomeController extends Controller
         // lấy 4 sp mới nhât(theo ngày tạo)
         $newProducts = Product::query()
             ->select(['id', 'name',  'slug', 'price', 'image', 'status', 'created_at'])
-            ->where('status', 1) // chỉ lấy sản phẩm đang active
+            ->where('status', 'active') // chỉ lấy sản phẩm đang active
             ->where(function ($query) {
                 $query->where('stock', '>', 0)
                     ->orWhereHas('variants', function ($q) {
@@ -31,7 +31,7 @@ class HomeController extends Controller
 
         $outstandingProducts = Product::query()
             ->select(['id', 'name', 'slug', 'stock', 'price', 'image', 'status', 'created_at'])
-            ->where('status', 1)
+            ->where('status', 'active')
             ->where(function ($query) {
                 $query->where('stock', '>', 0)
                     ->orWhereHas('variants', function ($q) {
@@ -45,7 +45,7 @@ class HomeController extends Controller
         // Dùng cho menu/header
         $cate = Category::query()
             ->select(['id', 'name', 'slug', 'description', 'parent_id', 'status', 'image'])
-            ->where('status', 1)
+            ->where('status', 'active')
             ->get();
 
         // Dùng riêng cho block "danh mục theo đồ" trên trang home
