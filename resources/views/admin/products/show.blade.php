@@ -100,67 +100,6 @@
 
             {{-- RIGHT: Thông tin --}}
             <div class="col-12 col-lg-7 col-xl-8 col-right-60">
-                
-                {{-- Thống kê: Đã bán - Doanh thu - Tồn kho --}}
-                <div class="row g-3 mb-3">
-                    {{-- Đã bán --}}
-                    <div class="col-md-4">
-                        <div class="card shadow-sm border-0 h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0 me-3">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                                            <i class="bi bi-cart-check fs-4"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="text-muted small fw-semibold text-uppercase">Đã bán</div>
-                                        <h4 class="mb-0 fw-bold">{{ number_format($soldQuantity) }}</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {{-- Doanh thu --}}
-                    <div class="col-md-4">
-                        <div class="card shadow-sm border-0 h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0 me-3">
-                                        <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                                            <i class="bi bi-currency-dollar fs-4"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="text-muted small fw-semibold text-uppercase">Doanh thu</div>
-                                        <h4 class="mb-0 fw-bold text-success">{{ number_format($revenue, 0, ',', '.') }} đ</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Tồn kho --}}
-                    <div class="col-md-4">
-                        <div class="card shadow-sm border-0 h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-shrink-0 me-3">
-                                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                                            <i class="bi bi-box-seam fs-4"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="text-muted small fw-semibold text-uppercase">Tồn kho</div>
-                                        <h4 class="mb-0 fw-bold">{{ number_format($totalStock) }}</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
