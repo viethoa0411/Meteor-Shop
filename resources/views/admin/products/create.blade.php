@@ -128,7 +128,7 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label>Tên màu <span class="text-danger">*</span></label>
-                                    <input type="text" id="color_name" class="form-control" placeholder="VD: Xám nhạt" required>
+                                    <input type="text" id="color_name" class="form-control" placeholder="VD: Xám nhạt">
                                 </div>
                                 <div class="col-md-6">
                                     <label>Màu (HEX) <span class="text-danger">*</span></label>
