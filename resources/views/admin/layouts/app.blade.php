@@ -1452,7 +1452,7 @@
 
                 this.state = {
                     notifications: [],
-                    unreadCount: 0,
+                    unreadCount: 0, 
                     isLoading: false,
                     lastFetchTime: null,
                     refreshInterval: null,
