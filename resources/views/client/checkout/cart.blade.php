@@ -697,29 +697,30 @@
                 const codRadio = document.getElementById('cash');
                 const momoRadio = document.getElementById('momo');
                 const codMessage = document.getElementById('cod-restriction-message');
-                const totalAmount = subtotal - currentDiscount + currentShippingFee + installationFee;
+                
+                function updatePaymentMethodDisplay(total = null) {
+                    if (!codOption || !codRadio) return;
+                    const currentTotal = typeof total === 'number' ?
+                        total :
+                        Math.max(0, subtotal - currentDiscount + currentShippingFee + installationFee);
 
-                if (codOption && codRadio && momoRadio) {
-                    if (totalAmount > COD_LIMIT) {
-                        // Ẩn COD và hiển thị thông báo
+                    if (momoRadio && currentTotal > COD_LIMIT) {
                         codOption.style.display = 'none';
                         if (codMessage) codMessage.style.display = 'block';
 
-                        // Nếu đang chọn COD, tự động chuyển sang Momo
                         if (codRadio.checked) {
-                            if (momoRadio) {
-                                function updatePaymentMethodDisplay() {
-                                    momoRadio.checked = true;
-                                    codRadio.required = false;
-                                }
-                            }
-                        } else {
-                            // Hiển thị COD và ẩn thông báo
-                            codOption.style.display = 'block';
-                            if (codMessage) codMessage.style.display = 'none';
-                            codRadio.required = true;
+                            momoRadio.checked = true;
+                            codRadio.required = false;
                         }
+                    } else {
+                        codOption.style.display = 'block';
+                        if (codMessage) codMessage.style.display = 'none';
+                        codRadio.required = true;
                     }
+                }
+
+                function checkPaymentMethodAvailability(total) {
+                    updatePaymentMethodDisplay(total);
                 }
 
                 function updateTotalDisplay() {
@@ -784,22 +785,28 @@
                 updateTotalDisplay();
 
                 // Xử lý khi chọn tỉnh/thành phố
-                document.getElementById('shipping_city').addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    if (selectedOption.dataset.code) {
-                        loadDistricts(selectedOption.dataset.code);
-                    }
-                    setTimeout(calculateShippingFee, 500);
-                });
+                const shippingCitySelect = document.getElementById('shipping_city');
+                if (shippingCitySelect) {
+                    shippingCitySelect.addEventListener('change', function() {
+                        const selectedOption = this.options[this.selectedIndex];
+                        if (selectedOption?.dataset?.code) {
+                            loadDistricts(selectedOption.dataset.code);
+                        }
+                        setTimeout(calculateShippingFee, 500);
+                    });
+                }
 
                 // Xử lý khi chọn quận/huyện
-                document.getElementById('shipping_district').addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    if (selectedOption.dataset.code) {
-                        loadWards(selectedOption.dataset.code);
-                    }
-                    setTimeout(calculateShippingFee, 300);
-                });
+                const shippingDistrictSelect = document.getElementById('shipping_district');
+                if (shippingDistrictSelect) {
+                    shippingDistrictSelect.addEventListener('change', function() {
+                        const selectedOption = this.options[this.selectedIndex];
+                        if (selectedOption?.dataset?.code) {
+                            loadWards(selectedOption.dataset.code);
+                        }
+                        setTimeout(calculateShippingFee, 300);
+                    });
+                }
 
                 const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
                 shippingInputs.forEach(input => {

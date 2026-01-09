@@ -159,7 +159,6 @@
                             <span>{{ number_format($order->shipping_fee ?? 0, 0, ',', '.') }} đ</span>
                         </div>
                         @if(($order->installation_fee ?? 0) > 0)
-                            <hr>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Phí lắp đặt</span>
                                 <span>{{ number_format($order->installation_fee, 0, ',', '.') }} đ</span>
