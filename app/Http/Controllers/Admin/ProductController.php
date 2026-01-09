@@ -167,7 +167,7 @@ class ProductController extends Controller
         // Tính toán thống kê
         $query = $product->orderDetails()
             ->join('orders', 'order_details.order_id', '=', 'orders.id')
-            ->whereNotIn('orders.status', ['cancelled', 'returned']);
+            ->whereNotIn('orders.order_status', ['cancelled', 'returned']);
 
         $soldQuantity = (clone $query)->sum('order_details.quantity');
         $revenue = (clone $query)->sum('order_details.subtotal');
@@ -194,30 +194,32 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-          $product = Product::with('variants')->findOrFail($id);
-        $hasOrders = $product->hasOrders();
+        $product = Product::with('variants', 'images')->findOrFail($id);
 
-        // Kiểm tra nếu sản phẩm có đơn hàng
-        if ($hasOrders) {
-            // Không cho phép thay đổi tên sản phẩm và danh mục
-            $request->validate([
-                'price' => 'required|numeric|min:0',
-                'description' => 'nullable|string',
-                'status' => 'required|in:active,inactive',
-                'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-                'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            ]);
-        } else {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'price' => 'required|numeric|min:0',
-                'category_id' => 'required|exists:categories,id',
-                'description' => 'nullable|string',
-                'status' => 'required|in:active,inactive',
-                'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-                'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            ]);
+        // Clean price inputs (remove dots)
+        $request->merge([
+            'price' => str_replace('.', '', $request->price),
+        ]);
+
+        if ($request->has('variants')) {
+            $variants = $request->variants;
+            foreach ($variants as $key => $variant) {
+                if (isset($variant['price'])) {
+                    $variants[$key]['price'] = str_replace('.', '', $variant['price']);
+                }
+            }
+            $request->merge(['variants' => $variants]);
         }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'description' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+        ]);
 
 
         // Validate biến thể
@@ -225,9 +227,9 @@ class ProductController extends Controller
             'variants.*.color_name' => 'required|string|max:50',
             'variants.*.color_code' => 'required|string|max:20',
             'variants.*.stock' => 'required|numeric|min:0',
-            'variants.*.length' => $hasOrders ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
-            'variants.*.width' => $hasOrders ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
-            'variants.*.height' => $hasOrders ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
+            'variants.*.length' => 'required|numeric|min:0',
+            'variants.*.width' => 'required|numeric|min:0',
+            'variants.*.height' => 'required|numeric|min:0',
             'variants.*.weight' => 'nullable|numeric|min:0',
             'variants.*.weight_unit' => 'nullable|in:g,kg,lb',
         ], [
@@ -240,9 +242,9 @@ class ProductController extends Controller
             'variants.*.weight.required' => 'Vui lòng nhập cân nặng cho biến thể.',
         ]);
 
-        // Xử lý ảnh đại diện - không cho phép thay đổi nếu có đơn hàng
+        // Xử lý ảnh đại diện
         $imagePath = $product->image;
-        if ($request->hasFile('image') && !$hasOrders) {
+        if ($request->hasFile('image') && !$product->hasOrders()) {
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
@@ -250,18 +252,26 @@ class ProductController extends Controller
         $oldStock = $product->stock;
 
         // Cập nhật thông tin sản phẩm
-        $updateData = [
-            'price' => $request->price,
-            'stock' => $request->stock ?? $product->stock,
-            'description' => $request->description,
-            'status' => $request->status,
-            'image' => $imagePath,
-        ];
-
-        // Chỉ cho phép thay đổi tên và danh mục nếu chưa có đơn hàng
-        if (!$hasOrders) {
-            $updateData['name'] = $request->name;
-            $updateData['category_id'] = $request->category_id;
+        if ($product->hasOrders()) {
+            $updateData = [
+                'name' => $product->name,
+                'category_id' => $product->category_id,
+                'price' => $request->price,
+                'stock' => $request->stock ?? $product->stock,
+                'description' => $request->description,
+                'status' => $request->status,
+                'image' => $product->image,
+            ];
+        } else {
+            $updateData = [
+                'name' => $request->name,
+                'category_id' => $request->category_id,
+                'price' => $request->price,
+                'stock' => $request->stock ?? $product->stock,
+                'description' => $request->description,
+                'status' => $request->status,
+                'image' => $imagePath,
+            ];
         }
 
         $product->update($updateData);
@@ -291,8 +301,8 @@ class ProductController extends Controller
             }
         }
 
-        // Xử lý upload ảnh phụ (nếu có) - không cho phép thay đổi nếu có đơn hàng
-        if ($request->hasFile('images') && !$hasOrders) {
+        // Xử lý upload ảnh phụ (nếu có)
+        if ($request->hasFile('images') && !$product->hasOrders()) {
 
 
 
@@ -329,17 +339,36 @@ class ProductController extends Controller
 
                 if ($variant) {
                     $oldVariantStock = $variant->stock;
-                    $variant->update([
-                        'product_version' => $version,
-                        'color_name' => $v['color_name'],
-                        'color_code' => $v['color_code'],
-                        'length'     => $v['length'] ?? null,
-                        'width'      => $v['width'] ?? null,
-                        'height'     => $v['height'] ?? null,
-                        'weight'     => $v['weight'] ?? 0,
-                        'stock'      => $v['stock'] ?? 0,
-                        'price'      => $v['price'] ?? $product->price,
-                    ]);
+
+                    if ($variant->hasOrders()) {
+                        $variantData = [
+                            'product_version' => $version,
+                            'color_name' => $variant->color_name,
+                            'color_code' => $variant->color_code,
+                            'length'     => $variant->length,
+                            'width'      => $variant->width,
+                            'height'     => $variant->height,
+                            'weight'     => $variant->weight,
+                            'weight_unit' => $variant->weight_unit,
+                            'stock'      => $v['stock'] ?? 0,
+                            'price'      => $v['price'] ?? $product->price,
+                        ];
+                    } else {
+                        $variantData = [
+                            'product_version' => $version,
+                            'color_name' => $v['color_name'],
+                            'color_code' => $v['color_code'],
+                            'length'     => $v['length'] ?? null,
+                            'width'      => $v['width'] ?? null,
+                            'height'     => $v['height'] ?? null,
+                            'weight'     => $v['weight'] ?? 0,
+                            'weight_unit' => $v['weight_unit'] ?? 'kg',
+                            'stock'      => $v['stock'] ?? 0,
+                            'price'      => $v['price'] ?? $product->price,
+                        ];
+                    }
+
+                    $variant->update($variantData);
 
                     // Kiểm tra stock của variant sau khi update
                     $newVariantStock = $variant->fresh()->stock;
@@ -377,9 +406,8 @@ class ProductController extends Controller
                 continue;
                 }
 
-                   // Tạo biến thể mới - chỉ cho phép nếu chưa có đơn hàng
-                if (!$hasOrders) {
-                        $product->variants()->create([
+                   // Tạo biến thể mới
+                        $createdVariant = $product->variants()->create([
 
                         'product_id'      => $product->id,
                         'product_version' => $version,
@@ -391,40 +419,39 @@ class ProductController extends Controller
                         'weight'          => $v['weight'] ?? 0,
                         'stock'           => $v['stock'] ?? 0,
                         'price'           => $v['price'] ?? $product->price,
-                        'weight'          => $v['weight'] ?? null,
                         'weight_unit'     => $v['weight_unit'] ?? 'kg',
                     ]);
 
                     // Kiểm tra stock của variant
-                    if ($variant->stock == 0) {
+                    if ($createdVariant->stock == 0) {
                         try {
                             NotificationService::createForAdmins([
                                 'type' => 'product',
                                 'level' => 'danger',
                                 'title' => 'Biến thể hết hàng',
-                                'message' => $product->name . ' - ' . ($variant->color_name ?? 'Biến thể') . ' đã hết hàng',
+                                'message' => $product->name . ' - ' . ($createdVariant->color_name ?? 'Biến thể') . ' đã hết hàng',
                                 'url' => route('admin.products.show', $product->id),
-                                'metadata' => ['product_id' => $product->id, 'variant_id' => $variant->id, 'stock' => 0]
+                                'metadata' => ['product_id' => $product->id, 'variant_id' => $createdVariant->id, 'stock' => 0]
                             ]);
                         } catch (\Exception $e) {
                             Log::error('Error creating variant out of stock notification: ' . $e->getMessage());
                         }
-                    } elseif ($variant->stock > 0 && $variant->stock <= 10) {
+                    } elseif ($createdVariant->stock > 0 && $createdVariant->stock <= 10) {
                         try {
                             NotificationService::createForAdmins([
                                 'type' => 'product',
                                 'level' => 'warning',
                                 'title' => 'Biến thể sắp hết hàng',
-                                'message' => $product->name . ' - ' . ($variant->color_name ?? 'Biến thể') . ' chỉ còn ' . $variant->stock . ' sản phẩm',
+                                'message' => $product->name . ' - ' . ($createdVariant->color_name ?? 'Biến thể') . ' chỉ còn ' . $createdVariant->stock . ' sản phẩm',
                                 'url' => route('admin.products.show', $product->id),
-                                'metadata' => ['product_id' => $product->id, 'variant_id' => $variant->id, 'stock' => $variant->stock]
+                                'metadata' => ['product_id' => $product->id, 'variant_id' => $createdVariant->id, 'stock' => $createdVariant->stock]
                             ]);
                         } catch (\Exception $e) {
                             Log::error('Error creating variant low stock notification: ' . $e->getMessage());
                         }
                     }
                 }
-                }
+
         return redirect()->route('admin.products.list')->with('success', 'Cập nhật sản phẩm thành công!');
     }
 
