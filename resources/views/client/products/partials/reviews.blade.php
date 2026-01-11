@@ -12,7 +12,7 @@
                     ->exists();
             @endphp
             @if($userHasPurchased)
-                <button type="button" class="btn btn-primary shadow-sm" id="btnWriteReview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; transition: all 0.3s ease;">
+                <button type="button" class="btn btn-orange-theme shadow-sm" id="btnWriteReview" style="border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; transition: all 0.3s ease;">
                     <i class="bi bi-plus-circle me-1"></i>
                     Viết đánh giá của bạn
                 </button>
@@ -149,9 +149,9 @@
             <div class="modal fade" id="writeReviewModal" tabindex="-1" aria-hidden="true" aria-labelledby="writeReviewModalLabel">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content review-form-modal">
-                        <div class="modal-header bg-primary text-white">
+                        <div class="modal-header bg-gradient-orange text-white">
                             <h5 class="modal-title">
-                                <i class="bi bi-star-fill me-2"></i>
+                                <i class="bi bi-star-fill text-white me-2"></i>
                                 Viết đánh giá của bạn
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -160,7 +160,7 @@
                             <div class="modal-body">
                                 <div class="mb-4">
                                     <label class="form-label fw-semibold mb-3">
-                                        <i class="bi bi-star-fill text-warning me-2"></i>
+                                        <i class="bi bi-star-fill text-orange-theme me-2"></i>
                                         Đánh giá của bạn <span class="text-danger">*</span>
                                     </label>
                                     <div class="rating-input-wrapper">
@@ -182,7 +182,7 @@
 
                                 <div class="mb-4">
                                     <label class="form-label fw-semibold mb-2">
-                                        <i class="bi bi-chat-left-text me-2 text-primary"></i>
+                                        <i class="bi bi-chat-left-text me-2 text-warning"></i>
                                         Nhận xét <span class="text-danger">*</span>
                                     </label>
                                     <div class="textarea-wrapper">
@@ -217,9 +217,9 @@
                                 @if($allowImages)
                                     <div class="mb-4">
                                         <label class="form-label fw-semibold mb-3 d-flex align-items-center">
-                                            <i class="bi bi-images me-2 text-primary"></i>
+                                            <i class="bi bi-images me-2 text-warning"></i>
                                             Hình ảnh
-                                            <span class="badge bg-primary ms-2">{{ $maxImages }} ảnh tối đa</span>
+                                            <span class="badge bg-dark ms-2">{{ $maxImages }} ảnh tối đa</span>
                                         </label>
                                         <div class="upload-area" id="uploadArea">
                                             <input type="file" name="images[]" id="reviewImages"
@@ -287,8 +287,8 @@
                                     <button type="button" class="btn btn-light btn-action" data-bs-dismiss="modal">
                                         <i class="bi bi-x-lg me-1"></i>
                                         Hủy
-                                </button>
-                                    <button type="submit" class="btn btn-primary btn-submit">
+                                    </button>
+                                    <button type="submit" class="btn btn-orange-theme btn-submit">
                                     <i class="bi bi-send me-1"></i>
                                     Gửi đánh giá
                                 </button>
@@ -329,6 +329,28 @@
 
 @push('head')
 <style>
+    /* Custom Orange Theme */
+    .bg-gradient-orange {
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%) !important;
+    }
+
+    .text-orange-theme {
+        color: #f97316 !important;
+    }
+
+    .btn-orange-theme {
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%) !important;
+        border: none !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3) !important;
+    }
+
+    .btn-orange-theme:hover {
+        background: linear-gradient(135deg, #ea580c 0%, #f97316 100%) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4) !important;
+    }
+
     /* ========= REVIEWS SECTION ========= */
     .reviews-section {
         padding: 3rem 0;
@@ -354,14 +376,14 @@
         color: #1a1a1a;
         line-height: 1;
         margin-bottom: 0.5rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
 
     .rating-number {
-        color: #667eea;
+        color: #212529;
         font-weight: 900;
     }
 
@@ -378,7 +400,7 @@
     }
 
     .rating-stars-large i {
-        filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.3));
+        filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.3));
     }
 
     /* Rating Bar */
@@ -399,7 +421,7 @@
 
     .rating-label::before {
         content: '★';
-        color: #ffc107;
+        color: #f97316;
         font-size: 0.85rem;
     }
 
@@ -420,10 +442,9 @@
 
     .rating-bar-fill {
         height: 100%;
-        background: linear-gradient(90deg, #ffd700 0%, #ffb347 50%, #ff8c00 100%);
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
         border-radius: 14px;
         transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
         position: relative;
         overflow: hidden;
     }
@@ -483,17 +504,17 @@
         width: 0;
         height: 0;
         border-radius: 50%;
-        background: rgba(102, 126, 234, 0.1);
+        background: rgba(33, 37, 41, 0.1);
         transform: translate(-50%, -50%);
         transition: width 0.6s, height 0.6s;
     }
 
     .btn-pill:hover {
-        border-color: #667eea;
-        color: #667eea;
-        background: #f7f9fc;
+        border-color: #212529;
+        color: #212529;
+        background: #f8f9fa;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 4px 12px rgba(33, 37, 41, 0.15);
     }
 
     .btn-pill:hover::before {
@@ -502,10 +523,10 @@
     }
 
     .btn-pill.active {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         border-color: transparent;
         color: white;
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 16px rgba(33, 37, 41, 0.3);
     }
 
     .btn-pill.active::before {
@@ -538,7 +559,7 @@
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         animation: spinner-bounce 1.4s ease-in-out infinite both;
     }
 
@@ -601,7 +622,7 @@
         left: 0;
         width: 3px;
         height: 100%;
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         transform: scaleY(0);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-radius: 0 3px 3px 0;
@@ -621,7 +642,7 @@
         width: 56px;
         height: 56px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -629,7 +650,7 @@
         font-weight: 700;
         font-size: 1.25rem;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+        box-shadow: 0 2px 8px rgba(33, 37, 41, 0.25);
         border: 2px solid #f8f9fa;
         transition: all 0.3s ease;
         position: relative;
@@ -641,7 +662,7 @@
         inset: -2px;
         border-radius: 50%;
         padding: 2px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
@@ -651,7 +672,7 @@
 
     .review-item:hover .review-avatar {
         transform: scale(1.03);
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
+        box-shadow: 0 4px 16px rgba(33, 37, 41, 0.35);
     }
 
     .review-item:hover .review-avatar::after {
@@ -668,7 +689,7 @@
     }
 
     .review-user-name:hover {
-        color: #667eea;
+        color: #212529;
     }
 
 
@@ -702,11 +723,34 @@
     }
 
     .review-rating {
-        color: #ffc107;
+        color: #fbbf24; /* Amber-400 */
         font-size: 1.1rem;
-        letter-spacing: 3px;
+        letter-spacing: 2px;
         margin: 0.5rem 0;
-        filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.3));
+    }
+
+    /* Synchronize star colors globally in reviews */
+    .text-warning {
+        color: #fbbf24 !important;
+    }
+
+    .rating-stars-large .bi-star-fill,
+    .rating-stars-large .bi-star-half {
+        color: #fbbf24 !important;
+    }
+
+    .review-filter i {
+        color: #fbbf24;
+    }
+
+    .review-filter.active {
+        background-color: #fbbf24;
+        border-color: #fbbf24;
+        color: white;
+    }
+
+    .review-filter.active i {
+        color: white;
     }
 
     .review-content {
@@ -790,7 +834,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(102, 126, 234, 0);
+        background: rgba(33, 37, 41, 0);
         transition: all 0.3s ease;
         z-index: 1;
         border-radius: 6px;
@@ -803,12 +847,12 @@
     }
 
     .review-image-item:hover .image-wrapper {
-        border-color: #667eea;
-        box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
+        border-color: #212529;
+        box-shadow: 0 1px 3px rgba(33, 37, 41, 0.3);
     }
 
     .review-image-item:hover::before {
-        background: rgba(102, 126, 234, 0.08);
+        background: rgba(33, 37, 41, 0.08);
     }
 
     .review-image-item:hover img {
@@ -893,12 +937,12 @@
 
     /* Admin Reply */
     .admin-reply {
-        background: linear-gradient(135deg, #f7f9fc 0%, #ffffff 100%);
-        border-left: 4px solid #667eea;
+        background: #f8f9fa;
+        border-left: 4px solid #212529;
         border-radius: 12px;
         padding: 1.25rem;
         margin-top: 1.5rem;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 2px 8px rgba(33, 37, 41, 0.1);
         position: relative;
     }
 
@@ -909,13 +953,13 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         border-radius: 12px 12px 0 0;
     }
 
     .admin-reply-header {
         font-weight: 700;
-        color: #667eea;
+        color: #212529;
         margin-bottom: 0.75rem;
         font-size: 0.95rem;
         display: flex;
@@ -1028,9 +1072,9 @@
         display: inline-block;
         padding: 0.25rem 1rem;
     }
-    
+
     #ratingText.highlight {
-        color: #d97706; /* Amber-600 */
+        color: #ea580c; /* Orange-600 */
         transform: scale(1.02);
     }
 
@@ -1043,7 +1087,7 @@
     }
 
     .review-form-modal .modal-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         border: none;
         padding: 1.5rem 2rem;
     }
@@ -1081,8 +1125,8 @@
     }
 
     .review-textarea:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        border-color: #212529;
+        box-shadow: 0 0 0 0.2rem rgba(33, 37, 41, 0.15);
         outline: none;
     }
 
@@ -1109,7 +1153,7 @@
 
     .char-count-bar {
         height: 100%;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         border-radius: 10px;
         transition: width 0.3s ease, background 0.3s ease;
         width: 0%;
@@ -1142,15 +1186,15 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.08), transparent);
+        background: linear-gradient(90deg, transparent, rgba(33, 37, 41, 0.08), transparent);
         transition: left 0.6s ease;
     }
 
     .upload-area:hover {
-        border-color: #667eea;
+        border-color: #212529;
         background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
         transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 10px 30px rgba(33, 37, 41, 0.15);
     }
 
     .upload-area:hover::before {
@@ -1158,10 +1202,10 @@
     }
 
     .upload-area.dragover {
-        border-color: #667eea;
+        border-color: #212529;
         background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%);
         transform: scale(1.02);
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25);
+        box-shadow: 0 15px 40px rgba(33, 37, 41, 0.25);
         border-style: solid;
     }
 
@@ -1184,7 +1228,7 @@
         transform: translate(-50%, -50%);
         width: 100px;
         height: 100px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         border-radius: 50%;
         opacity: 0.1;
         animation: pulse 2s ease-in-out infinite;
@@ -1203,11 +1247,11 @@
 
     .upload-icon {
         font-size: 3.5rem;
-        color: #667eea;
+        color: #212529;
         position: relative;
         z-index: 2;
         animation: float 3s ease-in-out infinite;
-        filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.2));
+        filter: drop-shadow(0 4px 8px rgba(33, 37, 41, 0.2));
     }
 
     @keyframes float {
@@ -1238,7 +1282,7 @@
     }
 
     .upload-link {
-        color: #667eea;
+        color: #212529;
         font-weight: 600;
         cursor: pointer;
         text-decoration: none;
@@ -1250,8 +1294,8 @@
     }
 
     .upload-link:hover {
-        color: #764ba2;
-        background: rgba(102, 126, 234, 0.1);
+        color: #212529;
+        background: rgba(33, 37, 41, 0.1);
         transform: translateY(-1px);
     }
 
@@ -1269,13 +1313,13 @@
         font-size: 0.875rem;
         color: #6b7280;
         padding: 0.375rem 0.75rem;
-        background: rgba(102, 126, 234, 0.05);
+        background: rgba(33, 37, 41, 0.05);
         border-radius: 20px;
-        border: 1px solid rgba(102, 126, 234, 0.1);
+        border: 1px solid rgba(33, 37, 41, 0.1);
     }
 
     .upload-hint-item i {
-        color: #667eea;
+        color: #212529;
     }
 
     /* Image Preview - Professional Design */
@@ -1295,7 +1339,7 @@
     }
 
     .preview-title i {
-        color: #667eea;
+        color: #212529;
     }
 
     .preview-grid {
@@ -1323,12 +1367,12 @@
     }
 
     .preview-grid::-webkit-scrollbar-thumb {
-        background: #667eea;
+        background: #212529;
         border-radius: 10px;
     }
 
     .preview-grid::-webkit-scrollbar-thumb:hover {
-        background: #764ba2;
+        background: #212529;
     }
 
     .preview-item,
@@ -1362,7 +1406,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        background: linear-gradient(135deg, rgba(33, 37, 41, 0.1) 0%, rgba(33, 37, 41, 0.1) 100%);
         opacity: 0;
         transition: opacity 0.3s ease;
         z-index: 1;
@@ -1370,8 +1414,8 @@
 
     .preview-item:hover {
         transform: scale(1.15) translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-        border-color: #667eea;
+        box-shadow: 0 6px 20px rgba(33, 37, 41, 0.3);
+        border-color: #212529;
         z-index: 10;
     }
 
@@ -1426,12 +1470,12 @@
     }
 
     #previewContainer::-webkit-scrollbar-thumb {
-        background: #667eea;
+        background: #212529;
         border-radius: 10px;
     }
 
     #previewContainer::-webkit-scrollbar-thumb:hover {
-        background: #764ba2;
+        background: #343a40;
     }
 
     .preview-remove {
@@ -1475,7 +1519,7 @@
     }
 
     .progress-modern .progress-bar {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         border-radius: 10px;
     }
 
@@ -1611,7 +1655,7 @@
 
     .review-actions .btn-helpful.active,
     .review-actions .btn-helpful.btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #212529;
         border-color: transparent;
         color: white;
     }
@@ -2052,7 +2096,7 @@
                             <i class="bi bi-exclamation-triangle"></i>
                             <p>Có lỗi xảy ra khi tải đánh giá. Vui lòng thử lại sau.</p>
                             <small class="text-muted mt-2 d-block">Lỗi: ${err.message || 'Unknown error'}</small>
-                            <button class="btn btn-sm btn-primary mt-2" onclick="loadReviews(1)">Thử lại</button>
+                            <button class="btn btn-sm btn-orange-theme mt-2" onclick="loadReviews(1)">Thử lại</button>
                         </div>
                     `;
                 }
@@ -2428,7 +2472,7 @@
                     } else if (length >= minLength) {
                         charCountBar.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
                     } else {
-                        charCountBar.style.background = 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)';
+                        charCountBar.style.background = 'linear-gradient(90deg, #212529 0%, #343a40 100%)';
                     }
                 }
 
@@ -2478,7 +2522,7 @@
                         5: '⭐⭐⭐⭐⭐ Rất hài lòng'
                     };
                     ratingText.textContent = ratingLabels[rating] || 'Chọn số sao từ 1 đến 5';
-                    ratingText.style.color = '#667eea';
+                    ratingText.style.color = '#212529';
                     ratingText.style.fontWeight = '600';
                 });
             });
