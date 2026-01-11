@@ -137,6 +137,12 @@ class CategoryController extends Controller
                 ->with('error', 'Không thể xoá danh mục vì vẫn còn danh mục con!');
         }
 
+        // Nếu danh mục có sản phẩm
+        if ($category->products()->count() > 0) {
+            return redirect()->route('admin.categories.list')
+                ->with('error', 'Không thể xoá danh mục vì vẫn còn sản phẩm!');
+        }
+
         $category->delete();
 
         return redirect()->route('admin.categories.list')
