@@ -68,6 +68,34 @@ class WishlistController extends Controller
             'message' => 'Đã thêm vào danh sách yêu thích.',
         ]);
     }
+
+    public function remove(Request $request)
+    {
+        if (! Auth::check()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Vui lòng đăng nhập.',
+                'redirect' => route('client.login'),
+            ], 401);
+        }
+
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+        ]);
+
+        $userId = Auth::id();
+        $productId = (int) $request->input('product_id');
+
+        Wishlist::where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'liked' => false,
+            'message' => 'Đã xóa khỏi danh sách yêu thích.',
+        ]);
+    }
 }
 
 

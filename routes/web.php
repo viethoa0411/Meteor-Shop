@@ -441,6 +441,7 @@ Route::post('/contact/store', [ClientContactController::class, 'store'])->name('
 // Wishlist (client)
 Route::get('/wishlist', [ClientWishlistController::class, 'index'])->name('client.wishlist.index');
 Route::post('/wishlist/toggle', [ClientWishlistController::class, 'toggle'])->name('client.wishlist.toggle');
+Route::post('/wishlist/remove', [ClientWishlistController::class, 'remove'])->name('client.wishlist.remove');
 
 // Chatbox CLIENT API
 Route::prefix('chat')->name('chat.')->group(function () {

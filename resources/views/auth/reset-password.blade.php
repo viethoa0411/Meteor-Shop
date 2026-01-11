@@ -242,9 +242,9 @@
             <a href="{{ route('password.request') }}">
                 <i class="bi bi-arrow-left"></i> Quay lại bước đầu
             </a>
-            <a href="{{ route('login') }}">
+            <a href="{{ route('client.login') }}">
                 <i class="bi bi-house"></i> Đăng nhập
-            </a>
+            </a>~
         </div>
     </div>
 

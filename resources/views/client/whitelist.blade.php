@@ -18,12 +18,13 @@
                 @if ($product)
                     <div class="col-6 col-md-4 col-lg-3 wishlist-item" data-wishlist-id="{{ $item->id }}">
                         <div class="card h-100 position-relative border-0 shadow-sm">
-                            <!-- Nút XÓA -->
+                            <!-- Nút XÓA (Style giống trang chủ) -->
                             <button type="button"
-                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle z-3 wishlist-remove-btn"
+                                    class="wishlist-remove-btn"
                                     data-product-id="{{ $product->id }}"
-                                    title="Xóa khỏi danh sách yêu thích">
-                                <i class="bi bi-trash"></i>
+                                    title="Xóa khỏi danh sách yêu thích"
+                                    style="position:absolute; top:8px; right:8px; z-index:2; border-radius:999px; border:none; background:rgba(255,255,255,0.9); padding:4px 8px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                                <i class="bi bi-heart-fill text-danger"></i>
                             </button>
 
                             <a href="{{ route('client.product.detail', $product->slug) }}" class="text-decoration-none text-dark">
@@ -47,7 +48,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -57,18 +58,15 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             e.stopPropagation();
 
-            if (!confirm('Bạn chắc chắn muốn xóa sản phẩm này khỏi danh sách yêu thích?')) {
-                return;
-            }
-
             const productId = this.dataset.productId;
             const card = this.closest('.wishlist-item');
+            const originalIcon = this.innerHTML;
 
             // Hiệu ứng loading
-            this.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            this.innerHTML = '<div class="spinner-border spinner-border-sm text-danger" role="status"></div>';
             this.disabled = true;
 
-            fetch('{{ route("client.wishlist.toggle") }}', {
+            fetch('{{ route("client.wishlist.remove") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -82,50 +80,64 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
-                if (data.status === 'success' && data.liked === false) {
+                // Trường hợp 1: Xóa thành công (hoặc đã xóa rồi)
+                if (data.status === 'success') {
                     // Xóa card mượt
                     card.style.transition = 'all 0.4s ease';
                     card.style.opacity = '0';
-                    card.style.transform = 'scale(0.9)';
-                    setTimeout(() => card.remove(), 400);
-
-                    // Nếu hết sản phẩm
-                    if (document.querySelectorAll('.wishlist-item').length === 0) {
-                        document.getElementById('wishlist-container').innerHTML = `
-                            <div class="text-center py-5 col-12">
-                                <p class="mb-4 fs-5">Bạn chưa thêm sản phẩm nào vào danh sách yêu thích.</p>
-                                <a href="{{ route('client.products.index') }}" class="btn btn-primary btn-lg">Xem sản phẩm ngay</a>
-                            </div>
-                        `;
-                    }
-
-                    // Cập nhật badge wishlist ở header (nếu bạn có)
-                    const badge = document.querySelector('.client-wishlist__badge');
-                    if (badge) {
-                        let count = parseInt(badge.textContent) || 1;
-                        count = Math.max(0, count - 1);
-                        if (count === 0) {
-                            badge.style.display = 'none';
-                        } else {
-                            badge.textContent = count > 99 ? '99+' : count;
+                    card.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        card.remove();
+                        // Nếu hết sản phẩm thì hiện thông báo trống
+                        if (document.querySelectorAll('.wishlist-item').length === 0) {
+                            document.getElementById('wishlist-container').innerHTML = `
+                                <div class="text-center py-5 col-12">
+                                    <p class="mb-4 fs-5">Bạn chưa thêm sản phẩm nào vào danh sách yêu thích.</p>
+                                    <a href="{{ route('client.products.index') }}" class="btn btn-primary btn-lg">Xem sản phẩm ngay</a>
+                                </div>
+                            `;
                         }
-                    }
+                        
+                        // Cập nhật badge wishlist trên header (nếu có)
+                        const badge = document.querySelector('[data-wishlist-badge]');
+                        if (badge) {
+                            let count = parseInt(badge.innerText) || 0;
+                            if (count > 0) count--;
+                            badge.innerText = count;
+                            if (count === 0) badge.classList.add('d-none');
+                        }
+                    }, 400);
 
-                    alert(data.message);
+                    // Show toast notification
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Đã xóa sản phẩm khỏi danh sách yêu thích'
+                    });
+
                 } else {
-                    alert(data.message || 'Không thể xóa');
+                    // Lỗi từ server
+                    alert(data.message || 'Có lỗi xảy ra!');
+                    this.innerHTML = originalIcon;
+                    this.disabled = false;
                 }
             })
-            .catch(err => {
-                console.error(err);
-                alert('Lỗi kết nối. Vui lòng thử lại.');
-            })
-            .finally(() => {
-                this.innerHTML = '<i class="bi bi-trash"></i>';
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra, vui lòng thử lại!');
+                this.innerHTML = originalIcon;
                 this.disabled = false;
             });
         });
     });
 });
 </script>
-@endsection
+@endpush
