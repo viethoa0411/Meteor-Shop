@@ -288,7 +288,7 @@
                                 {{ number_format($checkoutData['subtotal'], 0, ',', '.') }} đ
                             </span>
                         </div>
-                        <div class="mb-3">
+                            <div class="mb-3">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="installation-checkbox" name="installation">
                                 <label class="form-check-label" for="installation-checkbox">
@@ -342,10 +342,10 @@
     @push('head')
         <style>
             /* Ẩn mũi tên tăng giảm của input number */
-            input[type=number]::-webkit-inner-spin-button, 
-            input[type=number]::-webkit-outer-spin-button { 
-                -webkit-appearance: none; 
-                margin: 0; 
+            input[type=number]::-webkit-inner-spin-button,
+            input[type=number]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
             }
             input[type=number] {
                 -moz-appearance: textfield;
@@ -570,12 +570,11 @@
                             errorOption.disabled = true;
                             citySelect.appendChild(errorOption);
 
-                            if (typeof Swal !== 'undefined') {
-                                Swal.fire({
+                            if (typeof ToastNotification !== 'undefined') {
+                                ToastNotification.fire({
                                     icon: 'warning',
                                     title: 'Không tìm thấy tỉnh miền Bắc',
-                                    text: 'Hệ thống chỉ hỗ trợ giao hàng tại khu vực miền Bắc. Vui lòng liên hệ hỗ trợ nếu cần hỗ trợ.',
-                                    confirmButtonText: 'Đã hiểu'
+                                    text: 'Hệ thống chỉ hỗ trợ giao hàng tại khu vực miền Bắc. Vui lòng liên hệ hỗ trợ nếu cần hỗ trợ.'
                                 });
                             }
                         }
@@ -594,12 +593,11 @@
                     citySelect.disabled = false;
 
                     // Hiển thị thông báo lỗi cho người dùng
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
+                    if (typeof ToastNotification !== 'undefined') {
+                        ToastNotification.fire({
                             icon: 'warning',
                             title: 'Không thể tải danh sách tỉnh/thành phố',
-                            text: 'Vui lòng tải lại trang hoặc liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục.',
-                            confirmButtonText: 'Đã hiểu'
+                            text: 'Vui lòng tải lại trang hoặc liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục.'
                         });
                     }
                 }
@@ -823,7 +821,13 @@
                 let currentSubtotal = price;
                 let currentDiscount = {{ $checkoutData['discount_amount'] ?? 0 }};
                 let appliedCode = '{{ $checkoutData['promotion']['code'] ?? '' }}';
-                const fixedInstallationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                let fixedInstallationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                // Fallback nếu phí chưa cấu hình thì mặc định 100k (logic giống Controller)
+                if (fixedInstallationFee <= 0) {
+                    fixedInstallationFee = 100000;
+                }
+                let installationFee = 0;
+                let isInstallationSelected = false;
 
                 function setMessage(message, type = 'info') {
                     const el = document.getElementById('promotion-message');
@@ -1085,7 +1089,7 @@
                         if (cashContainer) {
                             cashContainer.style.display = 'none';
                         }
-                        
+
                         // Hiển thị alert box (tương tự trang cart)
                         const codMessage = document.getElementById('cod-restriction-message');
                         if (codMessage) {
@@ -1147,18 +1151,22 @@
                             : currentShippingFee.toLocaleString('vi-VN') + ' đ';
                     }
                     if (installationRow && installationFeeEl) {
-                        // Luôn hiển thị phí lắp đặt nếu có giá
-                        if (installationFee > 0) {
-                            installationRow.style.display = 'flex';
+                        // Hiển thị phí lắp đặt nếu được chọn
+                        if (isInstallationSelected && installationFee > 0) {
+                            installationRow.classList.remove('d-none');
+                            installationRow.classList.add('d-flex');
+                            installationRow.style.display = ''; // Clear inline style
                             installationFeeEl.textContent = installationFee.toLocaleString('vi-VN') + ' đ';
                         } else {
-                            installationRow.style.display = 'none';
+                            installationRow.classList.remove('d-flex');
+                            installationRow.classList.add('d-none');
+                            installationRow.style.display = ''; // Clear inline style
                         }
                     }
                     if (totalAmountEl) {
                         totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
                     }
-                    
+
                     // Cập nhật hiển thị phương thức thanh toán
                     // updatePaymentMethodDisplay(); // Removed
                 }
@@ -1166,20 +1174,14 @@
                 // Xử lý checkbox lắp đặt (giữ lại để tương thích, nhưng phí lắp đặt luôn được tính)
                 const installationCheckbox = document.getElementById('installation-checkbox');
                 if (installationCheckbox) {
-                    // Phí lắp đặt mặc định luôn được áp dụng nếu có giá
+                    // Mặc định không chọn, người dùng tự chọn
+                    installationCheckbox.checked = false;
+                    isInstallationSelected = false;
+                    installationFee = 0;
+
                     const installationFeeInput = document.getElementById('installation_fee_input');
                     if (installationFeeInput) {
-                        if (fixedInstallationFee > 0) {
-                            installationFee = fixedInstallationFee;
-                            installationFeeInput.value = installationFee;
-                            installationCheckbox.checked = true;
-                            isInstallationSelected = true;
-                        } else {
-                            installationFee = 0;
-                            installationFeeInput.value = 0;
-                            installationCheckbox.checked = false;
-                            isInstallationSelected = false;
-                        }
+                        installationFeeInput.value = 0;
                     }
 
                     installationCheckbox.addEventListener('change', function() {
@@ -1189,13 +1191,17 @@
                             installationFee = 0;
                             if (installationFeeInput) installationFeeInput.value = 0;
                         } else {
-                            installationFee = fixedInstallationFee;
+                            // Ensure fallback here too
+                            let fee = fixedInstallationFee;
+                            if (fee <= 0) fee = 100000;
+
+                            installationFee = fee;
                             if (installationFeeInput) installationFeeInput.value = installationFee;
                         }
                         updateTotalDisplay();
                     });
                 }
-                
+
                 // Khởi tạo hiển thị khi trang load
                 updateTotalDisplay();
 
@@ -1227,11 +1233,10 @@
                             setMessage('Số lượng đã thay đổi. Vui lòng áp dụng lại mã.', 'warning');
                         }
                     } else {
-                        Swal.fire({
+                        ToastNotification.fire({
                             icon: 'info',
                             title: 'Đã đạt tối đa',
-                            text: `Số lượng tối đa là ${maxStock} sản phẩm.`,
-                            confirmButtonText: 'Đã hiểu'
+                            text: `Số lượng tối đa là ${maxStock} sản phẩm.`
                         });
                     }
                 });
@@ -1243,11 +1248,10 @@
                         newQty = 1;
                         this.value = 1;
                     } else if (newQty > maxStock) {
-                        Swal.fire({
+                        ToastNotification.fire({
                             icon: 'warning',
                             title: 'Số lượng vượt quá tồn kho',
-                            text: `Số lượng tối đa là ${maxStock}. Vui lòng chọn lại.`,
-                            confirmButtonText: 'Đã hiểu'
+                            text: `Số lượng tối đa là ${maxStock}. Vui lòng chọn lại.`
                         });
                         newQty = maxStock;
                         this.value = maxStock;
@@ -1354,11 +1358,10 @@
                             const total = Math.max(0, (currentSubtotal - currentDiscount) + currentShippingFee + installationFee);
                             if (walletBalanceCheck < total) {
                                 e.preventDefault();
-                                Swal.fire({
+                                ToastNotification.fire({
                                     icon: 'error',
                                     title: 'Số dư không đủ',
-                                    text: `Số dư ví của bạn (${number_format($walletBalance)} đ) không đủ để thanh toán đơn hàng (${total.toLocaleString('vi-VN')} đ). Vui lòng nạp thêm tiền hoặc chọn phương thức thanh toán khác.`,
-                                    confirmButtonText: 'Đã hiểu'
+                                    text: `Số dư ví của bạn (${number_format($walletBalance)} đ) không đủ để thanh toán đơn hàng (${total.toLocaleString('vi-VN')} đ). Vui lòng nạp thêm tiền hoặc chọn phương thức thanh toán khác.`
                                 });
                                 return false;
                             }
