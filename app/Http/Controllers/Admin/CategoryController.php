@@ -119,6 +119,39 @@ class CategoryController extends Controller
             'image' => $imagePath,
         ]);
 
+        // Nếu danh mục bị ẩn, ẩn luôn tất cả con và sản phẩm
+        if ($request->status == 'inactive') {
+            \Illuminate\Support\Facades\Log::info("Hiding category {$category->id} and its descendants.");
+
+            // Lấy danh sách ID của tất cả danh mục con (đệ quy)
+            $descendantIds = $this->getAllDescendantIds($category->id);
+            \Illuminate\Support\Facades\Log::info("Descendant IDs: " . implode(',', $descendantIds));
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($category, $descendantIds) {
+                // Cập nhật trạng thái các danh mục con
+                if (!empty($descendantIds)) {
+                    \App\Models\Category::whereIn('id', $descendantIds)->update(['status' => 'inactive']);
+                }
+
+                // Cập nhật trạng thái sản phẩm (của danh mục hiện tại VÀ các danh mục con)
+                $allCategoryIds = array_merge([$category->id], $descendantIds);
+                \App\Models\Product::whereIn('category_id', $allCategoryIds)->update(['status' => 'inactive']);
+            });
+        } elseif ($request->status == 'active') {
+             // Nếu danh mục được bật lại, bật lại luôn tất cả con và sản phẩm (để khôi phục trạng thái cũ)
+             \Illuminate\Support\Facades\Log::info("Activating category {$category->id} and its descendants.");
+
+             $descendantIds = $this->getAllDescendantIds($category->id);
+
+             \Illuminate\Support\Facades\DB::transaction(function () use ($category, $descendantIds) {
+                 if (!empty($descendantIds)) {
+                     \App\Models\Category::whereIn('id', $descendantIds)->update(['status' => 'active']);
+                 }
+                 $allCategoryIds = array_merge([$category->id], $descendantIds);
+                 \App\Models\Product::whereIn('category_id', $allCategoryIds)->update(['status' => 'active']);
+             });
+        }
+
         return redirect()->route('admin.categories.list')
             ->with('success', 'Cập nhật danh mục thành công!');
     }
@@ -147,5 +180,19 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories.list')
             ->with('success', 'Xoá danh mục thành công!');
+    }
+
+    // Hàm đệ quy lấy tất cả ID của danh mục con
+    private function getAllDescendantIds($parentId)
+    {
+        $ids = [];
+        $childrenIds = Category::where('parent_id', $parentId)->pluck('id')->toArray();
+
+        foreach ($childrenIds as $childId) {
+            $ids[] = $childId;
+            $ids = array_merge($ids, $this->getAllDescendantIds($childId));
+        }
+
+        return $ids;
     }
 }

@@ -39,10 +39,16 @@ class ProductClientController extends Controller
         ])
         ->where('slug', $slug)
         ->where('status', 'active')
+        ->whereHas('category', function ($q) {
+            $q->where('status', 'active')
+              ->where(function ($sq) {
+                  $sq->whereNull('parent_id')
+                    ->orWhereHas('parent', function ($p) {
+                        $p->where('status', 'active');
+                    });
+              });
+        })
         ->firstOrFail();
-
-        // Lấy sản phẩm + ảnh phụ
-        $product = Product::with('images')->where('slug', $slug)->firstOrFail();
 
         // Lấy sản phẩm liên quan
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -324,7 +330,7 @@ class ProductClientController extends Controller
                         ];
                     })->values()->toArray();
                 }
-                
+
                 return [
                     'id' => $review->id ?? 0,
                     'user_name' => $hiddenName ?? 'Người dùng',
@@ -585,7 +591,7 @@ class ProductClientController extends Controller
                 Log::error('Error creating review notification: ' . $e->getMessage());
             }
         }
-        
+
         // Tạo thông báo cho review tiêu cực (1-2 sao)
         if ($request->rating <= 2) {
             try {
@@ -802,7 +808,7 @@ class ProductClientController extends Controller
         // Lấy danh mục đang hoạt động (cần thiết để truyền sang view cho menu/filter)
         $cate = Category::query()
             ->select(['id', 'name', 'slug', 'description', 'parent_id', 'status'])
-            ->where('status', 1)
+            ->where('status', 'active')
             ->get();
 
         // Nếu không có bất kỳ filter nào => trang danh sách sản phẩm dạng "mỗi danh mục 1 dòng, 4 sản phẩm mới"
@@ -810,10 +816,10 @@ class ProductClientController extends Controller
         if (!$hasAnyFilter) {
             $groupedCategories = Category::query()
                 ->select(['id', 'name', 'slug'])
-                ->where('status', 1)
+                ->where('status', 'active')
                 ->orderBy('name')
                 ->with(['products' => function ($q) {
-                    $q->where('status', 1)
+                    $q->where('status', 'active')
                         ->orderBy('created_at', 'desc')
                         ->take(4);
                 }])
@@ -839,7 +845,16 @@ class ProductClientController extends Controller
         // Khởi tạo truy vấn sản phẩm
         $query = Product::query()
             ->select(['id', 'name', 'slug', 'price', 'image', 'status', 'description', 'created_at', 'category_id'])
-            ->where('status', 1);
+            ->where('status', 'active')
+            ->whereHas('category', function ($q) {
+                $q->where('status', 'active')
+                  ->where(function ($sq) {
+                      $sq->whereNull('parent_id')
+                        ->orWhereHas('parent', function ($p) {
+                            $p->where('status', 'active');
+                        });
+                  });
+            });
 
         // ✅ Lọc theo danh mục nếu có
         $selectedCategory = null;

@@ -17,8 +17,17 @@ class HomeController extends Controller
     {
         // lấy 4 sp mới nhât(theo ngày tạo)
         $newProducts = Product::query()
-            ->select(['id', 'name',  'slug', 'price', 'image', 'status', 'created_at'])
+            ->select(['id', 'name',  'slug', 'price', 'image', 'status', 'created_at', 'category_id'])
             ->where('status', 'active') // chỉ lấy sản phẩm đang active
+            ->whereHas('category', function ($query) {
+                $query->where('status', 'active')
+                      ->where(function ($q) {
+                          $q->whereNull('parent_id')
+                            ->orWhereHas('parent', function ($p) {
+                                $p->where('status', 'active');
+                            });
+                      });
+            })
             ->where(function ($query) {
                 $query->where('stock', '>', 0)
                     ->orWhereHas('variants', function ($q) {
@@ -30,8 +39,17 @@ class HomeController extends Controller
             ->get();
 
         $outstandingProducts = Product::query()
-            ->select(['id', 'name', 'slug', 'stock', 'price', 'image', 'status', 'created_at'])
+            ->select(['id', 'name', 'slug', 'stock', 'price', 'image', 'status', 'created_at', 'category_id'])
             ->where('status', 'active')
+            ->whereHas('category', function ($query) {
+                $query->where('status', 'active')
+                      ->where(function ($q) {
+                          $q->whereNull('parent_id')
+                            ->orWhereHas('parent', function ($p) {
+                                $p->where('status', 'active');
+                            });
+                      });
+            })
             ->where(function ($query) {
                 $query->where('stock', '>', 0)
                     ->orWhereHas('variants', function ($q) {
