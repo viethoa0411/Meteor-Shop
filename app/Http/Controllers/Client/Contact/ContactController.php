@@ -60,7 +60,7 @@ class ContactController extends Controller
                 'contacted_at' => now(),
             ]);
 
-            // Gửi email thông báo
+            // Gửi email thông báo cho admin
             $adminEmail = env('MAIL_FROM_ADDRESS', 'admin@meteorshop.com');
             
             try {
@@ -75,8 +75,24 @@ class ContactController extends Controller
                             ->subject('Liên hệ mới từ ' . $contact->name);
                     });
             } catch (\Exception $e) {
-                // Nếu gửi email thất bại, vẫn lưu liên hệ
-                \Log::error('Lỗi gửi email liên hệ: ' . $e->getMessage());
+                \Log::error('Lỗi gửi email admin: ' . $e->getMessage());
+            }
+
+            // Gửi email xác nhận cho khách hàng
+            try {
+                Mail::raw("Chào {$contact->name},\n\n" .
+                    "Cảm ơn bạn đã quan tâm và đăng ký tư vấn thiết kế tại Meteor Shop.\n" .
+                    "Chúng tôi đã nhận được thông tin của bạn và sẽ liên hệ lại trong thời gian sớm nhất.\n\n" .
+                    "Thông tin đã đăng ký:\n" .
+                    "Họ tên: {$contact->name}\n" .
+                    "Số điện thoại: {$contact->phone}\n\n" .
+                    "Trân trọng,\nĐội ngũ Meteor Shop",
+                    function ($message) use ($contact) {
+                        $message->to($contact->email)
+                            ->subject('Xác nhận đăng ký tư vấn thiết kế - Meteor Shop');
+                    });
+            } catch (\Exception $e) {
+                \Log::error('Lỗi gửi email xác nhận khách hàng: ' . $e->getMessage());
             }
 
             // Tạo thông báo cho admin về liên hệ mới
@@ -87,7 +103,7 @@ class ContactController extends Controller
                 \Log::error('Error creating contact notification: ' . $e->getMessage());
             }
 
-            return redirect()->route('client.contact.list')->with('success', 'Gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.');
+            return redirect()->route('client.home')->with('success', 'Đăng ký tư vấn thành công! Chúng tôi đã gửi email xác nhận cho bạn.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', 'Lỗi gửi liên hệ: ' . $e->getMessage());
         }

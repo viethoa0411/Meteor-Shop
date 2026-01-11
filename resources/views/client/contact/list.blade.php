@@ -236,3 +236,17 @@
 </div>
 @endsection
 
+@push('scripts')
+<script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Đăng ký thành công!',
+            text: "{{ session('success') }}",
+            confirmButtonText: 'Tuyệt vời',
+            confirmButtonColor: '#111'
+        });
+    @endif
+</script>
+@endpush
+

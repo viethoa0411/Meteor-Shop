@@ -129,6 +129,12 @@ class CheckoutController extends Controller
                     continue; // Bỏ qua sản phẩm không tồn tại
                 }
 
+                // Check active status
+                if ($product->status !== 'active') {
+                    return redirect()->route('cart.index')
+                        ->with('error', "Sản phẩm {$product->name} hiện đang ngừng kinh doanh. Vui lòng xóa khỏi giỏ hàng.");
+                }
+
                 $stock   = $product->stock ?? 0;
                 $price   = $item['price'];
                 $variant = null;
@@ -201,6 +207,15 @@ class CheckoutController extends Controller
         $productId = $request->get('product_id');
         $variantId = $request->get('variant_id');
         $qty       = max(1, (int) $request->get('qty', 1));
+
+        $product = Product::find($productId);
+        if (!$product) {
+            return redirect()->back()->with('error', 'Sản phẩm không tồn tại');
+        }
+
+        if ($product->status !== 'active') {
+            return redirect()->back()->with('error', 'Sản phẩm hiện đang ngừng kinh doanh.');
+        }
 
         // --- Limit Logic: Max 10 ---
         if ($qty > 10) {

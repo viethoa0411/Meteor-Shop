@@ -52,7 +52,8 @@
                                     <div class="mb-3">
                                         <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
                                         <select name="status" class="form-select @error('status') is-invalid @enderror">
-                                            <option value="pending" {{ old('status', $contact->status) == 'pending' ? 'selected' : '' }}>Chưa Xử lý</option>
+                                            <option value="pending" {{ old('status', $contact->status) == 'pending' ? 'selected' : '' }}
+                                                {{ $contact->status == 'processed' ? 'disabled' : '' }}>Chưa Xử lý</option>
                                             <option value="processed" {{ old('status', $contact->status) == 'processed' ? 'selected' : '' }}>Đã Xử lý</option>
                                         </select>
                                         @error('status')

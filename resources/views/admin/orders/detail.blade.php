@@ -306,15 +306,20 @@
                                                 @if ($log->admin)
                                                     <div>
                                                         <strong>{{ $log->admin->name }}</strong>
-                                                        <br>
-                                                        <span class="text-muted">{{ $log->admin->email }}</span>
                                                     </div>
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="badge bg-secondary text-uppercase">{{ $log->role }}</span>
+                                                @php
+                                                    $roleNames = [
+                                                        'admin' => 'Quản trị viên',
+                                                        'customer' => 'Khách hàng',
+                                                        'user' => 'Khách hàng'
+                                                    ];
+                                                @endphp
+                                                <span class="badge bg-secondary text-uppercase">{{ $roleNames[$log->role] ?? $log->role }}</span>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -407,12 +412,21 @@
                             @if (isset($order->user_id) && $order->user_id)
                                 @if (isset($order->user))
                                     <ul class="list-unstyled mb-2 small">
-                                        <li><strong>Tên User:</strong> {{ $order->user->name ?? 'N/A' }}</li>
+                                        <li><strong>Tên Khách hàng:</strong> {{ $order->user->name ?? 'N/A' }}</li>
                                         <li><strong>Email:</strong> {{ $order->user->email ?? 'N/A' }}</li>
                                         <li><strong>SĐT:</strong> {{ $order->user->phone ?? 'N/A' }}</li>
                                         <li>
-                                            <strong>Vai trò:</strong> <span class="badge bg-secondary me-1">{{ ucfirst($order->user->role) ?? 'N/A' }}</span>
-                                            <strong>Status:</strong> @if ($order->user->status == 'active')
+                                            <strong>Vai trò:</strong>
+                                            @php
+                                                $userRole = $order->user->role ?? null;
+                                                $userRoleLabel = match($userRole) {
+                                                    'admin' => 'Quản trị viên',
+                                                    'customer', 'user' => 'Khách hàng',
+                                                    default => $userRole ? ucfirst($userRole) : 'N/A'
+                                                };
+                                            @endphp
+                                            <span class="badge bg-secondary me-1">{{ $userRoleLabel }}</span>
+                                            <strong>Trạng thái:</strong> @if ($order->user->status == 'active')
                                                 <span class="badge bg-success">Hoạt động</span>
                                             @elseif ($order->user->status == 'banned')
                                                 <span class="badge bg-danger">Bị cấm</span>
@@ -463,7 +477,15 @@
                         <div class="col-md-6">
                             <h6><i class="bi bi-credit-card-fill"></i> Thanh toán</h6>
                             <p class="mb-1 small">
-                                <strong>P.Thức:</strong> {{ strtoupper($order->payment_method) }}
+                                @php
+                                    $paymentMethodMap = [
+                                        'cash' => 'Thanh toán khi nhận hàng',
+                                        'momo' => 'Momo',
+                                        'vnpay' => 'VNPAY',
+                                        'bank' => 'Chuyển khoản'
+                                    ];
+                                @endphp
+                                <strong>P.Thức:</strong> {{ $paymentMethodMap[$order->payment_method] ?? strtoupper($order->payment_method) }}
                                 @if ($order->voucher_code)
                                     <br><strong>Voucher:</strong> <span class="badge bg-primary">{{ $order->voucher_code }}</span>
                                 @endif
@@ -483,8 +505,8 @@
                             <table class="table table-borderless table-sm small">
                                 <tbody>
                                     <tr>
-                                        <td>Tổng tiền hàng:</td>
-                                        <td class="text-end">{{ number_format($order->total_price, 0, ',', '.') }}₫</td>
+                                        <td>Tiền sản phẩm:</td>
+                                        <td class="text-end">{{ number_format($order->sub_total ?? $order->total_price, 0, ',', '.') }}₫</td>
                                     </tr>
                                     <tr>
                                         <td>Chiết khấu:</td>
@@ -494,6 +516,12 @@
                                         <td>Phí vận chuyển:</td>
                                         <td class="text-end">{{ number_format($order->shipping_fee, 0, ',', '.') }}₫</td>
                                     </tr>
+                                    @if($order->installation_fee > 0)
+                                    <tr>
+                                        <td>Phí lắp đặt:</td>
+                                        <td class="text-end">{{ number_format($order->installation_fee, 0, ',', '.') }}₫</td>
+                                    </tr>
+                                    @endif
                                     <tr class="table-dark">
                                         <td><strong>TỔNG CUỐI:</strong></td>
                                         <td class="text-end">
@@ -526,7 +554,18 @@
             @if (isset($orderDetails) && count($orderDetails) > 0)
                 @foreach ($orderDetails as $item)
                     <tr>
-                        <td>{{ $item->product_name }}</td>
+                        <td>
+                            <div class="fw-bold">{{ $item->product_name }}</div>
+                            @if($item->category_name)
+                                <div class="small text-muted mt-1 d-flex align-items-center">
+                                    <span class="me-1">Danh mục: {{ $item->category_name }}</span>
+                                    @if($item->category_image)
+                                        <img src="{{ asset('storage/' . $item->category_image) }}" alt=""
+                                             class="rounded-circle border" style="width: 20px; height: 20px; object-fit: cover;">
+                                    @endif
+                                </div>
+                            @endif
+                        </td>
                         <td>{{ number_format($item->price, 0, ',', '.') }}₫</td>
                         <td>{{ $item->quantity }}</td>
                         <td>{{ number_format($item->subtotal, 0, ',', '.') }}₫</td>

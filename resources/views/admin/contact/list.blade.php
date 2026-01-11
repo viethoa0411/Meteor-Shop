@@ -104,9 +104,11 @@
                                     <a href="{{ route('admin.contacts.show', $contact->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-eye"></i> Xem Chi Tiết 
                                     </a>
-                                    <a href="{{ route('admin.contacts.edit', $contact->id) }}" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil-square"></i> Sửa
-                                    </a>
+                                    @if($contact->status !== 'processed')
+                                        <a href="{{ route('admin.contacts.edit', $contact->id) }}" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

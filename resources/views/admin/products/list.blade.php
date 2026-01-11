@@ -36,7 +36,7 @@
 
                         <a href="{{ route('admin.products.list', ['status' => 'inactive'] + request()->except('status')) }}"
                             class="btn {{ request('status', 'active') == 'inactive' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm px-2 py-1">
-                            <i class="bi bi-pause-circle-fill"></i> Tạm ẩn
+                            <i class="bi bi-pause-circle-fill"></i> Dừng hoạt động
                         </a>
                     </div>
 

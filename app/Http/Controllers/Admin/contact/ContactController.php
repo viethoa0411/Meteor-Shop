@@ -76,6 +76,11 @@ public function update(Request $request, $id)
         return back()->with('error', 'Trạng thái chưa thay đổi, không thể cập nhật!');
     }
 
+    // Không cho phép chuyển từ đã xử lý về chưa xử lý
+    if ($contact->status === 'processed' && $validated['status'] === 'pending') {
+        return back()->with('error', 'Không thể chuyển trạng thái từ Đã Xử lý về Chưa Xử lý!');
+    }
+
     try {
         $contact->update(['status' => $validated['status']]);
         return redirect()->route('admin.contacts.index')->with('success', 'Cập nhật trạng thái thành công!');

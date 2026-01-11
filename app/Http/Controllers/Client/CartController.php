@@ -40,6 +40,7 @@ class CartController extends Controller
                         'price'      => (float) $ci->price,
                         'quantity'   => (int) $ci->quantity,
                         'max_stock'  => (int) $stock,
+                        'is_active'  => $product ? ($product->status === 'active') : false,
                         'color'      => $ci->color ?? ($variant->color_name ?? null),
                         'size'       => $ci->size ?? (
                             $variant && $variant->length && $variant->width && $variant->height
@@ -88,6 +89,7 @@ class CartController extends Controller
                 $item['image']    = $product->image;
                 $item['category'] = $product->category ?? null;
                 $item['name']     = $item['name'] ?? $product->name;
+                $item['is_active'] = $product->status === 'active';
 
                 if (!empty($item['variant_id'])) {
                     $variant = ProductVariant::find($item['variant_id']);
@@ -152,6 +154,13 @@ class CartController extends Controller
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Sản phẩm không tồn tại',
+            ]);
+        }
+
+        if ($product->status !== 'active') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Sản phẩm đã ngừng kinh doanh.',
             ]);
         }
 

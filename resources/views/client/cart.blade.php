@@ -34,19 +34,20 @@
                             $maxStock = $item['max_stock'] ?? 0;
                             $isOutOfStock = $maxStock < 1;
                             $isNotEnough = $maxStock < $item['quantity'];
+                            $isDeleted = $item['is_deleted'] ?? false;
                         @endphp
-                        <tr id="row-{{ $id }}" class="{{ $isOutOfStock ? 'table-secondary' : '' }}">
+                        <tr id="row-{{ $id }}" class="{{ ($isOutOfStock || $isDeleted) ? 'table-secondary' : '' }}" style="{{ $isDeleted ? 'opacity: 0.6;' : '' }}">
                             <td class="text-center">
                                 <input type="checkbox" name="selected[]" value="{{ $id }}"
                                     class="cart-item-checkbox"
                                     data-id="{{ $id }}"
                                     data-subtotal="{{ $item['price'] * $item['quantity'] }}"
-                                    {{ $isOutOfStock ? 'disabled' : 'checked' }}>
+                                    {{ ($isOutOfStock || $isDeleted) ? 'disabled' : 'checked' }}>
                             </td>
 
                             <td>
                                 <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/70x70?text=No+Image' }}"
-                                    width="70" alt="{{ $item['name'] }}" style="{{ $isOutOfStock ? 'opacity: 0.5' : '' }}">
+                                    width="70" alt="{{ $item['name'] }}" style="{{ ($isOutOfStock || $isDeleted) ? 'opacity: 0.5' : '' }}">
                             </td>
 
                             <td>
@@ -59,7 +60,11 @@
                                         <span class="ms-2">Size: <strong>{{ $item['size'] }}</strong></span>
                                     @endif
                                 </div>
-                                @if ($isOutOfStock)
+                                @if ($isDeleted)
+                                    <div class="text-danger fw-bold small mt-1">
+                                        <i class="bi bi-exclamation-triangle"></i> Sản phẩm ngừng sản xuất. Nếu khách có nhu cầu đặt thì liên hệ với shop.
+                                    </div>
+                                @elseif ($isOutOfStock)
                                     <div class="text-danger fw-bold small mt-1">Hết hàng</div>
                                 @elseif ($isNotEnough)
                                     <div class="text-danger fw-bold small mt-1">Kho chỉ còn {{ $maxStock }}</div>
@@ -180,7 +185,11 @@
 
             if (selectedCount === 0) {
                 e.preventDefault();
-                alert('Vui lòng chọn ít nhất một sản phẩm để đặt hàng.');
+                ToastNotification.fire({
+                    icon: 'warning',
+                    title: 'Thông báo',
+                    text: 'Vui lòng chọn ít nhất một sản phẩm để đặt hàng.'
+                });
             }
         });
 
@@ -198,7 +207,11 @@
 
             // Check limit 10 (REMOVED)
             if (type === 'plus' && maxStock && currentQty >= maxStock) {
-                alert('Bạn chỉ có thể mua tối đa ' + maxStock + ' sản phẩm cho lựa chọn này.');
+                ToastNotification.fire({
+                    icon: 'warning',
+                    title: 'Đạt giới hạn',
+                    text: 'Bạn chỉ có thể mua tối đa ' + maxStock + ' sản phẩm cho lựa chọn này.'
+                });
                 return;
             }
 
@@ -225,14 +238,18 @@
                     }
                 } else if (data.status === 'error') {
                     // Nếu lỗi (hết hàng hoặc giới hạn), hiện SweetAlert
-                    Swal.fire({
+                    ToastNotification.fire({
                         icon: 'error',
                         title: 'Thông báo',
                         text: data.message
                     });
                 }
             }).fail(function() {
-                alert('Có lỗi xảy ra, vui lòng thử lại');
+                ToastNotification.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: 'Có lỗi xảy ra, vui lòng thử lại'
+                });
             });
         });
 

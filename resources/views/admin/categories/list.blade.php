@@ -85,6 +85,7 @@
                         <tr>
                             <th>STT</th>
                             <th>Tên danh mục</th>
+                            <th>Hình ảnh</th>
                             <th>Danh mục cha</th>
                             <th>Trạng thái</th>
                             <th>Hành động</th>
@@ -95,6 +96,14 @@
                             <tr>
                                 <td data-label="STT">{{ $loop->iteration }}</td>
                                 <td data-label="Tên danh mục">{{ $category->name }}</td>
+                                <td data-label="Hình ảnh">
+                                    @if($category->image)
+                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
+                                             class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                    @else
+                                        <span class="text-muted small">Không có</span>
+                                    @endif
+                                </td>
                                 <td data-label="Danh mục cha">{{ $category->parent?->name ?? 'Không có' }}</td>
                                 <td data-label="Trạng thái">
                                     @if ($category->status == 'active')
