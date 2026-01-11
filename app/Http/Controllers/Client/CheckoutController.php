@@ -182,9 +182,9 @@ class CheckoutController extends Controller
             }
 
             // --- Limit Check: Max 100 million ---
-            if ($subtotal > 100000000) {
+            if ($subtotal > 50000000) {
                  return redirect()->route('cart.index')
-                    ->with('error', "Đơn hàng trên 100 triệu vui lòng liên hệ trực tiếp để được hỗ trợ. Vui lòng giảm giá trị đơn hàng.");
+                    ->with('error', "Đơn hàng trên 50 triệu vui lòng liên hệ trực tiếp để được hỗ trợ. Vui lòng giảm giá trị đơn hàng.");
             }
 
             // Lưu thông tin vào session
@@ -259,9 +259,9 @@ class CheckoutController extends Controller
         }
 
         // --- Limit Logic: Max 100 million total ---
-        if (($price * $qty) > 100000000) {
+        if (($price * $qty) > 50000000) {
             return redirect()->back()
-                ->with('error', 'Để đảm bảo an toàn giao dịch và hỗ trợ phương thức vận chuyển đặc biệt cho đơn hàng giá trị cao (trên 100 triệu VNĐ), quý khách vui lòng liên hệ bộ phận CSKH để được hướng dẫn thanh toán trực tiếp và nhận ưu đãi riêng.');
+                ->with('error', 'Đơn hàng trên 50 triệu vui lòng liên hệ trực tiếp để được hỗ trợ. Vui lòng giảm giá trị đơn hàng.');
         }
 
         // Lưu thông tin vào session
@@ -725,7 +725,7 @@ class CheckoutController extends Controller
                     return redirect($payUrl);
                 } else {
                     DB::rollBack();
-                    return redirect()->back()->with('error', 'Không thể tạo giao dịch Momo. Vui lòng thử lại sau.');
+                    return redirect()->back()->with('error', 'Đơn hàng quá 50 triệu, vui lòng liên hệ cửa hàng để được hỗ trợ đặt hàng');
                 }
             }
 
