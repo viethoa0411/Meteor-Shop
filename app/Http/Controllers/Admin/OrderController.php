@@ -76,8 +76,11 @@ class OrderController extends Controller
         // Lấy danh sách sản phẩm trong đơn
         $orderDetails = DB::table('order_details')
             ->join('products', 'order_details.product_id', '=', 'products.id')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->select(
                 'products.name as product_name',
+                'categories.name as category_name',
+                'categories.image as category_image',
                 'order_details.price',
                 'order_details.quantity',
                 'order_details.subtotal'
