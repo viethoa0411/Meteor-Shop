@@ -364,15 +364,15 @@
     @push('head')
         <style>
             /* Ẩn mũi tên tăng giảm của input number */
-            input[type=number]::-webkit-inner-spin-button, 
-            input[type=number]::-webkit-outer-spin-button { 
-                -webkit-appearance: none; 
-                margin: 0; 
+            input[type=number]::-webkit-inner-spin-button,
+            input[type=number]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
             }
             input[type=number] {
                 -moz-appearance: textfield;
             }
-            
+
             /* Style cho quantity control nhỏ gọn */
             .quantity-control .btn {
                 padding: 0.15rem 0.4rem;
@@ -455,17 +455,32 @@
 
             // Load tỉnh/thành phố - Chỉ hiển thị miền Bắc
             async function loadProvinces() {
+                const citySelect = document.getElementById('shipping_city');
+                if (!citySelect) {
+                    console.error('Không tìm thấy element shipping_city');
+                    return;
+                }
+
+                // Đảm bảo select không bị disabled
+                citySelect.disabled = false;
+
+                // Hiển thị loading state
+                citySelect.innerHTML = '<option value="">Đang tải dữ liệu...</option>';
+                citySelect.disabled = true;
+
                 try {
+                    console.log('Bắt đầu tải danh sách tỉnh/thành phố...');
                     const response = await fetch('https://esgoo.net/api-tinhthanh/1/0.htm');
                     if (!response.ok) {
-                        throw new Error('Không thể tải dữ liệu từ API');
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
-                    if (data.error === 0) {
-                        provinces = data.data;
-                        const citySelect = document.getElementById('shipping_city');
-                        if (!citySelect) return;
 
+                    console.log('API Response:', data);
+                    debugApiResponse('https://esgoo.net/api-tinhthanh/1/0.htm', data);
+
+                    if (data.error === 0 && data.data && Array.isArray(data.data)) {
+                        provinces = data.data;
                         citySelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
 
                         let addedCount = 0;
@@ -473,16 +488,40 @@
                             // Lấy tên tỉnh từ nhiều nguồn có thể
                             const provinceName = province.full_name || province.name || province.title || '';
 
+                            if (!provinceName) return; // Bỏ qua nếu không có tên
+
                             // Chỉ thêm các tỉnh miền Bắc
                             if (isNorthernProvince(provinceName)) {
                                 const option = document.createElement('option');
                                 option.value = provinceName; // Giữ nguyên tên gốc hiển thị
                                 option.textContent = provinceName;
-                                option.dataset.code = province.id || province.code || province.province_id;
+
+                                // Cải thiện việc lấy provinceCode với nhiều fallback
+                                const provinceCode = province.id || province.code || province.province_id || province.matp || '';
+
+                                if (provinceCode) {
+                                    option.dataset.code = provinceCode;
+                                    option.setAttribute('data-code', provinceCode);
+                                    option.setAttribute('data-province-code', provinceCode);
+                                    console.log(`Province "${provinceName}" assigned code: ${provinceCode}`);
+                                } else {
+                                    // Nếu không có code từ API, tạo một fallback code dựa trên index
+                                    const fallbackCode = `province_${addedCount + 1}`;
+                                    option.dataset.code = fallbackCode;
+                                    option.setAttribute('data-code', fallbackCode);
+                                    option.setAttribute('data-province-code', fallbackCode);
+                                    console.warn(`Province "${provinceName}" has no code, using fallback: ${fallbackCode}`, province);
+                                }
+
                                 citySelect.appendChild(option);
                                 addedCount++;
                             }
                         });
+
+                        // Kích hoạt select sau khi load xong
+                        citySelect.disabled = false;
+
+                        console.log(`Đã tải ${addedCount} tỉnh/thành phố miền Bắc (tổng ${provinces.length} từ API)`);
 
                         if (addedCount === 0) {
                             const errorOption = document.createElement('option');
@@ -490,135 +529,362 @@
                             errorOption.textContent = '⚠ Không tìm thấy tỉnh miền Bắc (API changed?)';
                             citySelect.appendChild(errorOption);
                         }
+                    } else {
+                        console.error('Dữ liệu API không hợp lệ:', data);
+                        throw new Error('Dữ liệu API không hợp lệ');
                     }
                 } catch (error) {
                     console.error('Lỗi khi tải danh sách tỉnh/thành phố:', error);
-                    const citySelect = document.getElementById('shipping_city');
-                    if (citySelect) {
-                        const errorOption = document.createElement('option');
-                        errorOption.value = '';
-                        errorOption.textContent = 'Không thể tải dữ liệu. Vui lòng tải lại trang.';
-                        citySelect.appendChild(errorOption);
-                    }
+                    citySelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
+                    const errorOption = document.createElement('option');
+                    errorOption.value = '';
+                    errorOption.textContent = 'Không thể tải dữ liệu. Vui lòng tải lại trang.';
+                    errorOption.disabled = true;
+                    citySelect.appendChild(errorOption);
+                    citySelect.disabled = false;
                 }
             }
 
             // Load quận/huyện
             async function loadDistricts(provinceCode) {
+                console.log('loadDistricts called with provinceCode:', provinceCode);
+                const districtSelect = document.getElementById('shipping_district');
+                if (!districtSelect) {
+                    console.error('Không tìm thấy element shipping_district');
+                    return;
+                }
+
+                // Cải thiện điều kiện kiểm tra - chỉ reset nếu thực sự không có code hợp lệ
+                if (!provinceCode || provinceCode === '' || provinceCode === '0' || provinceCode === 'undefined' || provinceCode === 'null') {
+                    console.log('Invalid provinceCode, resetting districts');
+                    districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+                    districtSelect.disabled = true;
+                    const wardSelect = document.getElementById('shipping_ward');
+                    if (wardSelect) {
+                        wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                        wardSelect.disabled = true;
+                    }
+                    return;
+                }
+
                 try {
+                    console.log('Fetching districts from API...');
+                    districtSelect.innerHTML = '<option value="">Đang tải...</option>';
+                    districtSelect.disabled = true;
+
                     const response = await fetch(`https://esgoo.net/api-tinhthanh/2/${provinceCode}.htm`);
                     if (!response.ok) {
-                        throw new Error('Không thể tải dữ liệu quận/huyện');
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
-                    if (data.error === 0) {
-                        districts = data.data || [];
-                        const districtSelect = document.getElementById('shipping_district');
-                        if (!districtSelect) return;
+                    console.log('Districts API Response:', data);
+                    debugApiResponse(`https://esgoo.net/api-tinhthanh/2/${provinceCode}.htm`, data);
 
+                    if (data.error === 0 && data.data && Array.isArray(data.data)) {
+                        districts = data.data || [];
+                        console.log(`Loaded ${districts.length} districts`);
                         districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
                         districts.forEach(district => {
                             const option = document.createElement('option');
-                            option.value = district.full_name;
-                            option.textContent = district.full_name;
-                            option.dataset.code = district.id;
+                            option.value = district.full_name || district.name || '';
+                            option.textContent = district.full_name || district.name || '';
+
+                            // Cải thiện việc gán districtCode
+                            const districtCode = district.id || district.code || district.district_id || district.maqh || '';
+                            if (districtCode) {
+                                option.dataset.code = districtCode;
+                                option.setAttribute('data-code', districtCode);
+                                option.setAttribute('data-district-code', districtCode);
+                            } else {
+                                console.warn('District has no code:', district);
+                            }
+
                             districtSelect.appendChild(option);
                         });
                         districtSelect.disabled = false;
+                        console.log('Districts loaded and select enabled');
                         // Reset phường/xã
                         const wardSelect = document.getElementById('shipping_ward');
                         if (wardSelect) {
                             wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
                             wardSelect.disabled = true;
                         }
+                    } else {
+                        console.error('API returned invalid data:', data);
+                        throw new Error('API trả về lỗi hoặc dữ liệu không hợp lệ');
                     }
                 } catch (error) {
                     console.error('Lỗi khi tải danh sách quận/huyện:', error);
-                    const districtSelect = document.getElementById('shipping_district');
-                    if (districtSelect) {
-                        districtSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
-                    }
+                    districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+                    const errorOption = document.createElement('option');
+                    errorOption.value = '';
+                    errorOption.textContent = 'Lỗi tải dữ liệu. Vui lòng thử lại.';
+                    errorOption.disabled = true;
+                    districtSelect.appendChild(errorOption);
+                    districtSelect.disabled = false;
                 }
             }
 
             // Load phường/xã
             async function loadWards(districtCode) {
+                console.log('loadWards called with districtCode:', districtCode);
+                const wardSelect = document.getElementById('shipping_ward');
+                if (!wardSelect) {
+                    console.error('Không tìm thấy element shipping_ward');
+                    return;
+                }
+
+                // Cải thiện điều kiện kiểm tra
+                if (!districtCode || districtCode === '' || districtCode === '0' || districtCode === 'undefined' || districtCode === 'null') {
+                    console.log('Invalid districtCode, resetting wards');
+                    wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                    wardSelect.disabled = true;
+                    return;
+                }
+
                 try {
+                    wardSelect.innerHTML = '<option value="">Đang tải...</option>';
+                    wardSelect.disabled = true;
+
                     const response = await fetch(`https://esgoo.net/api-tinhthanh/3/${districtCode}.htm`);
                     if (!response.ok) {
                         throw new Error('Không thể tải dữ liệu phường/xã');
                     }
                     const data = await response.json();
-                    if (data.error === 0) {
-                        wards = data.data || [];
-                        const wardSelect = document.getElementById('shipping_ward');
-                        if (!wardSelect) return;
+                    console.log('Wards API Response:', data);
+                    debugApiResponse(`https://esgoo.net/api-tinhthanh/3/${districtCode}.htm`, data);
 
+                    if (data.error === 0 && data.data && Array.isArray(data.data)) {
+                        wards = data.data || [];
+                        console.log(`Loaded ${wards.length} wards`);
                         wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
                         wards.forEach(ward => {
                             const option = document.createElement('option');
-                            option.value = ward.full_name;
-                            option.textContent = ward.full_name;
+                            option.value = ward.full_name || ward.name || '';
+                            option.textContent = ward.full_name || ward.name || '';
+
+                            // Thêm ward code nếu có (để tương lai sử dụng)
+                            const wardCode = ward.id || ward.code || ward.ward_id || ward.xaid || '';
+                            if (wardCode) {
+                                option.dataset.code = wardCode;
+                                option.setAttribute('data-code', wardCode);
+                                option.setAttribute('data-ward-code', wardCode);
+                            }
+
                             wardSelect.appendChild(option);
                         });
                         wardSelect.disabled = false;
+                        console.log('Wards loaded and select enabled');
+                    } else {
+                        console.error('API returned invalid ward data:', data);
+                        throw new Error('API trả về lỗi hoặc dữ liệu không hợp lệ');
                     }
                 } catch (error) {
                     console.error('Lỗi khi tải danh sách phường/xã:', error);
-                    const wardSelect = document.getElementById('shipping_ward');
-                    if (wardSelect) {
-                        wardSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
-                    }
+                    wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                    const errorOption = document.createElement('option');
+                    errorOption.value = '';
+                    errorOption.textContent = 'Lỗi tải dữ liệu. Vui lòng thử lại.';
+                    errorOption.disabled = true;
+                    wardSelect.appendChild(errorOption);
+                    wardSelect.disabled = false;
                 }
             }
 
-            document.addEventListener('DOMContentLoaded', async function() {
+            // Hàm debug để kiểm tra API response
+            function debugApiResponse(apiUrl, data) {
+                console.log(`=== DEBUG API: ${apiUrl} ===`);
+                console.log('Full response:', data);
+                if (data && data.data && Array.isArray(data.data)) {
+                    console.log(`Found ${data.data.length} items`);
+                    if (data.data.length > 0) {
+                        console.log('First item structure:', data.data[0]);
+                        console.log('Available keys:', Object.keys(data.data[0]));
+                    }
+                } else {
+                    console.log('Invalid data structure');
+                }
+                console.log('=== END DEBUG ===');
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('DOMContentLoaded triggered - Cart checkout');
+
+                // Đảm bảo select không bị disabled
+                const citySelect = document.getElementById('shipping_city');
+                const districtSelect = document.getElementById('shipping_district');
+                const wardSelect = document.getElementById('shipping_ward');
+
+                console.log('Elements found:', {
+                    citySelect: !!citySelect,
+                    districtSelect: !!districtSelect,
+                    wardSelect: !!wardSelect
+                });
+
+                if (!citySelect || !districtSelect || !wardSelect) {
+                    console.error('Missing address dropdown elements - cannot initialize');
+                    return;
+                }
+
+                if (citySelect) {
+                    citySelect.disabled = false;
+                }
+                if (districtSelect) {
+                    districtSelect.disabled = true; // Disabled cho đến khi chọn tỉnh
+                }
+                if (wardSelect) {
+                    wardSelect.disabled = true; // Disabled cho đến khi chọn quận
+                }
+
+                // Gắn event listener NGAY từ đầu (trước khi load provinces)
+                // Xử lý khi chọn tỉnh/thành phố
+                if (citySelect) {
+                    console.log('Attaching event listener to shipping_city (early)');
+                    citySelect.addEventListener('change', function() {
+                        console.log('City changed:', this.value);
+                        const selectedOption = this.options[this.selectedIndex];
+
+                        // Cải thiện việc lấy provinceCode với nhiều fallback
+                        let provinceCode = selectedOption.dataset.code ||
+                                         selectedOption.getAttribute('data-code') ||
+                                         selectedOption.getAttribute('data-province-code') ||
+                                         '';
+
+                        console.log('Province code from dataset:', provinceCode);
+                        console.log('Selected option attributes:', {
+                            'dataset.code': selectedOption.dataset.code,
+                            'data-code': selectedOption.getAttribute('data-code'),
+                            'value': selectedOption.value,
+                            'text': selectedOption.textContent
+                        });
+
+                        // Nếu không có provinceCode, thử tìm trong danh sách provinces đã load
+                        if (!provinceCode && this.value && provinces && provinces.length > 0) {
+                            const foundProvince = provinces.find(p => {
+                                const provinceName = p.full_name || p.name || p.title || '';
+                                return provinceName === this.value;
+                            });
+                            if (foundProvince) {
+                                provinceCode = foundProvince.id || foundProvince.code || foundProvince.province_id || foundProvince.matp || '';
+                                console.log('Found provinceCode from provinces array:', provinceCode);
+                            }
+                        }
+
+                        if (provinceCode && provinceCode !== '' && provinceCode !== '0') {
+                            console.log('Loading districts for province code:', provinceCode);
+                            loadDistricts(provinceCode);
+                        } else {
+                            console.log('No valid province code found, resetting districts and wards');
+                            // Reset quận/huyện và phường/xã nếu không chọn tỉnh
+                            const districtSelectEl = document.getElementById('shipping_district');
+                            const wardSelectEl = document.getElementById('shipping_ward');
+                            if (districtSelectEl) {
+                                districtSelectEl.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+                                districtSelectEl.disabled = true;
+                            }
+                            if (wardSelectEl) {
+                                wardSelectEl.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                                wardSelectEl.disabled = true;
+                            }
+                        }
+
+                        setTimeout(calculateShippingFee, 500);
+                    });
+                }
+
+                // Xử lý khi chọn quận/huyện
+                if (districtSelect) {
+                    console.log('Attaching event listener to shipping_district (early)');
+                    districtSelect.addEventListener('change', function() {
+                        console.log('District changed:', this.value);
+                        const selectedOption = this.options[this.selectedIndex];
+                        const districtCode = selectedOption.dataset.code ||
+                                            selectedOption.getAttribute('data-code') ||
+                                            '';
+                        console.log('District code from dataset:', districtCode);
+
+                        if (districtCode && districtCode !== '' && districtCode !== '0') {
+                            console.log('Loading wards for district code:', districtCode);
+                            loadWards(districtCode);
+                        } else {
+                            console.log('No district code found, resetting wards');
+                            // Reset phường/xã nếu không chọn quận
+                            const wardSelectEl = document.getElementById('shipping_ward');
+                            if (wardSelectEl) {
+                                wardSelectEl.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                                wardSelectEl.disabled = true;
+                            }
+                        }
+
+                        setTimeout(calculateShippingFee, 300);
+                    });
+                }
+
                 // Lấy thông tin địa chỉ cũ từ reorder (nếu có)
                 const savedCity = @json($checkoutData['shipping_city'] ?? null);
                 const savedDistrict = @json($checkoutData['shipping_district'] ?? null);
                 const savedWard = @json($checkoutData['shipping_ward'] ?? null);
 
-                // Load tỉnh/thành phố khi trang load
-                await loadProvinces();
+                // Load tỉnh/thành phố khi trang load (async)
+                console.log('Calling loadProvinces()...');
+                loadProvinces().then(() => {
+                    console.log('loadProvinces() completed');
 
-                // Nếu có địa chỉ cũ, tự động chọn
-                if (savedCity) {
-                    const citySelect = document.getElementById('shipping_city');
-                    for (let option of citySelect.options) {
-                        if (option.value === savedCity) {
-                            citySelect.value = savedCity;
-                            if (option.dataset.code) {
-                                await loadDistricts(option.dataset.code);
-
-                                if (savedDistrict) {
-                                    const districtSelect = document.getElementById('shipping_district');
-                                    for (let dOption of districtSelect.options) {
-                                        if (dOption.value === savedDistrict) {
-                                            districtSelect.value = savedDistrict;
-                                            if (dOption.dataset.code) {
-                                                await loadWards(dOption.dataset.code);
-
-                                                if (savedWard) {
-                                                    const wardSelect = document.getElementById('shipping_ward');
-                                                    wardSelect.value = savedWard;
+                    // Nếu có địa chỉ cũ, tự động chọn sau khi load xong
+                    if (savedCity) {
+                        const citySelectAfterLoad = document.getElementById('shipping_city');
+                        if (citySelectAfterLoad) {
+                            for (let option of citySelectAfterLoad.options) {
+                                if (option.value === savedCity) {
+                                    citySelectAfterLoad.value = savedCity;
+                                    const provinceCode = option.dataset.code || option.getAttribute('data-code') || option.getAttribute('data-province-code');
+                                    if (provinceCode) {
+                                        loadDistricts(provinceCode).then(() => {
+                                            if (savedDistrict) {
+                                                const districtSelectAfterLoad = document.getElementById('shipping_district');
+                                                if (districtSelectAfterLoad) {
+                                                    for (let dOption of districtSelectAfterLoad.options) {
+                                                        if (dOption.value === savedDistrict) {
+                                                            districtSelectAfterLoad.value = savedDistrict;
+                                                            const districtCode = dOption.dataset.code || dOption.getAttribute('data-code') || dOption.getAttribute('data-district-code');
+                                                            if (districtCode) {
+                                                                loadWards(districtCode).then(() => {
+                                                                    if (savedWard) {
+                                                                        const wardSelectAfterLoad = document.getElementById('shipping_ward');
+                                                                        if (wardSelectAfterLoad) {
+                                                                            wardSelectAfterLoad.value = savedWard;
+                                                                        }
+                                                                    }
+                                                                }).catch(err => {
+                                                                    console.error('Error loading wards:', err);
+                                                                });
+                                                            }
+                                                            break;
+                                                        }
+                                                    }
                                                 }
                                             }
-                                            break;
-                                        }
+                                        }).catch(err => {
+                                            console.error('Error loading districts:', err);
+                                        });
                                     }
+                                    break;
                                 }
                             }
-                            break;
                         }
                     }
-                }
+                }).catch(error => {
+                    console.error('Error loading provinces:', error);
+                });
 
                 const subtotal = {{ $subtotal }};
                 let currentShippingFee = 0;
-                let installationFee = {{ $shippingSettings->installation_fee ?? 0 }};
-                const fixedInstallationFee = {{ $shippingSettings->installation_fee ?? 0 }};
-                let isInstallationSelected =
-                    {{ ($shippingSettings->installation_fee ?? 0) > 0 ? 'true' : 'false' }};
+                let fixedInstallationFee = {{ $shippingSettings->installation_fee ?? 0 }};
+                if (fixedInstallationFee <= 0) {
+                    fixedInstallationFee = 100000;
+                }
+                let installationFee = 0;
+                let isInstallationSelected = false;
                 const COD_LIMIT = 10000000; // 10 triệu
 
                 // Hàm tính phí vận chuyển qua API
@@ -691,36 +957,42 @@
                 let currentDiscount = 0;
                 let appliedCode = '';
 
-                // Hàm cập nhật hiển thị phương thức thanh toán (ẩn COD nếu > 10 triệu)
+                // Hàm kiểm tra phương thức thanh toán dựa trên tổng tiền
+                function checkPaymentMethodAvailability(total) {
+                    const cashRadio = document.getElementById('cash');
+                    const cashLabel = document.querySelector('label[for="cash"]');
+                    const cashContainer = document.getElementById('cod-payment-option');
+                    const momoRadio = document.getElementById('momo');
+                    const codMessage = document.getElementById('cod-restriction-message');
 
-                const codOption = document.getElementById('cod-payment-option');
-                const codRadio = document.getElementById('cash');
-                const momoRadio = document.getElementById('momo');
-                const codMessage = document.getElementById('cod-restriction-message');
-                
-                function updatePaymentMethodDisplay(total = null) {
-                    if (!codOption || !codRadio) return;
-                    const currentTotal = typeof total === 'number' ?
-                        total :
-                        Math.max(0, subtotal - currentDiscount + currentShippingFee + installationFee);
+                    if (!cashRadio) return;
 
-                    if (momoRadio && currentTotal > COD_LIMIT) {
-                        codOption.style.display = 'none';
+                    // Ngưỡng 10.000.000 đ
+                    const threshold = 10000000;
+
+                    if (total > threshold) {
+                        // 1. Chuyển sang Momo nếu đang chọn COD
+                        if (cashRadio.checked) {
+                            if (momoRadio) {
+                                momoRadio.checked = true;
+                                cashRadio.required = false;
+                            } else {
+                                cashRadio.checked = false;
+                            }
+                        }
+
+                        // 2. Ẩn COD và hiển thị thông báo
+                        if (cashContainer) cashContainer.style.display = 'none';
                         if (codMessage) codMessage.style.display = 'block';
 
-                        if (codRadio.checked) {
-                            momoRadio.checked = true;
-                            codRadio.required = false;
-                        }
                     } else {
-                        codOption.style.display = 'block';
-                        if (codMessage) codMessage.style.display = 'none';
-                        codRadio.required = true;
-                    }
-                }
+                        // Enable lại
+                        cashRadio.disabled = false;
+                        cashRadio.required = true;
 
-                function checkPaymentMethodAvailability(total) {
-                    updatePaymentMethodDisplay(total);
+                        if (cashContainer) cashContainer.style.display = 'block';
+                        if (codMessage) codMessage.style.display = 'none';
+                    }
                 }
 
                 function updateTotalDisplay() {
@@ -740,31 +1012,34 @@
                             currentShippingFee.toLocaleString('vi-VN') + ' đ';
                     }
                     if (installationRow && installationFeeEl) {
-                        // Luôn hiển thị phí lắp đặt nếu có giá
-                        if (installationFee > 0) {
-                            installationRow.style.display = 'flex';
+                        // Hiển thị phí lắp đặt nếu được chọn
+                        if (isInstallationSelected && installationFee > 0) {
+                            installationRow.classList.remove('d-none');
+                            installationRow.classList.add('d-flex');
+                            installationRow.style.display = ''; // Clear inline style
                             installationFeeEl.textContent = installationFee.toLocaleString('vi-VN') + ' đ';
                         } else {
-                            installationRow.style.display = 'none';
+                            installationRow.classList.remove('d-flex');
+                            installationRow.classList.add('d-none');
+                            installationRow.style.display = ''; // Clear inline style
                         }
                     }
                     if (totalAmountEl) {
                         totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' đ';
                     }
-
-                    // Cập nhật hiển thị phương thức thanh toán
-                    updatePaymentMethodDisplay();
                 }
 
                 // Xử lý checkbox lắp đặt (giữ lại để tương thích, nhưng phí lắp đặt luôn được tính)
                 const installationCheckbox = document.getElementById('installation-checkbox');
                 if (installationCheckbox) {
-                    // Phí lắp đặt mặc định luôn được áp dụng nếu có giá
+                    // Mặc định không chọn
+                    installationCheckbox.checked = false;
+                    isInstallationSelected = false;
+                    installationFee = 0;
+
                     const installationFeeInput = document.getElementById('installation_fee_input');
-                    if (installationFeeInput && installationFee > 0) {
-                        installationFeeInput.value = installationFee;
-                        installationCheckbox.checked = true;
-                        isInstallationSelected = true;
+                    if (installationFeeInput) {
+                        installationFeeInput.value = 0;
                     }
 
                     installationCheckbox.addEventListener('change', function() {
@@ -774,7 +1049,11 @@
                             installationFee = 0;
                             if (installationFeeInput) installationFeeInput.value = 0;
                         } else {
-                            installationFee = fixedInstallationFee;
+                            // Ensure fallback here too
+                            let fee = fixedInstallationFee;
+                            if (fee <= 0) fee = 100000;
+
+                            installationFee = fee;
                             if (installationFeeInput) installationFeeInput.value = installationFee;
                         }
                         updateTotalDisplay();
@@ -784,29 +1063,7 @@
                 // Khởi tạo hiển thị khi trang load
                 updateTotalDisplay();
 
-                // Xử lý khi chọn tỉnh/thành phố
-                const shippingCitySelect = document.getElementById('shipping_city');
-                if (shippingCitySelect) {
-                    shippingCitySelect.addEventListener('change', function() {
-                        const selectedOption = this.options[this.selectedIndex];
-                        if (selectedOption?.dataset?.code) {
-                            loadDistricts(selectedOption.dataset.code);
-                        }
-                        setTimeout(calculateShippingFee, 500);
-                    });
-                }
-
-                // Xử lý khi chọn quận/huyện
-                const shippingDistrictSelect = document.getElementById('shipping_district');
-                if (shippingDistrictSelect) {
-                    shippingDistrictSelect.addEventListener('change', function() {
-                        const selectedOption = this.options[this.selectedIndex];
-                        if (selectedOption?.dataset?.code) {
-                            loadWards(selectedOption.dataset.code);
-                        }
-                        setTimeout(calculateShippingFee, 300);
-                    });
-                }
+                // Event listeners đã được gắn ở đầu DOMContentLoaded, không cần gắn lại
 
                 const shippingInputs = document.querySelectorAll('input[name="shipping_method"]');
                 shippingInputs.forEach(input => {
