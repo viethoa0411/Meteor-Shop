@@ -84,10 +84,13 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Hoàn tiền vào ví nếu đã thanh toán bằng wallet
+            // Hoàn tiền vào ví nếu đơn hàng đã thanh toán (bất kể phương thức: wallet, bank, momo...)
             $refundMessage = '';
-            if ($order->payment_method === 'wallet' && $order->payment_status === 'paid') {
-                $wallet = ClientWallet::where('user_id', $order->user_id)->first();
+            if ($order->payment_status === 'paid') {
+                $wallet = ClientWallet::firstOrCreate(
+                    ['user_id' => $order->user_id],
+                    ['balance' => 0, 'status' => 'active']
+                );
 
                 if ($wallet) {
                     $refundAmount = $order->final_total;
@@ -127,7 +130,7 @@ class OrderController extends Controller
                 'cancel_reason' => $request->reason,
                 'notes' => $request->notes,
                 'cancelled_at' => now(),
-                'payment_status' => $order->payment_method === 'wallet' ? 'refunded' : $order->payment_status,
+                'payment_status' => $order->payment_status === 'paid' ? 'refunded' : $order->payment_status,
             ]);
             $this->logStatusChange($order, 'cancelled', $request->user()->id);
 
