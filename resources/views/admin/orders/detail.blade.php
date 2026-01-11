@@ -556,15 +556,6 @@
                     <tr>
                         <td>
                             <div class="fw-bold">{{ $item->product_name }}</div>
-                            @if($item->category_name)
-                                <div class="small text-muted mt-1 d-flex align-items-center">
-                                    <span class="me-1">Danh mục: {{ $item->category_name }}</span>
-                                    @if($item->category_image)
-                                        <img src="{{ asset('storage/' . $item->category_image) }}" alt=""
-                                             class="rounded-circle border" style="width: 20px; height: 20px; object-fit: cover;">
-                                    @endif
-                                </div>
-                            @endif
                         </td>
                         <td>{{ number_format($item->price, 0, ',', '.') }}₫</td>
                         <td>{{ $item->quantity }}</td>
