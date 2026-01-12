@@ -198,7 +198,8 @@ class CheckoutController extends Controller
             session(['checkout_session' => $checkoutData]);
 
             // Lấy danh sách voucher khả dụng
-            $promotions = \App\Models\Promotion::active()->available()->get();
+            $promotionService = new PromotionService();
+            $promotions = $promotionService->getApplicablePromotions($user, $cartItems, $subtotal);
 
             return view('client.checkout.cart', compact('cartItems', 'subtotal', 'user', 'checkoutData', 'shippingSettings', 'promotions'));
         }
@@ -278,7 +279,13 @@ class CheckoutController extends Controller
         session(['checkout_session' => $checkoutData]);
 
         // Lấy danh sách voucher khả dụng
-        $promotions = \App\Models\Promotion::active()->available()->get();
+        $promotionService = new PromotionService();
+        $items = [[
+            'product_id' => $productId,
+            'product'    => $product,
+            'subtotal'   => $price * $qty,
+        ]];
+        $promotions = $promotionService->getApplicablePromotions($user, $items, $price * $qty);
 
         return view('client.checkout.index', compact('product', 'variant', 'qty', 'price', 'stock', 'user', 'checkoutData', 'shippingSettings', 'promotions'));
     }
@@ -710,6 +717,23 @@ class CheckoutController extends Controller
             }
             // Xử lý thanh toán Momo
             elseif (isset($checkoutSession['payment_method']) && trim($checkoutSession['payment_method']) == 'momo') {
+                
+                // Kiểm tra số tiền > 50 triệu
+                if ($order->final_total > 50000000) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', 'Đơn hàng quá 50 triệu, vui lòng liên hệ cửa hàng để được hỗ trợ đặt hàng');
+                }
+
+                // Kiểm tra số tiền = 0
+                if ($order->final_total == 0) {
+                    $order->update(['payment_status' => 'paid']);
+                    DB::commit();
+                    session()->forget('checkout_session');
+
+                    return redirect()->route('client.checkout.success', ['order_code' => $orderCode])
+                        ->with('success', 'Đơn này được miễn phí không cần thanh toán');
+                }
+
                 Log::info('CreateOrder: Processing Momo Payment (API)');
 
 
@@ -725,7 +749,7 @@ class CheckoutController extends Controller
                     return redirect($payUrl);
                 } else {
                     DB::rollBack();
-                    return redirect()->back()->with('error', 'Đơn hàng quá 50 triệu, vui lòng liên hệ cửa hàng để được hỗ trợ đặt hàng');
+                    return redirect()->back()->with('error', 'Không thể tạo giao dịch Momo. Vui lòng thử lại sau.');
                 }
             }
 
@@ -1248,6 +1272,16 @@ class CheckoutController extends Controller
                 ->with('success', 'Đơn hàng này đã được thanh toán.');
         }
 
+        if ($order->final_total > 50000000) {
+            return redirect()->back()->with('error', 'Đơn hàng quá 50 triệu, vui lòng liên hệ cửa hàng để được hỗ trợ đặt hàng');
+        }
+
+        if ($order->final_total == 0) {
+            $order->update(['payment_status' => 'paid']);
+            return redirect()->route('client.checkout.success', ['order_code' => $orderCode])
+                ->with('success', 'Đơn này được miễn phí không cần thanh toán');
+        }
+
         $payUrl = $this->_createMomoPayment($order);
 
         if ($payUrl) {
@@ -1274,6 +1308,16 @@ class CheckoutController extends Controller
         // Nếu đơn hàng đã thanh toán rồi thì chuyển về success
         if ($order->payment_status === 'paid') {
             return redirect()->route('client.checkout.success', ['order_code' => $orderCode]);
+        }
+
+        if ($order->final_total > 50000000) {
+            return redirect()->back()->with('error', 'Đơn hàng quá 50 triệu, vui lòng liên hệ cửa hàng để được hỗ trợ đặt hàng');
+        }
+
+        if ($order->final_total == 0) {
+            $order->update(['payment_status' => 'paid']);
+            return redirect()->route('client.checkout.success', ['order_code' => $orderCode])
+                ->with('success', 'Đơn này được miễn phí không cần thanh toán');
         }
 
         // Tự động chuyển hướng đến trang thanh toán Momo

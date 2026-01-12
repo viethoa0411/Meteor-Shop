@@ -2,6 +2,7 @@
 
 @section('title', 'Admin Dashboard')
 @section('content')
+    <div class="container-fluid py-4">
 
     {{-- ========== 1. HEADER DASHBOARD ========== --}}
     <section class="dashboard-section">
@@ -55,11 +56,6 @@
                                     <span class="text-white-50">Tháng {{ now()->month }}/{{ now()->year }}:</span>
                                     <strong>{{ number_format($currentMonthRevenue) }} ₫</strong>
                             </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-white-50">Mục tiêu:</span>
-                                    <strong>{{ number_format($monthlyTarget) }} ₫</strong>
-                                </div>
-                            </div>
 
                             {{-- Tooltip trigger --}}
                             <div class="kpi-tooltip-trigger" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -68,6 +64,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 </a>
             </div>
 
@@ -5185,6 +5182,7 @@
             z-index: 9999;
         }
     </style>
+    </div>
 
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -5265,7 +5263,6 @@
             });
 
             // Gauge Animation
-            const percent = {{ round(($currentMonthRevenue / max($monthlyTarget, 1)) * 100, 2) }};
             const gauge = document.querySelector('.half-gauge-value');
             const text = document.getElementById('halfPercent');
 

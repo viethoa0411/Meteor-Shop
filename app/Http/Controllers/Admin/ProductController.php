@@ -76,7 +76,6 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'images' => 'nullable',
             'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-            'status' => 'required|in:active,inactive',
 
             // Validate biến thể
             'variants' => 'required|array|min:1',
@@ -110,7 +109,7 @@ class ProductController extends Controller
             $count++;
         }
 
-        // 🛍️ Tạo sản phẩm chính
+        // Tạo sản phẩm chính
         $product = Product::create([
             'name' => $request->name,
             'slug' => $slug,
@@ -118,11 +117,11 @@ class ProductController extends Controller
             'price' => $request->price,
             'image' => $imagePath,
             'category_id' => $request->category_id,
-            'status' => $request->status,
+            'status' => 'active',
             'stock' => $request->stock,
         ]);
 
-        // 🖼 Lưu ảnh chi tiết (nếu có)
+        // Lưu ảnh chi tiết (nếu có)
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $img) {
                 $path = $img->store('products', 'public');
@@ -132,7 +131,7 @@ class ProductController extends Controller
             }
         }
 
-        // 🧩 Lưu biến thể kèm tồn kho riêng
+        // Lưu biến thể kèm tồn kho riêng
         if ($request->has('variants')) {
             foreach ($request->variants as $variant) {
                 $product->variants()->create([
@@ -304,8 +303,6 @@ class ProductController extends Controller
         // Xử lý upload ảnh phụ (nếu có)
         if ($request->hasFile('images') && !$product->hasOrders()) {
 
-
-
             // 1. XÓA toàn bộ ảnh cũ (trong database + trong storage)
             foreach ($product->images as $img) {
                 if ($img->image && Storage::disk('public')->exists($img->image)) {
@@ -323,7 +320,7 @@ class ProductController extends Controller
         }
 
         // ==========================
-        // 🔥 TĂNG VERSION SẢN PHẨM
+        //  TĂNG VERSION SẢN PHẨM
         // ==========================
         $product->increment('product_version');
         $product->refresh();

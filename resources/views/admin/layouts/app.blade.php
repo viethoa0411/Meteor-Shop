@@ -969,7 +969,7 @@
     <!-- Header -->
     <header class="admin-header">
         <nav class="navbar navbar-expand-lg px-4 py-3">
-            <div class="container-fluid d-flex align-items-center justify-content-between">
+            <div class="container-fluid d-flex align-items-center gap-4">
                 <div class="d-flex align-items-center">
                     <!-- Mobile Menu Toggle -->
                     <button class="admin-header-btn d-lg-none me-3" id="mobileMenuToggle" type="button">
@@ -999,7 +999,7 @@
                             <i class="bi bi-bell-fill"></i>
 
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg border-0"
+                        <ul class="dropdown-menu notification-dropdown shadow-lg border-0"
                             id="notificationDropdown"
                             style="min-width: 380px; max-width: 420px; max-height: 500px; overflow-y: auto; padding: 0;">
                             <!-- Header -->
@@ -1056,7 +1056,7 @@
                             <i class="bi bi-person-circle me-2 fs-5"></i>
                             <span class="d-none d-md-inline">{{ Auth::user()->name ?? 'Admin' }}</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0"
+                        <ul class="dropdown-menu shadow-lg border-0"
                             style="min-width: 200px; margin-top: 10px;">
                             <li>
                                 <a href="" class="dropdown-item py-2">
@@ -1108,6 +1108,11 @@
             <a href="{{ route('admin.products.list') }}"
                 class="admin-sidebar-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> Sản phẩm
+            </a>
+
+            <a href="{{ route('admin.wishlist.index') }}"
+                class="admin-sidebar-link {{ request()->routeIs('admin.wishlist.*') ? 'active' : '' }}">
+                <i class="bi bi-heart-fill"></i> Sản phẩm yêu thích
             </a>
 
             <a href="{{ route('admin.orders.list') }}"

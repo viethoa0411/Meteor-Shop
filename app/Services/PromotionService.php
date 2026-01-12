@@ -17,6 +17,11 @@ class PromotionService
             return ['ok' => false, 'error' => 'Mã khuyến mãi không tồn tại'];
         }
 
+        return $this->checkValidity($promotion, $user, $items, $orderSubtotal);
+    }
+
+    public function checkValidity(Promotion $promotion, $user, array $items, float $orderSubtotal): array
+    {
         if ($promotion->status !== 'active') {
             return ['ok' => false, 'error' => 'Mã khuyến mãi không hoạt động'];
         }
@@ -32,7 +37,6 @@ class PromotionService
         if (!is_null($promotion->limit_global) && $promotion->used_count >= $promotion->limit_global) {
             return ['ok' => false, 'error' => 'Mã khuyến mãi đã đạt giới hạn toàn hệ thống'];
         }
-        // Bỏ kiểm tra usage_limit (legacy)
 
         if ($user) {
             $usage = UserPromotionUsage::where('user_id', $user->id)->where('promotion_id', $promotion->id)->first();
@@ -78,6 +82,18 @@ class PromotionService
         ];
     }
 
+    public function getApplicablePromotions($user, array $items, float $orderSubtotal)
+    {
+        $promotions = Promotion::active()->available()
+            ->with(['categories', 'products'])
+            ->get();
+
+        return $promotions->filter(function ($promotion) use ($user, $items, $orderSubtotal) {
+            $result = $this->checkValidity($promotion, $user, $items, $orderSubtotal);
+            return $result['ok'];
+        });
+    }
+
     private function calculateEligibleAmount(Promotion $promotion, array $items): float
     {
         if ($promotion->scope === 'all') {
@@ -85,11 +101,11 @@ class PromotionService
         }
 
         if ($promotion->scope === 'category') {
-            $allowed = $promotion->categories()->pluck('categories.id')->toArray();
+            $allowed = $promotion->categories->pluck('id')->map(fn($id) => (int)$id)->toArray();
             $sum = 0.0;
             foreach ($items as $i) {
                 $catId = $i['product']->category_id ?? null;
-                if ($catId && in_array($catId, $allowed)) {
+                if ($catId && in_array((int)$catId, $allowed, true)) {
                     $sum += $i['subtotal'] ?? 0;
                 }
             }
@@ -97,11 +113,11 @@ class PromotionService
         }
 
         if ($promotion->scope === 'product') {
-            $allowed = $promotion->products()->pluck('products.id')->toArray();
+            $allowed = $promotion->products->pluck('id')->map(fn($id) => (int)$id)->toArray();
             $sum = 0.0;
             foreach ($items as $i) {
                 $pid = $i['product_id'] ?? ($i['product']->id ?? null);
-                if ($pid && in_array($pid, $allowed)) {
+                if ($pid && in_array((int)$pid, $allowed, true)) {
                     $sum += $i['subtotal'] ?? 0;
                 }
             }

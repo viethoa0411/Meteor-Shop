@@ -12,28 +12,41 @@
         @endif
 
         <div class="card border-0 shadow-sm mb-4 bg-body">
-            <div class="card-body d-flex justify-content-between align-items-center">
+            <div class="card-body">
                 <h3 class="fw-bold text-primary mb-0">
                     <i class="bi bi-ticket-perforated me-2"></i>Danh sách khuyến mãi
                 </h3>
-                <a href="{{ route('admin.promotions.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Thêm khuyến mãi
-                </a>
             </div>
         </div>
 
         <div class="card shadow-sm bg-body mb-3">
-            <div class="card-body d-flex flex-wrap gap-3 align-items-center">
+            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex gap-2">
+                    <a href="{{ route('admin.promotions.list', ['status' => '', 'keyword' => request('keyword')]) }}"
+                        class="btn {{ !request('status') ? 'btn-primary' : 'btn-outline-primary' }}">
+                        <i class="bi bi-list-ul"></i> Tất cả
+                    </a>
+                    <a href="{{ route('admin.promotions.list', ['status' => 'active', 'keyword' => request('keyword')]) }}"
+                        class="btn {{ request('status') == 'active' ? 'btn-success text-white' : 'btn-outline-success' }}">
+                        <i class="bi bi-check-circle"></i> Hoạt động
+                    </a>
+                    <a href="{{ route('admin.promotions.list', ['status' => 'inactive', 'keyword' => request('keyword')]) }}"
+                        class="btn {{ request('status') == 'inactive' ? 'btn-warning text-white' : 'btn-outline-warning' }}">
+                        <i class="bi bi-pause-circle"></i> Dừng hoạt động
+                    </a>
+                </div>
+
                 <form action="{{ route('admin.promotions.list') }}" method="GET" class="d-flex gap-2">
-                    <input type="text" name="keyword" class="form-control" placeholder="Tìm theo mã hoặc tên" value="{{ request('keyword') }}" style="max-width: 320px;">
-                    <select name="status" class="form-select" style="max-width: 200px;">
-                        <option value="">Trạng thái</option>
-                        <option value="active" {{ request('status')==='active' ? 'selected' : '' }}>Hoạt động</option>
-                        <option value="inactive" {{ request('status')==='inactive' ? 'selected' : '' }}>Tạm ẩn</option>
-                        <option value="expired" {{ request('status')==='expired' ? 'selected' : '' }}>Hết hạn</option>
-                    </select>
-                    <button class="btn btn-primary"><i class="bi bi-search"></i> Lọc</button>
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                    <div class="input-group">
+                        <input type="text" name="keyword" class="form-control" placeholder="Tìm theo mã hoặc tên" value="{{ request('keyword') }}" style="min-width: 300px;">
+                        <button class="btn btn-primary"><i class="bi bi-search"></i> Tìm kiếm</button>
+                    </div>
                 </form>
+
+                <a href="{{ route('admin.promotions.create') }}" class="btn btn-primary text-nowrap">
+                    <i class="bi bi-plus-circle"></i> Thêm khuyến mãi
+                </a>
             </div>
         </div>
 
@@ -75,7 +88,7 @@
                                     @if ($p->status == 'active')
                                         <span class="badge bg-success">Hoạt động</span>
                                     @elseif ($p->status == 'inactive')
-                                        <span class="badge bg-warning text-dark">Tạm ẩn</span>
+                                        <span class="badge bg-warning text-dark">Dừng hoạt động</span>
                                     @else
                                         <span class="badge bg-danger">Hết hạn</span>
                                     @endif

@@ -54,7 +54,6 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:categories,slug',
             'parent_id' => 'nullable|exists:categories,id',
-            'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
 
@@ -71,7 +70,7 @@ class CategoryController extends Controller
             'slug' => $slug,
             'image' => $imagePath,
             'parent_id' => $request->parent_id,
-            'status' => $request->status,
+            'status' => 'active',
         ]);
 
         return redirect()->route('admin.categories.list')
@@ -179,7 +178,7 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->route('admin.categories.list')
-            ->with('success', 'Xoá danh mục thành công!');
+            ->with('success', 'Xóa danh mục thành công!');
     }
 
     // Hàm đệ quy lấy tất cả ID của danh mục con

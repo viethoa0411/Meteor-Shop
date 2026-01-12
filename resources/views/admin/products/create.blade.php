@@ -96,12 +96,8 @@
                             {{-- Trạng thái --}}
                             <div class="mb-3">
                                 <label class="form-label">Trạng thái <span class="text-danger">*</span></label>
-                                <select name="status" class="form-select" required>
-                                    <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Active
-                                    </option>
-                                    <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive
-                                    </option>
-                                </select>
+                                <input type="hidden" name="status" value="active">
+                                <input type="text" class="form-control" value="Hoạt động" disabled>
                             </div>
 
                             {{-- Mô tả --}}

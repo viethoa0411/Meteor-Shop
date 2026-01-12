@@ -14,8 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use App\Models\OrderStatusHistory;
 use App\Models\OrderLog;
-
-
+use App\Services\NotificationService;
 
 class RefundController extends Controller
 {
@@ -155,7 +154,6 @@ class RefundController extends Controller
                 ]);
             }
 
-            // Liên kết refund với transaction nếu có (cho đơn hàng đã thanh toán online)
             if (in_array($order->payment_method, ['bank', 'momo'])) {
                 $transaction = Transaction::where('order_id', $order->id)
                     ->where('type', 'income')
@@ -166,8 +164,20 @@ class RefundController extends Controller
                 }
             }
 
-            // Gửi email thông báo
             $this->sendRefundNotificationEmail($refund, $order);
+
+            NotificationService::createForAdmins([
+                'type' => 'order',
+                'level' => 'warning',
+                'title' => 'Yêu cầu trả hàng hoàn tiền mới',
+                'message' => 'Đơn hàng #' . ($order->order_code ?? $order->id) . ' có yêu cầu trả hàng hoàn tiền mới',
+                'url' => route('admin.orders.returns.show', $order->id),
+                'metadata' => [
+                    'order_id' => $order->id,
+                    'refund_id' => $refund->id,
+                    'refund_type' => 'return',
+                ],
+            ]);
 
             DB::commit();
 
@@ -324,4 +334,3 @@ class RefundController extends Controller
         abort_if($order->user_id !== $userId, 403, 'Bạn không có quyền truy cập đơn hàng này.');
     }
 }
-

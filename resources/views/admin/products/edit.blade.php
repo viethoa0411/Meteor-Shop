@@ -113,10 +113,10 @@
                             <div class="mt-3">
                                 <label class="form-label">Trạng thái <span class="text-danger">*</span></label>
                                 <select name="status" class="form-select" required>
-                                    <option value="active" {{ $product->status === 'active' ? 'selected' : '' }}>Active
+                                    <option value="active" {{ $product->status === 'active' ? 'selected' : '' }}>Hoạt động
                                     </option>
                                     <option value="inactive" {{ $product->status === 'inactive' ? 'selected' : '' }}>
-                                        Inactive</option>
+                                        Dừng hoạt động</option>
                                 </select>
                             </div>
 

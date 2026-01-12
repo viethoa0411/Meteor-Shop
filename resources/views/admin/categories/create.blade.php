@@ -45,13 +45,7 @@
             </select>
         </div>
 
-        <div class="mb-3">
-            <label for="status" class="form-label">Trạng thái</label>
-            <select class="form-select" name="status" required>
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Tạm ẩn</option>
-            </select>
-        </div>
+        <input type="hidden" name="status" value="active">
 
         <button type="submit" class="btn btn-success">Thêm danh mục</button>
         <a href="{{ route('admin.categories.list') }}" class="btn btn-secondary">Quay lại</a>

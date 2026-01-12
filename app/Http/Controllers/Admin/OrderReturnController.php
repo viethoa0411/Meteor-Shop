@@ -131,7 +131,7 @@ class OrderReturnController extends Controller
 
             // Redirect về trang danh sách returns để admin thấy trạng thái đã cập nhật
             return redirect()->route('admin.orders.returns.index', ['status' => 'approved'])
-                ->with('success', 'Đã duyệt yêu cầu trả hàng thành công! Trạng thái đã được cập nhật thành "Đã duyệt".');
+                ->with('success', 'Đã chấp nhận hoàn hàng từ người dùng thành công.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());

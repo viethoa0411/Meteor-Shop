@@ -103,6 +103,22 @@ class PromotionController extends Controller
             return back()->withErrors(['max_discount' => 'Vui lòng nhập giới hạn tiền giảm tối đa khi chọn giảm theo %'])->withInput();
         }
 
+        if ($validated['discount_type'] === 'percent' && $validated['discount_value'] > 100) {
+            return back()->withErrors(['discount_value' => 'Giá trị giảm phần trăm không được vượt quá 100%'])->withInput();
+        }
+
+        if ($validated['discount_type'] === 'fixed' && $validated['discount_value'] > 10000000) {
+            return back()->withErrors(['discount_value' => 'Giá trị giảm số tiền không được vượt quá 10.000.000đ'])->withInput();
+        }
+
+        if ($validated['scope'] === 'category' && empty($request->category_ids)) {
+            return back()->withErrors(['category_ids' => 'Vui lòng chọn ít nhất một danh mục'])->withInput();
+        }
+
+        if ($validated['scope'] === 'product' && empty($request->product_ids)) {
+            return back()->withErrors(['product_ids' => 'Vui lòng chọn ít nhất một sản phẩm'])->withInput();
+        }
+
         $promotion = Promotion::create([
             'code' => $validated['code'],
             'name' => $validated['name'],
@@ -171,6 +187,22 @@ class PromotionController extends Controller
 
         if ($validated['discount_type'] === 'percent' && empty($validated['max_discount'])) {
             return back()->withErrors(['max_discount' => 'Vui lòng nhập giới hạn tiền giảm tối đa khi chọn giảm theo %'])->withInput();
+        }
+
+        if ($validated['discount_type'] === 'percent' && $validated['discount_value'] > 100) {
+            return back()->withErrors(['discount_value' => 'Giá trị giảm phần trăm không được vượt quá 100%'])->withInput();
+        }
+
+        if ($validated['discount_type'] === 'fixed' && $validated['discount_value'] > 10000000) {
+            return back()->withErrors(['discount_value' => 'Giá trị giảm số tiền không được vượt quá 10.000.000đ'])->withInput();
+        }
+
+        if ($validated['scope'] === 'category' && empty($request->category_ids)) {
+            return back()->withErrors(['category_ids' => 'Vui lòng chọn ít nhất một danh mục'])->withInput();
+        }
+
+        if ($validated['scope'] === 'product' && empty($request->product_ids)) {
+            return back()->withErrors(['product_ids' => 'Vui lòng chọn ít nhất một sản phẩm'])->withInput();
         }
 
         $promotion->update([

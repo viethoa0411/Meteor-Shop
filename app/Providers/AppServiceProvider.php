@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Category;
+use App\Models\Collection;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,14 @@ class AppServiceProvider extends ServiceProvider
             'childCategories',
             Category::whereNotNull('parent_id')
                 ->where('status', 1)
+                ->get()
+        );
+
+        // ✅ Chia sẻ collections cho tất cả view (menu)
+        View::share(
+            'collections',
+            Collection::active()
+                ->orderBy('sort_order', 'asc')
                 ->get()
         );
     }

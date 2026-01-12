@@ -9,7 +9,6 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 
 // ===== ADMIN CONTROLLERS =====
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\MonthlyTargetController;
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
@@ -154,12 +153,6 @@ Route::middleware(['admin'])
             ->name('dashboard.users.ban');
         Route::post('/api/dashboard/users/{id}/unban', [DashboardController::class, 'unbanUser'])
             ->name('dashboard.users.unban');
-
-        // Monthly Target
-        Route::get('monthly-target/create', [MonthlyTargetController::class, 'create'])
-            ->name('monthly_target.create');
-        Route::post('monthly-target/store', [MonthlyTargetController::class, 'store'])
-            ->name('monthly_target.store');
 
         /* Categories */
         Route::prefix('categories')->name('categories.')->group(function () {

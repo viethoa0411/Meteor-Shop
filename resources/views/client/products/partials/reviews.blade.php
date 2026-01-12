@@ -303,10 +303,10 @@
 </div>
 
 {{-- Lightbox for review images (tách biệt với lightbox ảnh sản phẩm) --}}
-<div class="modal fade" id="reviewImageLightbox" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="reviewImageLightbox" tabindex="-1" aria-hidden="true" style="background: rgba(10, 10, 10, 0.92); backdrop-filter: blur(5px);">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content bg-transparent border-0 position-relative">
-            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" style="z-index: 1051; background: rgba(0,0,0,0.5); border-radius: 50%; padding: 0.5rem;"></button>
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 lightbox-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
             <div class="lightbox-container position-relative">
                 <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" onclick="lightboxPrev()" style="display: none;">
@@ -322,7 +322,7 @@
                 </button>
             </div>
 
-            <div class="lightbox-counter position-absolute bottom-0 start-50 translate-middle-x mb-3" id="lightboxCounter" style="display: none; background: rgba(0,0,0,0.7); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600;"></div>
+            <div class="lightbox-counter position-absolute bottom-0 start-50 translate-middle-x mb-4 lightbox-counter-badge" id="lightboxCounter" style="display: none;"></div>
         </div>
     </div>
 </div>
@@ -814,10 +814,10 @@
         border-radius: 0;
         overflow: visible;
         cursor: pointer;
-        width: 90px !important;
-        min-width: 90px !important;
-        max-width: 90px !important;
-        height: 90px !important;
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+        height: 120px !important;
         flex-shrink: 0 !important;
         flex-grow: 0 !important;
         border: none;
@@ -842,13 +842,14 @@
     }
 
     .review-image-item:hover {
-        transform: translateY(-1px) scale(1.2);
+        transform: translateY(-3px);
         z-index: 10;
+        cursor: zoom-in;
     }
 
     .review-image-item:hover .image-wrapper {
         border-color: #212529;
-        box-shadow: 0 1px 3px rgba(33, 37, 41, 0.3);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     }
 
     .review-image-item:hover::before {
@@ -861,12 +862,12 @@
 
     .review-image-item .image-wrapper {
         position: relative;
-        width: 90px !important;
-        height: 90px !important;
-        min-width: 90px !important;
-        max-width: 90px !important;
-        min-height: 90px !important;
-        max-height: 90px !important;
+        width: 120px !important;
+        height: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+        min-height: 120px !important;
+        max-height: 120px !important;
         overflow: hidden !important;
         display: inline-flex;
         align-items: center;
@@ -878,12 +879,12 @@
     }
 
     .review-image-item img {
-        width: 90px !important;
-        height: 90px !important;
-        min-width: 90px !important;
-        max-width: 90px !important;
-        min-height: 90px !important;
-        max-height: 90px !important;
+        width: 120px !important;
+        height: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+        min-height: 120px !important;
+        max-height: 120px !important;
         object-fit: contain !important;
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: block !important;
@@ -901,10 +902,10 @@
 
     .review-images-grid .review-image-item .image-wrapper,
     .review-images-grid .review-image-item .image-wrapper img {
-        width: 90px !important;
-        height: 90px !important;
-        max-width: 90px !important;
-        max-height: 90px !important;
+        width: 120px !important;
+        height: 120px !important;
+        max-width: 120px !important;
+        max-height: 120px !important;
     }
 
     .review-image-item img.image-error {
@@ -1556,31 +1557,53 @@
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         color: white;
-        width: 50px;
-        height: 50px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.75rem;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1050;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     .lightbox-nav:hover {
-        background: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.95);
+        color: #1a1a1a;
+        border-color: white;
         transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     .lightbox-nav:disabled {
         opacity: 0.3;
         cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .lightbox-close {
+        z-index: 1051;
+        background-color: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        border-radius: 50%;
+        padding: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0.8;
+    }
+
+    .lightbox-close:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg) scale(1.1);
+        opacity: 1;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
 
     .lightbox-prev {
@@ -1591,9 +1614,20 @@
         right: 20px;
     }
 
-    .lightbox-counter {
+    .lightbox-counter-badge {
         z-index: 1051;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        letter-spacing: 1px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     /* Empty State */
@@ -2124,7 +2158,7 @@
                         // Escape URL để tránh XSS và lỗi syntax
                         const safeImg = String(img).replace(/'/g, "\\'").replace(/"/g, '&quot;');
                         imagesHtml += `
-                        <div class="review-image-item" onclick="openReviewLightbox('${safeImg}', ${index})" aria-label="Xem ảnh đánh giá" role="button">
+                        <div class="review-image-item" onclick="openReviewLightbox(this, '${safeImg}', ${index})" aria-label="Xem ảnh đánh giá" role="button">
                             <div class="image-wrapper">
                                 <img src="${safeImg}"
                                      alt="Review image ${index + 1}"
@@ -3288,12 +3322,12 @@
     let currentImageIndex = 0;
     let currentImageList = [];
 
-    function openReviewLightbox(imageSrc, index = 0) {
+    function openReviewLightbox(element, imageSrc, index = 0) {
         const lightbox = document.getElementById('reviewImageLightbox');
         const lightboxImage = document.getElementById('lightboxImage');
 
         // Lấy tất cả images từ review hiện tại
-        const reviewItem = event.target.closest('.review-item');
+        const reviewItem = element.closest('.review-item');
         if (reviewItem) {
             const imageItems = reviewItem.querySelectorAll('.review-image-item');
             currentImageList = Array.from(imageItems).map(item => {
@@ -3325,8 +3359,10 @@
             this.style.opacity = '1';
         };
         lightboxImage.onerror = function() {
-            this.src = '/images/placeholder.jpg';
+            this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'%3E%3C/circle%3E%3Cpolyline points='21 15 16 10 5 21'%3E%3C/polyline%3E%3C/svg%3E";
             this.style.opacity = '1';
+            this.style.padding = '50px';
+            this.style.background = '#f8f9fa';
         };
 
         // Convert relative path to full URL if needed
@@ -3346,12 +3382,12 @@
         const counter = document.getElementById('lightboxCounter');
 
         if (prevBtn) {
-            prevBtn.style.display = currentImageList.length > 1 ? 'block' : 'none';
+            prevBtn.style.display = currentImageList.length > 1 ? 'flex' : 'none';
             prevBtn.disabled = currentImageIndex === 0;
         }
 
         if (nextBtn) {
-            nextBtn.style.display = currentImageList.length > 1 ? 'block' : 'none';
+            nextBtn.style.display = currentImageList.length > 1 ? 'flex' : 'none';
             nextBtn.disabled = currentImageIndex === currentImageList.length - 1;
         }
 

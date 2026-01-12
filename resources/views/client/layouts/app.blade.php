@@ -1302,6 +1302,22 @@
                             @endforeach
                         </ul>
                     </li>
+                    <li class="has-dropdown">
+                        <a href="{{ route('client.collections.index') }}" class="dropdown-toggle">Bộ sưu tập</a>
+                        <ul class="dropdown-menu">
+                            @forelse ($collections as $collection)
+                                <li>
+                                    <a href="{{ route('client.collections.show', $collection->slug) }}">
+                                        {{ $collection->name }}
+                                    </a>
+                                </li>
+                            @empty
+                                <li><span
+                                        style="display: block; padding: 12px 16px; color: #9ca3af; font-size: 14px;">Đang
+                                        cập nhật</span></li>
+                            @endforelse
+                        </ul>
+                    </li>
                     <li><a href="{{ route('client.contact.list') }}">Thiết kế nội thất</a></li>
                     <li><a href="{{ route('client.blogs.list') }}">Bài viết</a></li>
                 </ul>

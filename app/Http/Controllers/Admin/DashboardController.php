@@ -10,7 +10,6 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Review;
 use App\Models\ReviewAuditLog;
-use App\Models\MonthlyTarget;
 use App\Models\Contact;
 use App\Models\ChatSession;
 use App\Models\DepositRequest;
@@ -94,19 +93,6 @@ class DashboardController extends Controller
         // Tổng doanh thu tất cả thời gian (đơn hoàn thành)
         $totalCompletedRevenue = Order::where('order_status', 'completed')
             ->sum('final_total');
-
-        // Kiểm tra mục tiêu tháng
-        $monthlyTargetModel = MonthlyTarget::where('year', $year)
-            ->where('month', $month)
-            ->first();
-
-        $showTargetAlert = false;
-        if (!$monthlyTargetModel) {
-            $showTargetAlert = true; // hiển thị cảnh báo
-        }
-
-        // Gán giá trị cho biến monthlyTarget
-        $monthlyTarget = $monthlyTargetModel ? $monthlyTargetModel->target_amount : 0;
 
         // Lọc doanh thu theo khoảng thời gian
         $startDate = $request->input('start_date');
@@ -378,6 +364,8 @@ class DashboardController extends Controller
         $categoryLabels = array_map(fn ($c) => $c['name'], $topCategories);
         $categoryRevenue = array_map(fn ($c) => round($c['revenue']), $topCategories);
 
+        $showTargetAlert = false; // Fix undefined variable
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalOrders',
@@ -391,7 +379,6 @@ class DashboardController extends Controller
             'totalProducts',
             'soldProductsLast30Days',
 
-            'monthlyTarget',
             'revenueData',
             'filteredRevenue',
             'startDate',
@@ -1880,7 +1867,7 @@ class DashboardController extends Controller
                 'totalUnread' => $totalUnread,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error loading notifications:', [
+            Log::error('Error loading notifications:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

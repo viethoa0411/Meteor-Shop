@@ -194,7 +194,7 @@
 
         {{-- CỘT PHẢI: HÀNH ĐỘNG --}}
         <div class="col-lg-4">
-            <div class="card shadow-sm sticky-top" style="top: 20px;">
+            <div class="card shadow-sm">
                 <div class="card-header bg-danger text-white">
                     <h5 class="mb-0">Thao tác</h5>
                 </div>
@@ -264,4 +264,3 @@
     </div>
 </div>
 @endsection
-
