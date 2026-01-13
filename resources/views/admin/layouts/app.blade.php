@@ -347,7 +347,7 @@
         .toast-notification {
             position: fixed;
             top: 20px;
-            right: 20px;
+            right: 10px;
             min-width: 300px;
             max-width: 400px;
             background: white;
@@ -999,7 +999,7 @@
                             <i class="bi bi-bell-fill"></i>
 
                         </button>
-                        <ul class="dropdown-menu notification-dropdown shadow-lg border-0"
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg border-0"
                             id="notificationDropdown"
                             style="min-width: 380px; max-width: 420px; max-height: 500px; overflow-y: auto; padding: 0;">
                             <!-- Header -->
