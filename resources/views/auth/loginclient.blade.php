@@ -336,10 +336,10 @@
                     <!-- Remember & Forgot -->
                     <div class="remember-forgot">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                            <label class="form-check-label" for="remember">
+                            {{-- <input class="form-check-input" type="checkbox" id="remember" name="remember"> --}}
+                            {{-- <label class="form-check-label" for="remember">
                                 Ghi nhớ tôi
-                            </label>
+                            </label> --}}
                         </div>
                         <a href="{{ route('password.request') }}" class="forgot-password">Quên mật khẩu?</a>
                     </div>

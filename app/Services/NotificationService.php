@@ -93,6 +93,40 @@ class NotificationService
     }
 
     /**
+     * Notify user about return request status update
+     */
+    public static function notifyReturnStatusUpdate($order, $status): void
+    {
+        $statusText = match($status) {
+            'approved' => 'được chấp nhận',
+            'rejected' => 'bị từ chối',
+            'completed' => 'hoàn tất',
+            'refunded' => 'đã hoàn tiền',
+            'received' => 'đã nhận được hàng hoàn',
+            default => 'được cập nhật',
+        };
+
+        $level = match($status) {
+            'approved', 'completed', 'refunded', 'received' => 'success',
+            'rejected' => 'danger',
+            default => 'info',
+        };
+        
+        $title = 'Cập nhật yêu cầu trả hàng';
+        $orderCode = $order->order_code ?? $order->id;
+        $message = "Yêu cầu trả hàng cho đơn hàng #{$orderCode} đã {$statusText}.";
+
+        self::createForUser($order->user_id, [
+            'type' => 'order',
+            'level' => $level,
+            'title' => $title,
+            'message' => $message,
+            'url' => route('client.account.orders.show', $order->id),
+            'metadata' => ['order_id' => $order->id, 'return_status' => $status]
+        ]);
+    }
+
+    /**
      * Create review notification
      */
     public static function notifyNewReview($review): void

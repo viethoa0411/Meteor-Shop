@@ -93,9 +93,9 @@
                 <div class="wallet-label"><i class="bi bi-wallet2 me-2"></i>Số dư ví</div>
                 <div class="wallet-balance">{{ $wallet->formatted_balance }}</div>
                 <div class="wallet-actions">
-                    <a href="{{ route('client.account.wallet.deposit') }}" class="wallet-btn wallet-btn-deposit">
+                    {{-- <a href="{{ route('client.account.wallet.deposit') }}" class="wallet-btn wallet-btn-deposit">
                         <i class="bi bi-plus-circle me-2"></i>Nạp tiền
-                    </a>
+                    </a> --}}
                     <a href="{{ route('client.account.wallet.withdraw') }}" class="wallet-btn wallet-btn-withdraw">
                         <i class="bi bi-arrow-up-circle me-2"></i>Rút tiền
                     </a>

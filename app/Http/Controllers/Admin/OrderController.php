@@ -222,6 +222,10 @@ class OrderController extends Controller
                         'metadata' => ['order_id' => $id, 'status' => $newStatus]
                     ]);
                 }
+
+                if ($newStatus === 'returned' && $currentStatus !== 'returned') {
+                     \App\Services\NotificationService::notifyReturnStatusUpdate($order, 'completed');
+                }
             }
         } catch (\Exception $e) {
             // Không dừng flow nếu tạo notification thất bại

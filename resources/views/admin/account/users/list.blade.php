@@ -189,14 +189,14 @@
 
 
                 {{-- Nút chức năng --}}
-                <div class="d-flex flex-shrink-0 gap-2">
+                {{-- <div class="d-flex flex-shrink-0 gap-2">
                     <a href="{{ route('admin.account.users.trash') }}" class="btn btn-outline-secondary">
                         <i class="bi bi-person-fill-slash"></i> Tài khoản bị ẩn
                     </a>
                     <a href="{{ route('admin.account.users.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Thêm người dùng
                     </a>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -243,7 +243,7 @@
                                 {{-- Các nút hành động --}}
                             <td data-label="Hành động">
                                 <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                                    <a href="{{ route('admin.account.users.edit', $user->id) }}" class="btn btn-sm btn-info">
+                                    {{-- <a href="{{ route('admin.account.users.edit', $user->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-pencil-square"></i> Sửa
                                     </a>
 
@@ -254,7 +254,7 @@
                                         <button type="submit" class="btn btn-sm btn-danger">
                                             <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
                                         </button>
-                                    </form>
+                                    </form> --}}
                                     <a href="{{ route('admin.account.users.show', $user->id) }}" class="btn btn-sm btn-secondary">
                                         <i class="bi bi-eye"></i> Xem Chi Tiết
                                     </a>

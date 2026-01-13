@@ -12,9 +12,6 @@
                     <i class="bi bi-speedometer2 text-primary"></i>
                     <span>Dashboard quản trị</span>
                 </h4>
-                <p class="text-muted small mb-0">
-                    Tổng quan real-time về doanh thu, đơn hàng, sản phẩm và người dùng trong hệ thống Meteor-Shop.
-                </p>
             </div>
 
             {{-- (Đã ẩn cụm search / language / notification theo yêu cầu) --}}

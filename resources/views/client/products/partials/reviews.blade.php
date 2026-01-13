@@ -2242,9 +2242,6 @@
                                 <button class="btn btn-sm btn-outline-danger btn-report" onclick="openReportModal(${reviewId})" type="button">
                                     <i class="bi bi-flag"></i> Báo cáo
                                 </button>
-                                <button class="btn btn-sm btn-outline-secondary btn-share" onclick="shareReview(${reviewId})" type="button">
-                                    <i class="bi bi-share"></i> Chia sẻ
-                                </button>
                             </div>
                         </div>
                     </div>

@@ -190,9 +190,9 @@
             {{-- Nút chức năng --}}
             <div class="d-flex flex-shrink-0 gap-2">
                 <!-- Trang tài khoản bị ẩn -->
-                <a href="{{ route('admin.account.admin.trash') }}" class="btn btn-outline-secondary">
+                {{-- <a href="{{ route('admin.account.admin.trash') }}" class="btn btn-outline-secondary">
                     <i class="bi bi-person-fill-slash"></i> Tài khoản bị ẩn
-                </a>
+                </a> --}}
                 <!-- Thêm người dùng -->
                 <a href="{{ route('admin.account.admin.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Thêm người dùng
@@ -250,13 +250,13 @@
                             <i class="bi bi-shield-lock"></i> Thay đổi thông tin
                         </a>
 
-                        <form action="{{ route('admin.account.admin.destroy', $user->id) }}" method="POST" class="d-inline">
+                        {{-- <form action="{{ route('admin.account.admin.destroy', $user->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="button" class="btn btn-sm btn-danger btn-delete" data-name="{{ $user->name }}">
                                 <i class="bi bi-person-fill-slash"></i> Ẩn tài khoản
                             </button>
-                        </form>
+                        </form> --}}
 
                         <a href="{{ route('admin.account.admin.show', $user->id) }}" class="btn btn-sm btn-secondary">
                             <i class="bi bi-eye"></i> Xem Chi Tiết

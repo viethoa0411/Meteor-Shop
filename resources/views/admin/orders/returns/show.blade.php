@@ -193,13 +193,13 @@
                 <div class="card-body">
                     @if ($order->return_status === 'requested')
                         {{-- DUYỆT YÊU CẦU --}}
-                        <form action="{{ route('admin.orders.returns.approve', $order->id) }}" method="POST" class="mb-3">
+                        <form action="{{ route('admin.orders.returns.approve', $order->id) }}" method="POST" class="mb-3" id="approve-return-form">
                             @csrf
                             <div class="mb-3">
                                 <label for="admin_note" class="form-label">Ghi chú (tùy chọn):</label>
                                 <textarea name="admin_note" id="admin_note" class="form-control" rows="3" placeholder="Nhập ghi chú nếu có..."></textarea>
                             </div>
-                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Bạn có chắc chắn muốn duyệt yêu cầu trả hàng này?')">
+                            <button type="button" class="btn btn-success w-100" id="approve-return-button" data-order-code="{{ $order->order_code }}">
                                 <i class="bi bi-check-circle"></i> Duyệt yêu cầu
                             </button>
                         </form>
@@ -259,30 +259,71 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Handle Reject Button
         var rejectButton = document.getElementById('reject-return-button');
         var rejectForm = document.getElementById('reject-return-form');
 
-        if (rejectButton && rejectForm && typeof Swal !== 'undefined') {
+        if (rejectButton && rejectForm) {
             rejectButton.addEventListener('click', function () {
                 var orderCode = this.getAttribute('data-order-code') || '';
                 var text = orderCode
                     ? 'Bạn có chắc chắn muốn từ chối yêu cầu trả hàng cho đơn "' + orderCode + '" không?'
                     : 'Bạn có chắc chắn muốn từ chối yêu cầu trả hàng này không?';
 
-                Swal.fire({
-                    title: 'Xác nhận từ chối?',
-                    text: text,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Từ chối ngay',
-                    cancelButtonText: 'Hủy'
-                }).then(function (result) {
-                    if (result.isConfirmed) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Xác nhận từ chối?',
+                        text: text,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Từ chối ngay',
+                        cancelButtonText: 'Hủy'
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            rejectForm.submit();
+                        }
+                    });
+                } else {
+                    if (confirm(text)) {
                         rejectForm.submit();
                     }
-                });
+                }
+            });
+        }
+
+        // Handle Approve Button
+        var approveButton = document.getElementById('approve-return-button');
+        var approveForm = document.getElementById('approve-return-form');
+
+        if (approveButton && approveForm) {
+            approveButton.addEventListener('click', function () {
+                var orderCode = this.getAttribute('data-order-code') || '';
+                var text = orderCode
+                    ? 'Bạn có chắc chắn muốn duyệt yêu cầu trả hàng cho đơn "' + orderCode + '" không?'
+                    : 'Bạn có chắc chắn muốn duyệt yêu cầu trả hàng này không?';
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Xác nhận duyệt?',
+                        text: text,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Duyệt ngay',
+                        cancelButtonText: 'Hủy'
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            approveForm.submit();
+                        }
+                    });
+                } else {
+                    if (confirm(text)) {
+                        approveForm.submit();
+                    }
+                }
             });
         }
     });

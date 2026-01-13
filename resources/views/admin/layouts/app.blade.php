@@ -67,6 +67,7 @@
 
         /* Header Styles */
         .admin-header {
+            height: 80px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
             position: sticky;
@@ -74,11 +75,14 @@
             z-index: 1000;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
         }
 
-        .admin-header .dropdown {
-            overflow: visible;
-            /* allow badge/bubble to overflow */
+        .admin-header .navbar {
+            width: 100%;
+            padding: 0 1.5rem;
+            height: 100%;
         }
 
         .admin-header.scrolled {
@@ -968,8 +972,8 @@
 
     <!-- Header -->
     <header class="admin-header">
-        <nav class="navbar navbar-expand-lg px-4 py-3">
-            <div class="container-fluid d-flex align-items-center gap-4">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid d-flex align-items-center gap-4 h-100">
                 <div class="d-flex align-items-center">
                     <!-- Mobile Menu Toggle -->
                     <button class="admin-header-btn d-lg-none me-3" id="mobileMenuToggle" type="button">
@@ -1058,19 +1062,6 @@
                         </a>
                         <ul class="dropdown-menu shadow-lg border-0"
                             style="min-width: 200px; margin-top: 10px;">
-                            <li>
-                                <a href="" class="dropdown-item py-2">
-                                    <i class="bi bi-person me-2"></i> Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" class="dropdown-item py-2">
-                                    <i class="bi bi-gear me-2"></i> Settings
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf

@@ -352,19 +352,19 @@
                         </div>
 
                         <div class="col-md-2">
-                            <label>Dài (mm)</label>
+                            <label>Dài (cm)</label>
                             <input type="number" step="0.01"
                                 name="variants[new_${newVariantIndex}][length]" class="form-control" placeholder="VD: 2.5">
                         </div>
 
                         <div class="col-md-2">
-                            <label>Rộng (mm)</label>
+                            <label>Rộng (cm)</label>
                             <input type="number" step="0.01"
                                 name="variants[new_${newVariantIndex}][width]" class="form-control" placeholder="VD: 1.8">
                         </div>
 
                         <div class="col-md-2">
-                            <label>Cao (mm)</label>
+                            <label>Cao (cm)</label>
                             <input type="number" step="0.01"
                                 name="variants[new_${newVariantIndex}][height]" class="form-control" placeholder="VD: 0.8">
                         </div>

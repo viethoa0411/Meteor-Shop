@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\ClientWallet;
 use App\Models\OrderReturn;
 use App\Models\WalletTransaction;
+use App\Services\NotificationService;
 
 
 class OrderReturnController extends Controller
@@ -130,9 +131,11 @@ class OrderReturnController extends Controller
 
             DB::commit();
 
+            NotificationService::notifyReturnStatusUpdate($order, 'approved');
+
             // Redirect về trang danh sách returns để admin thấy trạng thái đã cập nhật
             return redirect()->route('admin.orders.returns.index', ['status' => 'approved'])
-                ->with('success', 'Đã chấp nhận hoàn hàng từ người dùng thành công.');
+                ->with('success', 'Đã chấp nhận yêu cầu trả hàng thành công.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
@@ -191,6 +194,8 @@ class OrderReturnController extends Controller
             }
 
             DB::commit();
+
+            NotificationService::notifyReturnStatusUpdate($order, 'rejected');
 
             // Redirect về trang danh sách returns
             return redirect()->route('admin.orders.returns.index', ['status' => 'rejected'])
@@ -272,6 +277,10 @@ class OrderReturnController extends Controller
                 $newStatus,
                 ['return_id' => $return->id]
             );
+
+            if ($oldStatus !== $newStatus) {
+                NotificationService::notifyReturnStatusUpdate($order, $newStatus);
+            }
 
             DB::commit();
 
@@ -376,6 +385,10 @@ class OrderReturnController extends Controller
                     'new_status' => $updateData['order_status'] ?? $order->order_status,
                     'note' => 'Cập nhật trạng thái trả hàng: ' . ($request->admin_note ?? ''),
                 ]);
+            }
+
+            if ($order->return_status !== $newReturnStatus) {
+                NotificationService::notifyReturnStatusUpdate($order, $newReturnStatus);
             }
 
             DB::commit();

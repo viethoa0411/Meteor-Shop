@@ -75,15 +75,9 @@
                         <i class="bi bi-flag"></i> Bị báo cáo 
                         <span class="badge bg-white text-danger ms-1">{{ isset($stats) && isset($stats['reported']) ? $stats['reported'] : 0 }}</span>
                     </a>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="sortByHelpful()" title="Sắp xếp theo hữu ích nhất">
-                        <i class="bi bi-hand-thumbs-up"></i> Hữu ích nhất
-                    </button>
                     <a href="{{ route('admin.comments.settings') }}" class="btn btn-secondary btn-sm">
                         <i class="bi bi-gear"></i> Cài đặt
                     </a>
-                    <button type="button" class="btn btn-info btn-sm" onclick="exportReviews()">
-                        <i class="bi bi-download"></i> Xuất Excel
-                    </button>
                 </div>
             </div>
         </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
@@ -227,7 +228,7 @@ class AdminController extends Controller
 
         session(['admin_change_admin_info' => $data]);
 
-        \Mail::to($user->email)->send(new \App\Mail\AdminOtpChangeInfoMail($otp, $user->name));
+        Mail::to($user->email)->send(new \App\Mail\AdminOtpChangeInfoMail($otp, $user->name));
 
         return back()->with('success', 'Mã OTP đã gửi đến email: ' . $user->email . '. Vui lòng nhập để xác nhận thay đổi.');
     }

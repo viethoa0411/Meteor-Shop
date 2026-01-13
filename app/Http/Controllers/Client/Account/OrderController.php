@@ -313,7 +313,7 @@ class OrderController extends Controller
         NotificationService::notifyReturnRequest($order);
 
 
-        return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');
+        return back()->with('success', 'Yêu cầu trả hàng đã được gửi thành công. Chúng tôi sẽ xử lý trong thời gian sớm nhất.');
     }
 
     protected function applyFilters($query, Request $request)

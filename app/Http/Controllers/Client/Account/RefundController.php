@@ -166,17 +166,10 @@ class RefundController extends Controller
 
             $this->sendRefundNotificationEmail($refund, $order);
 
-            NotificationService::createForAdmins([
-                'type' => 'order',
-                'level' => 'warning',
-                'title' => 'Yêu cầu trả hàng hoàn tiền mới',
-                'message' => 'Đơn hàng #' . ($order->order_code ?? $order->id) . ' có yêu cầu trả hàng hoàn tiền mới',
-                'url' => route('admin.orders.returns.show', $order->id),
-                'metadata' => [
-                    'order_id' => $order->id,
-                    'refund_id' => $refund->id,
-                    'refund_type' => 'return',
-                ],
+            NotificationService::notifyReturnRequest($order, [
+                'type' => 'refund',
+                'refund_id' => $refund->id,
+                'refund_type' => 'return',
             ]);
 
             DB::commit();
