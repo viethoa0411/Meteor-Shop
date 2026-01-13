@@ -63,7 +63,12 @@ class OrderController extends Controller
 
         $orders = $query->orderBy('orders.created_at', 'DESC')->get();
 
-        return view('admin.orders.list', compact('orders', 'status', 'keyword'));
+        $pendingReturnCount = DB::table('orders')
+            ->whereNotNull('return_status')
+            ->where('return_status', 'requested')
+            ->count();
+
+        return view('admin.orders.list', compact('orders', 'status', 'keyword', 'pendingReturnCount'));
     }
 
 
@@ -226,34 +231,4 @@ class OrderController extends Controller
         return back()->with('success', 'Cập nhật trạng thái thành công!');
     }
 
-
-    // Thêm method này để lấy danh sách trạng thái cho dropdown (không hiển thị pending)
-    public function getAvailableStatuses($id)
-    {
-        $order = DB::table('orders')->where('id', $id)->first();
-
-        if (!$order) {
-            return response()->json(['error' => 'Đơn hàng không tồn tại'], 404);
-        }
-
-        $statusLabels = [
-            'processing' => 'Đang xử lý',
-            'shipping' => 'Đang giao hàng',
-            'delivered' => 'Đã giao',
-            'returned' => 'Đã trả hàng',
-        ];
-
-        $availableStatuses = self::STATUS_TRANSITIONS[$order->order_status] ?? [];
-        $allowedStatuses = array_values(array_filter(
-            $availableStatuses,
-            fn($status) => in_array($status, self::ADMIN_EDITABLE_STATUSES, true)
-        ));
-
-        return response()->json(array_map(function ($status) use ($statusLabels) {
-            return [
-                'value' => $status,
-                'label' => $statusLabels[$status] ?? ucfirst($status),
-            ];
-        }, $allowedStatuses));
-    }
 }

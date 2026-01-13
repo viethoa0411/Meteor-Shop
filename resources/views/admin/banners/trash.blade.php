@@ -3,14 +3,6 @@
 
 @section('content')
     <div class="container-fluid py-4">
-        {{-- Thông báo --}}
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
         {{-- Tiêu đề --}}
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body">
@@ -222,4 +214,3 @@
         </script>
     @endpush
 @endsection
-

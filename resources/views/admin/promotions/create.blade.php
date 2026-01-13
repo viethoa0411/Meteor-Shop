@@ -53,11 +53,11 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Giá trị giảm % hoặc số tiền</label>
-                        <input type="number" step="0" name="discount_value" class="form-control" value="{{ old('discount_value') }}" required>
+                        <input type="number" step="0.01" max="10000000" name="discount_value" class="form-control" value="{{ old('discount_value') }}" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Giới hạn giảm tối đa (nếu %) </label>
-                        <input type="number" step="0." name="max_discount" class="form-control" value="{{ old('max_discount') }}">
+                        <input type="number" step="0.01" max="10000000" name="max_discount" class="form-control" value="{{ old('max_discount') }}">
                     </div>
                 </div>
 
@@ -148,6 +148,7 @@
         // Validation for Discount Value
         const discountTypeSelect = document.querySelector('select[name="discount_type"]');
         const discountValueInput = document.querySelector('input[name="discount_value"]');
+        const maxDiscountInput = document.querySelector('input[name="max_discount"]');
         const clientErrorAlert = document.getElementById('client-error-alert');
         const clientErrorList = document.getElementById('client-error-list');
 
@@ -155,7 +156,7 @@
             clientErrorList.innerHTML = `<li>${message}</li>`;
             clientErrorAlert.style.display = 'block';
             // Scroll to top to see error
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // window.scrollTo({ top: 0, behavior: 'smooth' }); // Optional
         }
 
         function hideClientError() {
@@ -165,6 +166,14 @@
 
         function validateDiscountValue() {
             const type = discountTypeSelect.value;
+            
+            // Update max attribute based on type
+            if (type === 'percent') {
+                discountValueInput.max = 100;
+            } else {
+                discountValueInput.max = 10000000;
+            }
+
             let value = parseFloat(discountValueInput.value);
 
             // Hide error initially
@@ -184,9 +193,21 @@
                 }
             }
         }
+        
+        if (maxDiscountInput) {
+            maxDiscountInput.addEventListener('input', function() {
+                let val = parseFloat(this.value);
+                if (val > 10000000) {
+                    showClientError('Giới hạn giảm tối đa là 10.000.000đ');
+                    this.value = 10000000;
+                }
+            });
+        }
 
         discountTypeSelect.addEventListener('change', validateDiscountValue);
         discountValueInput.addEventListener('input', validateDiscountValue);
+        
+        validateDiscountValue(); // Init
 
         // Form Submission Validation
         const form = document.querySelector('form');

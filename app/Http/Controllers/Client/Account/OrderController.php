@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderLog;
 use App\Models\ClientWallet;
 use App\Models\WalletTransaction;
+use App\Services\NotificationService;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -118,10 +119,10 @@ class OrderController extends Controller
             foreach ($order->items as $item) {
                 if (!empty($item->variant_id)) {
                     \App\Models\ProductVariant::where('id', $item->variant_id)
-                        ->update(['stock' => \DB::raw('COALESCE(stock, 0) + ' . (int)$item->quantity)]);
+                        ->update(['stock' => DB::raw('COALESCE(stock, 0) + ' . (int)$item->quantity)]);
                 } else {
                     \App\Models\Product::where('id', $item->product_id)
-                        ->update(['stock' => \DB::raw('COALESCE(stock, 0) + ' . (int)$item->quantity)]);
+                        ->update(['stock' => DB::raw('COALESCE(stock, 0) + ' . (int)$item->quantity)]);
                 }
             }
 
@@ -308,6 +309,8 @@ class OrderController extends Controller
             'role' => 'customer',
             'created_at' => now(),
         ]);
+
+        NotificationService::notifyReturnRequest($order);
 
 
         return back()->with('success', 'Yêu cầu đổi trả đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.');

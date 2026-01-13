@@ -9,14 +9,6 @@
         </a>
     </div>
 
-    {{-- THÔNG BÁO --}}
-    @if (session('success'))
-        <div class="alert alert-success py-2">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger py-2">{{ session('error') }}</div>
-    @endif
-
     {{-- BỘ LỌC TRẠNG THÁI --}}
     <form method="GET" action="{{ route('admin.orders.returns.index') }}" class="row g-2 mb-3">
         <div class="col-md-3">
@@ -115,4 +107,3 @@
     </div>
 </div>
 @endsection
-

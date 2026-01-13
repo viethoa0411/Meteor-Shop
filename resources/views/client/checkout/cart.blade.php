@@ -261,7 +261,7 @@
                             <span>Tạm tính:</span>
                             <strong id="subtotal-display">{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
                         </div>
-                        <div class="mb-2 d-flex justify-content-between">
+                        <div class="mb-2 d-flex justify-content-between d-none" id="shipping-fee-row">
                             <span>Phí vận chuyển:</span>
                             <strong id="shipping-fee">-</strong>
                         </div>
@@ -893,6 +893,7 @@
                     const districtSelect = document.getElementById('shipping_district');
                     const selectedMethod = document.querySelector('input[name="shipping_method"]:checked')?.value ||
                         'standard';
+                    const shippingFeeRow = document.getElementById('shipping-fee-row');
 
                     if (!citySelect || !districtSelect) return;
 
@@ -907,6 +908,11 @@
                         document.getElementById('shipping-fee-text').textContent =
                             'Vui lòng chọn địa chỉ để tính phí vận chuyển';
                         document.getElementById('shipping-fee-display').className = 'alert alert-info mb-0';
+                        if (shippingFeeRow) {
+                            shippingFeeRow.classList.remove('d-flex');
+                            shippingFeeRow.classList.add('d-none');
+                            shippingFeeRow.style.display = '';
+                        }
                         updateTotalDisplay();
                         return;
                     }
@@ -946,11 +952,21 @@
                                 }
 
                                 // Cập nhật tổng tiền
+                                if (shippingFeeRow) {
+                                    shippingFeeRow.classList.remove('d-none');
+                                    shippingFeeRow.classList.add('d-flex');
+                                    shippingFeeRow.style.display = '';
+                                }
                                 updateTotalDisplay();
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
+                            if (shippingFeeRow) {
+                                shippingFeeRow.classList.remove('d-flex');
+                                shippingFeeRow.classList.add('d-none');
+                                shippingFeeRow.style.display = '';
+                            }
                         });
                 }
 
@@ -1002,9 +1018,29 @@
                     checkPaymentMethodAvailability(total);
 
                     const shippingFeeEl = document.getElementById('shipping-fee');
+                    const shippingFeeRow = document.getElementById('shipping-fee-row');
                     const totalAmountEl = document.getElementById('total-amount');
                     const installationRow = document.getElementById('installation-row');
                     const installationFeeEl = document.getElementById('installation-fee');
+
+                    const citySelect = document.getElementById('shipping_city');
+                    const districtSelect = document.getElementById('shipping_district');
+                    const cityName = citySelect?.options[citySelect.selectedIndex]?.text || '';
+                    const districtName = districtSelect?.options[districtSelect.selectedIndex]?.text || '';
+                    const hasAddress = cityName && cityName !== '-- Chọn Tỉnh/Thành phố --'
+                        && districtName && districtName !== '-- Chọn Quận/Huyện --';
+
+                    if (shippingFeeRow) {
+                        if (hasAddress) {
+                            shippingFeeRow.classList.remove('d-none');
+                            shippingFeeRow.classList.add('d-flex');
+                            shippingFeeRow.style.display = '';
+                        } else {
+                            shippingFeeRow.classList.remove('d-flex');
+                            shippingFeeRow.classList.add('d-none');
+                            shippingFeeRow.style.display = '';
+                        }
+                    }
 
                     if (shippingFeeEl) {
                         shippingFeeEl.textContent = currentShippingFee === 0 ?

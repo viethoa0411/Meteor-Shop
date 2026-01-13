@@ -220,7 +220,7 @@
                         : (is_array($orderStatsByStatus) ? array_sum($orderStatsByStatus) : 0);
                     $completeRate = $totalForRate > 0 ? round(($completed / $totalForRate) * 100, 1) : 0;
                 @endphp
-                <a href="{{ route('admin.orders.analytics') }}" class="text-decoration-none kpi-card-link">
+                <a href="{{ route('admin.orders.list', ['status' => 'completed']) }}" class="text-decoration-none kpi-card-link">
                     <div class="card h-100 shadow-sm border-0 kpi-card-premium kpi-completion"
                          style="border-radius: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); position: relative; overflow: hidden;">
                         <div class="card-body text-white d-flex flex-column justify-content-between p-4 kpi-card-body-responsive">
@@ -8136,7 +8136,7 @@
 
             // Xóa các hidden input filter doanh thu
             const form = document.getElementById('orderFilterForm');
-            const hiddenInputs = form.querySelectorAll('input[type="hidden"]');
+            const hiddenInputs = form.querySelectorAll('input[type="hidden"]');~
             hiddenInputs.forEach(input => {
                 if (input.name === 'start_date' || input.name === 'end_date') {
                     input.remove();
@@ -8147,4 +8147,3 @@
     </script>
     @endpush
 @endsection
-

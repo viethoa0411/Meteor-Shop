@@ -17,10 +17,6 @@
         </div>
     @endif
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
     <a href="{{ route('admin.promotions.list') }}" class="btn btn-secondary">← Danh sách</a>
 
     <div class="card mt-3">
@@ -58,11 +54,11 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Giá trị giảm % hoặc số tiền</label>
-                        <input type="number" step="0.01" name="discount_value" class="form-control" value="{{ old('discount_value', (float)$promotion->discount_value) }}" required>
+                        <input type="number" step="0.01" max="10000000" name="discount_value" class="form-control" value="{{ old('discount_value', (float)$promotion->discount_value) }}" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Giới hạn giảm tối đa (nếu %) </label>
-                        <input type="number" step="0.01" name="max_discount" class="form-control" value="{{ old('max_discount', (float)$promotion->max_discount) }}">
+                        <input type="number" step="0.01" max="10000000" name="max_discount" class="form-control" value="{{ old('max_discount', (float)$promotion->max_discount) }}">
                     </div>
                 </div>
 
@@ -153,6 +149,7 @@
         // Validation for Discount Value
         const discountTypeSelect = document.querySelector('select[name="discount_type"]');
         const discountValueInput = document.querySelector('input[name="discount_value"]');
+        const maxDiscountInput = document.querySelector('input[name="max_discount"]');
         const clientErrorAlert = document.getElementById('client-error-alert');
         const clientErrorList = document.getElementById('client-error-list');
 
@@ -170,6 +167,14 @@
 
         function validateDiscountValue() {
             const type = discountTypeSelect.value;
+            
+            // Update max attribute based on type
+            if (type === 'percent') {
+                discountValueInput.max = 100;
+            } else {
+                discountValueInput.max = 10000000;
+            }
+
             let value = parseFloat(discountValueInput.value);
 
             // Hide error initially
@@ -192,6 +197,16 @@
 
         discountTypeSelect.addEventListener('change', validateDiscountValue);
         discountValueInput.addEventListener('input', validateDiscountValue);
+
+        if (maxDiscountInput) {
+            maxDiscountInput.addEventListener('input', function() {
+                let val = parseFloat(this.value);
+                if (val > 10000000) {
+                    showClientError('Giới hạn giảm tối đa là 10.000.000đ');
+                    this.value = 10000000;
+                }
+            });
+        }
 
         // Form Submission Validation
         const form = document.querySelector('form');
@@ -239,6 +254,7 @@
 
         scopeSelect.addEventListener('change', toggleScope);
         toggleScope(); // Chạy lần đầu khi trang tải
+        validateDiscountValue(); // Cập nhật max attribute ban đầu
     });
  </script>
 @endsection

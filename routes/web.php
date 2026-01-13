@@ -164,16 +164,6 @@ Route::middleware(['admin'])
             Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
         });
 
-        /* Home Categories (3 ảnh trang chủ) */
-        Route::prefix('home-categories')->name('home-categories.')->group(function () {
-            Route::get('/', [HomeCategoryController::class, 'index'])->name('index');
-            Route::get('/create', [HomeCategoryController::class, 'create'])->name('create');
-            Route::post('/', [HomeCategoryController::class, 'store'])->name('store');
-            Route::get('/{id}/edit', [HomeCategoryController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [HomeCategoryController::class, 'update'])->name('update');
-            Route::delete('/{id}', [HomeCategoryController::class, 'destroy'])->name('destroy');
-        });
-
         /* Products */
         Route::prefix('products')->name('products.')->group(function () {
             Route::get('/', [ProductController::class, 'list'])->name('list');
@@ -189,7 +179,6 @@ Route::middleware(['admin'])
         /* Orders */
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'list'])->name('list');
-            Route::get('/analytics', [OrderAnalyticsController::class, 'index'])->name('analytics');
 
             // Returns management - Đặt trước route /{id}
             Route::get('/returns', [OrderReturnController::class, 'index'])->name('returns.index');
@@ -295,7 +284,6 @@ Route::middleware(['admin'])
             // Settings routes
             Route::get('/settings', [AdminWalletSettingsController::class, 'index'])->name('settings');
             Route::put('/settings', [AdminWalletSettingsController::class, 'update'])->name('settings.update');
-            
         });
 
         /* Wishlist (ADMIN) */

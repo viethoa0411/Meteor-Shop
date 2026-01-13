@@ -129,12 +129,13 @@
                 height: 100%;
                 object-fit: cover;
                 display: block;
+                filter: brightness(1.06) saturate(1.04);
             }
 
             .hero-slide-overlay {
                 position: absolute;
                 inset: 0;
-                background: linear-gradient(90deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.35) 45%, transparent 100%);
+                background: linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.15) 45%, transparent 100%);
             }
 
             .hero-slide-content {

@@ -4,13 +4,7 @@
 @section('content')
     <div class="container-fluid py-4">
 
-        {{-- Thông báo --}}
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+
 
         {{-- Tiêu đề --}}
         <div class="card border-0 shadow-sm mb-4">

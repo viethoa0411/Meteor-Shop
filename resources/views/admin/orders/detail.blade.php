@@ -11,14 +11,6 @@
         </a>
     </div>
 
-    {{-- THÔNG BÁO --}}
-    @if (session('success'))
-        <div class="alert alert-success py-2">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger py-2">{{ session('error') }}</div>
-    @endif
-
     {{-- PHÂN CHIA BỐ CỤC CHÍNH --}}
     <div class="row">
         {{-- CỘT TRÁI: HÀNH ĐỘNG, TRẠNG THÁI & LỊCH SỬ GỌN --}}

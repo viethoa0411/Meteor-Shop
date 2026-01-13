@@ -34,23 +34,29 @@
                             $maxStock = $item['max_stock'] ?? 0;
                             $isOutOfStock = $maxStock < 1;
                             $isNotEnough = $maxStock < $item['quantity'];
-                            $isDeleted = $item['is_deleted'] ?? false;
+                            $isInactive = !($item['is_active'] ?? true);
                         @endphp
-                        <tr id="row-{{ $id }}" class="{{ ($isOutOfStock || $isDeleted) ? 'table-secondary' : '' }}" style="{{ $isDeleted ? 'opacity: 0.6;' : '' }}">
+                        <tr id="row-{{ $id }}" class="{{ ($isOutOfStock || $isInactive) ? 'table-secondary' : '' }}" style="{{ $isInactive ? 'opacity: 0.6;' : '' }}">
                             <td class="text-center">
                                 <input type="checkbox" name="selected[]" value="{{ $id }}"
                                     class="cart-item-checkbox"
                                     data-id="{{ $id }}"
                                     data-subtotal="{{ $item['price'] * $item['quantity'] }}"
-                                    {{ ($isOutOfStock || $isDeleted) ? 'disabled' : 'checked' }}>
+                                    data-inactive="{{ $isInactive ? '1' : '0' }}"
+                                    {{ ($isOutOfStock || $isInactive) ? 'disabled' : 'checked' }}>
                             </td>
 
                             <td>
                                 <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : 'https://via.placeholder.com/70x70?text=No+Image' }}"
-                                    width="70" alt="{{ $item['name'] }}" style="{{ ($isOutOfStock || $isDeleted) ? 'opacity: 0.5' : '' }}">
+                                    width="70" alt="{{ $item['name'] }}" style="{{ ($isOutOfStock || $isInactive) ? 'opacity: 0.5' : '' }}">
                             </td>
 
                             <td>
+                                @if ($isInactive)
+                                    <div class="text-danger fw-bold small mb-1">
+                                        <i class="bi bi-exclamation-triangle"></i> Sản phẩm ngừng kinh doanh. Nếu cần đặt, vui lòng liên hệ shop.
+                                    </div>
+                                @endif
                                 {{ $item['name'] }}
                                 <div class="mt-1 text-muted" style="font-size: 0.9em;">
                                     @if ($item['color'])
@@ -60,11 +66,7 @@
                                         <span class="ms-2">Size: <strong>{{ $item['size'] }}</strong></span>
                                     @endif
                                 </div>
-                                @if ($isDeleted)
-                                    <div class="text-danger fw-bold small mt-1">
-                                        <i class="bi bi-exclamation-triangle"></i> Sản phẩm ngừng sản xuất. Nếu khách có nhu cầu đặt thì liên hệ với shop.
-                                    </div>
-                                @elseif ($isOutOfStock)
+                                @if ($isOutOfStock)
                                     <div class="text-danger fw-bold small mt-1">Hết hàng</div>
                                 @elseif ($isNotEnough)
                                     <div class="text-danger fw-bold small mt-1">Kho chỉ còn {{ $maxStock }}</div>
@@ -73,16 +75,18 @@
 
                             <td class="text-end">{{ number_format($item['price']) }}đ</td>
 
-                            <td class="d-flex align-items-center gap-2 flex-column flex-sm-row">
-                                <button type="button" class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
-                                    data-type="minus">-</button>
+                            <td class="d-flex flex-column align-items-center justify-content-center gap-2 disabled-cell-td" data-disabled="{{ ($isOutOfStock || $isInactive) ? '1' : '0' }}">
+                                <div class="d-flex align-items-center justify-content-center gap-2 w-100">
+                                <button type="button" class="btn btn-outline-secondary btn-sm updateQty {{ ($isOutOfStock || $isInactive) ? 'disabled' : '' }}" data-id="{{ $id }}"
+                                    data-type="minus" {{ ($isOutOfStock || $isInactive) ? 'disabled' : '' }}>-</button>
                                 <span id="qty-{{ $id }}" data-max="{{ $item['max_stock'] ?? '' }}">{{ $item['quantity'] }}</span>
-                                <button type="button" class="btn btn-outline-secondary btn-sm updateQty" data-id="{{ $id }}"
-                                    data-type="plus">+</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm updateQty {{ ($isOutOfStock || $isInactive) ? 'disabled' : '' }}" data-id="{{ $id }}"
+                                    data-type="plus" {{ ($isOutOfStock || $isInactive) ? 'disabled' : '' }}>+</button>
+                                </div>
                                 @if (!empty($item['max_stock']))
-                                    <small class="text-muted" id="stock-note-{{ $id }}">Tối đa: {{ $item['max_stock'] }}</small>
+                                    <small class="text-muted mt-1 d-block mb-0 text-center" id="stock-note-{{ $id }}">Tối đa: {{ $item['max_stock'] }}</small>
                                 @else
-                                    <small class="text-muted" id="stock-note-{{ $id }}"></small>
+                                    <small class="text-muted mt-1 d-block mb-0 text-center" id="stock-note-{{ $id }}"></small>
                                 @endif
                             </td>
 
@@ -160,7 +164,7 @@
         };
 
         const syncSelectAll = () => {
-            const totalCheckboxes = $('.cart-item-checkbox').length;
+            const totalCheckboxes = $('.cart-item-checkbox:not(:disabled)').length;
             const checked = $('.cart-item-checkbox:checked').length;
             $('#select-all').prop('checked', totalCheckboxes > 0 && checked === totalCheckboxes);
         };
@@ -170,7 +174,7 @@
 
         $('#select-all').on('change', function() {
             const checked = $(this).is(':checked');
-            $('.cart-item-checkbox').prop('checked', checked);
+            $('.cart-item-checkbox:not(:disabled)').prop('checked', checked);
             updateSelectedTotal();
         });
 
@@ -182,25 +186,26 @@
         // Validate form submit
         $('#cart-form').on('submit', function(e) {
             const selectedCount = $('.cart-item-checkbox:checked').length;
+            const hasInactiveSelected = $('.cart-item-checkbox:checked[data-inactive="1"]').length > 0;
 
-            if (selectedCount === 0) {
+            if (selectedCount === 0 || hasInactiveSelected) {
                 e.preventDefault();
-                ToastNotification.fire({
-                    icon: 'warning',
-                    title: 'Thông báo',
-                    text: 'Vui lòng chọn ít nhất một sản phẩm để đặt hàng.'
-                });
+                $('#checkout-selected').prop('disabled', true);
+                return;
             }
         });
 
 
         // Update số lượng
         $(document).on('click', '.updateQty', function() {
+            if ($(this).prop('disabled') || $(this).hasClass('disabled')) return;
             let id = $(this).data('id');
             let type = $(this).data('type');
             let qtySpan = $("#qty-" + id);
             let currentQty = parseInt(qtySpan.text());
             let maxStock = parseInt(qtySpan.attr('data-max'));
+            const itemCheckbox = $(".cart-item-checkbox[data-id='" + id + "']");
+            if (itemCheckbox.length && itemCheckbox.is(':disabled')) return;
 
             // Chặn bớt request nếu giảm về 1
             if (type === 'minus' && currentQty <= 1) return;
@@ -269,6 +274,9 @@
                     if (data.total == 0) {
                         window.location.reload();
                     }
+                    const hasInactiveSelectedAfter = $('.cart-item-checkbox:checked[data-inactive="1"]').length > 0;
+                    const selectedCountAfter = $('.cart-item-checkbox:checked').length;
+                    $('#checkout-selected').prop('disabled', selectedCountAfter === 0 || hasInactiveSelectedAfter);
                 }
             });
         });

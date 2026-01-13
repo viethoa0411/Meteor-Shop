@@ -4,13 +4,6 @@
 @section('content')
     <div class="container-fluid py-4">
 
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
-
         <div class="card border-0 shadow-sm mb-4 bg-body">
             <div class="card-body">
                 <h3 class="fw-bold text-primary mb-0">
@@ -104,22 +97,55 @@
                                 </td>
                                 <td>
                                     <a href="{{ route('admin.promotions.edit', $p->id) }}" class="btn btn-sm btn-info"><i class="bi bi-pencil-square"></i> Sửa</a>
-                                    <form action="{{ route('admin.promotions.destroy', $p->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xoá khuyến mãi này?');">
+                                    <form action="{{ route('admin.promotions.destroy', $p->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Xóa</button>
+                                        <button type="button" class="btn btn-sm btn-danger btn-delete" data-name="{{ $p->code }}"><i class="bi bi-trash"></i> Xóa</button>
                                     </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
             </div>
             <div class="d-flex justify-content-center mt-4">
                 {{ $promotions->withQueryString()->links('pagination::bootstrap-5') }}
             </div>
-        @endif
+@endif
 
-    </div>
+</div>
 @endsection
-
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const form = this.closest('form');
+                const name = this.getAttribute('data-name') || 'khuyến mãi này';
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Xác nhận xóa?',
+                        text: `Bạn có chắc chắn muốn xóa "${name}" không?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Xóa ngay',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                } else {
+                    if (window.confirm(`Bạn có chắc chắn muốn xóa "${name}" không?`)) {
+                        form.submit();
+                    }
+                }
+            });
+        });
+    });
+</script>
+@endpush

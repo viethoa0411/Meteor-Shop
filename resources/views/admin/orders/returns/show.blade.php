@@ -14,14 +14,6 @@
         </div>
     </div>
 
-    {{-- THÔNG BÁO --}}
-    @if (session('success'))
-        <div class="alert alert-success py-2">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger py-2">{{ session('error') }}</div>
-    @endif
-
     <div class="row">
         {{-- THÔNG TIN ĐƠN HÀNG --}}
         <div class="col-lg-8">
@@ -213,13 +205,13 @@
                         </form>
 
                         {{-- TỪ CHỐI YÊU CẦU --}}
-                        <form action="{{ route('admin.orders.returns.reject', $order->id) }}" method="POST">
+                        <form action="{{ route('admin.orders.returns.reject', $order->id) }}" method="POST" id="reject-return-form">
                             @csrf
                             <div class="mb-3">
                                 <label for="reject_reason" class="form-label">Lý do từ chối <span class="text-danger">*</span>:</label>
                                 <textarea name="reject_reason" id="reject_reason" class="form-control" rows="3" required placeholder="Nhập lý do từ chối..."></textarea>
                             </div>
-                            <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Bạn có chắc chắn muốn từ chối yêu cầu trả hàng này?')">
+                            <button type="button" class="btn btn-danger w-100" id="reject-return-button" data-order-code="{{ $order->order_code }}">
                                 <i class="bi bi-x-circle"></i> Từ chối yêu cầu
                             </button>
                         </form>
@@ -263,4 +255,38 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var rejectButton = document.getElementById('reject-return-button');
+        var rejectForm = document.getElementById('reject-return-form');
+
+        if (rejectButton && rejectForm && typeof Swal !== 'undefined') {
+            rejectButton.addEventListener('click', function () {
+                var orderCode = this.getAttribute('data-order-code') || '';
+                var text = orderCode
+                    ? 'Bạn có chắc chắn muốn từ chối yêu cầu trả hàng cho đơn "' + orderCode + '" không?'
+                    : 'Bạn có chắc chắn muốn từ chối yêu cầu trả hàng này không?';
+
+                Swal.fire({
+                    title: 'Xác nhận từ chối?',
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Từ chối ngay',
+                    cancelButtonText: 'Hủy'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        rejectForm.submit();
+                    }
+                });
+            });
+        }
+    });
+</script>
+@endpush
+
 @endsection

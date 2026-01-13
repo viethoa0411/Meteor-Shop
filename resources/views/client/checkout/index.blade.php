@@ -250,7 +250,7 @@
                             <span>Tạm tính:</span>
                             <strong id="subtotal-display">{{ number_format($checkoutData['subtotal'], 0, ',', '.') }} đ</strong>
                         </div>
-                        <div class="mb-2 d-flex justify-content-between">
+                        <div class="mb-2 d-flex justify-content-between d-none" id="shipping-fee-row">
                             <span>Phí vận chuyển:</span>
                             <strong id="shipping-fee">-</strong>
                         </div>
@@ -917,6 +917,7 @@
                     const shippingLoading = document.getElementById('shipping-loading');
                     const shippingFeeText = document.getElementById('shipping-fee-text');
                     const shippingFeeDisplay = document.getElementById('shipping-fee-display');
+                    const shippingFeeRow = document.getElementById('shipping-fee-row');
 
                     if (!citySelect || !districtSelect) return;
 
@@ -940,6 +941,11 @@
                         }
                         if (shippingLoading) {
                             shippingLoading.classList.add('d-none');
+                        }
+                        if (shippingFeeRow) {
+                            shippingFeeRow.classList.remove('d-flex');
+                            shippingFeeRow.classList.add('d-none');
+                            shippingFeeRow.style.display = '';
                         }
                         // Reset phí về 0
                         currentShippingFee = 0;
@@ -1022,6 +1028,11 @@
                             }
 
                             // Cập nhật tổng tiền ngay lập tức
+                            if (shippingFeeRow) {
+                                shippingFeeRow.classList.remove('d-none');
+                                shippingFeeRow.classList.add('d-flex');
+                                shippingFeeRow.style.display = '';
+                            }
                             updateTotalDisplay();
                         } else {
                             if (shippingFeeText) {
@@ -1029,6 +1040,11 @@
                             }
                             if (shippingFeeDisplay) {
                                 shippingFeeDisplay.className = 'alert alert-danger mb-0 position-relative';
+                            }
+                            if (shippingFeeRow) {
+                                shippingFeeRow.classList.remove('d-flex');
+                                shippingFeeRow.classList.add('d-none');
+                                shippingFeeRow.style.display = '';
                             }
                             // Reset phí về 0 nếu lỗi
                             currentShippingFee = 0;
@@ -1049,6 +1065,11 @@
                         }
                         if (shippingFeeDisplay) {
                             shippingFeeDisplay.className = 'alert alert-danger mb-0 position-relative';
+                        }
+                        if (shippingFeeRow) {
+                            shippingFeeRow.classList.remove('d-flex');
+                            shippingFeeRow.classList.add('d-none');
+                            shippingFeeRow.style.display = '';
                         }
                         // Reset phí về 0 nếu lỗi
                         currentShippingFee = 0;
@@ -1141,9 +1162,29 @@
                     checkPaymentMethodAvailability(total);
 
                     const shippingFeeEl = document.getElementById('shipping-fee');
+                    const shippingFeeRow = document.getElementById('shipping-fee-row');
                     const totalAmountEl = document.getElementById('total-amount');
                     const installationRow = document.getElementById('installation-row');
                     const installationFeeEl = document.getElementById('installation-fee');
+
+                    const citySelect = document.getElementById('shipping_city');
+                    const districtSelect = document.getElementById('shipping_district');
+                    const cityName = citySelect?.options[citySelect.selectedIndex]?.text || '';
+                    const districtName = districtSelect?.options[districtSelect.selectedIndex]?.text || '';
+                    const hasAddress = cityName && cityName !== '-- Chọn Tỉnh/Thành phố --'
+                        && districtName && districtName !== '-- Chọn Quận/Huyện --';
+
+                    if (shippingFeeRow) {
+                        if (hasAddress) {
+                            shippingFeeRow.classList.remove('d-none');
+                            shippingFeeRow.classList.add('d-flex');
+                            shippingFeeRow.style.display = '';
+                        } else {
+                            shippingFeeRow.classList.remove('d-flex');
+                            shippingFeeRow.classList.add('d-none');
+                            shippingFeeRow.style.display = '';
+                        }
+                    }
 
                     if (shippingFeeEl) {
                         shippingFeeEl.textContent = currentShippingFee === 0
@@ -1469,58 +1510,78 @@
 
                     // Xử lý hủy voucher
                     const removePromoBtn = document.getElementById('remove-promotion-btn');
-                    if (removePromoBtn) {
-                        removePromoBtn.addEventListener('click', function(e) {
+                    document.addEventListener('click', function(e) {
+                        const target = e.target;
+                        if (target && (target.id === 'remove-promotion-btn' || target.closest('#remove-promotion-btn'))) {
                             e.preventDefault();
-
-                            // Loading/Confirm state if needed
-                            // if (!confirm('Bạn có chắc muốn hủy mã giảm giá này?')) return;
-
-                            setMessage('Đang hủy mã...', 'warning');
-
-                            fetch('{{ route('client.checkout.removePromotion') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            const codeText = appliedCode || (document.getElementById('applied-code')?.textContent || 'mã giảm giá này');
+                            const proceedRemove = () => {
+                                setMessage('Đang hủy mã...', 'warning');
+                                fetch('{{ route('client.checkout.removePromotion') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    }
+                                })
+                                .then(async res => {
+                                    if (res.status === 401) {
+                                        window.location.href = '{{ route('client.login') }}';
+                                        return null;
+                                    }
+                                    const data = await res.json();
+                                    if (!data.ok) {
+                                        throw new Error(data.error || 'Có lỗi xảy ra.');
+                                    }
+                                    return data;
+                                })
+                                .then(data => {
+                                    if (!data) return;
+                                    currentDiscount = 0;
+                                    appliedCode = '';
+                                    const voucherBadge = document.getElementById('voucher-badge');
+                                    if (voucherBadge) {
+                                        voucherBadge.classList.remove('d-flex');
+                                        voucherBadge.classList.add('d-none');
+                                    }
+                                    if (appliedCodeEl) appliedCodeEl.textContent = '';
+                                    if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
+                                    if (codeInput) codeInput.value = '';
+                                    updateTotalDisplay();
+                                    setMessage('Đã xóa mã giảm giá khỏi đơn hàng.', 'info');
+                                    if (typeof ToastNotification !== 'undefined') {
+                                        ToastNotification.fire({
+                                            icon: 'success',
+                                            title: 'Đã xóa mã giảm giá khỏi đơn hàng'
+                                        });
+                                    }
+                                })
+                                .catch(err => {
+                                    setMessage(err.message || 'Không thể hủy mã.', 'danger');
+                                });
+                            };
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    title: 'Xác nhận xóa?',
+                                    text: `Bạn có chắc chắn muốn xóa "${codeText}" không?`,
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#d33',
+                                    cancelButtonColor: '#3085d6',
+                                    confirmButtonText: 'Xóa ngay',
+                                    cancelButtonText: 'Hủy'
+                                }).then(result => {
+                                    if (result.isConfirmed) {
+                                        proceedRemove();
+                                    }
+                                });
+                            } else {
+                                if (window.confirm(`Bạn có chắc chắn muốn xóa "${codeText}" không?`)) {
+                                    proceedRemove();
                                 }
-                            })
-                            .then(async res => {
-                                if (res.status === 401) {
-                                    window.location.href = '{{ route('client.login') }}';
-                                    return null;
-                                }
-                                const data = await res.json();
-                                if (!data.ok) {
-                                    throw new Error(data.error || 'Có lỗi xảy ra.');
-                                }
-                                return data;
-                            })
-                            .then(data => {
-                                if (!data) return;
-
-                                // Reset discount info
-                                currentDiscount = 0;
-                                appliedCode = '';
-
-                                // UI updates
-                                const voucherBadge = document.getElementById('voucher-badge');
-                                if (voucherBadge) {
-                                    voucherBadge.classList.remove('d-flex');
-                                    voucherBadge.classList.add('d-none');
-                                }
-                                if (appliedCodeEl) appliedCodeEl.textContent = '';
-                                if (discountAmountEl) discountAmountEl.textContent = '- 0 đ';
-                                if (codeInput) codeInput.value = '';
-
-                                updateTotalDisplay();
-                                setMessage('Đã hủy mã giảm giá.', 'info');
-                            })
-                            .catch(err => {
-                                setMessage(err.message || 'Không thể hủy mã.', 'danger');
-                            });
-                        });
-                    }
+                            }
+                        }
+                    });
                 }
 
                 // Khởi tạo lần đầu

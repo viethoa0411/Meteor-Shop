@@ -155,6 +155,21 @@ class NotificationService
     }
 
     /**
+     * Create return request notification
+     */
+    public static function notifyReturnRequest($order): void
+    {
+        self::createForAdmins([
+            'type' => 'order',
+            'level' => 'warning',
+            'title' => 'Yêu cầu trả hàng mới',
+            'message' => 'Đơn hàng #' . ($order->order_code ?? $order->id) . ' có yêu cầu trả hàng',
+            'url' => route('admin.orders.returns.show', $order->id),
+            'metadata' => ['order_id' => $order->id]
+        ]);
+    }
+
+    /**
      * Get default icon for notification type
      */
     private static function getDefaultIcon(string $type): string

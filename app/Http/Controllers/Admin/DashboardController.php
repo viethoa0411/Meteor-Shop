@@ -298,6 +298,14 @@ class DashboardController extends Controller
         // Tổng số đơn hàng theo filter
         $totalFilteredOrders = $ordersQuery->count();
 
+        $totalReturnOrders = Order::whereNotNull('return_status')
+            ->where('return_status', '!=', 'none')
+            ->count();
+
+        $returnRate = $totalAllOrders > 0
+            ? round(($totalReturnOrders / $totalAllOrders) * 100, 1)
+            : 0;
+
         // ========== BIỂU ĐỒ & KPI SẢN PHẨM ==========
         // Thống kê cho 30 ngày gần nhất, chỉ tính đơn hoàn thành
         $productOrders = Order::with('items.product.category')
@@ -400,6 +408,8 @@ class DashboardController extends Controller
             'growthChartLabels',
             'orderGrowthRate',
             'totalFilteredOrders',
+            'totalReturnOrders',
+            'returnRate',
             'topProductsLabels',
             'topProductsRevenue',
             'categoryLabels',
