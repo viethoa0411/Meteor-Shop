@@ -17,39 +17,51 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\ClientWallet;
 use App\Models\OrderReturn;
 use App\Models\WalletTransaction;
-use App\Services\NotificationService;
 
 
 class OrderReturnController extends Controller
 {
     /**
-
      * List Returns - Hiển thị danh sách đơn hàng có yêu cầu trả hàng
+     *
+     * Chức năng:
+     * - Lấy danh sách các đơn hàng có `return_status` (trạng thái trả hàng) khác null và khác 'none'.
+     * - Hỗ trợ lọc theo từng trạng thái cụ thể (requested, approved, refunded...).
      */
     public function index(Request $request)
     {
+        // Lấy trạng thái từ bộ lọc (mặc định là 'all')
         $status = $request->get('status', 'all');
 
+        // Khởi tạo query builder: Join bảng orders với users để lấy tên khách hàng
         $query = DB::table('orders')
             ->join('users', 'orders.user_id', '=', 'users.id')
             ->select('orders.*', 'users.name as customer_name')
+            // Chỉ lấy những đơn CÓ liên quan đến quy trình trả hàng
             ->whereNotNull('orders.return_status')
             ->where('orders.return_status', '!=', 'none');
 
+        // Áp dụng bộ lọc trạng thái nếu có
         if ($status && $status !== 'all') {
             $query->where('orders.return_status', $status);
         }
 
+        // Sắp xếp theo thời gian cập nhật mới nhất
         $orders = $query->orderBy('orders.updated_at', 'DESC')->get();
 
         return view('admin.orders.returns.index', compact('orders', 'status'));
     }
 
     /**
-     * Show Return Detail for an Order (using old system with return_status)
+     * Show Return Detail - Xem chi tiết yêu cầu trả hàng
+     *
+     * Chức năng:
+     * - Hiển thị thông tin đơn hàng, lý do trả hàng, hình ảnh bằng chứng (nếu có).
+     * - Hiển thị danh sách sản phẩm trong đơn để admin đối chiếu.
      */
     public function show($orderId)
     {
+        // 1. Lấy thông tin đơn hàng và người dùng
         $order = DB::table('orders')
             ->join('users', 'orders.user_id', '=', 'users.id')
             ->select('orders.*', 'users.name as customer_name', 'users.email as customer_email')
@@ -60,7 +72,7 @@ class OrderReturnController extends Controller
             return redirect()->route('admin.orders.list')->with('error', 'Đơn hàng không tồn tại');
         }
 
-        // Lấy chi tiết sản phẩm
+        // 2. Lấy chi tiết các sản phẩm trong đơn hàng đó
         $orderDetails = DB::table('order_details')
             ->join('products', 'order_details.product_id', '=', 'products.id')
             ->select(
@@ -73,7 +85,8 @@ class OrderReturnController extends Controller
             ->where('order_details.order_id', $orderId)
             ->get();
 
-        // Xử lý return_attachments - decode JSON nếu cần
+        // 3. Xử lý hình ảnh bằng chứng (return_attachments)
+        // Dữ liệu trong DB có thể là chuỗi JSON hoặc mảng, cần chuẩn hóa về mảng
         if ($order->return_attachments) {
             if (is_string($order->return_attachments)) {
                 $decoded = json_decode($order->return_attachments, true);
@@ -89,7 +102,13 @@ class OrderReturnController extends Controller
     }
 
     /**
-     * Approve Return Request
+     * Approve Return Request - Duyệt yêu cầu trả hàng
+     *
+     * Logic nghiệp vụ:
+     * 1. Kiểm tra đơn hàng có tồn tại và đang ở trạng thái 'requested' (đã yêu cầu) hay không.
+     * 2. Cập nhật `return_status` thành 'approved' (đã duyệt).
+     * 3. Cập nhật `order_status` thành 'return_requested' (đang trong quy trình trả hàng).
+     * 4. Ghi lịch sử thay đổi trạng thái (OrderStatusHistory).
      */
     public function approve(Request $request, $orderId)
     {
@@ -99,24 +118,26 @@ class OrderReturnController extends Controller
             return back()->with('error', 'Đơn hàng không tồn tại');
         }
 
+        // Chỉ được duyệt khi đang ở trạng thái 'requested'
         if ($order->return_status !== 'requested') {
             return back()->with('error', 'Chỉ có thể duyệt yêu cầu trả hàng ở trạng thái "requested"');
         }
 
+        // Bắt đầu Transaction để đảm bảo tính toàn vẹn dữ liệu
         DB::beginTransaction();
         try {
             $oldStatus = $order->return_status;
 
-            // Cập nhật return_status và order_status
+            // Cập nhật trạng thái
             DB::table('orders')
                 ->where('id', $orderId)
                 ->update([
-                    'return_status' => 'approved',
-                    'order_status' => 'return_requested',
+                    'return_status' => 'approved',       // Đã duyệt hoàn hàng
+                    'order_status' => 'return_requested', // Đánh dấu đơn đang trả hàng
                     'updated_at' => now(),
                 ]);
 
-            // Lưu lịch sử
+            // Ghi lịch sử thao tác của Admin
             if (Schema::hasTable('order_status_history')) {
                 OrderStatusHistory::create([
                     'order_id' => $orderId,
@@ -127,23 +148,24 @@ class OrderReturnController extends Controller
                 ]);
             }
 
-            // Không tạo log 'return_requested' từ Admin để tránh ghi đè thông tin khách hàng
+            DB::commit(); // Lưu thay đổi vào DB
 
-            DB::commit();
-
-            NotificationService::notifyReturnStatusUpdate($order, 'approved');
-
-            // Redirect về trang danh sách returns để admin thấy trạng thái đã cập nhật
+            // Quay lại trang danh sách với thông báo thành công
             return redirect()->route('admin.orders.returns.index', ['status' => 'approved'])
-                ->with('success', 'Đã chấp nhận yêu cầu trả hàng thành công.');
+                ->with('success', 'Đã chấp nhận hoàn hàng từ người dùng thành công.');
         } catch (\Exception $e) {
-            DB::rollBack();
+            DB::rollBack(); // Hoàn tác nếu có lỗi
             return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
 
     /**
-     * Reject Return Request
+     * Reject Return Request - Từ chối yêu cầu trả hàng
+     *
+     * Logic nghiệp vụ:
+     * 1. Admin phải nhập lý do từ chối.
+     * 2. Cập nhật `return_status` thành 'rejected'.
+     * 3. Nếu đơn hàng đang bị treo ở 'return_requested', trả về trạng thái 'completed' (coi như đơn thành công vì không cho trả).
      */
     public function reject(Request $request, $orderId)
     {
@@ -157,6 +179,7 @@ class OrderReturnController extends Controller
             return back()->with('error', 'Chỉ có thể từ chối yêu cầu trả hàng ở trạng thái "requested"');
         }
 
+        // Bắt buộc phải có lý do từ chối
         $request->validate([
             'reject_reason' => 'required|string|max:1000',
         ]);
@@ -168,11 +191,12 @@ class OrderReturnController extends Controller
                 ->where('id', $orderId)
                 ->update([
                     'return_status' => 'rejected',
-                    'return_note' => $request->reject_reason,
+                    'return_note' => $request->reject_reason, // Lưu lý do từ chối vào note
                     'updated_at' => now(),
                 ]);
 
-            // Nếu order_status là return_requested, chuyển về completed
+            // Logic phục hồi trạng thái đơn hàng:
+            // Nếu đơn hàng đang ở trạng thái 'return_requested', nghĩa là quy trình trả hàng thất bại -> đơn hàng coi như thành công (completed)
             if ($order->order_status === 'return_requested') {
                 DB::table('orders')
                     ->where('id', $orderId)
@@ -182,7 +206,7 @@ class OrderReturnController extends Controller
                     ]);
             }
 
-            // Lưu lịch sử
+            // Ghi lịch sử
             if (Schema::hasTable('order_status_history')) {
                 OrderStatusHistory::create([
                     'order_id' => $orderId,
@@ -195,9 +219,6 @@ class OrderReturnController extends Controller
 
             DB::commit();
 
-            NotificationService::notifyReturnStatusUpdate($order, 'rejected');
-
-            // Redirect về trang danh sách returns
             return redirect()->route('admin.orders.returns.index', ['status' => 'rejected'])
                 ->with('success', 'Đã từ chối yêu cầu trả hàng!');
         } catch (\Exception $e) {
@@ -278,10 +299,6 @@ class OrderReturnController extends Controller
                 ['return_id' => $return->id]
             );
 
-            if ($oldStatus !== $newStatus) {
-                NotificationService::notifyReturnStatusUpdate($order, $newStatus);
-            }
-
             DB::commit();
 
             return back()->with('success', 'Cập nhật trạng thái trả hàng thành công!');
@@ -293,6 +310,16 @@ class OrderReturnController extends Controller
 
     /**
      * Update old return status system
+     *
+     * Logic Hoàn tiền (Refund) và Kết thúc quy trình:
+     * 1. Khi admin chọn 'refunded' (đã hoàn tiền):
+     *    - Cập nhật payment_status = 'refunded'.
+     *    - Hoàn trả lại số lượng tồn kho (stock) cho sản phẩm.
+     *    - Cộng tiền lại vào Ví khách hàng (ClientWallet).
+     *    - Ghi log giao dịch ví (WalletTransaction).
+     *
+     * 2. Khi admin chọn 'completed' (hoàn tất):
+     *    - Cập nhật order_status = 'returned'.
      */
     private function updateOldReturnStatus(Request $request, $orderId)
     {
@@ -319,10 +346,13 @@ class OrderReturnController extends Controller
             if ($newReturnStatus === 'approved') {
                 $updateData['order_status'] = 'return_requested';
             } elseif ($newReturnStatus === 'refunded') {
-                // Đã nhận hàng và hoàn lại tiền - giữ nguyên order_status
+                // QUAN TRỌNG: Xử lý Hoàn tiền
+                // 1. Giữ nguyên trạng thái đơn hàng nhưng đánh dấu thanh toán là 'refunded'
                 $updateData['order_status'] = $order->order_status;
                 $updateData['payment_status'] = 'refunded';
+
                 if ($order->return_status !== 'refunded') {
+                    // 2. Hoàn lại tồn kho (Stock Restock)
                     $items = DB::table('order_details')
                         ->select('product_id', 'variant_id', 'quantity')
                         ->where('order_id', $orderId)
@@ -340,11 +370,12 @@ class OrderReturnController extends Controller
                         }
                     }
 
-                    // Hoàn tiền vào ví khách hàng
+                    // 3. Hoàn tiền vào ví khách hàng (Wallet Refund)
                     $wallet = ClientWallet::getOrCreateForUser((int) $order->user_id);
                     $balanceBefore = $wallet->balance;
-                    $wallet->addBalance((float) $order->final_total);
+                    $wallet->addBalance((float) $order->final_total); // Cộng tiền vào ví
 
+                    // Ghi lịch sử giao dịch ví
                     WalletTransaction::create([
                         'wallet_id' => $wallet->id,
                         'user_id' => (int) $order->user_id,
@@ -359,10 +390,11 @@ class OrderReturnController extends Controller
                     ]);
                 }
             } elseif ($newReturnStatus === 'completed') {
-                // Hoàn hàng thành công - trạng thái cuối cùng
+                // Hoàn hàng thành công -> Đơn hàng coi như đã trả (returned)
                 $updateData['order_status'] = 'returned';
                 $updateData['returned_at'] = now();
             } elseif ($newReturnStatus === 'rejected' && $order->order_status === 'return_requested') {
+                // Nếu từ chối sau khi đã request -> Quay về completed
                 $updateData['order_status'] = 'completed';
                 $updateData['completed_at'] = now();
                 if (($order->payment_method ?? null) === 'cash') {
@@ -385,10 +417,6 @@ class OrderReturnController extends Controller
                     'new_status' => $updateData['order_status'] ?? $order->order_status,
                     'note' => 'Cập nhật trạng thái trả hàng: ' . ($request->admin_note ?? ''),
                 ]);
-            }
-
-            if ($order->return_status !== $newReturnStatus) {
-                NotificationService::notifyReturnStatusUpdate($order, $newReturnStatus);
             }
 
             DB::commit();
