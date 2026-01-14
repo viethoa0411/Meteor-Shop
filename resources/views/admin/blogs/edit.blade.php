@@ -20,6 +20,10 @@
         font-size: 0.875rem;
         color: #dc3545;
     }
+    /* CKEditor Custom Height */
+    .ck-editor__editable_inline {
+        min-height: 300px;
+    }
 </style>
 @endpush
 
@@ -128,7 +132,7 @@
                             <div class="mb-3">
                                 <label for="content" class="form-label">Nội dung <span class="text-danger">*</span></label>
                                 <textarea name="content" class="form-control @error('content') is-invalid @enderror" 
-                                          id="content" rows="10" required>{{ old('content', $blog->content) }}</textarea>
+                                          id="content" rows="10">{{ old('content', $blog->content) }}</textarea>
                                 @error('content')
                                     <div class="invalid-feedback d-block" style="color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</div>
                                 @enderror
@@ -149,4 +153,19 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        ClassicEditor
+            .create(document.querySelector('#content'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo']
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+</script>
+@endpush
 

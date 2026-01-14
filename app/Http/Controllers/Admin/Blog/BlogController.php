@@ -143,8 +143,8 @@ class BlogController extends Controller
                 'user_id'   => $user->id,
                 'title'     => $request->title,
                 'slug'      => $slug,
-                'excerpt'   => $request->excerpt ?? Str::limit(strip_tags($request->getContent), 150),
-                'content'   => $request->getContent,
+                'excerpt'   => $request->excerpt ?? Str::limit(strip_tags($request->content), 150),
+                'content'   => $request->content,
                 'status'    => $dbStatus,
                 'thumbnail' => $imageName,
             ]);
@@ -269,8 +269,8 @@ class BlogController extends Controller
                 'user_id'   => $user->id,
                 'title'     => $request->title,
                 'slug'      => $slug,
-                'excerpt'   => $request->excerpt ?? Str::limit(strip_tags($request->getContent), 150),
-                'content'   => $request->getContent,
+                'excerpt'   => $request->excerpt ?? Str::limit(strip_tags($request->content), 150),
+                'content'   => $request->content,
                 'status'    => $dbStatus,
                 'thumbnail' => $imageName,
             ]);

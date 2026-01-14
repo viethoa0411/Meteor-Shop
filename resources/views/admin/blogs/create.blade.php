@@ -20,6 +20,10 @@
         font-size: 0.875rem;
         color: #dc3545;
     }
+    /* CKEditor Custom Height */
+    .ck-editor__editable_inline {
+        min-height: 300px;
+    }
 </style>
 @endpush
 
@@ -118,7 +122,7 @@
                             <textarea class="form-control @error('content') is-invalid @enderror" 
                                       id="content" name="content" rows="10">{{ old('content') }}</textarea>
                             @error('content')
-                                <div class="invalid-feedback d-block" style="color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</div>
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -137,4 +141,19 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        ClassicEditor
+            .create(document.querySelector('#content'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo']
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+</script>
+@endpush
 

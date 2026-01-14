@@ -24,7 +24,7 @@ class BlogClientController extends Controller
         $blogs = Blog::with('user')
             ->where('status', 'published')
             ->orderBy('created_at', 'desc')
-            ->paginate(9); // Hiển thị 9 bài viết mỗi trang
+            ->paginate(3); // Hiển thị 3 bài viết mỗi trang
 
         return view('client.blogs.list', compact('blogs', 'cate'));
     }

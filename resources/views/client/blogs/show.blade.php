@@ -316,7 +316,7 @@
         {{-- Ảnh bên trái --}}
         <div class="blog-detail-image-wrapper">
             @if($blog->thumbnail)
-                <img src="{{ asset('blog/images/' . $blog->thumbnail) }}" alt="{{ $blog->title }}" class="blog-detail-image">
+                <img src="{{ asset('blogs/images/' . $blog->thumbnail) }}" alt="{{ $blog->title }}" class="blog-detail-image">
             @else
                 <img src="https://via.placeholder.com/600x600?text=No+Image" alt="{{ $blog->title }}" class="blog-detail-image">
             @endif
